@@ -1,4 +1,5 @@
 import { Disc3, Settings2, Cog, BatteryCharging, Filter, CircleDot, Lightbulb, Anchor, Container, Truck, Bolt, Lock, Wrench } from "lucide-react";
+import { deriveFitment } from "./fitment.js";
 
 // Unsplash URL builder. All ids below were verified to load.
 export const u = (id, w = 640, h = 480) =>
@@ -218,10 +219,11 @@ const RAW = [
 // Assign each product a category-matched photo, cycled so neighbours differ.
 const cursor = {};
 export const PRODUCTS = RAW.map((p) => {
-  if (p.image) return p;
+  const fitment = deriveFitment(p);
+  if (p.image) return { ...p, fitment };
   const set = CAT_IMAGES[p.cat] || [LIB.semiRed];
   const i = (cursor[p.cat] = (cursor[p.cat] ?? -1) + 1);
-  return { ...p, image: u(set[i % set.length]) };
+  return { ...p, fitment, image: u(set[i % set.length]) };
 });
 
 // Hero, featured panels, guides and news imagery.

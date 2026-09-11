@@ -1,8 +1,27 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Star, Heart, ShoppingCart, Eye, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Star, ShoppingCart, Eye, ArrowRight, ChevronLeft, ChevronRight, Check, TriangleAlert } from "lucide-react";
 import { useShop } from "../store/shop.jsx";
+import { useGarage } from "./garage/GarageContext.jsx";
+import { fitLabel } from "../data/fitment.js";
+
+// Angular fit chip. Hidden when there is no selected truck (status unknown).
+export function FitChip({ status, vehicle, className = "" }) {
+  if (!status || status === "unknown") return null;
+  const cut = { clipPath: "polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px))" };
+  const styles = {
+    fits: "bg-[#10B981] text-white",
+    universal: "bg-[#1A1A2E]/85 text-white backdrop-blur",
+    no: "bg-[#F59E0B] text-[#1A1A2E]",
+  }[status];
+  const Icon = status === "no" ? TriangleAlert : Check;
+  return (
+    <span style={cut} className={`inline-flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide ${styles} ${className}`}>
+      <Icon size={11} /> {fitLabel(status, vehicle)}
+    </span>
+  );
+}
 
 export const EASE = [0.16, 1, 0.3, 1];
 
@@ -194,8 +213,9 @@ export function ScrollRow({ children, className = "" }) {
 }
 
 export function ProductCard({ p, index = 0 }) {
-  const { add, wishlist, setWishlist, toggleCompare, compare, setEnquirySku } = useShop();
-  const wished = wishlist.includes(p.sku);
+  const { add, toggleCompare, compare, setEnquirySku } = useShop();
+  const { fitStatus, selectedVehicle } = useGarage();
+  const fit = fitStatus(p);
   const inCompare = compare.includes(p.sku);
   const discount = p.oldPrice ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : null;
   const inStock = p.stock.includes("In stock");
@@ -231,13 +251,11 @@ export function ProductCard({ p, index = 0 }) {
           </span>
         ) : null}
 
-        <button
-          onClick={() => setWishlist((w) => (wished ? w.filter((x) => x !== p.sku) : [...w, p.sku]))}
-          aria-label="wishlist"
-          className="absolute top-3 right-3 z-10 w-9 h-9 grid place-items-center rounded-full bg-white/95 backdrop-blur border border-[#E5E7EB] hover:border-[#E53E00] hover:scale-110 transition shadow-sm"
-        >
-          <Heart size={15} className={wished ? "fill-[#E53E00] text-[#E53E00]" : "text-[#9CA3AF]"} />
-        </button>
+        {fit !== "unknown" && (
+          <span className="absolute top-3 right-3 z-10">
+            <FitChip status={fit} vehicle={selectedVehicle} />
+          </span>
+        )}
 
         <span
           className={`absolute bottom-3 left-3 z-10 text-[11px] font-bold px-2.5 py-1 rounded-lg backdrop-blur ${

@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, useMemo } from "react";
+import { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
+import { matchFit } from "../../data/fitment.js";
 
 const GarageCtx = createContext(null);
 
@@ -80,20 +81,24 @@ export function GarageProvider({ children }) {
   }, [vehicles, selectedVehicleId]);
 
   const hasValidVehicle = useMemo(() => {
-    return selectedVehicle && selectedVehicle.year && selectedVehicle.make && selectedVehicle.model;
+    return Boolean(selectedVehicle && selectedVehicle.make && selectedVehicle.model);
   }, [selectedVehicle]);
+
+  // Fit state of one product against the selected truck: fits | universal | no | unknown.
+  const fitStatus = useCallback((product) => matchFit(product, selectedVehicle), [selectedVehicle]);
 
   const value = useMemo(() => ({
     vehicles,
     selectedVehicle,
     selectedVehicleId,
     hasValidVehicle,
+    fitStatus,
     addVehicle,
     updateVehicle,
     removeVehicle,
     selectVehicle,
     clearSelectedVehicle
-  }), [vehicles, selectedVehicle, selectedVehicleId, hasValidVehicle]);
+  }), [vehicles, selectedVehicle, selectedVehicleId, hasValidVehicle, fitStatus]);
 
   return <GarageCtx.Provider value={value}>{children}</GarageCtx.Provider>;
 }

@@ -1,181 +1,175 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Search, ChevronDown, Car, Plus, X } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown, Truck, X, Check, Wrench } from "lucide-react";
 import { useGarage } from "./GarageContext.jsx";
-import { MAKES, MODELS } from "../../data/catalog.js";
+import { TRUCK_MAKES, TRUCK_YEARS } from "../../data/fitment.js";
 
-export default function YMMWidget({ compact = false, darkTheme = false }) {
-  const { selectedVehicle, hasValidVehicle, addVehicle, updateVehicle, clearSelectedVehicle } = useGarage();
-  const [isOpen, setIsOpen] = useState(false);
-  const [year, setYear] = useState(selectedVehicle?.year || "");
+const CUT = { clipPath: "polygon(0 0, 100% 0, 100% 100%, 10px 100%, 0 calc(100% - 10px))" };
+const EASE = [0.16, 1, 0.3, 1];
+
+function Field({ label, value, onChange, options, placeholder, disabled, dark }) {
+  return (
+    <motion.label
+      variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
+      className={`block ${disabled ? "opacity-40" : ""}`}
+    >
+      <span className="block text-[10px] font-black tracking-[0.22em] uppercase mb-1.5 text-[#FF6B35]">
+        {label}
+      </span>
+      <div className="relative">
+        <select
+          value={value}
+          disabled={disabled}
+          onChange={(e) => onChange(e.target.value)}
+          className={`w-full appearance-none rounded-md px-3.5 py-3 text-sm font-bold outline-none transition cursor-pointer disabled:cursor-not-allowed border-2 ${
+            dark
+              ? "bg-white/[0.04] border-white/10 text-white focus:border-[#FF6B35]"
+              : "bg-[#F5F6F8] border-[#E5E7EB] text-[#1A1A2E] focus:border-[#E53E00]"
+          }`}
+        >
+          <option value="">{placeholder}</option>
+          {options.map((o) => (
+            <option key={o} value={o} className="text-[#1A1A2E]">{o}</option>
+          ))}
+        </select>
+        <ChevronDown size={15} className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none ${dark ? "text-white/40" : "text-[#9CA3AF]"}`} />
+      </div>
+    </motion.label>
+  );
+}
+
+// The console: three progressive selects plus confirm. Shared by the hero and the header pill.
+function Console({ dark = true, onDone }) {
+  const { selectedVehicle, addVehicle, updateVehicle } = useGarage();
   const [make, setMake] = useState(selectedVehicle?.make || "");
   const [model, setModel] = useState(selectedVehicle?.model || "");
-  const [partSearch, setPartSearch] = useState("");
+  const [year, setYear] = useState(selectedVehicle?.year || "");
 
-  const handleSaveVehicle = () => {
-    if (year && make && model) {
-      if (selectedVehicle) {
-        updateVehicle(selectedVehicle.id, { year, make, model });
-      } else {
-        addVehicle({ year, make, model });
-      }
-      setIsOpen(false);
-    }
+  const models = make ? TRUCK_MAKES[make] || [] : [];
+  const ready = make && model;
+
+  const commit = () => {
+    if (!ready) return;
+    if (selectedVehicle) updateVehicle(selectedVehicle.id, { make, model, year });
+    else addVehicle({ make, model, year });
+    onDone && onDone();
   };
 
-  const handleClearVehicle = () => {
-    clearSelectedVehicle();
-    setYear("");
-    setMake("");
-    setModel("");
-  };
+  return (
+    <motion.div
+      initial="hidden"
+      animate="show"
+      variants={{ show: { transition: { staggerChildren: 0.06, delayChildren: 0.04 } } }}
+    >
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Field label="Make" value={make} dark={dark} placeholder="Select make"
+          options={Object.keys(TRUCK_MAKES)}
+          onChange={(v) => { setMake(v); setModel(""); }} />
+        <Field label="Model" value={model} dark={dark} placeholder={make ? "Select model" : "Pick make first"}
+          options={models} disabled={!make}
+          onChange={setModel} />
+        <Field label="Year" value={year} dark={dark} placeholder={model ? "Any year" : "Pick model first"}
+          options={TRUCK_YEARS} disabled={!model}
+          onChange={setYear} />
+      </div>
+      <motion.button
+        variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
+        onClick={commit}
+        disabled={!ready}
+        style={CUT}
+        className="mt-3 w-full bg-[#E53E00] text-white py-3.5 text-sm font-black tracking-wide uppercase flex items-center justify-center gap-2 hover:bg-[#C23400] active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed transition"
+      >
+        <Check size={16} /> Lock in my rig
+      </motion.button>
+    </motion.div>
+  );
+}
 
-  const handleSearch = () => {
-    if (partSearch.trim()) {
-      window.location.href = `/shop?q=${encodeURIComponent(partSearch)}`;
-    }
-  };
+export default function YMMWidget({ variant = "hero" }) {
+  const { selectedVehicle, hasValidVehicle, clearSelectedVehicle } = useGarage();
+  const [open, setOpen] = useState(false);
+  const boxRef = useRef(null);
 
-  const themeClasses = darkTheme 
-    ? "bg-white/10 border-white/20 text-white placeholder:text-white/40" 
-    : "bg-[#F5F6F8] border-[#E5E7EB] text-[#1A1A2E] placeholder:text-[#9CA3AF]";
+  // Close the pill dropdown on outside click.
+  useEffect(() => {
+    if (!open || variant !== "pill") return;
+    const onDoc = (e) => { if (boxRef.current && !boxRef.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open, variant]);
 
-  if (compact) {
+  // ===== Hero console: always open, industrial panel =====
+  if (variant === "hero") {
     return (
-      <div className="flex items-center gap-2">
-        {hasValidVehicle ? (
-          <div className="flex items-center gap-2 bg-[#10B981]/10 border border-[#10B981]/20 rounded-lg px-3 py-2">
-            <Car size={16} className="text-[#10B981]" />
-            <span className="text-sm font-semibold text-[#10B981]">
-              {selectedVehicle.year} {selectedVehicle.make} {selectedVehicle.model}
+      <div className="relative" style={CUT}>
+        <div className="bg-[#12121B] border-t-2 border-[#FF6B35] p-5 sm:p-6 shadow-elevated">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="grid place-items-center w-9 h-9 bg-[#E53E00] text-white" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
+              <Truck size={17} />
             </span>
-            <button onClick={handleClearVehicle} className="text-[#10B981] hover:text-[#059669]">
-              <X size={14} />
-            </button>
+            <div>
+              <p className="text-white font-display font-bold text-[15px] leading-none">Find parts that fit</p>
+              <p className="text-white/45 text-[11px] mt-1 font-mono tracking-wide">
+                {hasValidVehicle ? `ACTIVE: ${selectedVehicle.year || "any"} ${selectedVehicle.make} ${selectedVehicle.model}` : "SET YOUR TRUCK ONCE, WE FILTER EVERYTHING"}
+              </p>
+            </div>
+            {hasValidVehicle && (
+              <button onClick={clearSelectedVehicle} className="ml-auto text-white/40 hover:text-white text-[11px] font-bold uppercase tracking-widest flex items-center gap-1">
+                <X size={13} /> Clear
+              </button>
+            )}
           </div>
-        ) : (
-          <button 
-            onClick={() => setIsOpen(true)}
-            className="flex items-center gap-2 bg-[#E53E00]/10 border border-[#E53E00]/20 rounded-lg px-3 py-2 text-[#E53E00] hover:bg-[#E53E00]/20 transition"
-          >
-            <Plus size={16} />
-            <span className="text-sm font-semibold">Add Vehicle</span>
-          </button>
-        )}
+          <Console dark onDone={() => {}} />
+        </div>
       </div>
     );
   }
 
+  // ===== Header pill: collapsed chip that opens the console =====
   return (
-    <div className="relative">
-      {!isOpen ? (
-        <div className="flex items-center gap-3">
-          {hasValidVehicle ? (
-            <div className="flex items-center gap-3 bg-[#10B981]/10 border border-[#10B981]/20 rounded-xl px-4 py-3">
-              <Car size={20} className="text-[#10B981]" />
-              <div>
-                <p className="text-sm font-bold text-[#10B981]">
-                  {selectedVehicle.year} {selectedVehicle.make} {selectedVehicle.model}
-                </p>
-                <p className="text-xs text-[#10B981]/70">Parts filtered for your vehicle</p>
-              </div>
-              <button onClick={handleClearVehicle} className="text-[#10B981] hover:text-[#059669]">
-                <X size={18} />
-              </button>
-            </div>
-          ) : (
-            <button 
-              onClick={() => setIsOpen(true)}
-              className="flex items-center gap-2 bg-[#E53E00] text-white rounded-xl px-5 py-3 font-bold hover:bg-[#C23400] transition"
-            >
-              <Car size={18} />
-              Select Your Vehicle
-            </button>
-          )}
-        </div>
-      ) : (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`rounded-2xl p-5 ${darkTheme ? 'bg-white/10' : 'bg-white border border-[#E5E7EB]'} shadow-elevated`}
+    <div className="relative" ref={boxRef}>
+      {hasValidVehicle ? (
+        <button
+          onClick={() => setOpen((o) => !o)}
+          style={CUT}
+          className="flex items-center gap-2 bg-[#1A1A2E] text-white pl-2.5 pr-3 py-2 hover:bg-[#12121B] transition group"
         >
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-lg">Select Your Vehicle</h3>
-            <button onClick={() => setIsOpen(false)} className="p-2 rounded-lg hover:bg-[#E5E7EB] transition">
-              <X size={18} />
-            </button>
-          </div>
-          
-          <div className="grid gap-3 md:grid-cols-[1fr_1fr_1fr_auto] items-end">
-            <div>
-              <label className="text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase">Make</label>
-              <div className="relative mt-1.5">
-                <select 
-                  value={make} 
-                  onChange={(e) => setMake(e.target.value)}
-                  className={`w-full ${themeClasses} rounded-xl px-4 py-3.5 text-sm font-semibold outline-none appearance-none cursor-pointer`}
-                >
-                  <option value="">Select make</option>
-                  {MAKES.map((m) => <option key={m}>{m}</option>)}
-                </select>
-                <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#9CA3AF]" />
-              </div>
-            </div>
-            
-            <div>
-              <label className="text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase">Year</label>
-              <div className="relative mt-1.5">
-                <select 
-                  value={year} 
-                  onChange={(e) => setYear(e.target.value)}
-                  className={`w-full ${themeClasses} rounded-xl px-4 py-3.5 text-sm font-semibold outline-none appearance-none cursor-pointer`}
-                >
-                  <option value="">Select year</option>
-                  {MODELS.map((m) => <option key={m}>{m}</option>)}
-                </select>
-                <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#9CA3AF]" />
-              </div>
-            </div>
-            
-            <div>
-              <label className="text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase">Model</label>
-              <input 
-                value={model} 
-                onChange={(e) => setModel(e.target.value)}
-                placeholder="Enter model"
-                className={`mt-1.5 w-full ${themeClasses} rounded-xl px-4 py-3.5 text-sm font-semibold outline-none`}
-              />
-            </div>
-            
-            <button 
-              onClick={handleSaveVehicle}
-              disabled={!year || !make || !model}
-              className="bg-[#E53E00] text-white rounded-xl px-6 py-3.5 text-sm font-bold hover:bg-[#C23400] disabled:opacity-50 disabled:cursor-not-allowed transition"
-            >
-              Save Vehicle
-            </button>
-          </div>
-          
-          <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
-            <label className="text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase">Part Search</label>
-            <div className="mt-2 flex gap-2">
-              <input 
-                value={partSearch}
-                onChange={(e) => setPartSearch(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                placeholder="Brake, winch, filter..."
-                className={`flex-1 ${themeClasses} rounded-xl px-4 py-3 text-sm font-semibold outline-none`}
-              />
-              <button 
-                onClick={handleSearch}
-                className="bg-[#1A1A2E] text-white rounded-xl px-5 py-3 text-sm font-bold hover:bg-[#2D2D4A] transition"
-              >
-                <Search size={16} />
-              </button>
-            </div>
-          </div>
-        </motion.div>
+          <span className="grid place-items-center w-6 h-6 bg-[#E53E00]" style={{ clipPath: "polygon(0 0,100% 0,100% 65%,65% 100%,0 100%)" }}>
+            <Truck size={13} />
+          </span>
+          <span className="text-left leading-none">
+            <span className="block text-[8px] font-black tracking-[0.2em] text-[#FF6B35] uppercase">Your rig</span>
+            <span className="block text-[12px] font-bold mt-0.5">{selectedVehicle.make} {selectedVehicle.model}</span>
+          </span>
+          <ChevronDown size={14} className="text-white/40 group-hover:text-white transition" />
+        </button>
+      ) : (
+        <button
+          onClick={() => setOpen((o) => !o)}
+          style={CUT}
+          className="flex items-center gap-2 bg-[#E53E00] text-white px-3.5 py-2.5 text-[13px] font-black uppercase tracking-wide hover:bg-[#C23400] transition"
+        >
+          <Wrench size={15} /> Add your truck
+        </button>
       )}
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            transition={{ duration: 0.22, ease: EASE }}
+            style={CUT}
+            className="absolute right-0 top-full mt-2 w-[340px] max-w-[calc(100vw-2rem)] bg-[#12121B] border-t-2 border-[#FF6B35] p-4 shadow-elevated z-[65]"
+          >
+            <p className="text-white font-display font-bold text-sm mb-3 flex items-center gap-2">
+              <Truck size={15} className="text-[#FF6B35]" /> Select your truck
+            </p>
+            <Console dark onDone={() => setOpen(false)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

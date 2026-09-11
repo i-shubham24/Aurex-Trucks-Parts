@@ -3,38 +3,64 @@ import { useSearchParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X } from "lucide-react";
 import { PRODUCTS as SEED, BRANDS } from "../data/catalog.js";
+import { FIT_RANK } from "../data/fitment.js";
 import { useProducts } from "../store/products.jsx";
 import { useSite } from "../store/site.jsx";
 import { ProductCard } from "../components/ui.jsx";
 import { useShop } from "../store/shop.jsx";
+import { useGarage } from "../components/garage/GarageContext.jsx";
+import FitmentBanner from "../components/garage/FitmentBanner.jsx";
 
 export default function Shop() {
   const { query, setQuery } = useShop();
   const { products: PRODUCTS } = useProducts();
   const { liveCategories: CATEGORIES } = useSite();
+  const { fitStatus, hasValidVehicle } = useGarage();
   const [params] = useSearchParams();
   const [cat, setCat] = useState(params.get("cat") || "All");
   const [brand, setBrand] = useState("All brands");
   const [sort, setSort] = useState("Popular");
   const [maxPrice, setMaxPrice] = useState(1600);
   const [inStock, setInStock] = useState(false);
+  const [onlyFits, setOnlyFits] = useState(false);
+
+  // Basic facet filter first.
+  const base = useMemo(() => PRODUCTS.filter((p) => {
+    const okCat = cat === "All" || p.cat === cat;
+    const okBrand = brand === "All brands" || p.brand === brand;
+    const okQ = query.trim() === "" || (p.name + " " + p.sku + " " + (p.brand || "")).toLowerCase().includes(query.toLowerCase());
+    const okP = p.price <= maxPrice;
+    const okS = !inStock || p.stock.includes("In stock");
+    return okCat && okBrand && okQ && okP && okS;
+  }), [PRODUCTS, cat, brand, query, maxPrice, inStock]);
+
+  // Parts that fit the selected truck, for the banner count.
+  const fitCount = useMemo(
+    () => (hasValidVehicle ? base.filter((p) => ["fits", "universal"].includes(fitStatus(p))).length : 0),
+    [base, hasValidVehicle, fitStatus]
+  );
 
   const list = useMemo(() => {
-    let l = PRODUCTS.filter((p) => {
-      const okCat = cat === "All" || p.cat === cat;
-      const okBrand = brand === "All brands" || p.brand === brand;
-      const okQ = query.trim() === "" || (p.name + " " + p.sku + " " + (p.brand || "")).toLowerCase().includes(query.toLowerCase());
-      const okP = p.price <= maxPrice;
-      const okS = !inStock || p.stock.includes("In stock");
-      return okCat && okBrand && okQ && okP && okS;
+    let l = base;
+    if (hasValidVehicle && onlyFits) l = l.filter((p) => ["fits", "universal"].includes(fitStatus(p)));
+    const bySort = (a, b) => {
+      if (sort === "Low to High") return a.price - b.price;
+      if (sort === "High to Low") return b.price - a.price;
+      if (sort === "Top Rated") return b.rating - a.rating;
+      return 0;
+    };
+    // With a truck set, fitting parts always float up, then the chosen sort applies.
+    l = [...l].sort((a, b) => {
+      if (hasValidVehicle) {
+        const r = FIT_RANK[fitStatus(a)] - FIT_RANK[fitStatus(b)];
+        if (r !== 0) return r;
+      }
+      return bySort(a, b);
     });
-    if (sort === "Low to High") l = [...l].sort((a, b) => a.price - b.price);
-    if (sort === "High to Low") l = [...l].sort((a, b) => b.price - a.price);
-    if (sort === "Top Rated") l = [...l].sort((a, b) => b.rating - a.rating);
     return l;
-  }, [cat, brand, query, sort, maxPrice, inStock]);
+  }, [base, hasValidVehicle, onlyFits, fitStatus, sort]);
 
-  const clearAll = () => { setCat("All"); setBrand("All brands"); setQuery(""); setMaxPrice(1600); setInStock(false); };
+  const clearAll = () => { setCat("All"); setBrand("All brands"); setQuery(""); setMaxPrice(1600); setInStock(false); setOnlyFits(false); };
 
   return (
     <div>
@@ -84,6 +110,11 @@ export default function Shop() {
           </div>
         </div>
       </section>
+
+      {/* Fitment banner */}
+      <div className="mx-auto max-w-7xl px-4 pt-6">
+        <FitmentBanner fitCount={fitCount} onlyFits={onlyFits} setOnlyFits={setOnlyFits} />
+      </div>
 
       {/* Filters + Grid */}
       <div className="mx-auto max-w-7xl px-4 py-8 grid lg:grid-cols-[260px_1fr] gap-6 items-start">

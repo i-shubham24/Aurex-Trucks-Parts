@@ -16,7 +16,6 @@ const lookup = (sku) => {
 const ShopCtx = createContext(null);
 export function ShopProvider({ children }) {
   const [cart, setCart] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
   const [query, setQuery] = useState("");
   const [drawer, setDrawer] = useState(false);
   const [enquirySku, setEnquirySku] = useState(null);
@@ -44,14 +43,14 @@ export function ShopProvider({ children }) {
     setCart((c) => c.filter((i) => i.sku !== sku));
   };
   const value = useMemo(() => ({
-    cart, setCart, wishlist, setWishlist, query, setQuery, drawer, setDrawer, add,
+    cart, setCart, query, setQuery, drawer, setDrawer, add,
     enquirySku, setEnquirySku, compare, setCompare, toggleCompare, updateQuantity, remove,
     total: cart.reduce((s, i) => {
       const price = i.product?.price || i.price || 0;
       return s + price * i.qty;
     }, 0),
     count: cart.reduce((s, i) => s + i.qty, 0),
-  }), [cart, wishlist, query, drawer, enquirySku, compare]);
+  }), [cart, query, drawer, enquirySku, compare]);
   return <ShopCtx.Provider value={value}>{children}</ShopCtx.Provider>;
 }
 export const useShop = () => useContext(ShopCtx);

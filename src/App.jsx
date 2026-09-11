@@ -38,6 +38,9 @@ export default function App() {
                     <Route path="content" element={<AdminContent />} />
                     <Route path="settings" element={<AdminSettings />} />
                   </Route>
+                  {/* Full screen auth, no store header or footer */}
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/signup" element={<SignupPage />} />
                   <Route path="/*" element={
                     <Layout>
                       <Routes>
@@ -52,8 +55,6 @@ export default function App() {
                         <Route path="/quote" element={<QuotePage />} />
                         <Route path="/checkout" element={<CheckoutPage />} />
                         <Route path="/order-success/:id" element={<OrderSuccessPage />} />
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/signup" element={<SignupPage />} />
                         <Route path="/account" element={<AccountPage />} />
                         <Route path="/track" element={<TrackPage />} />
                         <Route path="/compliance" element={<CompliancePage />} />

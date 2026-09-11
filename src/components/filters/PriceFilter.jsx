@@ -39,7 +39,7 @@ export default function PriceFilter({ range = [0, 1600], onChange, min = 0, max 
         <div className="mt-2 space-y-3">
           <div className="flex items-center justify-between text-[12px] font-semibold text-[#9CA3AF]">
             <span>{formatPrice(localRange[0])}</span>
-            <span>—</span>
+            <span>to</span>
             <span>{formatPrice(localRange[1])}</span>
           </div>
           

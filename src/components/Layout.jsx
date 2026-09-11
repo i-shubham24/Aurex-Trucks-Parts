@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, ShoppingCart, Phone, ChevronRight, Minus, Plus, Send, ArrowRight, User, MapPin, ArrowUp, Mail } from "lucide-react";
+import { Menu, ShoppingCart, Phone, Minus, Plus, Send, ArrowRight, User, MapPin, ArrowUp, Mail, X } from "lucide-react";
 import { useShop } from "../store/shop.jsx";
 import { useAuth } from "../store/auth.jsx";
 import { useSite } from "../store/site.jsx";
 import { LogoFull } from "./logo.jsx";
 import { ScrollProgress } from "./ui.jsx";
 import { ShopWidgets } from "./shopwise.jsx";
+import YMMWidget from "./garage/YMMWidget.jsx";
 import MegaMenu from "./navigation/MegaMenu.jsx";
 import MobileDrawer from "./navigation/MobileDrawer.jsx";
 import SearchBar from "./navigation/SearchBar.jsx";
@@ -48,20 +49,20 @@ export default function Layout({ children }) {
       <ScrollManager />
 
       {/* Top utility bar */}
-      <div className="bg-[#1A1A2E] text-white text-[12px] font-medium relative z-40">
+      <div className="bg-[#E53E00] text-white text-[12px] font-semibold relative z-40">
         <div className="mx-auto max-w-7xl px-4 py-2 flex items-center gap-4">
-          <p className="truncate text-white/75 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
+          <p className="truncate text-white/90 flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
             Free freight over $500. Dispatch in 1 to 2 days Australia wide.
           </p>
-          <div className="ml-auto hidden md:flex gap-5 shrink-0 text-white/65">
+          <div className="ml-auto hidden md:flex gap-5 shrink-0 text-white/80">
             <Link to="/track" className="hover:text-white transition">Track My Order</Link>
             <Link to="/quote" className="hover:text-white transition">Quote Cart</Link>
             <Link to={user ? "/account" : "/login"} className="hover:text-white transition">
               {user ? user.name.split(" ")[0] + " Account" : "Login / Signup"}
             </Link>
-            <span className="text-white/30">|</span>
-            <span className="flex items-center gap-1.5 text-white"><Phone size={12} className="text-[#FF6B35]" /> 03 9000 0000</span>
+            <span className="text-white/40">|</span>
+            <span className="flex items-center gap-1.5 text-white"><Phone size={12} /> 03 9000 0000</span>
           </div>
         </div>
       </div>
@@ -81,6 +82,7 @@ export default function Layout({ children }) {
           </div>
 
           <div className="ml-auto flex items-center gap-2">
+            <div className="hidden lg:block"><YMMWidget variant="pill" /></div>
             <a href="tel:0390000000" className="hidden xl:flex items-center gap-2 text-[13px] font-semibold text-[#6B7280] hover:text-[#E53E00] transition">
               <span className="grid place-items-center w-9 h-9 rounded-full bg-[#FFF0EB] text-[#E53E00]"><Phone size={15} /></span>
               <span className="leading-tight"><span className="block text-[10px] text-[#9CA3AF] font-bold uppercase tracking-wide">Parts desk</span>03 9000 0000</span>
@@ -239,10 +241,10 @@ export default function Layout({ children }) {
                 )}
                 {cart.map((i) => (
                   <div key={i.sku} className="bg-[#F7F8FA] border border-[#E5E7EB] rounded-xl p-3 flex gap-3">
-                    <img src={i.image} alt="" className="w-16 h-16 rounded-lg object-cover bg-white shrink-0" onError={(e) => { e.currentTarget.style.visibility = "hidden"; }} />
+                    <img src={i.product?.image} alt="" className="w-16 h-16 rounded-lg object-cover bg-white shrink-0" onError={(e) => { e.currentTarget.style.visibility = "hidden"; }} />
                     <div className="flex-1 min-w-0">
                       <p className="text-[11px] font-semibold text-[#9CA3AF]">{i.sku}</p>
-                      <p className="font-semibold text-[13px] leading-snug text-[#1A1A2E] line-clamp-2">{i.name}</p>
+                      <p className="font-semibold text-[13px] leading-snug text-[#1A1A2E] line-clamp-2">{i.product?.name}</p>
                       <div className="mt-2 flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                           <button
@@ -259,7 +261,7 @@ export default function Layout({ children }) {
                             <Plus size={13} />
                           </button>
                         </div>
-                        <p className="font-bold text-[#1A1A2E] text-sm">${(i.price * i.qty).toFixed(2)}</p>
+                        <p className="font-bold text-[#1A1A2E] text-sm">${((i.product?.price || 0) * i.qty).toFixed(2)}</p>
                       </div>
                     </div>
                   </div>

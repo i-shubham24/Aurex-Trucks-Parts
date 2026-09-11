@@ -2,11 +2,11 @@ import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
-  ArrowRight, Search, ShieldCheck, Zap, BadgeCheck, Truck, RotateCcw, Headphones,
+  ArrowRight, ShieldCheck, Zap, BadgeCheck, Truck, RotateCcw, Headphones,
   Quote, ChevronRight, Star, Flame,
 } from "lucide-react";
 import {
-  BRANDS, MAKES, MODELS, PANELS, HERO, GUIDES, NEWS, TESTIMONIALS,
+  BRANDS, PANELS, HERO, GUIDES, NEWS, TESTIMONIALS,
 } from "../data/catalog.js";
 import {
   SectionHead, ProductCard, AnimatedCounter, Reveal, ScrollRow, Countdown, SafeImg,
@@ -21,12 +21,10 @@ import Testimonials from "../components/trust/Testimonials.jsx";
 import BrandShowcase from "../components/trust/BrandShowcase.jsx";
 
 export default function Home() {
-  const { query, setQuery, add } = useShop();
+  const { add } = useShop();
   const { products: PRODUCTS } = useProducts();
   const { liveCategories: CATEGORIES } = useSite();
   const findP = (sku) => PRODUCTS.find((p) => p.sku === sku);
-  const [make, setMake] = useState(MAKES[2]);
-  const [year, setYear] = useState(MODELS[2]);
   const [heroIdx, setHeroIdx] = useState(0);
   const [tab, setTab] = useState("Most Reordered");
 
@@ -285,30 +283,10 @@ export default function Home() {
         <div className="relative mx-auto max-w-7xl px-4 py-12">
           <Reveal className="text-center mb-6">
             <p className="text-[12px] font-black tracking-[0.22em] text-[#FF6B35] uppercase">Find the right part faster</p>
-            <h2 className="font-display font-bold text-[26px] sm:text-[34px] text-white mt-2">Choose your vehicle</h2>
+            <h2 className="font-display font-bold text-[26px] sm:text-[34px] text-white mt-2">Tell us your truck</h2>
           </Reveal>
-          <Reveal>
-            <div className="bg-white rounded-2xl p-5 grid gap-3 md:grid-cols-[1fr_1fr_1fr_auto] items-end shadow-elevated">
-              <div>
-                <label className="text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase">Make</label>
-                <select value={make} onChange={(e) => setMake(e.target.value)} className="mt-1.5 w-full bg-[#F5F6F8] text-[#1A1A2E] border border-[#E5E7EB] rounded-xl px-4 py-3.5 text-sm font-semibold outline-none focus:border-[#E53E00] transition">
-                  {MAKES.map((m) => <option key={m}>{m}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase">Year</label>
-                <select value={year} onChange={(e) => setYear(e.target.value)} className="mt-1.5 w-full bg-[#F5F6F8] text-[#1A1A2E] border border-[#E5E7EB] rounded-xl px-4 py-3.5 text-sm font-semibold outline-none focus:border-[#E53E00] transition">
-                  {MODELS.map((m) => <option key={m}>{m}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase">Part or SKU</label>
-                <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Brake, winch, EB10P-L..." className="mt-1.5 w-full bg-[#F5F6F8] text-[#1A1A2E] border border-[#E5E7EB] rounded-xl px-4 py-3.5 text-sm font-semibold outline-none placeholder:text-[#9CA3AF] focus:border-[#E53E00] transition" />
-              </div>
-              <Link to="/shop" className="bg-[#E53E00] rounded-xl px-8 py-3.5 text-sm font-bold flex items-center justify-center gap-2 text-white hover:bg-[#C23400] transition">
-                <Search size={15} /> Search
-              </Link>
-            </div>
+          <Reveal className="max-w-3xl mx-auto">
+            <YMMWidget variant="hero" />
           </Reveal>
         </div>
       </section>

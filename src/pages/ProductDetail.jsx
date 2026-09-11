@@ -1,10 +1,12 @@
 import { useState, useMemo, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, CheckCircle2, ShieldCheck, Truck, RotateCcw, Minus, Plus, ScanLine, ChevronRight } from "lucide-react";
+import { ShoppingCart, CheckCircle2, ShieldCheck, Truck, RotateCcw, Minus, Plus, ScanLine, ChevronRight, TriangleAlert } from "lucide-react";
 import { ProductCard, Reveal, SafeImg, Stars, staggerParent } from "../components/ui.jsx";
 import { useShop } from "../store/shop.jsx";
 import { useProducts } from "../store/products.jsx";
+import { useGarage } from "../components/garage/GarageContext.jsx";
+import YMMWidget from "../components/garage/YMMWidget.jsx";
 import { pushRecent, RecentlyViewed } from "../components/shopwise.jsx";
 
 export default function ProductDetail() {
@@ -12,6 +14,7 @@ export default function ProductDetail() {
   const { products: PRODUCTS } = useProducts();
   const p = PRODUCTS.find((x) => x.sku === sku);
   const { add, toggleCompare, compare, setEnquirySku } = useShop();
+  const { fitStatus, selectedVehicle, hasValidVehicle } = useGarage();
   useEffect(() => { if (p) pushRecent(p.sku); }, [sku]);
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState("Specs");
@@ -35,6 +38,9 @@ export default function ProductDetail() {
   const related = PRODUCTS.filter((x) => x.cat === p.cat && x.sku !== p.sku).slice(0, 4);
   const discount = p.oldPrice ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : null;
   const inStock = p.stock.includes("In stock");
+  const fit = fitStatus(p);
+  const fitMakes = [...new Set((p.fitment?.apps || []).map((a) => a.make))];
+  const cut = { clipPath: "polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px))" };
 
   return (
     <div>
@@ -107,7 +113,48 @@ export default function ProductDetail() {
               )}
             </div>
 
-            <div className="mt-5 rounded-xl border border-[#E5E7EB] bg-[#F7F8FA] p-4">
+            {/* Garage fit box */}
+            <div className="mt-5">
+              {fit === "fits" && (
+                <div style={cut} className="bg-[#10B981] text-white p-4 flex items-center gap-3">
+                  <CheckCircle2 size={22} className="shrink-0" />
+                  <div>
+                    <p className="font-display font-bold text-[15px]">This fits your {selectedVehicle.year ? selectedVehicle.year + " " : ""}{selectedVehicle.make} {selectedVehicle.model}</p>
+                    <p className="text-white/85 text-[13px]">Matched against our fitment data. Order with confidence.</p>
+                  </div>
+                </div>
+              )}
+              {fit === "universal" && (
+                <div style={cut} className="bg-[#12121B] text-white p-4 flex items-center gap-3">
+                  <Truck size={22} className="text-[#FF6B35] shrink-0" />
+                  <div>
+                    <p className="font-display font-bold text-[15px]">Universal fit</p>
+                    <p className="text-white/60 text-[13px]">Cross make part. Works with your {selectedVehicle.make} and most trucks and trailers.</p>
+                  </div>
+                </div>
+              )}
+              {fit === "no" && (
+                <div style={cut} className="bg-[#FEF3C7] border-2 border-[#F59E0B] text-[#1A1A2E] p-4 flex items-center gap-3">
+                  <TriangleAlert size={22} className="text-[#B45309] shrink-0" />
+                  <div>
+                    <p className="font-display font-bold text-[15px]">Heads up: made for other makes</p>
+                    <p className="text-[#78350F] text-[13px]">Listed for {fitMakes.join(", ")}. Check the fitment tab or ask our desk before you buy for a {selectedVehicle.make}.</p>
+                  </div>
+                </div>
+              )}
+              {!hasValidVehicle && (
+                <div style={cut} className="bg-[#F7F8FA] border border-[#E5E7EB] p-4 flex flex-wrap items-center gap-3">
+                  <Truck size={20} className="text-[#E53E00] shrink-0" />
+                  <div className="flex-1 min-w-[180px]">
+                    <p className="font-bold text-[#1A1A2E] text-[15px]">Add your truck to confirm fit</p>
+                    <p className="text-[#6B7280] text-[13px]">We check OEM {p.oem} against your make before dispatch.</p>
+                  </div>
+                  <YMMWidget variant="pill" />
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 rounded-xl border border-[#E5E7EB] bg-[#F7F8FA] p-4">
               <p className="text-[12px] font-bold tracking-widest text-[#9CA3AF] flex items-center gap-1.5 uppercase">
                 <ScanLine size={14} className="text-[#E53E00]" /> Check Fitment by VIN
               </p>
@@ -169,7 +216,26 @@ export default function ProductDetail() {
                     ))}
                   </ul>
                 )}
-                {tab === "Fitment" && <p>{p.fit}. For mixed fleets, add your make and year in the Quote page notes and we cross check OEM {p.oem} before you pay.</p>}
+                {tab === "Fitment" && (
+                  <div className="space-y-4">
+                    <p>{p.fit}.</p>
+                    {p.fitment?.universal ? (
+                      <p className="font-semibold text-[#1A1A2E]">Cross make part. Fits most Australian trucks and trailers. Confirm the physical dimensions against your unit.</p>
+                    ) : (p.fitment?.apps?.length ? (
+                      <div>
+                        <p className="text-[11px] font-bold tracking-[0.2em] text-[#9CA3AF] uppercase mb-2">Confirmed makes and models</p>
+                        <div className="flex flex-wrap gap-2">
+                          {p.fitment.apps.map((a, i) => (
+                            <span key={i} className="bg-[#F7F8FA] border border-[#E5E7EB] rounded-lg px-3 py-1.5 text-[13px] font-semibold text-[#1A1A2E]">
+                              {a.make}{a.model ? " " + a.model : ""}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null)}
+                    <p className="text-[13px]">For mixed fleets, add your truck in the garage bar up top and we cross check OEM {p.oem} before you pay.</p>
+                  </div>
+                )}
                 {tab === "Freight" && <p>VIC metro 1 day. Sydney, Brisbane and Adelaide 1 to 2 days. Perth and regional 2 to 5 days. Free freight over $500. VIC pickup from Campbellfield.</p>}
               </motion.div>
             </AnimatePresence>
