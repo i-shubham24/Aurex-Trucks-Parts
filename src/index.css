@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --color-primary: #E53E00;
+  --color-primary-dark: #C23400;
+  --color-primary-light: #FF6B35;
+  --color-dark: #1A1A2E;
+  --color-dark-alt: #16213E;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F7F8FA;
+  --color-surface-warm: #FFF8F5;
+  --color-card: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-text: #1A1A2E;
+  --color-muted: #6B7280;
+  --color-text-light: #9CA3AF;
+  --color-accent: #FFBB00;
+  --color-success: #10B981;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: #FFFFFF;
+  color: #1A1A2E;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.font-display { font-family: var(--font-display); }
+
+::selection { background: #E53E00; color: #fff; }
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: #F1F2F4; }
+::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #E53E00; }
+
+/* Marquee */
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.animate-marquee { animation: marquee 38s linear infinite; }
+.animate-marquee-slow { animation: marquee 60s linear infinite; }
+.marquee-track:hover { animation-play-state: paused; }
+
+/* Shadows */
+.shadow-card { box-shadow: 0 1px 3px rgba(16,24,40,0.06), 0 1px 2px rgba(16,24,40,0.04); }
+.shadow-card-hover { box-shadow: 0 18px 40px -12px rgba(16,24,40,0.16), 0 8px 16px -8px rgba(16,24,40,0.08); }
+.shadow-elevated { box-shadow: 0 30px 60px -18px rgba(16,24,40,0.22); }
+.shadow-primary { box-shadow: 0 14px 30px -10px rgba(229,62,0,0.45); }
+
+/* Gradient text */
+.text-gradient {
+  background: linear-gradient(100deg, #FF6B35 0%, #E53E00 55%, #C23400 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Tasteful hover sheen that sweeps across a card */
+.shine { position: relative; overflow: hidden; }
+.shine::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -75%;
+  width: 50%; height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.55), transparent);
+  transform: skewX(-18deg);
+  transition: left 0.7s var(--ease-out-expo);
+  pointer-events: none;
+  z-index: 5;
+}
+.shine:hover::after { left: 130%; }
+
+/* Subtle engineering grid for dark hero panels */
+.grid-scrim {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse 80% 70% at 30% 20%, #000 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 70% at 30% 20%, #000 40%, transparent 100%);
+}
+
+/* Edge fade for marquees and drag rows */
+.mask-fade-x {
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+/* Hide scrollbar for draggable rows */
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Animated underline for links */
+.link-underline { position: relative; }
+.link-underline::after {
+  content: "";
+  position: absolute; left: 0; bottom: -3px;
+  width: 100%; height: 2px;
+  background: #E53E00;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--ease-out-expo);
+}
+.link-underline:hover::after { transform: scaleX(1); }
+
+/* Slow float for hero chips */
+@keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+.animate-floaty { animation: floaty 5.5s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee, .animate-marquee-slow, .animate-floaty { animation: none; }
+  html { scroll-behavior: auto; }
+}
