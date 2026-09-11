@@ -28,14 +28,28 @@ export function ShopProvider({ children }) {
       if (f) return c.map((i) => (i.sku === sku ? { ...i, qty: i.qty + qty } : i));
       const p = lookup(sku);
       if (!p) return c;
-      return [...c, { ...p, qty }];
+      return [...c, { sku, qty, product: p }];
     });
     setDrawer(true);
   };
+  
+  const updateQuantity = (sku, qty) => {
+    setCart((c) => {
+      if (qty <= 0) return c.filter((i) => i.sku !== sku);
+      return c.map((i) => (i.sku === sku ? { ...i, qty } : i));
+    });
+  };
+  
+  const remove = (sku) => {
+    setCart((c) => c.filter((i) => i.sku !== sku));
+  };
   const value = useMemo(() => ({
     cart, setCart, wishlist, setWishlist, query, setQuery, drawer, setDrawer, add,
-    enquirySku, setEnquirySku, compare, setCompare, toggleCompare,
-    total: cart.reduce((s, i) => s + i.price * i.qty, 0),
+    enquirySku, setEnquirySku, compare, setCompare, toggleCompare, updateQuantity, remove,
+    total: cart.reduce((s, i) => {
+      const price = i.product?.price || i.price || 0;
+      return s + price * i.qty;
+    }, 0),
     count: cart.reduce((s, i) => s + i.qty, 0),
   }), [cart, wishlist, query, drawer, enquirySku, compare]);
   return <ShopCtx.Provider value={value}>{children}</ShopCtx.Provider>;

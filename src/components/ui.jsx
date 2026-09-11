@@ -128,6 +128,71 @@ export function Stars({ rating, reviews, size = 12 }) {
   );
 }
 
+/* Animated counter for statistics */
+export function AnimatedCounter({ target, suffix = "", duration = 1900, className = "" }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  const started = useRef(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !started.current) {
+          started.current = true;
+          const start = performance.now();
+          const step = (now) => {
+            const progress = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setCount(Math.floor(eased * target));
+            if (progress < 1) requestAnimationFrame(step);
+            else setCount(target);
+          };
+          requestAnimationFrame(step);
+        }
+      },
+      { threshold: 0.4 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [target, duration]);
+
+  return (
+    <span ref={ref} className={`font-display font-bold text-[34px] sm:text-[40px] text-[#1A1A2E] tabular-nums ${className}`}>
+      {count}
+      {suffix}
+    </span>
+  );
+}
+
+/* Horizontal scroll row for carousels */
+export function ScrollRow({ children, className = "" }) {
+  const ref = useRef(null);
+  const by = (dir) => {
+    const el = ref.current;
+    if (el) el.scrollBy({ left: dir * Math.min(el.clientWidth * 0.8, 520), behavior: "smooth" });
+  };
+  return (
+    <div className="relative">
+      <div
+        ref={ref}
+        className={`flex gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-2 mask-fade-x ${className}`}
+      >
+        {children}
+      </div>
+      <div className="mt-5 flex gap-2 justify-end">
+        <button onClick={() => by(-1)} aria-label="previous" className="w-11 h-11 grid place-items-center rounded-full border border-[#E5E7EB] text-[#1A1A2E] bg-white hover:bg-[#1A1A2E] hover:text-white hover:border-[#1A1A2E] transition">
+          <ChevronLeft size={18} />
+        </button>
+        <button onClick={() => by(1)} aria-label="next" className="w-11 h-11 grid place-items-center rounded-full border border-[#E5E7EB] text-[#1A1A2E] bg-white hover:bg-[#E53E00] hover:text-white hover:border-[#E53E00] transition">
+          <ChevronRight size={18} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function ProductCard({ p, index = 0 }) {
   const { add, wishlist, setWishlist, toggleCompare, compare, setEnquirySku } = useShop();
   const wished = wishlist.includes(p.sku);
@@ -229,69 +294,7 @@ export function ProductCard({ p, index = 0 }) {
   );
 }
 
-/* Horizontal snap carousel with arrow controls and drag via native scroll */
-export function ScrollRow({ children, className = "" }) {
-  const ref = useRef(null);
-  const by = (dir) => {
-    const el = ref.current;
-    if (el) el.scrollBy({ left: dir * Math.min(el.clientWidth * 0.8, 520), behavior: "smooth" });
-  };
-  return (
-    <div className="relative">
-      <div
-        ref={ref}
-        className={`flex gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-2 mask-fade-x ${className}`}
-      >
-        {children}
-      </div>
-      <div className="mt-5 flex gap-2 justify-end">
-        <button onClick={() => by(-1)} aria-label="previous" className="w-11 h-11 grid place-items-center rounded-full border border-[#E5E7EB] text-[#1A1A2E] bg-white hover:bg-[#1A1A2E] hover:text-white hover:border-[#1A1A2E] transition">
-          <ChevronLeft size={18} />
-        </button>
-        <button onClick={() => by(1)} aria-label="next" className="w-11 h-11 grid place-items-center rounded-full border border-[#E5E7EB] text-[#1A1A2E] bg-white hover:bg-[#E53E00] hover:text-white hover:border-[#E53E00] transition">
-          <ChevronRight size={18} />
-        </button>
-      </div>
-    </div>
-  );
-}
 
-export function AnimatedCounter({ target, suffix = "", duration = 1900, className = "" }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef(null);
-  const started = useRef(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !started.current) {
-          started.current = true;
-          const start = performance.now();
-          const step = (now) => {
-            const progress = Math.min((now - start) / duration, 1);
-            const eased = 1 - Math.pow(1 - progress, 3);
-            setCount(Math.floor(eased * target));
-            if (progress < 1) requestAnimationFrame(step);
-            else setCount(target);
-          };
-          requestAnimationFrame(step);
-        }
-      },
-      { threshold: 0.4 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [target, duration]);
-
-  return (
-    <span ref={ref} className={`font-display font-bold text-[34px] sm:text-[40px] text-[#1A1A2E] tabular-nums ${className}`}>
-      {count}
-      {suffix}
-    </span>
-  );
-}
 
 /* Simple countdown for deal sections */
 export function Countdown({ end }) {

@@ -15,6 +15,10 @@ import {
 import { useShop } from "../store/shop.jsx";
 import { useProducts } from "../store/products.jsx";
 import { useSite } from "../store/site.jsx";
+import YMMWidget from "../components/garage/YMMWidget.jsx";
+import TrustBadges from "../components/trust/TrustBadges.jsx";
+import Testimonials from "../components/trust/Testimonials.jsx";
+import BrandShowcase from "../components/trust/BrandShowcase.jsx";
 
 export default function Home() {
   const { query, setQuery, add } = useShop();
