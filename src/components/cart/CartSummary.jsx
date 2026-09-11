@@ -21,7 +21,7 @@ export default function CartSummary({ compact = false, showCheckout = true }) {
         {showCheckout && (
           <Link
             to="/checkout"
-            className="bg-[#E53E00] text-white rounded-lg px-6 py-3 text-sm font-bold hover:bg-[#C23400] transition flex items-center gap-2"
+            className="bg-[#E53E00] text-white rounded-lg px-6 py-3 text-sm font-bold hover:bg-[#1A1A2E] transition flex items-center gap-2"
           >
             Checkout <ArrowRight size={16} />
           </Link>
@@ -93,7 +93,7 @@ export default function CartSummary({ compact = false, showCheckout = true }) {
       {showCheckout && (
         <Link
           to="/checkout"
-          className="w-full bg-[#E53E00] text-white rounded-xl py-4 text-sm font-bold hover:bg-[#C23400] transition flex items-center justify-center gap-2"
+          className="w-full bg-[#E53E00] text-white rounded-xl py-4 text-sm font-bold hover:bg-[#1A1A2E] transition flex items-center justify-center gap-2"
         >
           Proceed to Checkout <ArrowRight size={16} />
         </Link>

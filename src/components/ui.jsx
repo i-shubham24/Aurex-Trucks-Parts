@@ -1,10 +1,54 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Star, ShoppingCart, Eye, ArrowRight, ChevronLeft, ChevronRight, Check, TriangleAlert } from "lucide-react";
+import { Star, ShoppingCart, Eye, ArrowRight, ChevronLeft, ChevronRight, ChevronDown, Check, TriangleAlert } from "lucide-react";
 import { useShop } from "../store/shop.jsx";
 import { useGarage } from "./garage/GarageContext.jsx";
 import { fitLabel } from "../data/fitment.js";
+
+// Styled dropdown that replaces raw select boxes. Angular house shape.
+export function Dropdown({ value, options, onChange, align = "left", className = "" }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [open]);
+  return (
+    <div ref={ref} className={`relative ${className}`}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="clip-cut w-full flex items-center justify-between gap-3 bg-white border-2 border-[#E5E7EB] px-4 py-3 text-sm font-bold text-[#1A1A2E] hover:border-[#E53E00] transition"
+      >
+        {value}
+        <ChevronDown size={15} className={`text-[#9CA3AF] transition ${open ? "rotate-180" : ""}`} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.ul
+            initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.16 }}
+            className={`absolute z-40 mt-1.5 min-w-full bg-white border-2 border-[#1A1A2E] shadow-elevated overflow-hidden ${align === "right" ? "right-0" : "left-0"}`}
+          >
+            {options.map((o) => (
+              <li key={o}>
+                <button
+                  type="button"
+                  onClick={() => { onChange(o); setOpen(false); }}
+                  className={`w-full text-left px-4 py-2.5 text-sm font-semibold transition ${o === value ? "bg-[#E53E00] text-white" : "text-[#1A1A2E] hover:bg-[#FFF0EB]"}`}
+                >
+                  {o}
+                </button>
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 // Angular fit chip. Hidden when there is no selected truck (status unknown).
 export function FitChip({ status, vehicle, className = "" }) {
@@ -112,7 +156,7 @@ export function SectionHead({ kicker, title, sub, link, linkLabel, center }) {
       <div className={`max-w-2xl ${center ? "mx-auto" : ""}`}>
         {kicker && (
           <p className={`text-[12px] font-black tracking-[0.22em] text-[#E53E00] uppercase mb-2 flex items-center gap-2 ${center ? "justify-center" : ""}`}>
-            <span className="w-6 h-[2px] bg-[#E53E00] inline-block" />{kicker}
+{kicker}
           </p>
         )}
         <h2 className="font-display font-bold tracking-[-0.02em] text-[28px] sm:text-[38px] leading-[1.05] text-[#1A1A2E]">
@@ -123,7 +167,7 @@ export function SectionHead({ kicker, title, sub, link, linkLabel, center }) {
       {link && (
         <Link
           to={link}
-          className="ml-auto text-sm font-bold flex items-center gap-2 border border-[#E5E7EB] rounded-full px-6 py-3 text-[#1A1A2E] hover:border-[#E53E00] hover:text-[#E53E00] hover:gap-3 transition-all group"
+          className={`clip-cut ${center ? "mx-auto" : "ml-auto"} text-sm font-bold flex items-center gap-2 bg-[#F5F6F8] px-6 py-3 text-[#1A1A2E] hover:bg-[#1A1A2E] hover:text-white hover:gap-3 transition-all group`}
         >
           {linkLabel || "View all"}
           <ArrowRight size={15} className="group-hover:translate-x-0.5 transition" />
@@ -242,11 +286,11 @@ export function ProductCard({ p, index = 0 }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition pointer-events-none" />
 
         {discount ? (
-          <span className="absolute top-3 left-3 z-10 bg-[#E53E00] text-white text-[11px] font-black px-2.5 py-1 rounded-lg shadow-primary">
+          <span className="clip-cut-sm absolute bottom-4 left-4 z-10 bg-[#E53E00] text-white text-[11px] font-black px-2.5 py-1 shadow-primary">
             -{discount}%
           </span>
         ) : p.badge ? (
-          <span className="absolute top-3 left-3 z-10 bg-[#1A1A2E] text-white text-[11px] font-black px-2.5 py-1 rounded-lg">
+          <span className="clip-cut-sm absolute bottom-4 left-4 z-10 bg-[#1A1A2E] text-white text-[11px] font-black px-2.5 py-1">
             {p.badge}
           </span>
         ) : null}
@@ -258,8 +302,8 @@ export function ProductCard({ p, index = 0 }) {
         )}
 
         <span
-          className={`absolute bottom-3 left-3 z-10 text-[11px] font-bold px-2.5 py-1 rounded-lg backdrop-blur ${
-            inStock ? "bg-[#10B981]/90 text-white" : "bg-white/90 text-[#6B7280] border border-[#E5E7EB]"
+          className={`clip-cut-sm absolute top-3 left-3 z-10 text-[11px] font-bold px-2.5 py-1 backdrop-blur ${
+            inStock ? "bg-[#1A1A2E]/90 text-white" : "bg-white/90 text-[#6B7280] border border-[#E5E7EB]"
           }`}
         >
           {p.stock}
@@ -276,7 +320,7 @@ export function ProductCard({ p, index = 0 }) {
 
       <div className="p-5 flex flex-col flex-1">
         <p className="text-[11px] font-semibold tracking-wide text-[#9CA3AF] uppercase">
-          {p.brand ? p.brand + " · " : ""}
+          {p.brand ? p.brand + ", " : ""}
           {p.cat}
         </p>
         <Link
@@ -297,15 +341,15 @@ export function ProductCard({ p, index = 0 }) {
           </p>
           <button
             onClick={() => add(p.sku)}
-            className="flex items-center gap-1.5 bg-[#E53E00] text-white rounded-lg px-4 py-2.5 text-[13px] font-bold hover:bg-[#C23400] hover:gap-2.5 active:scale-95 transition-all"
+            className="clip-cut flex items-center gap-1.5 bg-[#E53E00] text-white px-4 py-2.5 text-[13px] font-bold hover:bg-[#1A1A2E] hover:gap-2.5 active:scale-95 transition-all"
           >
             <ShoppingCart size={14} />
             Add
           </button>
         </div>
         <div className="mt-2.5 flex gap-2">
-          <button onClick={() => toggleCompare(p.sku)} className={`flex-1 rounded-lg py-2 text-[12px] font-bold border transition ${inCompare ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#1A1A2E] hover:text-[#1A1A2E]"}`}>{inCompare ? "Added to compare" : "Compare"}</button>
-          <button onClick={() => setEnquirySku(p.sku)} className="flex-1 rounded-lg py-2 text-[12px] font-bold border border-[#E5E7EB] text-[#6B7280] hover:border-[#E53E00] hover:text-[#E53E00] transition">Enquire on SKU</button>
+          <button onClick={() => toggleCompare(p.sku)} className={`clip-cut-sm flex-1 py-2 text-[12px] font-bold border transition ${inCompare ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#1A1A2E] hover:text-[#1A1A2E]"}`}>{inCompare ? "Added to compare" : "Compare"}</button>
+          <button onClick={() => setEnquirySku(p.sku)} className="clip-cut-sm flex-1 py-2 text-[12px] font-bold border border-[#E5E7EB] text-[#6B7280] hover:border-[#E53E00] hover:text-[#E53E00] transition">Enquire on SKU</button>
         </div>
       </div>
     </motion.article>

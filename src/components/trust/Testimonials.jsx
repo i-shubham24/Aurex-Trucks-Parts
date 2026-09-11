@@ -129,7 +129,7 @@ export default function Testimonials({ compact = false }) {
               <div>
                 <p className="font-semibold text-[#1A1A2E]">{currentTestimonial.name}</p>
                 <p className="text-sm text-[#6B7280]">
-                  {currentTestimonial.company} · {currentTestimonial.location}
+                  {currentTestimonial.company}, {currentTestimonial.location}
                 </p>
               </div>
             </div>

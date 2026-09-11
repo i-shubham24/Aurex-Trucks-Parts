@@ -36,7 +36,7 @@ export function EnquiryModal() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/60" onClick={close} />
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
             <div className="flex items-center gap-3">
-              <div className="flex-1"><p className="text-[11px] font-bold text-[#E53E00]">PRODUCT ENQUIRY • {p.sku}</p><p className="font-bold text-[15px] text-[#1A1A2E] leading-snug mt-0.5">{p.name}</p></div>
+              <div className="flex-1"><p className="text-[11px] font-bold text-[#E53E00]">PRODUCT ENQUIRY, {p.sku}</p><p className="font-bold text-[15px] text-[#1A1A2E] leading-snug mt-0.5">{p.name}</p></div>
               <button onClick={close} className="p-2 border border-[#E5E7EB] rounded-lg"><X size={15} /></button>
             </div>
             {sent
@@ -48,7 +48,7 @@ export function EnquiryModal() {
                     <input required value={f.phone} onChange={set("phone")} placeholder="Phone" className="rounded-xl px-4 py-3 text-sm bg-[#F7F8FA] border border-[#E5E7EB] outline-none" />
                   </div>
                   <textarea required value={f.message} onChange={set("message")} rows={3} placeholder="Question about fitment, stock or bulk price..." className="rounded-xl px-4 py-3 text-sm bg-[#F7F8FA] border border-[#E5E7EB] outline-none" />
-                  <button className="bg-[#E53E00] text-white rounded-xl py-3.5 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#C23400] transition"><Send size={14} /> Send enquiry</button>
+                  <button className="bg-[#E53E00] text-white rounded-xl py-3.5 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#1A1A2E] transition"><Send size={14} /> Send enquiry</button>
                 </form>
               )}
           </motion.div>

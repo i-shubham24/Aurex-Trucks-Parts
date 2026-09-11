@@ -44,7 +44,7 @@ export default function SearchBar({ placeholder = "Search parts, SKU, or brand..
       {!compact && (
         <button 
           onClick={handleSearch}
-          className="bg-[#E53E00] text-white rounded-lg w-9 h-9 grid place-items-center hover:bg-[#C23400] active:scale-95 transition ml-1"
+          className="bg-[#E53E00] text-white rounded-lg w-9 h-9 grid place-items-center hover:bg-[#1A1A2E] active:scale-95 transition ml-1"
           aria-label="search"
         >
           <Search size={15} />

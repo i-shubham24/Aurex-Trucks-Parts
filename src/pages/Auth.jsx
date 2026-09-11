@@ -44,7 +44,7 @@ function AuthShell({ title, sub, children, footer }) {
         <div className="absolute -right-24 top-1/3 w-96 h-96 rounded-full bg-[#E53E00]/20 blur-[120px]" />
 
         <Link to="/" className="relative w-fit">
-          <LogoFull light />
+          <LogoFull mono size={58} />
         </Link>
 
         <div className="relative">
@@ -134,7 +134,7 @@ export function LoginPage() {
           <PasswordField value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" inputClass={inputClass} />
         </label>
         {err && <p className="text-[13px] text-red-500 font-semibold">{err}</p>}
-        <button className="mt-2 bg-[#E53E00] text-white rounded-xl py-4 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#C23400] active:scale-[0.99] transition shadow-primary">
+        <button className="mt-2 bg-[#E53E00] text-white rounded-xl py-4 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#1A1A2E] active:scale-[0.99] transition shadow-primary">
           <LogIn size={16} /> Log in
         </button>
       </form>
@@ -179,7 +179,7 @@ export function AccountPage() {
       <Package size={36} className="mx-auto text-[#E53E00]" />
       <h1 className="font-display font-bold text-3xl mt-4 text-[#1A1A2E]">Please log in</h1>
       <p className="text-[#6B7280] text-sm mt-2">Your account holds your details plus order history.</p>
-      <button onClick={() => nav("/login")} className="mt-5 bg-[#E53E00] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#C23400] transition">Go to login</button>
+      <button onClick={() => nav("/login")} className="mt-5 bg-[#E53E00] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition">Go to login</button>
     </div>
   );
   return (
@@ -190,7 +190,7 @@ export function AccountPage() {
         <p className="text-[#6B7280] text-sm mt-1">{user.email}</p>
         <p className="text-[#9CA3AF] text-[13px] mt-1">{user.company || "Independent buyer"} {user.phone ? ", " + user.phone : ""}</p>
         <button onClick={() => { logout(); nav("/"); }} className="mt-5 w-full rounded-xl border border-[#E5E7EB] py-3 text-sm font-bold text-[#6B7280] hover:border-red-400 hover:text-red-500 transition">Log out</button>
-        <Link to="/shop" className="mt-2 block text-center rounded-xl bg-[#E53E00] text-white py-3 text-sm font-bold hover:bg-[#C23400] transition">Continue shopping</Link>
+        <Link to="/shop" className="mt-2 block text-center rounded-xl bg-[#E53E00] text-white py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">Continue shopping</Link>
       </div>
       <div>
         <h1 className="font-display font-bold text-3xl text-[#1A1A2E]">Order history ({myOrders.length})</h1>

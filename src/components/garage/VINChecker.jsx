@@ -69,7 +69,7 @@ export default function VINChecker({ onValidation, compact = false }) {
         <button 
           onClick={handleCheck}
           disabled={vin.length < 6}
-          className="bg-[#E53E00] text-white rounded-lg px-4 py-2 text-sm font-bold hover:bg-[#C23400] disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="bg-[#E53E00] text-white rounded-lg px-4 py-2 text-sm font-bold hover:bg-[#1A1A2E] disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           Check
         </button>
@@ -94,7 +94,7 @@ export default function VINChecker({ onValidation, compact = false }) {
         <button 
           onClick={handleCheck}
           disabled={vin.length < 6}
-          className="bg-[#E53E00] text-white rounded-lg px-5 py-3 text-sm font-bold hover:bg-[#C23400] disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="bg-[#E53E00] text-white rounded-lg px-5 py-3 text-sm font-bold hover:bg-[#1A1A2E] disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           Check
         </button>

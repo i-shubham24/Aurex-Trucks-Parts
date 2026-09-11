@@ -8,33 +8,52 @@ const CUT = { clipPath: "polygon(0 0, 100% 0, 100% 100%, 10px 100%, 0 calc(100% 
 const EASE = [0.16, 1, 0.3, 1];
 
 function Field({ label, value, onChange, options, placeholder, disabled, dark }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, [open]);
+
   return (
-    <motion.label
-      variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
-      className={`block ${disabled ? "opacity-40" : ""}`}
-    >
-      <span className="block text-[10px] font-black tracking-[0.22em] uppercase mb-1.5 text-[#FF6B35]">
-        {label}
-      </span>
-      <div className="relative">
-        <select
-          value={value}
+    <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }} className={disabled ? "opacity-40 pointer-events-none" : ""}>
+      <span className="block text-[10px] font-black tracking-[0.22em] uppercase mb-1.5 text-[#FF6B35]">{label}</span>
+      <div className="relative" ref={ref}>
+        <button
+          type="button"
           disabled={disabled}
-          onChange={(e) => onChange(e.target.value)}
-          className={`w-full appearance-none rounded-md px-3.5 py-3 text-sm font-bold outline-none transition cursor-pointer disabled:cursor-not-allowed border-2 ${
-            dark
-              ? "bg-white/[0.04] border-white/10 text-white focus:border-[#FF6B35]"
-              : "bg-[#F5F6F8] border-[#E5E7EB] text-[#1A1A2E] focus:border-[#E53E00]"
-          }`}
+          onClick={() => setOpen((o) => !o)}
+          className={`clip-cut-sm w-full flex items-center justify-between gap-2 px-3.5 py-3 text-sm font-bold outline-none transition border-2 ${
+            dark ? "bg-white/[0.04] border-white/10 hover:border-[#FF6B35]" : "bg-[#F5F6F8] border-[#E5E7EB] hover:border-[#E53E00]"
+          } ${value ? (dark ? "text-white" : "text-[#1A1A2E]") : (dark ? "text-white/45" : "text-[#9CA3AF]")}`}
         >
-          <option value="">{placeholder}</option>
-          {options.map((o) => (
-            <option key={o} value={o} className="text-[#1A1A2E]">{o}</option>
-          ))}
-        </select>
-        <ChevronDown size={15} className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none ${dark ? "text-white/40" : "text-[#9CA3AF]"}`} />
+          <span className="truncate">{value || placeholder}</span>
+          <ChevronDown size={15} className={`shrink-0 transition ${open ? "rotate-180" : ""} ${dark ? "text-white/40" : "text-[#9CA3AF]"}`} />
+        </button>
+        <AnimatePresence>
+          {open && (
+            <motion.ul
+              initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.16 }}
+              className={`absolute left-0 right-0 z-[70] mt-1.5 max-h-52 overflow-auto no-scrollbar shadow-elevated ${dark ? "bg-[#1A1A2E] border-2 border-white/10" : "bg-white border-2 border-[#1A1A2E]"}`}
+            >
+              {options.map((o) => (
+                <li key={o}>
+                  <button
+                    type="button"
+                    onClick={() => { onChange(o); setOpen(false); }}
+                    className={`w-full text-left px-3.5 py-2.5 text-sm font-semibold transition ${o === value ? "bg-[#E53E00] text-white" : (dark ? "text-white/85 hover:bg-white/10" : "text-[#1A1A2E] hover:bg-[#FFF0EB]")}`}
+                  >
+                    {o}
+                  </button>
+                </li>
+              ))}
+            </motion.ul>
+          )}
+        </AnimatePresence>
       </div>
-    </motion.label>
+    </motion.div>
   );
 }
 
@@ -77,7 +96,7 @@ function Console({ dark = true, onDone }) {
         onClick={commit}
         disabled={!ready}
         style={CUT}
-        className="mt-3 w-full bg-[#E53E00] text-white py-3.5 text-sm font-black tracking-wide uppercase flex items-center justify-center gap-2 hover:bg-[#C23400] active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed transition"
+        className="mt-3 w-full bg-[#E53E00] text-white py-3.5 text-sm font-black tracking-wide uppercase flex items-center justify-center gap-2 hover:bg-white hover:text-[#E53E00] active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed transition"
       >
         <Check size={16} /> Lock in my rig
       </motion.button>
@@ -147,7 +166,7 @@ export default function YMMWidget({ variant = "hero" }) {
         <button
           onClick={() => setOpen((o) => !o)}
           style={CUT}
-          className="flex items-center gap-2 bg-[#E53E00] text-white px-3.5 py-2.5 text-[13px] font-black uppercase tracking-wide hover:bg-[#C23400] transition"
+          className="flex items-center gap-2 bg-[#E53E00] text-white px-3.5 py-2.5 text-[13px] font-black uppercase tracking-wide hover:bg-[#1A1A2E] transition"
         >
           <Wrench size={15} /> Add your truck
         </button>

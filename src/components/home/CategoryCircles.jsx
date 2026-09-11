@@ -1,0 +1,41 @@
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { CATEGORIES } from "../../data/catalog.js";
+import { SafeImg } from "../ui.jsx";
+
+// Compact category browse tiles in the house angular shape. Label sits under the tile.
+export default function CategoryCircles() {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-8">
+      {CATEGORIES.slice(0, 10).map((c, i) => (
+        <motion.div
+          key={c.name}
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.45, delay: (i % 5) * 0.05, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <Link to={`/shop?cat=${encodeURIComponent(c.name)}`} className="group flex flex-col items-center text-center">
+            <div className="relative w-full aspect-square max-w-[200px] group-hover:-translate-y-1 transition-transform duration-500">
+              <div className="clip-cut-lg w-full h-full overflow-hidden bg-[#1A1A2E]">
+                <SafeImg
+                  src={c.image}
+                  alt={c.name}
+                  label={c.name}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  wrapClass="w-full h-full"
+                />
+                <span className="clip-cut-lg absolute inset-0 border-[3px] border-[#E53E00] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
+              <span className="clip-notch absolute -bottom-2 left-1/2 -translate-x-1/2 grid place-items-center w-9 h-9 bg-[#E53E00] text-white shadow-primary group-hover:scale-110 transition">
+                <c.icon size={16} />
+              </span>
+            </div>
+            <p className="mt-5 text-[13px] font-bold text-[#1A1A2E] leading-tight group-hover:text-[#E53E00] transition">{c.name}</p>
+            <p className="text-[11px] text-[#9CA3AF]">{c.count} lines</p>
+          </Link>
+        </motion.div>
+      ))}
+    </div>
+  );
+}

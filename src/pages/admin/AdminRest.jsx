@@ -32,7 +32,7 @@ export function AdminQuotes() {
         <div className="mt-4 space-y-3">{enquiries.map((e) => (
           <div key={e.id} className="rounded-[20px] border border-white/10 bg-[#0d1218] p-5">
             <div className="flex gap-2 items-center"><b>{e.name}</b><span className={`text-[11px] font-black rounded-full px-2.5 py-1 ${e.status === "New" ? "bg-[#ff4d00] text-white" : "bg-white/10 text-white/60"}`}>{e.status}</span><span className="ml-auto text-[11px] text-white/35">{e.id}</span></div>
-            <p className="text-[13px] text-white/55 mt-1.5">{e.truck} • {e.email} • {e.phone}</p>
+            <p className="text-[13px] text-white/55 mt-1.5">{e.truck}, {e.email}, {e.phone}</p>
             <p className="text-sm mt-2">{e.message}</p>
             <div className="mt-3 flex gap-2">{["New", "Replied", "Closed"].map((s) => <button key={s} onClick={() => setEnquiryStatus(e.id, s)} className={`px-3.5 py-1.5 rounded-full text-[12px] font-bold border ${e.status === s ? "bg-white text-black border-white" : "border-white/15 text-white/55"}`}>{s}</button>)}</div>
           </div>))}
@@ -44,7 +44,7 @@ export function AdminQuotes() {
         <div className="mt-4 space-y-3">{quotes.length === 0 && <p className="rounded-[20px] border border-dashed border-white/15 p-8 text-center text-white/40 text-sm">No saved quotes yet.</p>}{quotes.map((x) => (
           <div key={x.id} className="rounded-[20px] border border-white/10 bg-[#0d1218] p-5">
             <div className="flex gap-2 items-center"><b>{x.id}</b><span className="text-[11px] font-black bg-white/10 rounded-full px-2.5 py-1">{x.status}</span><b className="ml-auto">${(x.total || 0).toFixed(2)}</b></div>
-            <p className="text-[13px] text-white/55 mt-1.5">{x.email} • {(x.items || []).length} lines</p>
+            <p className="text-[13px] text-white/55 mt-1.5">{x.email}, {(x.items || []).length} lines</p>
             <div className="mt-3 flex gap-2">{["New", "Quoted", "Won", "Lost"].map((s) => <button key={s} onClick={() => setQuoteStatus(x.id, s)} className={`px-3.5 py-1.5 rounded-full text-[12px] font-bold border ${x.status === s ? "bg-white text-black border-white" : "border-white/15 text-white/55"}`}>{s}</button>)}</div>
           </div>))}
         </div>

@@ -43,7 +43,7 @@ export function formatWeight(kg) {
  * Format dimensions
  */
 export function formatDimensions(length, width, height, unit = "mm") {
-  return `${length}×${width}×${height} ${unit}`;
+  return `${length}x${width}x${height} ${unit}`;
 }
 
 /**

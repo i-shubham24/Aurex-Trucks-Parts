@@ -2,17 +2,18 @@ import { Truck, X, Filter } from "lucide-react";
 import { useGarage } from "./GarageContext.jsx";
 import YMMWidget from "./YMMWidget.jsx";
 
-const CUT = { clipPath: "polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px))" };
+const NOTCH = { clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" };
 
 // Persistent fitment bar for the shop. Shows what the garage is filtering to, or prompts for a truck.
+// No clip-path on the outer container, so the YMM dropdown can overflow freely.
 export default function FitmentBanner({ fitCount, onlyFits, setOnlyFits }) {
   const { selectedVehicle, hasValidVehicle, clearSelectedVehicle } = useGarage();
 
   if (!hasValidVehicle) {
     return (
-      <div style={CUT} className="bg-[#12121B] text-white p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+      <div className="relative bg-[#12121B] text-white p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4 border-l-4 border-[#E53E00]">
         <div className="flex items-center gap-3 flex-1">
-          <span className="grid place-items-center w-10 h-10 bg-white/5 border border-white/10 text-[#FF6B35] shrink-0">
+          <span className="grid place-items-center w-10 h-10 bg-white/5 border border-white/10 text-[#FF6B35] shrink-0" style={NOTCH}>
             <Truck size={18} />
           </span>
           <div>
@@ -26,8 +27,8 @@ export default function FitmentBanner({ fitCount, onlyFits, setOnlyFits }) {
   }
 
   return (
-    <div style={CUT} className="bg-[#E53E00] text-white p-4 sm:px-5 flex flex-col sm:flex-row sm:items-center gap-3">
-      <span className="grid place-items-center w-10 h-10 bg-black/15 shrink-0" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
+    <div className="relative bg-[#E53E00] text-white p-4 sm:px-5 flex flex-col sm:flex-row sm:items-center gap-3 border-l-4 border-[#1A1A2E]">
+      <span className="grid place-items-center w-10 h-10 bg-black/15 shrink-0" style={NOTCH}>
         <Truck size={18} />
       </span>
       <div className="flex-1 min-w-0">

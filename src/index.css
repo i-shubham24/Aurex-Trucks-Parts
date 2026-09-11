@@ -110,6 +110,12 @@ body {
 @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
 .animate-floaty { animation: floaty 5.5s ease-in-out infinite; }
 
+/* House button shape: square with the bottom left corner cropped */
+.clip-cut { clip-path: polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px)); }
+.clip-cut-sm { clip-path: polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px)); }
+.clip-cut-lg { clip-path: polygon(0 0, 100% 0, 100% 100%, 18px 100%, 0 calc(100% - 18px)); }
+.clip-notch { clip-path: polygon(0 0, 100% 0, 100% 70%, 70% 100%, 0 100%); }
+
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee, .animate-marquee-slow, .animate-floaty { animation: none; }
   html { scroll-behavior: auto; }

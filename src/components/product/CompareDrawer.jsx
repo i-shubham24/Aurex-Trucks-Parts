@@ -124,7 +124,7 @@ export default function CompareDrawer({ open, onClose }) {
               <div className="p-5 border-t border-[#E5E7EB] bg-[#F7F8FA]">
                 <button
                   onClick={onClose}
-                  className="w-full bg-[#E53E00] text-white rounded-xl py-3.5 text-sm font-bold hover:bg-[#C23400] transition flex items-center justify-center gap-2"
+                  className="w-full bg-[#E53E00] text-white rounded-xl py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition flex items-center justify-center gap-2"
                 >
                   Continue Shopping <ArrowRight size={16} />
                 </button>

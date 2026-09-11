@@ -20,7 +20,7 @@ const DEFAULT_SETTINGS = {
   standardFee: 24,
   expressFee: 39,
   abn: "ABN 00 000 000 000",
-  announcement: "Free shipping over $500 • Dispatch in 1 to 2 days Australia wide",
+  announcement: "Free shipping over $500, Dispatch in 1 to 2 days Australia wide",
 };
 const DEFAULT_CONTENT = {
   heroKicker: "VIN matched catalogue for Aussie fleets",

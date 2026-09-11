@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Phone, Send, PackageSearch, ArrowRight, BadgeCheck, MapPin, Mail, Clock } from "lucide-react";
-import { BRANDS, GUIDES, NEWS } from "../data/catalog.js";
+import { ChevronDown, Phone, Send, PackageSearch, ArrowRight, BadgeCheck, MapPin, Mail, Clock, X } from "lucide-react";
+import { BRANDS, GUIDES, NEWS, HERO } from "../data/catalog.js";
 import { ProductCard, Reveal, SafeImg, SectionHead, staggerParent, staggerChild } from "../components/ui.jsx";
 import { useShop } from "../store/shop.jsx";
 import { useProducts } from "../store/products.jsx";
@@ -11,9 +11,20 @@ import { useSite } from "../store/site.jsx";
 function PageHero({ crumb, title, accent, sub, right }) {
   return (
     <section className="relative overflow-hidden bg-[#1A1A2E] text-white">
+      <SafeImg src={HERO.dark} alt="" label="AUREX" className="absolute inset-0 w-full h-full object-cover opacity-[0.14]" wrapClass="absolute inset-0 w-full h-full" />
       <div className="absolute inset-0 grid-scrim opacity-40" />
-      <div className="absolute -right-16 top-0 w-80 h-80 rounded-full bg-[#E53E00]/20 blur-[110px]" />
-      <div className="relative mx-auto max-w-7xl px-4 pt-10 pb-9 flex flex-wrap items-end gap-5">
+      <div className="absolute inset-0 bg-gradient-to-r from-[#1A1A2E] via-[#1A1A2E]/85 to-[#1A1A2E]/55" />
+
+      {/* animated glows */}
+      <motion.div aria-hidden animate={{ x: [0, 40, 0], y: [0, -24, 0], opacity: [0.2, 0.38, 0.2] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }} className="absolute -right-24 -top-12 w-[440px] h-[440px] rounded-full bg-[#E53E00]/25 blur-[130px]" />
+      <motion.div aria-hidden animate={{ x: [0, -30, 0], y: [0, 20, 0] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} className="absolute -left-24 -bottom-20 w-80 h-80 rounded-full bg-[#FF6B35]/15 blur-[130px]" />
+
+      {/* floating angular shapes */}
+      <motion.span aria-hidden animate={{ y: [0, -16, 0], rotate: [0, 8, 0] }} transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }} className="clip-cut hidden md:block absolute right-[9%] top-10 w-16 h-16 bg-[#E53E00]/15 border-2 border-[#E53E00]/40" />
+      <motion.span aria-hidden animate={{ y: [0, 14, 0], rotate: [0, -6, 0] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }} className="clip-cut hidden md:block absolute right-[18%] bottom-9 w-11 h-11 bg-[#FF6B35]/10 border-2 border-[#FF6B35]/30" />
+      <motion.span aria-hidden animate={{ y: [0, -10, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="clip-notch hidden lg:block absolute right-[4%] bottom-16 w-8 h-8 bg-white/5 border border-white/20" />
+
+      <div className="relative mx-auto max-w-7xl px-4 pt-12 pb-11 flex flex-wrap items-end gap-5">
         <Reveal className="max-w-2xl">
           <p className="text-[12px] font-semibold text-white/50">
             <Link to="/" className="hover:text-[#FF6B35] transition">Home</Link>
@@ -24,7 +35,7 @@ function PageHero({ crumb, title, accent, sub, right }) {
           </h1>
           {sub && <p className="text-white/60 text-[15px] mt-3 max-w-xl">{sub}</p>}
         </Reveal>
-        {right && <div className="ml-auto">{right}</div>}
+        {right && <div className="ml-auto relative">{right}</div>}
       </div>
     </section>
   );
@@ -89,7 +100,7 @@ export function BrandsPage() {
               <div className="flex flex-wrap items-center gap-3">
                 <p className="font-display font-bold text-2xl text-[#1A1A2E]">{active}</p>
                 <span className="text-[12px] font-semibold text-[#9CA3AF]">{preview.length} live matches</span>
-                <Link to="/shop" onClick={() => setQuery(active.split(" ")[0])} className="ml-auto bg-[#E53E00] text-white rounded-lg px-6 py-3 text-sm font-bold hover:bg-[#C23400] transition">Open in shop</Link>
+                <Link to="/shop" onClick={() => setQuery(active.split(" ")[0])} className="ml-auto bg-[#E53E00] text-white rounded-lg px-6 py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">Open in shop</Link>
               </div>
               <div className="mt-5 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {preview.slice(0, 3).map((p, i) => <ProductCard key={p.sku} p={p} index={i} />)}
@@ -129,7 +140,7 @@ export function DealsPage() {
               <motion.div initial={{ width: 0 }} whileInView={{ width: `${62 + ((i * 11) % 30)}%` }} viewport={{ once: true }} transition={{ duration: 1 }} className="h-full bg-gradient-to-r from-[#E53E00] to-[#FFBB00]" />
             </div>
             <p className="text-[11px] text-[#9CA3AF] mt-1.5">Selling fast this week</p>
-            <button onClick={() => add(p.sku)} className="mt-3 w-full bg-[#E53E00] text-white rounded-lg py-3 text-sm font-bold hover:bg-[#C23400] transition">Add deal to cart</button>
+            <button onClick={() => add(p.sku)} className="mt-3 w-full bg-[#E53E00] text-white rounded-lg py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">Add deal to cart</button>
           </motion.div>
         ))}
       </motion.div>
@@ -161,17 +172,17 @@ export function ResourcesPage() {
         <motion.div variants={staggerParent} initial="initial" whileInView="whileInView" viewport={{ once: true, margin: "-50px" }} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {articles.map((a) => (
             <motion.div key={a.title} variants={staggerChild}>
-              <div className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] hover:shadow-card-hover hover:border-[#E53E00]/40 transition h-full group">
-                <div className="h-44 overflow-hidden relative shine">
-                  <SafeImg src={a.img} alt={a.title} label={a.tag} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" wrapClass="w-full h-full" />
-                  <span className="absolute top-3 left-3 text-[11px] font-bold bg-white/95 rounded-lg px-3 py-1.5 text-[#1A1A2E]">{a.tag}</span>
+              <button onClick={() => setArt(a)} className="group relative block w-full text-left h-72 overflow-hidden clip-cut-lg">
+                <SafeImg src={a.img} alt={a.title} label={a.tag} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" wrapClass="absolute inset-0 w-full h-full" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A2E] via-[#1A1A2E]/35 to-transparent" />
+                <span className="clip-cut-lg absolute inset-0 border-[3px] border-[#E53E00] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <span className="clip-cut-sm absolute top-4 left-4 text-[11px] font-black uppercase tracking-wide bg-[#E53E00] text-white px-3 py-1.5">{a.tag}</span>
+                <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+                  <p className="font-display font-bold text-[19px] leading-tight">{a.title}</p>
+                  <p className="text-[13px] text-white/70 mt-1.5 line-clamp-2">{a.desc || "Read the full workshop guide and fitment tips."}</p>
+                  <span className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-black text-[#FF6B35] group-hover:gap-2.5 transition-all">Read guide <ArrowRight size={14} /></span>
                 </div>
-                <div className="p-5">
-                  <p className="font-display font-semibold text-[16px] text-[#1A1A2E] leading-snug">{a.title}</p>
-                  <p className="text-[13px] text-[#6B7280] mt-1.5">{a.desc || "Read the full workshop guide and fitment tips."}</p>
-                  <button onClick={() => setArt(a)} className="mt-3 text-[13px] font-bold text-[#E53E00] hover:underline">Read guide →</button>
-                </div>
-              </div>
+              </button>
             </motion.div>
           ))}
         </motion.div>
@@ -203,7 +214,7 @@ export function ResourcesPage() {
               <div className="p-6 bg-[#1A1A2E] text-white">
                 <p className="font-display font-bold text-xl">Need a hand from a specialist?</p>
                 <p className="text-white/60 text-[14px] mt-2">Send your VIN and a photo. Our team replies within 4 business hours with the exact parts and pricing.</p>
-                <Link to="/contact" className="mt-4 inline-flex items-center gap-2 bg-[#E53E00] text-white rounded-lg px-6 py-3 text-sm font-bold hover:bg-[#C23400] transition">Contact the parts desk <ArrowRight size={14} /></Link>
+                <Link to="/contact" className="mt-4 inline-flex items-center gap-2 bg-[#E53E00] text-white rounded-lg px-6 py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">Contact the parts desk <ArrowRight size={14} /></Link>
               </div>
             </div>
           </Reveal>
@@ -215,7 +226,7 @@ export function ResourcesPage() {
           <div className="fixed inset-0 z-[80] grid place-items-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/60" onClick={() => setArt(null)} />
             <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="relative w-full max-w-2xl rounded-2xl bg-white p-6 sm:p-8 max-h-[86vh] overflow-auto">
-              <div className="flex items-start gap-3"><div><p className="text-[11px] font-bold text-[#E53E00]">{art.tag}</p><p className="font-display font-bold text-2xl text-[#1A1A2E] mt-1">{art.title}</p></div><button onClick={() => setArt(null)} className="ml-auto p-2 border border-[#E5E7EB] rounded-lg text-[#6B7280]">✕</button></div>
+              <div className="flex items-start gap-3"><div><p className="text-[11px] font-bold text-[#E53E00]">{art.tag}</p><p className="font-display font-bold text-2xl text-[#1A1A2E] mt-1">{art.title}</p></div><button onClick={() => setArt(null)} className="ml-auto p-2 border border-[#E5E7EB] rounded-lg text-[#6B7280]"><X size={15} /></button></div>
               <img src={art.img} alt="" className="mt-4 w-full h-52 object-cover rounded-xl" loading="lazy" />
               <p className="mt-4 text-[14px] text-[#6B7280] leading-relaxed">{art.desc || "Workshop guide with fitment tips from the Aurex parts desk."} Match the table below to your rig, then shop the linked system with your SKU shortlist ready.</p>
               {BODIES[art.title] ? (
@@ -280,32 +291,57 @@ export function ContactPage() {
   return (
     <div>
       <PageHero crumb="Contact" title="Talk to the" accent="parts desk." sub="Send your VIN plus photos. A specialist replies within 4 business hours." />
-      <div className="mx-auto max-w-7xl px-4 py-12 grid lg:grid-cols-2 gap-6 items-start">
-        <Reveal className="space-y-4">
-          {[[MapPin, "Visit", "41 Halley Court, Campbellfield VIC 3061"], [Phone, "Call", "03 9000 0000, Mon to Fri 9am to 5pm"], [Mail, "Email", "sales@aurextruckparts.com.au"], [Clock, "Hours", "Mon to Fri 8am to 5pm AEST"]].map(([Icon, k, v]) => (
-            <div key={k} className="rounded-2xl bg-white border border-[#E5E7EB] p-6 shadow-sm flex items-start gap-4">
-              <span className="grid place-items-center w-11 h-11 rounded-xl bg-[#FFF0EB] text-[#E53E00] shrink-0"><Icon size={20} /></span>
-              <div>
+      <div className="mx-auto max-w-7xl px-4 py-12 grid lg:grid-cols-[1fr_1.05fr] gap-8 items-start">
+        <Reveal className="space-y-5">
+          <div>
+            <p className="text-[12px] font-black tracking-[0.22em] text-[#E53E00] uppercase">Reach the desk</p>
+            <h2 className="font-display font-bold text-[26px] sm:text-[30px] text-[#1A1A2E] mt-1 leading-tight">Three ways to get parts moving</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {[[Phone, "Call the trade desk", "03 9000 0000", "Mon to Fri, 8am to 5pm AEST"], [Mail, "Email us", "sales@aurextruckparts.com.au", "Replies within 4 business hours"], [MapPin, "Visit VIC", "41 Halley Court", "Campbellfield VIC 3061"], [Clock, "Pickup hours", "Mon to Fri 8am to 5pm", "Saturday by appointment"]].map(([Icon, k, v1, v2]) => (
+              <div key={k} className="group bg-white border border-[#E5E7EB] p-5 hover:border-[#E53E00]/40 hover:shadow-card-hover transition">
+                <span className="clip-notch grid place-items-center w-11 h-11 bg-[#E53E00] text-white mb-3 group-hover:scale-110 transition"><Icon size={19} /></span>
                 <p className="text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase">{k}</p>
-                <p className="font-semibold mt-1 text-[#1A1A2E]">{v}</p>
+                <p className="font-bold text-[#1A1A2E] mt-1 break-words">{v1}</p>
+                <p className="text-[13px] text-[#6B7280] mt-0.5">{v2}</p>
+              </div>
+            ))}
+          </div>
+          <div className="relative overflow-hidden bg-[#1A1A2E] text-white p-6 clip-cut-lg">
+            <div className="absolute inset-0 grid-scrim opacity-40" />
+            <div className="relative flex items-center gap-4">
+              <span className="clip-notch grid place-items-center w-12 h-12 bg-[#E53E00] shrink-0"><Phone size={22} /></span>
+              <div>
+                <p className="font-display font-bold text-lg leading-tight">Prefer to call? We match by VIN on the spot.</p>
+                <p className="text-white/60 text-[13px] mt-1">Have your VIN and a photo ready for the fastest match.</p>
               </div>
             </div>
-          ))}
-          <div className="rounded-2xl bg-gradient-to-br from-[#E53E00] to-[#C23400] p-6 flex items-center gap-4 text-white">
-            <Phone size={28} />
-            <p className="font-bold">Prefer to call? We match by VIN on the spot.</p>
           </div>
         </Reveal>
+
         <Reveal dir="right">
-          <form onSubmit={(e) => { e.preventDefault(); addEnquiry({ name: f.name, phone: f.phone, email: "", truck: f.truck || "Not specified", message: f.message }); setSent(true); setF({ name: "", phone: "", truck: "", message: "" }); }} className="rounded-2xl bg-white border border-[#E5E7EB] p-7 grid gap-3 shadow-sm">
-            {sent && <p className="rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-[13px] font-semibold px-4 py-3">Thanks. Your enquiry is logged and our VIC team will reply within 4 business hours.</p>}
-            <div className="grid sm:grid-cols-2 gap-3">
-              <input required value={f.name} onChange={set("name")} placeholder="Full name" className="rounded-xl px-4 py-3.5 text-sm bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-[#1A1A2E] focus:border-[#E53E00] transition" />
-              <input required value={f.phone} onChange={set("phone")} placeholder="Phone" className="rounded-xl px-4 py-3.5 text-sm bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-[#1A1A2E] focus:border-[#E53E00] transition" />
+          <form onSubmit={(e) => { e.preventDefault(); addEnquiry({ name: f.name, phone: f.phone, email: "", truck: f.truck || "Not specified", message: f.message }); setSent(true); setF({ name: "", phone: "", truck: "", message: "" }); }} className="bg-white border border-[#E5E7EB] overflow-hidden shadow-card">
+            <div className="relative overflow-hidden bg-[#1A1A2E] text-white px-7 py-6">
+              <div className="absolute inset-0 grid-scrim opacity-40" />
+              <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-[#E53E00]/25 blur-[70px]" />
+              <p className="relative text-[11px] font-black tracking-[0.2em] text-[#FF6B35] uppercase">Send an enquiry</p>
+              <p className="relative font-display font-bold text-xl mt-1">Tell us what you need</p>
             </div>
-            <input value={f.truck} onChange={set("truck")} placeholder="Truck make and model" className="rounded-xl px-4 py-3.5 text-sm bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-[#1A1A2E] focus:border-[#E53E00] transition" />
-            <textarea required value={f.message} onChange={set("message")} placeholder="Parts needed plus quantities" rows={5} className="rounded-xl px-4 py-3.5 text-sm bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-[#1A1A2E] focus:border-[#E53E00] transition" />
-            <button className="bg-[#E53E00] text-white rounded-xl py-4 text-sm font-bold hover:bg-[#C23400] transition">Send enquiry</button>
+            <div className="p-7 grid gap-3.5">
+              {sent && <p className="clip-cut-sm bg-emerald-50 border-2 border-emerald-200 text-emerald-700 text-[13px] font-semibold px-4 py-3">Thanks. Your enquiry is logged and our VIC team will reply within 4 business hours.</p>}
+              <div className="grid sm:grid-cols-2 gap-3.5">
+                <label className="grid gap-1.5"><span className="text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase">Full name</span>
+                  <input required value={f.name} onChange={set("name")} placeholder="John Smith" className="rounded-lg px-4 py-3.5 text-sm bg-[#F7F8FA] border-2 border-[#E5E7EB] outline-none text-[#1A1A2E] focus:border-[#E53E00] transition" /></label>
+                <label className="grid gap-1.5"><span className="text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase">Phone</span>
+                  <input required value={f.phone} onChange={set("phone")} placeholder="0400 000 000" className="rounded-lg px-4 py-3.5 text-sm bg-[#F7F8FA] border-2 border-[#E5E7EB] outline-none text-[#1A1A2E] focus:border-[#E53E00] transition" /></label>
+              </div>
+              <label className="grid gap-1.5"><span className="text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase">Truck make and model</span>
+                <input value={f.truck} onChange={set("truck")} placeholder="Kenworth T610, 2021" className="rounded-lg px-4 py-3.5 text-sm bg-[#F7F8FA] border-2 border-[#E5E7EB] outline-none text-[#1A1A2E] focus:border-[#E53E00] transition" /></label>
+              <label className="grid gap-1.5"><span className="text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase">Parts needed plus quantities</span>
+                <textarea required value={f.message} onChange={set("message")} placeholder="List the SKUs or describe the parts and how many..." rows={5} className="rounded-lg px-4 py-3.5 text-sm bg-[#F7F8FA] border-2 border-[#E5E7EB] outline-none text-[#1A1A2E] focus:border-[#E53E00] transition resize-none" /></label>
+              <button className="clip-cut bg-[#E53E00] text-white py-4 text-sm font-black uppercase tracking-wide flex items-center justify-center gap-2 hover:bg-[#1A1A2E] transition"><Send size={16} /> Send enquiry</button>
+              <p className="text-[12px] text-[#9CA3AF] text-center">We reply within 4 business hours on weekdays.</p>
+            </div>
           </form>
         </Reveal>
       </div>
@@ -325,7 +361,7 @@ export function QuotePage() {
           {cart.length === 0 && (
             <div className="rounded-2xl border border-dashed border-[#E5E7EB] p-12 text-center">
               <p className="font-display font-bold text-2xl text-[#1A1A2E]">Quote is empty</p>
-              <Link to="/shop" className="mt-4 inline-block bg-[#E53E00] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#C23400] transition">Browse shop</Link>
+              <Link to="/shop" className="mt-4 inline-block bg-[#E53E00] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition">Browse shop</Link>
             </div>
           )}
           {cart.map((i) => (
@@ -347,7 +383,7 @@ export function QuotePage() {
           <p className="mt-2 text-[12px] text-[#9CA3AF] flex gap-1.5"><BadgeCheck size={14} className="text-[#10B981] shrink-0 mt-0.5" /> Free freight over $500.</p>
           {saved && <p className="mt-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-[13px] font-semibold px-4 py-3">Saved as {saved}. Our desk replies shortly.</p>}
           <button onClick={() => { const id = addQuote({ email: "", items: cart, total }); setSaved(id); }} className="mt-3 w-full border border-[#E5E7EB] rounded-xl py-3.5 text-sm font-bold hover:border-[#1A1A2E] transition">Save as quote request</button>
-          <Link to="/checkout" className="mt-2.5 flex items-center justify-center gap-2 bg-[#E53E00] text-white rounded-xl py-4 text-sm font-bold hover:bg-[#C23400] transition"><Send size={15} /> Go to checkout</Link>
+          <Link to="/checkout" className="mt-2.5 flex items-center justify-center gap-2 bg-[#E53E00] text-white rounded-xl py-4 text-sm font-bold hover:bg-[#1A1A2E] transition"><Send size={15} /> Go to checkout</Link>
         </aside>
       </div>
     </div>
@@ -375,14 +411,14 @@ export function TrackPage() {
         <form onSubmit={(e) => { e.preventDefault(); setDone(true); }} className="rounded-2xl border border-[#E5E7EB] bg-white p-4 flex gap-2 shadow-sm">
           <span className="grid place-items-center w-12 h-12 rounded-xl bg-[#F7F8FA] border border-[#E5E7EB] shrink-0"><PackageSearch size={20} className="text-[#6B7280]" /></span>
           <input value={id} onChange={(e) => setId(e.target.value)} required placeholder="AUX-0000" className="flex-1 min-w-0 bg-transparent outline-none font-bold tracking-widest text-[#1A1A2E]" />
-          <button className="bg-[#E53E00] text-white rounded-xl px-6 py-3 text-sm font-bold hover:bg-[#C23400] transition">Track</button>
+          <button className="bg-[#E53E00] text-white rounded-xl px-6 py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">Track</button>
         </form>
         <AnimatePresence>
           {done && (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mt-4 rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
               <p className="font-bold text-[#1A1A2E]">Order {id || "AUX-0000"}</p>
               {done && !found && id.trim() !== "" && <p className="mt-1.5 text-[13px] text-[#9CA3AF]">No checkout record for this number in this browser. Showing demo timeline. Log in and order to track live.</p>}
-              {found && <p className="mt-1.5 text-[13px] font-bold text-emerald-600">Live status: {found.status} • ${found.total.toFixed(2)} • {found.items.length} lines</p>}
+              {found && <p className="mt-1.5 text-[13px] font-bold text-emerald-600">Live status: {found.status}, ${found.total.toFixed(2)}, {found.items.length} lines</p>}
               <div className="mt-3">
                 {steps.map(([t, on], i) => (
                   <p key={t} className="flex gap-2.5 py-2 text-sm">

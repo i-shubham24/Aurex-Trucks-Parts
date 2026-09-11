@@ -143,7 +143,7 @@ export default function ProductDetail() {
                 </div>
               )}
               {!hasValidVehicle && (
-                <div style={cut} className="bg-[#F7F8FA] border border-[#E5E7EB] p-4 flex flex-wrap items-center gap-3">
+                <div className="bg-[#F7F8FA] border border-[#E5E7EB] border-l-4 border-l-[#E53E00] p-4 flex flex-wrap items-center gap-3">
                   <Truck size={20} className="text-[#E53E00] shrink-0" />
                   <div className="flex-1 min-w-[180px]">
                     <p className="font-bold text-[#1A1A2E] text-[15px]">Add your truck to confirm fit</p>
@@ -160,7 +160,7 @@ export default function ProductDetail() {
               </p>
               <div className="mt-2.5 flex gap-2">
                 <input value={vin} onChange={(e) => setVin(e.target.value)} placeholder="Enter VIN, 17 characters" className="flex-1 rounded-lg px-4 py-3 bg-white border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#E53E00] transition" />
-                <button onClick={() => setVinOk(vin.trim().length >= 6)} className="bg-[#E53E00] text-white rounded-lg px-5 py-3 text-sm font-bold hover:bg-[#C23400] transition">Check</button>
+                <button onClick={() => setVinOk(vin.trim().length >= 6)} className="clip-cut bg-[#E53E00] text-white px-5 py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">Check</button>
               </div>
               {vinOk === true && (
                 <p className="mt-2 text-[13px] text-[#10B981] font-semibold flex items-center gap-1.5">
@@ -176,13 +176,13 @@ export default function ProductDetail() {
                 <b className="w-8 text-center font-display text-lg text-[#1A1A2E]">{qty}</b>
                 <button onClick={() => setQty(qty + 1)} className="w-10 h-10 grid place-items-center rounded-lg border border-[#E5E7EB] hover:border-[#E53E00] transition text-[#6B7280]"><Plus size={15} /></button>
               </span>
-              <button onClick={() => add(p.sku, qty)} className="flex-1 min-w-[220px] bg-[#E53E00] rounded-lg py-4 text-sm font-bold hover:bg-[#C23400] active:scale-[0.99] transition flex items-center justify-center gap-2 text-white shadow-primary">
+              <button onClick={() => add(p.sku, qty)} className="clip-cut flex-1 min-w-[220px] bg-[#E53E00] py-4 text-sm font-bold hover:bg-[#1A1A2E] active:scale-[0.99] transition flex items-center justify-center gap-2 text-white shadow-primary">
                 <ShoppingCart size={16} /> Add {qty} to quote cart
               </button>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button onClick={() => toggleCompare(p.sku)} className={`flex-1 min-w-[150px] rounded-lg py-3 text-[13px] font-bold border transition ${compare.includes(p.sku) ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#1A1A2E] hover:text-[#1A1A2E]"}`}>{compare.includes(p.sku) ? "Added to compare" : "Add to compare"}</button>
-              <button onClick={() => setEnquirySku(p.sku)} className="flex-1 min-w-[150px] rounded-lg py-3 text-[13px] font-bold border border-[#E5E7EB] text-[#6B7280] hover:border-[#E53E00] hover:text-[#E53E00] transition">Enquire on this SKU</button>
+              <button onClick={() => toggleCompare(p.sku)} className={`clip-cut-sm flex-1 min-w-[150px] py-3 text-[13px] font-bold border-2 transition ${compare.includes(p.sku) ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#1A1A2E] hover:text-[#1A1A2E]"}`}>{compare.includes(p.sku) ? "Added to compare" : "Add to compare"}</button>
+              <button onClick={() => setEnquirySku(p.sku)} className="clip-cut-sm flex-1 min-w-[150px] py-3 text-[13px] font-bold border-2 border-[#E5E7EB] text-[#6B7280] hover:border-[#E53E00] hover:text-[#E53E00] transition">Enquire on this SKU</button>
             </div>
 
             <div className="mt-4 grid grid-cols-3 gap-2.5 text-[12px]">

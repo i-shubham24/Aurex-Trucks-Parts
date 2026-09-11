@@ -28,7 +28,7 @@ export function CheckoutPage() {
     <div className="mx-auto max-w-xl px-4 py-14 text-center">
       <h1 className="font-display font-bold text-3xl text-[#1A1A2E]">Cart is empty</h1>
       <p className="text-[#6B7280] text-sm mt-2">Add parts before checkout.</p>
-      <Link to="/shop" className="mt-5 inline-block bg-[#E53E00] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#C23400] transition">Back to shop</Link>
+      <Link to="/shop" className="mt-5 inline-block bg-[#E53E00] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition">Back to shop</Link>
     </div>
   );
 
@@ -124,7 +124,7 @@ export function CheckoutPage() {
               const order = placeOrder({ items: cart, subtotal: total, shipping: shipOpt.label, shippingFee: fee, payment: pay, total: grand, address: form });
               setCart([]);
               nav(`/order-success/${order.id}`);
-            }} className="mt-5 w-full bg-[#E53E00] text-white rounded-xl py-4 text-sm font-bold hover:bg-[#C23400] transition flex items-center justify-center gap-2">
+            }} className="mt-5 w-full bg-[#E53E00] text-white rounded-xl py-4 text-sm font-bold hover:bg-[#1A1A2E] transition flex items-center justify-center gap-2">
               <Lock size={15} /> Pay ${grand.toFixed(2)}, Place order
             </button>
           </aside>
@@ -154,7 +154,7 @@ export function OrderSuccessPage() {
         </div>
       )}
       <div className="mt-6 flex flex-wrap justify-center gap-2.5">
-        <Link to={`/track?order=${id || ""}`} className="bg-[#E53E00] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#C23400] transition">Track this order</Link>
+        <Link to={`/track?order=${id || ""}`} className="bg-[#E53E00] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition">Track this order</Link>
         <Link to="/shop" className="rounded-lg px-7 py-3.5 text-sm font-bold border border-[#E5E7EB] text-[#1A1A2E] flex items-center gap-2 hover:border-[#E53E00] transition">Keep shopping <ArrowRight size={15} /></Link>
       </div>
     </div>

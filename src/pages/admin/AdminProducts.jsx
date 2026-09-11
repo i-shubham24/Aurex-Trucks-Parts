@@ -88,7 +88,7 @@ export default function AdminProducts() {
             <tr key={p.sku} className="border-t border-white/[0.07] hover:bg-white/[0.02]">
               <td className="px-4 py-2.5">{p.image ? <img src={p.image} alt="" className="w-12 h-12 rounded-lg object-cover" loading="lazy" /> : <span className="grid place-items-center w-12 h-12 rounded-lg bg-white/5 text-white/25"><ImageIcon size={18} /></span>}</td>
               <td className="px-2 py-3 font-bold text-[12px]">{p.sku}</td>
-              <td className="px-4 py-3"><b className="block max-w-[300px] truncate">{p.name}</b><span className="text-[11px] text-white/35">{p.brand} • {p.reviews} rev</span></td>
+              <td className="px-4 py-3"><b className="block max-w-[300px] truncate">{p.name}</b><span className="text-[11px] text-white/35">{p.brand}, {p.reviews} rev</span></td>
               <td className="px-4 py-3 text-white/60 text-[13px]">{p.cat}</td>
               <td className="px-4 py-3 font-bold">${p.price.toFixed(2)}{p.oldPrice && <span className="block text-[11px] line-through text-white/30 font-medium">${p.oldPrice.toFixed(2)}</span>}</td>
               <td className="px-4 py-3"><span className="text-[11px] font-black bg-white/10 rounded-full px-2.5 py-1">{p.stock}</span></td>
