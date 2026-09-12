@@ -52,40 +52,126 @@ export function AboutPage() {
 
 export function LocationsPage() {
   return (
-    <div className="bg-[#F7F8FA]">
-      <PageHero crumb="Locations" title="Pickup in VIC." accent="Freight everywhere." sub="Click and Collect from Campbellfield, or tracked freight to every state." />
-      <div className="mx-auto max-w-7xl px-4 py-12 grid md:grid-cols-3 gap-5">
-        <div className="rounded-2xl bg-white border border-[#E5E7EB] p-6 shadow-sm">
-          <p className="inline-block text-[11px] font-black bg-[#10B981] text-white rounded-lg px-2.5 py-1">OPEN NOW</p>
-          <p className="font-display font-bold text-xl text-[#1A1A2E] mt-3 flex items-center gap-2"><MapPin size={18} className="text-[#E53E00]" /> Campbellfield VIC</p>
-          <p className="text-sm text-[#6B7280] mt-1.5">41 Halley Court, Campbellfield VIC 3061</p>
-          <div className="mt-3 space-y-1.5 text-[13px] text-[#4B5563]">
-            <p className="flex items-center gap-2"><Clock size={14} /> Mon to Fri 9am to 5pm, Sat 9am to 12pm</p>
-            <p className="flex items-center gap-2"><Phone size={14} /> 03 9000 0000</p>
-            <p className="flex items-center gap-2"><Mail size={14} /> sales@aurextruckparts.com.au</p>
-          </div>
-          <p className="mt-3 text-[13px] font-semibold text-[#1A1A2E]">Order by 2pm for same day dispatch. Ready in 4 hours for pickup.</p>
-        </div>
-        {[["Brisbane QLD", "Ending 2026", "Northside trade counter with Click and Collect for SEQ fleets."], ["Sydney NSW", "Ending 2026", "Western Sydney pickup point for overnight metro orders."]].map(([t, tag, d]) => (
-          <div key={t} className="rounded-2xl bg-white border border-dashed border-[#E5E7EB] p-6">
-            <p className="inline-block text-[11px] font-black bg-[#F3F4F6] text-[#6B7280] rounded-lg px-2.5 py-1">{tag.toUpperCase()}</p>
-            <p className="font-display font-bold text-xl text-[#1A1A2E] mt-3 flex items-center gap-2"><Building2 size={18} className="text-[#9CA3AF]" /> {t}</p>
-            <p className="text-sm text-[#6B7280] mt-1.5">{d}</p>
-            <p className="mt-3 text-[13px] text-[#6B7280]">Until opening day this region ships tracked from VIC in 1 to 3 days.</p>
-          </div>
-        ))}
-      </div>
-      <div className="mx-auto max-w-7xl px-4 pb-6">
-        <div className="rounded-2xl bg-[#1A1A2E] text-white p-6 sm:p-8 grid sm:grid-cols-3 gap-5">
-          {[["VIC metro", "1 day"], ["Sydney, Brisbane, Adelaide", "1 to 2 days"], ["Perth plus regional", "2 to 5 days"]].map(([a, b]) => (
-            <div key={a}><p className="font-display font-bold text-2xl">{b}</p><p className="text-white/55 text-sm">{a}</p></div>
-          ))}
+    <div className="bg-[#F9FAFB] min-h-screen pb-20">
+      <div className="bg-[#1A1A2E] text-white py-20 relative overflow-hidden">
+        <div className="absolute inset-0 grid-scrim opacity-30" />
+        <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2000&auto=format&fit=crop" alt="Warehouse" className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-luminosity" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A2E] to-transparent" />
+        
+        <div className="max-w-6xl mx-auto px-4 relative z-10 text-center">
+          <span className="inline-block bg-[#E53E00] text-white text-[12px] font-black px-4 py-1.5 rounded-full tracking-widest mb-4">NATIONAL NETWORK</span>
+          <h1 className="font-display font-bold text-4xl md:text-6xl max-w-3xl mx-auto leading-tight">
+            Pickup in Victoria. <br/>
+            <span className="text-[#9CA3AF]">Freight everywhere.</span>
+          </h1>
+          <p className="text-[#9CA3AF] mt-6 max-w-2xl mx-auto text-lg">
+            Our 60,000+ parts inventory is dispatched daily from our central Campbellfield warehouse, with new rapid pickup counters opening across the eastern seaboard in 2026.
+          </p>
         </div>
       </div>
-      <div className="mx-auto max-w-7xl px-4 pb-12 grid md:grid-cols-3 gap-4">
-        {[["Truck parts Sydney", "Western Sydney workshops get overnight metro freight on stock lines ordered by 2pm. Braking, filtration and lighting move daily from Campbellfield."], ["Truck parts Brisbane", "South East Queensland routes run 2 to 3 days. Acacia Ridge pickup options open with our Brisbane counter. Bulk fleet orders ride free over threshold."], ["Truck parts Perth", "WA freight runs 3 to 5 days with tracking at every leg. Order service kits ahead of shutdowns and we consolidate cartons free."]].map(([t, d]) => (
-          <div key={t} className="rounded-2xl bg-white border border-[#E5E7EB] p-6"><p className="font-display font-bold text-lg text-[#1A1A2E]">{t}</p><p className="text-sm text-[#6B7280] mt-1.5 leading-relaxed">{d}</p></div>
-        ))}
+
+      <div className="max-w-6xl mx-auto px-4 -mt-12 relative z-20">
+        <div className="bg-white rounded-3xl p-8 md:p-12 shadow-elevated border border-[#E5E7EB] grid lg:grid-cols-[1.5fr_1fr] gap-12 items-center">
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="flex items-center gap-1.5 text-[11px] font-black bg-[#10B981]/10 text-[#10B981] rounded-md px-2.5 py-1 uppercase tracking-wider"><span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" /> HQ & Trade Counter</span>
+            </div>
+            <h2 className="font-display font-bold text-3xl text-[#1A1A2E] mb-2">Campbellfield, VIC</h2>
+            <p className="text-[#6B7280] mb-8 text-lg">41 Halley Court, Campbellfield VIC 3061</p>
+            
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-[#F5F6F8] flex items-center justify-center text-[#E53E00] shrink-0"><Clock size={24} /></div>
+                <div>
+                  <p className="font-bold text-[#1A1A2E]">Trading Hours</p>
+                  <p className="text-[#6B7280] text-sm mt-1">Monday to Friday: 8:00am - 5:00pm<br/>Saturday: 9:00am - 12:00pm</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-xl bg-[#F5F6F8] flex items-center justify-center text-[#E53E00] shrink-0"><Phone size={24} /></div>
+                <div>
+                  <p className="font-bold text-[#1A1A2E]">Contact</p>
+                  <p className="text-[#6B7280] text-sm mt-1">03 9000 0000<br/>sales@aurextruckparts.com.au</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-10 bg-[#FFF0EB] border border-[#FFD0C2] rounded-2xl p-5">
+              <p className="text-sm font-bold text-[#E53E00] flex items-center gap-2"><Truck size={18} /> Click & Collect</p>
+              <p className="text-[13px] text-[#A62D00] mt-1">Order by 2pm for same day dispatch, or select Click & Collect at checkout for 4-hour turnaround.</p>
+            </div>
+          </div>
+          
+          <div className="h-full min-h-[300px] bg-[#F5F6F8] rounded-2xl overflow-hidden relative border border-[#E5E7EB]">
+            <img src="https://images.unsplash.com/photo-1587293852726-70cdb56c2866?q=80&w=1000&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover" alt="Warehouse Location" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+            <div className="absolute bottom-6 left-6 flex items-center gap-3">
+              <div className="relative">
+                <div className="absolute inset-0 bg-[#E53E00] rounded-full animate-ping opacity-60" />
+                <div className="relative w-12 h-12 bg-[#E53E00] text-white rounded-full flex items-center justify-center shadow-lg border-4 border-white">
+                  <MapPin size={20} />
+                </div>
+              </div>
+              <div className="text-white">
+                <p className="font-bold text-lg drop-shadow-md">Campbellfield HQ</p>
+                <p className="text-sm text-white/90 drop-shadow-md">Victoria, Australia</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 mt-16">
+        <h3 className="font-display font-bold text-2xl text-[#1A1A2E] mb-6">Coming Soon (2026)</h3>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-2xl border border-dashed border-[#CBD5E1] p-8 hover:border-[#E53E00] transition group">
+            <div className="flex justify-between items-start mb-4">
+              <Building2 size={32} className="text-[#9CA3AF] group-hover:text-[#E53E00] transition" />
+              <span className="bg-[#F1F5F9] text-[#64748B] text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Opening Q3 2026</span>
+            </div>
+            <h4 className="font-display font-bold text-xl text-[#1A1A2E]">Brisbane, QLD</h4>
+            <p className="text-[#6B7280] text-sm mt-3 leading-relaxed">
+              Northside trade counter with rapid Click and Collect for South East Queensland fleets. Acacia Ridge pickup options open alongside our Brisbane counter. 
+            </p>
+          </div>
+          
+          <div className="bg-white rounded-2xl border border-dashed border-[#CBD5E1] p-8 hover:border-[#E53E00] transition group">
+            <div className="flex justify-between items-start mb-4">
+              <Building2 size={32} className="text-[#9CA3AF] group-hover:text-[#E53E00] transition" />
+              <span className="bg-[#F1F5F9] text-[#64748B] text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Opening Q4 2026</span>
+            </div>
+            <h4 className="font-display font-bold text-xl text-[#1A1A2E]">Sydney, NSW</h4>
+            <p className="text-[#6B7280] text-sm mt-3 leading-relaxed">
+              Western Sydney pickup point for overnight metro orders. Stocking core braking, filtration, and lighting systems.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div className="max-w-6xl mx-auto px-4 mt-16">
+        <div className="bg-[#1A1A2E] rounded-3xl p-8 md:p-12 text-white overflow-hidden relative">
+          <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#E53E00]/10 rounded-full blur-3xl" />
+          <div className="relative z-10">
+            <h3 className="font-display font-bold text-2xl mb-8 flex items-center gap-3"><Truck className="text-[#E53E00]" /> National Freight Times</h3>
+            <div className="grid sm:grid-cols-3 gap-8 sm:gap-4 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
+              <div className="pt-4 sm:pt-0 sm:px-6 first:pl-0">
+                <p className="text-[#FF6B35] font-black text-3xl font-display">1 Day</p>
+                <p className="font-bold text-lg mt-1">VIC Metro</p>
+                <p className="text-white/60 text-sm mt-2">Overnight freight on stock lines ordered by 2pm.</p>
+              </div>
+              <div className="pt-4 sm:pt-0 sm:px-6">
+                <p className="text-[#FF6B35] font-black text-3xl font-display">1-2 Days</p>
+                <p className="font-bold text-lg mt-1">Sydney, Brisbane, Adelaide</p>
+                <p className="text-white/60 text-sm mt-2">South East Queensland routes run daily from Campbellfield.</p>
+              </div>
+              <div className="pt-4 sm:pt-0 sm:px-6">
+                <p className="text-[#FF6B35] font-black text-3xl font-display">2-5 Days</p>
+                <p className="font-bold text-lg mt-1">Perth & Regional</p>
+                <p className="text-white/60 text-sm mt-2">WA freight runs with tracking at every leg. Consolidate cartons free.</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

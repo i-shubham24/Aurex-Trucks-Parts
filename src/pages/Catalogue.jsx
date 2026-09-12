@@ -29,9 +29,9 @@ export function CataloguePage() {
               Features over 200 of our most popular trailer and truck parts, including detailed specifications, load ratings, and technical drawings for axles and braking systems.
             </p>
             <div className="flex flex-wrap gap-4 justify-center md:justify-start mt-6">
-              <button onClick={() => alert('Catalogue PDF download simulated.')} className="bg-[#E53E00] text-white px-6 py-3.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-[#1A1A2E] transition">
+              <a href="/Aurex_Catalogue_2026.pdf" download="Aurex_Catalogue_2026.pdf" className="bg-[#E53E00] text-white px-6 py-3.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-[#1A1A2E] transition">
                 <Download size={18} /> Download PDF (12MB)
-              </button>
+              </a>
             </div>
             <p className="text-xs text-[#9CA3AF] mt-4">
               Last updated: August 2026. Prices in the catalogue may be subject to change. For live pricing, please search the part number on our website.

@@ -214,11 +214,13 @@ export function SafeImg({ src, alt, className = "", label, wrapClass = "" }) {
 
 export function SectionHead({ kicker, title, sub, link, linkLabel, center }) {
   return (
-    <Reveal className={`flex flex-wrap items-end gap-5 mb-8 ${center ? "justify-center text-center" : ""}`}>
-      <div className={`max-w-2xl ${center ? "mx-auto" : ""}`}>
+    <Reveal className={center ? "grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-end gap-6 mb-10" : "flex flex-wrap items-end justify-between gap-5 mb-8"}>
+      {center && <div className="hidden md:block"></div>}
+      
+      <div className={`max-w-2xl ${center ? "text-center mx-auto" : ""}`}>
         {kicker && (
           <p className={`text-[12px] font-black tracking-[0.22em] text-[#E53E00] uppercase mb-2 flex items-center gap-2 ${center ? "justify-center" : ""}`}>
-{kicker}
+            {kicker}
           </p>
         )}
         <h2 className="font-display font-bold tracking-[-0.02em] text-[28px] sm:text-[38px] leading-[1.05] text-[#1A1A2E]">
@@ -226,14 +228,19 @@ export function SectionHead({ kicker, title, sub, link, linkLabel, center }) {
         </h2>
         {sub && <p className="text-[#6B7280] text-[15px] mt-2.5 leading-relaxed">{sub}</p>}
       </div>
-      {link && (
-        <Link
-          to={link}
-          className={`clip-cut ${center ? "mx-auto" : "ml-auto"} text-sm font-bold flex items-center gap-2 bg-[#F5F6F8] px-6 py-3 text-[#1A1A2E] hover:bg-[#1A1A2E] hover:text-white hover:gap-3 transition-all group`}
-        >
-          {linkLabel || "View all"}
-          <ArrowRight size={15} className="group-hover:translate-x-0.5 transition" />
-        </Link>
+
+      {link ? (
+        <div className={`flex ${center ? "justify-center md:justify-end" : ""}`}>
+          <Link
+            to={link}
+            className={`clip-cut text-sm font-bold flex items-center gap-2 bg-[#F5F6F8] px-6 py-3 text-[#1A1A2E] hover:bg-[#1A1A2E] hover:text-white hover:gap-3 transition-all group`}
+          >
+            {linkLabel || "View all"}
+            <ArrowRight size={15} className="group-hover:translate-x-0.5 transition" />
+          </Link>
+        </div>
+      ) : (
+        center && <div className="hidden md:block"></div>
       )}
     </Reveal>
   );

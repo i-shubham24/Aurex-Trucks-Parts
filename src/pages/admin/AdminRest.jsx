@@ -125,20 +125,34 @@ export function AdminContent() {
 
 export function AdminSettings() {
   const { settings, setSettings, resetSite } = useSite();
+  const [saved, setSaved] = useState(false);
+  
   const set = (k) => (e) => setSettings({ ...settings, [k]: e.target.type === "number" ? Number(e.target.value) : e.target.value });
+  
+  const handleSave = () => {
+    // Already auto-saved to store, just provide UX feedback
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
   return (
     <div>
       <h1 className="font-display font-bold text-3xl">Store settings</h1>
       <p className="text-white/50 text-sm mt-1">Contact, freight rules and announcement bar.</p>
       <div className="mt-5 rounded-[22px] border border-white/10 bg-[#0d1218] p-6 grid sm:grid-cols-2 gap-3 text-sm">
         {[["storeName", "Store name"], ["phone", "Phone"], ["email", "Email"], ["address", "Address"], ["hours", "Hours"], ["abn", "ABN"]].map(([k, l]) => (
-          <label key={k} className="grid gap-1.5"><span className="text-[11px] font-black tracking-widest text-white/35">{l.toUpperCase()}</span><input value={settings[k] || ""} onChange={set(k)} className="rounded-xl px-4 py-3 bg-black/40 border border-white/10 outline-none" /></label>
+          <label key={k} className="grid gap-1.5"><span className="text-[11px] font-black tracking-widest text-white/35">{l.toUpperCase()}</span><input value={settings[k] || ""} onChange={set(k)} className="rounded-xl px-4 py-3 bg-black/40 border border-white/10 outline-none focus:border-[#ff4d00]/50 transition" /></label>
         ))}
-        <label className="grid gap-1.5"><span className="text-[11px] font-black tracking-widest text-white/35">FREE FREIGHT OVER ($)</span><input type="number" value={settings.freeFreightOver} onChange={set("freeFreightOver")} className="rounded-xl px-4 py-3 bg-black/40 border border-white/10 outline-none" /></label>
-        <label className="grid gap-1.5"><span className="text-[11px] font-black tracking-widest text-white/35">STANDARD FEE ($)</span><input type="number" value={settings.standardFee} onChange={set("standardFee")} className="rounded-xl px-4 py-3 bg-black/40 border border-white/10 outline-none" /></label>
-        <label className="grid gap-1.5 sm:col-span-2"><span className="text-[11px] font-black tracking-widest text-white/35">ANNOUNCEMENT BAR</span><input value={settings.announcement} onChange={set("announcement")} className="rounded-xl px-4 py-3 bg-black/40 border border-white/10 outline-none" /></label>
+        <label className="grid gap-1.5"><span className="text-[11px] font-black tracking-widest text-white/35">FREE FREIGHT OVER ($)</span><input type="number" value={settings.freeFreightOver} onChange={set("freeFreightOver")} className="rounded-xl px-4 py-3 bg-black/40 border border-white/10 outline-none focus:border-[#ff4d00]/50 transition" /></label>
+        <label className="grid gap-1.5"><span className="text-[11px] font-black tracking-widest text-white/35">STANDARD FEE ($)</span><input type="number" value={settings.standardFee} onChange={set("standardFee")} className="rounded-xl px-4 py-3 bg-black/40 border border-white/10 outline-none focus:border-[#ff4d00]/50 transition" /></label>
+        <label className="grid gap-1.5 sm:col-span-2"><span className="text-[11px] font-black tracking-widest text-white/35">ANNOUNCEMENT BAR</span><input value={settings.announcement} onChange={set("announcement")} className="rounded-xl px-4 py-3 bg-black/40 border border-white/10 outline-none focus:border-[#ff4d00]/50 transition" /></label>
       </div>
-      <button onClick={() => { if (confirm("Reset settings and content to defaults?")) resetSite(); }} className="mt-4 rounded-full border border-white/15 px-6 py-3 text-sm font-bold">Reset to defaults</button>
+      <div className="mt-6 flex items-center gap-3">
+        <button onClick={handleSave} className={`rounded-xl px-8 py-3.5 text-sm font-bold transition flex items-center gap-2 ${saved ? 'bg-[#10B981] text-white' : 'bg-[#ff4d00] text-white hover:bg-[#ff8c00]'}`}>
+          {saved ? "Settings Saved!" : "Save Settings"}
+        </button>
+        <button onClick={() => { if (confirm("Reset settings and content to defaults?")) resetSite(); }} className="rounded-xl border border-white/15 px-6 py-3.5 text-sm font-bold text-white/60 hover:text-white hover:bg-white/5 transition">Reset to defaults</button>
+      </div>
     </div>
   );
 }

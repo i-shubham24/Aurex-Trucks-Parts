@@ -18,8 +18,8 @@ export default function BootLoader() {
       setGone(true);
       return;
     }
-    // No loader on mobile and compact screens. Small screens go straight in.
-    if (window.matchMedia?.("(max-width: 820px)").matches) {
+    // No loader on mobile, compact screens, or admin portal.
+    if (window.matchMedia?.("(max-width: 820px)").matches || window.location.pathname.startsWith('/admin')) {
       setGone(true);
       return;
     }

@@ -115,7 +115,7 @@ export default function Layout({ children }) {
           <div>
             <p className="font-bold text-[12px] tracking-widest text-white/40 uppercase">Support</p>
             <div className="mt-3 grid gap-2 text-white/65">
-              <Link to="/resources" className="hover:text-white transition w-fit">Guides</Link>
+              <Link to="/resources" className="hover:text-white transition w-fit">Resources</Link>
               <Link to="/compliance" className="hover:text-white transition w-fit">ADR Compliance</Link>
               <Link to="/track" className="hover:text-white transition w-fit">Track order</Link>
               <Link to="/quote" className="hover:text-white transition w-fit">Quote cart</Link>
