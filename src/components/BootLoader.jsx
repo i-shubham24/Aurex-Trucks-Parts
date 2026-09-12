@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Volume2, VolumeX } from "lucide-react";
 
 const MIN_SHOW = 1200;
 const MAX_SHOW = 9000;
@@ -9,11 +8,10 @@ export default function BootLoader() {
   const [gone, setGone] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [ready, setReady] = useState(false);
-  const [muted, setMuted] = useState(true);
-  const [soundBlocked, setSoundBlocked] = useState(false);
   const videoRef = useRef(null);
   const doneRef = useRef(false);
   const t0Ref = useRef(Date.now());
+  const soundOnRef = useRef(false);
 
   useEffect(() => {
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
@@ -35,19 +33,28 @@ export default function BootLoader() {
       setTimeout(() => setLeaving(true), wait);
     };
 
-    // Try with sound first. Browsers block audible autoplay, so fall
-    // back to muted motion plus a tap for sound button.
+    // Sound on by default. Browsers block audible autoplay until the first
+    // user gesture, so try unmuted immediately and also unmute on the first
+    // pointer or key interaction anywhere on the page.
+    const enableSound = () => {
+      const el = videoRef.current;
+      if (!el || soundOnRef.current) return;
+      el.muted = false;
+      el.play()
+        .then(() => { soundOnRef.current = true; })
+        .catch(() => { /* still blocked, retry on next gesture */ });
+    };
     const trySound = async () => {
       if (!v) return;
       v.muted = false;
       try {
         await v.play();
-        setMuted(false);
+        soundOnRef.current = true;
       } catch {
         v.muted = true;
-        setMuted(true);
-        setSoundBlocked(true);
         try { await v.play(); } catch { /* still blocked, splash covers */ }
+        window.addEventListener("pointerdown", enableSound, { once: true });
+        window.addEventListener("keydown", enableSound, { once: true });
       }
     };
     trySound();
@@ -64,6 +71,8 @@ export default function BootLoader() {
       v?.removeEventListener("playing", onPlaying);
       v?.removeEventListener("ended", onEnded);
       v?.removeEventListener("error", onError);
+      window.removeEventListener("pointerdown", enableSound);
+      window.removeEventListener("keydown", enableSound);
       document.body.style.overflow = "";
     };
   }, []);
@@ -77,16 +86,6 @@ export default function BootLoader() {
     return () => clearTimeout(t);
   }, [leaving]);
 
-  const unmute = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.muted = false;
-    v.play().then(() => {
-      setMuted(false);
-      setSoundBlocked(false);
-    }).catch(() => {});
-  };
-
   if (gone) return null;
 
   return (
@@ -98,36 +97,17 @@ export default function BootLoader() {
           exit={{ opacity: 0, scale: 1.04, filter: "blur(6px)" }}
           transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="absolute inset-0 grid place-items-center">
-            <div className="text-center">
-              <p className="font-display font-black text-3xl tracking-wide text-white">AUREX</p>
-              <p className="mt-1 text-[11px] font-black tracking-[0.3em] text-white/50 uppercase">Truck Parts Australia</p>
-              <div className="mt-5 mx-auto w-40 h-[3px] rounded-full bg-white/10 overflow-hidden">
-                <div className="h-full w-1/2 rounded-full bg-[#E53E00] animate-pulse" />
-              </div>
-            </div>
-          </div>
           <motion.video
             ref={videoRef}
             src="/aurex-loader.mp4"
             className="absolute inset-0 h-full w-full object-cover"
             autoPlay
-            muted
             playsInline
             preload="auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: ready ? 1 : 0 }}
             transition={{ duration: 0.4 }}
           />
-          {soundBlocked && ready && (
-            <button
-              onClick={unmute}
-              className="absolute bottom-6 right-6 flex items-center gap-2 rounded-full bg-black/60 backdrop-blur border border-white/15 px-4 py-2.5 text-[12px] font-bold text-white hover:border-[#E53E00] transition"
-            >
-              {muted ? <VolumeX size={15} /> : <Volume2 size={15} />}
-              {muted ? "Tap for sound" : "Sound on"}
-            </button>
-          )}
         </motion.div>
       )}
     </AnimatePresence>
