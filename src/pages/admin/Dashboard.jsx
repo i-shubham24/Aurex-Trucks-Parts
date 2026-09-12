@@ -62,7 +62,7 @@ export default function Dashboard() {
       <div className="mt-5 rounded-[22px] border border-white/10 bg-[#0d1218] p-5">
         <p className="font-display font-bold text-xl">Latest orders</p>
         <div className="mt-3 overflow-x-auto">
-          <table className="w-full text-sm min-w-[640px]">
+          <table className="sticky-col w-full text-sm min-w-[640px]">
             <thead><tr className="text-left text-[11px] text-white/35">{["ORDER", "EMAIL", "ITEMS", "TOTAL", "STATUS"].map((h) => <th key={h} className="py-2 pr-3 font-black tracking-widest">{h}</th>)}</tr></thead>
             <tbody>{orders.slice(0, 5).map((o) => <tr key={o.id} className="border-t border-white/[0.07]"><td className="py-2.5 pr-3 font-bold">{o.id}</td><td className="pr-3 text-white/55">{o.email}</td><td className="pr-3">{o.items.length}</td><td className="pr-3 font-bold">${o.total.toFixed(2)}</td><td><span className="text-[11px] font-black bg-white/10 rounded-full px-2.5 py-1">{o.status}</span></td></tr>)}{orders.length === 0 && <tr><td colSpan={5} className="py-4 text-white/40">No orders yet. Place a demo checkout to see rows here.</td></tr>}</tbody>
           </table>

@@ -11,6 +11,8 @@ import ProductDetail from "./pages/ProductDetail.jsx";
 import { CategoriesPage, BrandsPage, DealsPage, ResourcesPage, ContactPage, QuotePage, TrackPage, CompliancePage } from "./pages/Extra.jsx";
 import { LoginPage, SignupPage, AccountPage } from "./pages/Auth.jsx";
 import { CheckoutPage, OrderSuccessPage } from "./pages/Checkout.jsx";
+import { AboutPage, LocationsPage, TradePage, PoliciesPage } from "./pages/Company.jsx";
+import BrandPage from "./pages/Brand.jsx";
 import AdminLayout from "./pages/admin/AdminLayout.jsx";
 import Dashboard from "./pages/admin/Dashboard.jsx";
 import AdminOrders from "./pages/admin/AdminOrders.jsx";
@@ -56,8 +58,14 @@ export default function App() {
                         <Route path="/checkout" element={<CheckoutPage />} />
                         <Route path="/order-success/:id" element={<OrderSuccessPage />} />
                         <Route path="/account" element={<AccountPage />} />
-                        <Route path="/track" element={<TrackPage />} />
-                        <Route path="/compliance" element={<CompliancePage />} />
+                      <Route path="/track" element={<TrackPage />} />
+                      <Route path="/compliance" element={<CompliancePage />} />
+                      <Route path="/about" element={<AboutPage />} />
+                      <Route path="/locations" element={<LocationsPage />} />
+                      <Route path="/trade" element={<TradePage />} />
+                      <Route path="/policies" element={<PoliciesPage />} />
+                      <Route path="/policies/:slug" element={<PoliciesPage />} />
+                      <Route path="/brand/:name" element={<BrandPage />} />
                         <Route path="*" element={<Home />} />
                       </Routes>
                     </Layout>

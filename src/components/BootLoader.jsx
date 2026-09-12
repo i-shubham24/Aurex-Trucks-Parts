@@ -19,7 +19,7 @@ export default function BootLoader() {
     document.body.style.overflow = "hidden";
     const v = videoRef.current;
     if (v) {
-      v.playbackRate = 1.25;
+      v.playbackRate = 1;
       v.play().catch(() => {});
     }
     const finish = () => {

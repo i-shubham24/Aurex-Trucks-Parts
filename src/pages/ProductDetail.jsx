@@ -9,6 +9,51 @@ import { useGarage } from "../components/garage/GarageContext.jsx";
 import YMMWidget from "../components/garage/YMMWidget.jsx";
 import { pushRecent, RecentlyViewed } from "../components/shopwise.jsx";
 
+const RKEY = "aurex_reviews_v1";
+const readReviews = (sku) => { try { const a = JSON.parse(localStorage.getItem(RKEY) || "{}"); return Array.isArray(a[sku]) ? a[sku] : []; } catch { return []; } };
+
+function Reviews({ sku }) {
+  const [list, setList] = useState(() => readReviews(sku));
+  const [f, setF] = useState({ name: "", rating: 5, text: "" });
+  const [done, setDone] = useState(false);
+  const submit = (e) => {
+    e.preventDefault();
+    const entry = { name: f.name.trim() || "Verified buyer", rating: Number(f.rating), text: f.text.trim(), at: new Date().toISOString() };
+    try {
+      const all = JSON.parse(localStorage.getItem(RKEY) || "{}");
+      all[sku] = [entry, ...(Array.isArray(all[sku]) ? all[sku] : [])].slice(0, 20);
+      localStorage.setItem(RKEY, JSON.stringify(all));
+    } catch { /* noop */ }
+    setList((l) => [entry, ...l].slice(0, 20));
+    setF({ name: "", rating: 5, text: "" });
+    setDone(true);
+  };
+  return (
+    <div className="mt-12 grid lg:grid-cols-[1fr_360px] gap-6 items-start">
+      <div>
+        <h2 className="font-display font-bold text-[24px] text-[#1A1A2E]">Workshop reviews ({list.length})</h2>
+        <div className="mt-4 space-y-3">
+          {list.length === 0 && <p className="text-sm text-[#6B7280] rounded-2xl border border-dashed border-[#E5E7EB] p-6 text-center">No reviews yet. Fitted this part? Leave the first one.</p>}
+          {list.map((r, i) => (
+            <div key={i} className="rounded-2xl bg-white border border-[#E5E7EB] p-5">
+              <p className="flex items-center gap-2 text-[13px]"><b>{r.name}</b><span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 rounded-full px-2.5 py-0.5">Verified fitment</span><span className="ml-auto text-[#FFBB00]">{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)}</span></p>
+              <p className="text-sm text-[#4B5563] mt-2">{r.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+      <form onSubmit={submit} className="rounded-2xl bg-white border border-[#E5E7EB] p-6 lg:sticky lg:top-28">
+        <p className="font-display font-bold text-lg text-[#1A1A2E]">Leave a review</p>
+        {done && <p className="mt-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-[13px] font-semibold px-4 py-3">Thanks. Your review is live below.</p>}
+        <input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Name or workshop" className="mt-3 w-full rounded-xl px-4 py-3 text-sm bg-[#F7F8FA] border border-[#E5E7EB] outline-none" />
+        <select value={f.rating} onChange={(e) => setF({ ...f, rating: e.target.value })} className="mt-2.5 w-full rounded-xl px-4 py-3 text-sm bg-[#F7F8FA] border border-[#E5E7EB] outline-none">{[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{n} stars</option>)}</select>
+        <textarea required value={f.text} onChange={(e) => setF({ ...f, text: e.target.value })} rows={4} placeholder="How did it fit and perform?" className="mt-2.5 w-full rounded-xl px-4 py-3 text-sm bg-[#F7F8FA] border border-[#E5E7EB] outline-none" />
+        <button className="mt-3 w-full bg-[#1A1A2E] text-white rounded-xl py-3.5 text-sm font-bold hover:bg-[#E53E00] transition">Submit review</button>
+      </form>
+    </div>
+  );
+}
+
 export default function ProductDetail() {
   const { sku } = useParams();
   const { products: PRODUCTS } = useProducts();
@@ -247,6 +292,7 @@ export default function ProductDetail() {
         <motion.div variants={staggerParent} initial="initial" whileInView="whileInView" viewport={{ once: true, margin: "-50px" }} className="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {related.map((r, i) => <ProductCard key={r.sku} p={r} index={i} />)}
         </motion.div>
+        <Reviews sku={p.sku} />
         <RecentlyViewed current={p.sku} />
       </div>
     </div>

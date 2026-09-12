@@ -192,6 +192,12 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-4 py-16">
         <SectionHead kicker="Brands we stock" title="The names your workshop trusts" sub="Genuine and OE match parts from the brands built for Australian heavy transport." center />
         <BrandWall />
+        <div className="mt-8 rounded-2xl border border-[#E5E7EB] bg-[#F7F8FA] px-6 py-5 flex flex-wrap items-center gap-x-8 gap-y-3 justify-center">
+          <span className="text-[11px] font-black tracking-[0.2em] text-[#9CA3AF] uppercase">Stockists include</span>
+          {["Narva", "Donaldson", "KYB", "Koyo", "Wabco", "Bendix", "Century", "Exedy"].map((b) => (
+            <Link key={b} to="/brands" className="font-display font-bold tracking-wide text-[#1A1A2E]/70 hover:text-[#E53E00] transition text-[15px]">{b}</Link>
+          ))}
+        </div>
       </section>
 
       {/* Testimonials */}

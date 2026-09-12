@@ -33,7 +33,7 @@ export default function AdminOrders() {
       </div>
 
       <div className="mt-4 rounded-[22px] border border-white/10 bg-[#0d1218] overflow-hidden">
-        <div className="overflow-x-auto"><table className="w-full text-sm min-w-[760px]">
+        <div className="overflow-x-auto"><table className="sticky-col w-full text-sm min-w-[760px]">
           <thead><tr className="text-left text-[11px] text-white/35">{["ORDER", "CUSTOMER", "ITEMS", "TOTAL", "PAYMENT", "STATUS"].map((h) => <th key={h} className="px-4 py-3 font-black tracking-widest">{h}</th>)}</tr></thead>
           <tbody>{list.map((o) => (
             <tr key={o.id} onClick={() => setSel(o)} className="border-t border-white/[0.07] hover:bg-white/[0.03] cursor-pointer">

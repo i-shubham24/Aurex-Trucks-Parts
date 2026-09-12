@@ -67,6 +67,19 @@ export function CategoriesPage() {
           </motion.div>
         ))}
       </motion.div>
+      <div className="mx-auto max-w-7xl px-4 pb-12">
+        <div className="rounded-2xl bg-white border border-[#E5E7EB] p-6 sm:p-8">
+          <h2 className="font-display font-bold text-2xl text-[#1A1A2E]">Truck parts by system, explained</h2>
+          <div className="mt-4 grid md:grid-cols-2 gap-x-8 gap-y-4">
+            {CATEGORIES.map((c) => (
+              <div key={c.name}>
+                <Link to={`/shop?cat=${encodeURIComponent(c.name)}`} className="font-bold text-[#1A1A2E] hover:text-[#E53E00] text-[14px]">{c.name} parts →</Link>
+                <p className="text-[13px] text-[#6B7280] mt-0.5">{c.blurb}. Shop {(c.subs || []).join(", ").toLowerCase()} with OEM crosses and VIC stock.</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -100,7 +113,10 @@ export function BrandsPage() {
               <div className="flex flex-wrap items-center gap-3">
                 <p className="font-display font-bold text-2xl text-[#1A1A2E]">{active}</p>
                 <span className="text-[12px] font-semibold text-[#9CA3AF]">{preview.length} live matches</span>
-                <Link to="/shop" onClick={() => setQuery(active.split(" ")[0])} className="ml-auto bg-[#E53E00] text-white rounded-lg px-6 py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">Open in shop</Link>
+                <span className="ml-auto flex gap-2">
+                  <Link to={`/brand/${encodeURIComponent(active)}`} className="border border-[#E5E7EB] rounded-lg px-5 py-3 text-sm font-bold hover:border-[#1A1A2E] transition">Brand page</Link>
+                  <Link to="/shop" onClick={() => setQuery(active.split(" ")[0])} className="bg-[#E53E00] text-white rounded-lg px-6 py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">Open in shop</Link>
+                </span>
               </div>
               <div className="mt-5 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {preview.slice(0, 3).map((p, i) => <ProductCard key={p.sku} p={p} index={i} />)}
@@ -178,6 +194,44 @@ export function DealsPage() {
   );
 }
 
+function TipperSelector() {
+  const [body, setBody] = useState("8x5 tandem");
+  const rows = {
+    "8x5 single": ["800mm stage", "12L oil", "HTKS kit suits"],
+    "8x5 tandem": ["900mm stage", "16L oil", "HTKS kit suits"],
+    "10x5 tandem": ["1050mm stage", "20L oil", "Ask the desk"],
+    "12ft bodies": ["1200mm stage", "28L oil", "Ask the desk"],
+  };
+  const r = rows[body];
+  return (
+    <div className="rounded-2xl bg-[#1A1A2E] text-white p-6">
+      <p className="text-[11px] font-black tracking-[0.2em] text-[#FF6B35] uppercase">Tipper stage selector</p>
+      <div className="mt-3 flex flex-wrap gap-2">{Object.keys(rows).map((b) => <button key={b} onClick={() => setBody(b)} className={`px-4 py-2 rounded-lg text-[13px] font-bold border transition ${body === b ? "bg-[#E53E00] border-[#E53E00]" : "border-white/15 text-white/60 hover:text-white"}`}>{b}</button>)}</div>
+      <div className="mt-4 grid grid-cols-3 gap-2 text-center">{r.map((x) => <p key={x} className="rounded-xl bg-white/5 border border-white/10 px-2 py-3 text-[13px] font-bold">{x}</p>)}</div>
+      <Link to="/shop?cat=Tipper%20and%20Hydraulic" className="mt-4 inline-block bg-[#E53E00] rounded-lg px-5 py-2.5 text-[13px] font-bold">Shop tipper kits</Link>
+    </div>
+  );
+}
+
+function BrakeSelector() {
+  const [atm, setAtm] = useState("3.5T");
+  const rows = {
+    "750kg": ["Mechanical", "Single axle", "MB9 kits"],
+    "2T": ["Hydraulic override", "Single plus tandem", "HCCZ coupling"],
+    "3.5T": ["Electric 10in", "Tandem", "EB10 plates plus DIYTAE"],
+    "4.5T": ["Electric 12in", "Tri plus tandem", "EB12 plates"],
+  };
+  const r = rows[atm];
+  return (
+    <div className="rounded-2xl bg-white border border-[#E5E7EB] p-6">
+      <p className="text-[11px] font-black tracking-[0.2em] text-[#E53E00] uppercase">Brake by ATM selector</p>
+      <div className="mt-3 flex flex-wrap gap-2">{Object.keys(rows).map((a) => <button key={a} onClick={() => setAtm(a)} className={`px-4 py-2 rounded-lg text-[13px] font-bold border transition ${atm === a ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "border-[#E5E7EB] text-[#6B7280]"}`}>{a}</button>)}</div>
+      <div className="mt-4 grid grid-cols-3 gap-2 text-center">{r.map((x) => <p key={x} className="rounded-xl bg-[#F7F8FA] border border-[#E5E7EB] px-2 py-3 text-[13px] font-bold text-[#1A1A2E]">{x}</p>)}</div>
+      <Link to="/shop?cat=Braking" className="mt-4 inline-block border border-[#E5E7EB] rounded-lg px-5 py-2.5 text-[13px] font-bold hover:border-[#1A1A2E] transition">Shop braking</Link>
+    </div>
+  );
+}
+
 export function ResourcesPage() {
   const [open, setOpen] = useState(0);
   const faqs = [
@@ -193,10 +247,15 @@ export function ResourcesPage() {
     "Tipper kit selection guide": [["Stage", "800mm", "900mm", "1050mm", "1200mm"], ["Suits", "8x5 single", "8x5 tandem", "10x5 tandem", "12ft bodies"], ["Oil needed", "12L", "16L", "20L", "28L"]],
     "Brake kit sizing guide": [["Trailer ATM", "750kg", "2T", "3.5T", "4.5T"], ["System", "Mechanical", "Hydraulic override", "Electric 10in", "Electric 12in"], ["Axles", "Single", "Single plus tandem", "Tandem", "Tri plus tandem"]],
     "Bearing finder by hub": [["Hub", "LM Holden", "Slimline", "Ford"], ["Cup", "11910/49", "L68149", "387A"], ["Cone", "67010/48", "L68110", "382A"]],
+    "Chain grades explained": [["Use", "Tie down", "Safety chain", "Lifting"], ["Grade", "G70 transport", "G80 rated", "G100 alloy"], ["Colour", "Yellow zinc", "Black", "Blue"]],
   };
   return (
     <div>
       <PageHero crumb="Resources" title="Guides plus" accent="answers." sub="Fitment explainers and the questions fleets ask most." />
+      <div className="mx-auto max-w-7xl px-4 pt-12 grid md:grid-cols-2 gap-5">
+        <TipperSelector />
+        <BrakeSelector />
+      </div>
       <div className="mx-auto max-w-7xl px-4 py-12">
         <SectionHead kicker="Workshop library" title="Latest guides" />
         <motion.div variants={staggerParent} initial="initial" whileInView="whileInView" viewport={{ once: true, margin: "-50px" }} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -381,8 +440,17 @@ export function ContactPage() {
 
 export function QuotePage() {
   const { cart, setCart, total, count } = useShop();
-  const { addQuote } = useSite();
+  const { addQuote, settings } = useSite();
   const [saved, setSaved] = useState(null);
+  const [post, setPost] = useState("");
+  const [est, setEst] = useState(null);
+  const estimate = () => {
+    const d = (post.trim()[0] || "");
+    const table = { 3: ["VIC metro", "1 day", 15], 2: ["NSW", "1 to 2 days", 24], 4: ["QLD", "2 to 3 days", 28], 5: ["SA", "2 days", 24], 6: ["WA", "3 to 5 days", 39], 7: ["TAS", "2 to 3 days", 28], 0: ["NT plus ACT", "3 to 5 days", 39] };
+    const z = table[d] || ["Australia wide", "1 to 5 days", 28];
+    const free = total >= (settings?.freeFreightOver ?? 500);
+    setEst({ zone: z[0], eta: z[1], fee: free ? 0 : z[2], free });
+  };
   return (
     <div>
       <PageHero crumb="Quote" title="Your fleet" accent={`quote (${count}).`} sub="One list for the whole job." />
@@ -411,6 +479,14 @@ export function QuotePage() {
           <p className="font-display font-bold text-xl text-[#1A1A2E]">Summary</p>
           <p className="mt-3 font-display font-bold text-3xl text-[#1A1A2E]">${total.toFixed(2)}</p>
           <p className="mt-2 text-[12px] text-[#9CA3AF] flex gap-1.5"><BadgeCheck size={14} className="text-[#10B981] shrink-0 mt-0.5" /> Free freight over $500.</p>
+          <div className="mt-4 rounded-xl bg-[#F7F8FA] border border-[#E5E7EB] p-4">
+            <p className="text-[12px] font-black tracking-widest text-[#6B7280] uppercase">Freight estimate</p>
+            <div className="mt-2 flex gap-2">
+              <input value={post} onChange={(e) => setPost(e.target.value.replace(/\D/g, "").slice(0, 4))} placeholder="Postcode" inputMode="numeric" className="flex-1 min-w-0 rounded-lg px-3 py-2.5 text-sm bg-white border border-[#E5E7EB] outline-none" />
+              <button onClick={estimate} className="bg-[#1A1A2E] text-white rounded-lg px-4 py-2.5 text-[13px] font-bold">Go</button>
+            </div>
+            {est && <p className="mt-2 text-[13px] text-[#1A1A2E]"><b>{est.zone}</b> • {est.eta} • <b>{est.fee === 0 ? "Free" : `$${est.fee.toFixed(2)}`}</b>{est.free && " (order over threshold)"}</p>}
+          </div>
           {saved && <p className="mt-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-[13px] font-semibold px-4 py-3">Saved as {saved}. Our desk replies shortly.</p>}
           <button onClick={() => { const id = addQuote({ email: "", items: cart, total }); setSaved(id); }} className="mt-3 w-full border border-[#E5E7EB] rounded-xl py-3.5 text-sm font-bold hover:border-[#1A1A2E] transition">Save as quote request</button>
           <Link to="/checkout" className="mt-2.5 flex items-center justify-center gap-2 bg-[#E53E00] text-white rounded-xl py-4 text-sm font-bold hover:bg-[#1A1A2E] transition"><Send size={15} /> Go to checkout</Link>

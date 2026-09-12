@@ -14,7 +14,7 @@ export function AdminCustomers() {
       <h1 className="font-display font-bold text-3xl">Customers ({users.length})</h1>
       <p className="text-white/50 text-sm mt-1">Signup accounts from the storefront. Admins are tagged.</p>
       <div className="mt-4 flex items-center gap-2 bg-white/[0.05] border border-white/10 rounded-full px-4 py-2.5 max-w-md"><Search size={15} className="text-white/40" /><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, email, company..." className="flex-1 bg-transparent outline-none text-sm" /></div>
-      <div className="mt-4 rounded-[22px] border border-white/10 bg-[#0d1218] overflow-hidden"><div className="overflow-x-auto"><table className="w-full text-sm min-w-[680px]">
+      <div className="mt-4 rounded-[22px] border border-white/10 bg-[#0d1218] overflow-hidden"><div className="overflow-x-auto"><table className="sticky-col w-full text-sm min-w-[680px]">
         <thead><tr className="text-left text-[11px] text-white/35">{["NAME", "EMAIL", "COMPANY", "JOINED", ""].map((h) => <th key={h} className="px-4 py-3 font-black tracking-widest">{h}</th>)}</tr></thead>
         <tbody>{list.map((u) => <tr key={u.email} className="border-t border-white/[0.07]"><td className="px-4 py-3 font-bold">{u.name} {u.role === "admin" && <span className="ml-1 text-[10px] font-black bg-[#d9ff3d] text-black rounded-full px-2 py-0.5">ADMIN</span>}</td><td className="px-4 py-3 text-white/55">{u.email}</td><td className="px-4 py-3 text-white/55">{u.company || "-"}</td><td className="px-4 py-3 text-white/45 text-[13px]">{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "-"}</td><td className="px-4 py-3">{u.role !== "admin" && <button onClick={() => remove(u.email)} className="p-2 border border-white/10 rounded-lg"><Trash2 size={14} /></button>}</td></tr>)}</tbody>
       </table></div></div>
@@ -24,6 +24,17 @@ export function AdminCustomers() {
 
 export function AdminQuotes() {
   const { enquiries, setEnquiryStatus, quotes, setQuoteStatus } = useSite();
+  const convert = (x) => {
+    if (!x.items || x.items.length === 0) { alert("Quote has no lines to convert."); return; }
+    const id = "AUX-" + Math.floor(1000 + Math.random() * 9000);
+    const order = { id, email: x.email || "trade-counter", items: x.items, subtotal: x.total || 0, shipping: "Standard road", shippingFee: 0, payment: "Trade account", total: x.total || 0, status: "Packed in Campbellfield VIC", placedAt: new Date().toISOString() };
+    try {
+      const raw = localStorage.getItem("aurex_orders");
+      const arr = raw ? JSON.parse(raw) : [];
+      localStorage.setItem("aurex_orders", JSON.stringify([order, ...arr]));
+    } catch { /* noop */ }
+    setQuoteStatus(x.id, "Won");
+  };
   return (
     <div className="grid lg:grid-cols-2 gap-5 items-start">
       <div>
@@ -45,7 +56,9 @@ export function AdminQuotes() {
           <div key={x.id} className="rounded-[20px] border border-white/10 bg-[#0d1218] p-5">
             <div className="flex gap-2 items-center"><b>{x.id}</b><span className="text-[11px] font-black bg-white/10 rounded-full px-2.5 py-1">{x.status}</span><b className="ml-auto">${(x.total || 0).toFixed(2)}</b></div>
             <p className="text-[13px] text-white/55 mt-1.5">{x.email}, {(x.items || []).length} lines</p>
-            <div className="mt-3 flex gap-2">{["New", "Quoted", "Won", "Lost"].map((s) => <button key={s} onClick={() => setQuoteStatus(x.id, s)} className={`px-3.5 py-1.5 rounded-full text-[12px] font-bold border ${x.status === s ? "bg-white text-black border-white" : "border-white/15 text-white/55"}`}>{s}</button>)}</div>
+            <div className="mt-3 flex flex-wrap gap-2">{["New", "Quoted", "Won", "Lost"].map((s) => <button key={s} onClick={() => setQuoteStatus(x.id, s)} className={`px-3.5 py-1.5 rounded-full text-[12px] font-bold border ${x.status === s ? "bg-white text-black border-white" : "border-white/15 text-white/55"}`}>{s}</button>)}
+              {(x.items || []).length > 0 && x.status !== "Won" && <button onClick={() => convert(x)} className="px-3.5 py-1.5 rounded-full text-[12px] font-black bg-[#d9ff3d] text-black">Convert to order</button>}
+            </div>
           </div>))}
         </div>
       </div>

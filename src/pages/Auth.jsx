@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LogIn, UserPlus, Package, ArrowLeft, ShieldCheck, Truck, Boxes, Star, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../store/auth.jsx";
+import { useShop } from "../store/shop.jsx";
 import { LogoFull } from "../components/logo.jsx";
 import { SafeImg } from "../components/ui.jsx";
 import { HERO, TESTIMONIALS } from "../data/catalog.js";
@@ -173,7 +174,20 @@ export function SignupPage() {
 
 export function AccountPage() {
   const { user, logout, myOrders } = useAuth();
+  const { setCart, setDrawer } = useShop();
   const nav = useNavigate();
+  const reorder = (o) => {
+    setCart((c) => {
+      const next = [...c];
+      (o.items || []).forEach((i) => {
+        const f = next.find((x) => x.sku === i.sku);
+        if (f) f.qty += i.qty;
+        else next.push({ ...i });
+      });
+      return next;
+    });
+    setDrawer(true);
+  };
   if (!user) return (
     <div className="mx-auto max-w-xl px-4 py-14 text-center">
       <Package size={36} className="mx-auto text-[#E53E00]" />
@@ -207,6 +221,7 @@ export function AccountPage() {
                 {new Date(o.placedAt).toLocaleString()} | {o.items.length} lines | {o.shipping} | {o.payment}
               </p>
               <Link to={`/order-success/${o.id}`} className="mt-3 inline-block text-[13px] font-bold text-[#E53E00]">View receipt</Link>
+              <button onClick={() => reorder(o)} className="mt-3 ml-4 inline-block text-[13px] font-bold text-[#1A1A2E] underline">Reorder these lines</button>
             </div>
           ))}
         </div>

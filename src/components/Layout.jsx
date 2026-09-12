@@ -75,7 +75,7 @@ export default function Layout({ children }) {
 
       {/* Footer */}
       <footer className="bg-[#1A1A2E] text-white">
-        <div className="mx-auto max-w-7xl px-4 py-14 grid sm:grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+        <div className="mx-auto max-w-7xl px-4 py-14 grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 text-sm">
           <div>
             <LogoFull light />
             <p className="text-white/60 text-[13px] mt-4 leading-relaxed">
@@ -105,6 +105,17 @@ export default function Layout({ children }) {
               <Link to="/quote" className="hover:text-white transition w-fit">Quote cart</Link>
               <Link to="/checkout" className="hover:text-white transition w-fit">Checkout</Link>
               <Link to="/contact" className="hover:text-white transition w-fit">Contact</Link>
+            </div>
+          </div>
+          <div>
+            <p className="font-bold text-[12px] tracking-widest text-white/40 uppercase">Company</p>
+            <div className="mt-3 grid gap-2 text-white/65">
+              <Link to="/about" className="hover:text-white transition w-fit">About us</Link>
+              <Link to="/locations" className="hover:text-white transition w-fit">Locations</Link>
+              <Link to="/trade" className="hover:text-white transition w-fit">Trade accounts</Link>
+              <Link to="/policies/shipping" className="hover:text-white transition w-fit">Shipping</Link>
+              <Link to="/policies/returns" className="hover:text-white transition w-fit">Returns</Link>
+              <Link to="/policies/warranty" className="hover:text-white transition w-fit">Warranty</Link>
             </div>
           </div>
           <div>

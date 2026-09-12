@@ -80,6 +80,8 @@ export const IMG_OVERRIDES = {
  "AX-ROLLER-KEEL": "/images/products/q-38.jpg",
  "AX-ROLLER-WOB": "/images/products/q-38.jpg",
  "AX-DROP-AXLE": "/images/products/q-39.jpg",
- "AX-JOCKEY-CLAMP": "/images/products/q-40.jpg"
+ "AX-JOCKEY-CLAMP": "/images/products/q-40.jpg",
+ "ATX-BATT-N200": "/images/products/q-56.jpg",
+ "AX-BATT-N150": "/images/products/q-57.jpg"
 };
-export const LOCAL_IMAGE_COUNT = 80;
+export const LOCAL_IMAGE_COUNT = 82;
