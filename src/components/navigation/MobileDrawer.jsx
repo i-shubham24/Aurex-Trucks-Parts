@@ -1,7 +1,9 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronRight } from "lucide-react";
+import { X, ChevronRight, Search } from "lucide-react";
 import { useSite } from "../../store/site.jsx";
+import { useShop } from "../../store/shop.jsx";
 import { LogoFull } from "../logo.jsx";
 
 const LINKS = [
@@ -11,6 +13,9 @@ const LINKS = [
 
 export default function MobileDrawer({ open, onClose }) {
   const { liveCategories: CATEGORIES } = useSite();
+  const { query, setQuery } = useShop();
+  const [q, setQ] = useState("");
+  const nav = useNavigate();
 
   return (
     <AnimatePresence>
@@ -36,6 +41,19 @@ export default function MobileDrawer({ open, onClose }) {
                 <X size={18} />
               </button>
             </div>
+            <form
+              onSubmit={(e) => { e.preventDefault(); setQuery(q); onClose(); nav("/shop"); }}
+              className="mt-4 flex items-center gap-2 bg-[#F7F8FA] border border-[#E5E7EB] rounded-xl pl-4 pr-1.5 py-1.5 focus-within:border-[#E53E00] transition"
+            >
+              <Search size={16} className="text-[#9CA3AF] shrink-0" />
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search parts or SKU..."
+                className="flex-1 min-w-0 bg-transparent outline-none text-sm placeholder:text-[#9CA3AF]"
+              />
+              <button type="submit" className="bg-[#E53E00] text-white rounded-lg px-4 py-2 text-[13px] font-bold shrink-0">Go</button>
+            </form>
             <div className="mt-5 grid gap-2 font-semibold">
               {LINKS.map(([t, h]) => (
                 <Link

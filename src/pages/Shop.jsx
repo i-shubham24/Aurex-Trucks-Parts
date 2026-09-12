@@ -25,6 +25,7 @@ export default function Shop() {
   const [maxPrice, setMaxPrice] = useState(1600);
   const [inStock, setInStock] = useState(false);
   const [onlyFits, setOnlyFits] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Keep the filter in sync when the category or query in the URL changes (nav clicks, mega menu).
   useEffect(() => { setCat(catParam); }, [catParam]);
@@ -156,10 +157,16 @@ export default function Shop() {
         <aside className="rounded-2xl bg-white border border-[#E5E7EB] p-5 lg:sticky lg:top-28 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="font-display font-bold text-lg text-[#1A1A2E]">Filters</p>
-            <button onClick={clearAll} className="text-[12px] font-semibold text-[#9CA3AF] hover:text-[#E53E00] transition">
-              Clear all
-            </button>
+            <span className="flex items-center gap-3">
+              <button onClick={clearAll} className="text-[12px] font-semibold text-[#9CA3AF] hover:text-[#E53E00] transition">
+                Clear all
+              </button>
+              <button onClick={() => setFiltersOpen(!filtersOpen)} className="lg:hidden text-[12px] font-bold text-[#E53E00]">
+                {filtersOpen ? "Hide ▲" : "Show ▼"}
+              </button>
+            </span>
           </div>
+          <div className={`${filtersOpen ? "block" : "hidden"} lg:block`}>
 
           <p className="mt-5 text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase">System</p>
           <div className="mt-2 grid gap-1 max-h-[300px] overflow-auto pr-1">
@@ -222,6 +229,7 @@ export default function Shop() {
           <div className="mt-5 rounded-xl bg-gradient-to-br from-[#E53E00] to-[#C23400] text-white p-4">
             <p className="font-bold">Fleet top up?</p>
             <p className="text-[12px] font-medium mt-1 text-white/80">5 plus units unlocks extra pricing in the quote cart.</p>
+          </div>
           </div>
         </aside>
 

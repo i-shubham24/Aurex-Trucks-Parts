@@ -76,7 +76,7 @@ export function CompareTray() {
 
   return (
     <>
-      <div className="fixed bottom-20 sm:bottom-4 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-2 bg-[#1A1A2E] text-white rounded-full pl-2 pr-2 py-2 shadow-2xl border border-white/10">
+      <div className="fixed bottom-20 sm:bottom-4 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-2 max-w-[calc(100vw-2rem)] bg-[#1A1A2E] text-white rounded-full pl-2 pr-2 py-2 shadow-2xl border border-white/10">
         <span className="flex -space-x-2 pl-2">{items.map((p) => <span key={p.sku} className="w-8 h-8 rounded-full bg-white/10 border border-white/20 grid place-items-center text-[10px] font-black">{p.sku.slice(0, 2)}</span>)}</span>
         <span className="text-[13px] font-bold px-1">Compare ({items.length}/3)</span>
         <button onClick={() => setOpen(true)} className="bg-[#E53E00] rounded-full px-5 py-2 text-[13px] font-bold">Compare</button>
