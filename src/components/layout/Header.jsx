@@ -25,17 +25,9 @@ export default function Header({ onOpenMobile }) {
   const { liveCategories: CATEGORIES, settings } = useSite();
   const { products: PRODUCTS } = useProducts();
   const nav = useNavigate();
-  const [scrolled, setScrolled] = useState(false);
   const [mega, setMega] = useState(false);
   const [sugOpen, setSugOpen] = useState(false);
   const searchRef = useRef(null);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 30);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     const h = (e) => { if (searchRef.current && !searchRef.current.contains(e.target)) setSugOpen(false); };
@@ -55,9 +47,9 @@ export default function Header({ onOpenMobile }) {
   const submitSearch = (e) => { e.preventDefault(); go("/shop"); };
 
   return (
-    <header className="sticky top-0 z-50 shadow-[0_6px_20px_-12px_rgba(16,24,40,0.35)]">
-      {/* Utility strip: dark, collapses on scroll */}
-      <div className={`bg-[#1A1A2E] text-white overflow-hidden transition-all duration-300 ${scrolled ? "max-h-0" : "max-h-10"}`}>
+    <header className="sticky top-[-36px] z-50 shadow-[0_6px_20px_-12px_rgba(16,24,40,0.35)]">
+      {/* Utility strip: dark, 36px tall. Will scroll out of view and then stick. */}
+      <div className="bg-[#1A1A2E] text-white">
         <div className="mx-auto max-w-7xl px-4 h-9 flex items-center justify-between text-[12px] font-semibold">
           <div className="flex items-center gap-5 text-white/80">
             <a href={`mailto:${settings.email}`} className="flex items-center gap-1.5 hover:text-white transition"><Mail size={13} className="text-[#FF6B35]" /> <span className="hidden sm:inline">{settings.email}</span></a>
@@ -75,11 +67,11 @@ export default function Header({ onOpenMobile }) {
       <div>
         {/* Main bar (white) */}
         <div className="bg-white border-b border-[#E5E7EB]">
-          <div className={`mx-auto max-w-7xl px-4 flex items-center gap-4 transition-all duration-300 ${scrolled ? "py-2" : "py-3"}`}>
+          <div className="mx-auto max-w-7xl px-4 flex items-center gap-4 py-3">
             <button onClick={onOpenMobile} className="lg:hidden p-2 -ml-1 text-[#1A1A2E]" aria-label="menu"><Menu size={22} /></button>
 
             <Link to="/" aria-label="Aurex Truck Parts home" className="shrink-0">
-              <LogoFull className={scrolled ? "scale-95 origin-left" : ""} />
+              <LogoFull />
             </Link>
 
             <div ref={searchRef} className="hidden md:block relative flex-1 max-w-xl mx-2">

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Lock, Truck, CreditCard, CheckCircle2, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Lock, Truck, CreditCard, CheckCircle2, ArrowRight, AlertTriangle, Printer } from "lucide-react";
 import { useShop } from "../store/shop.jsx";
 import { useAuth } from "../store/auth.jsx";
 import { useSite } from "../store/site.jsx";
@@ -10,6 +10,7 @@ export function CheckoutPage() {
   const { cart, total, count, setCart } = useShop();
   const { user, placeOrder } = useAuth();
   const { settings } = useSite();
+  
   const SHIPPING = [
     { id: "Standard", label: "Standard road", eta: "1 to 5 days by zone", fee: (t) => (t >= settings.freeFreightOver ? 0 : settings.standardFee) },
     { id: "Express", label: "Express priority", eta: "1 to 2 days metro", fee: () => settings.expressFee },
@@ -17,13 +18,61 @@ export function CheckoutPage() {
   ];
   const PAYMENTS = ["Card", "Bank transfer", "Afterpay", "30 day fleet terms"];
   const nav = useNavigate();
+  
   const [ship, setShip] = useState(SHIPPING[0].id);
   const [pay, setPay] = useState(PAYMENTS[0]);
   const [form, setForm] = useState({ name: user?.name || "", email: user?.email || "", phone: user?.phone || "", address: "", suburb: "", state: "VIC", postcode: "", notes: "" });
-  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+  const [errors, setErrors] = useState({});
+  const [card, setCard] = useState({ number: "", expiry: "", cvv: "" });
+  
+  const setF = (k) => (e) => {
+    setForm({ ...form, [k]: e.target.value });
+    if (errors[k]) setErrors({ ...errors, [k]: "" });
+  };
+  
+  const handleCardNumber = (e) => {
+    // Only allow numbers and format with spaces
+    let val = e.target.value.replace(/\D/g, "").substring(0, 16);
+    val = val.replace(/(\d{4})/g, "$1 ").trim();
+    setCard({ ...card, number: val });
+  };
+
+  const handleCardExpiry = (e) => {
+    let val = e.target.value.replace(/\D/g, "").substring(0, 4);
+    if (val.length >= 2) val = val.substring(0, 2) + "/" + val.substring(2, 4);
+    setCard({ ...card, expiry: val });
+  };
+
+  const handleCardCvv = (e) => {
+    setCard({ ...card, cvv: e.target.value.replace(/\D/g, "").substring(0, 4) });
+  };
+
   const shipOpt = SHIPPING.find((s) => s.id === ship);
   const fee = useMemo(() => shipOpt.fee(total), [shipOpt, total]);
   const grand = total + fee;
+
+  const validate = () => {
+    let newErrs = {};
+    const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRx = /^0[45]\d{8}$|^0[2378]\d{8}$/; // Basic Aus phone validation
+    const pcRx = /^\d{4}$/; // Aus postcode
+
+    if (!form.name.trim()) newErrs.name = "Name is required";
+    if (!emailRx.test(form.email)) newErrs.email = "Valid email is required";
+    if (!phoneRx.test(form.phone.replace(/\s/g, ''))) newErrs.phone = "Valid 10-digit Australian phone required";
+    if (!form.address.trim()) newErrs.address = "Address is required";
+    if (!form.suburb.trim()) newErrs.suburb = "Suburb is required";
+    if (!pcRx.test(form.postcode)) newErrs.postcode = "Valid 4-digit postcode required";
+
+    if (pay === "Card") {
+      if (card.number.replace(/\s/g, '').length < 15) newErrs.card = "Valid card number required";
+      if (card.expiry.length !== 5) newErrs.expiry = "Valid MM/YY required";
+      if (card.cvv.length < 3) newErrs.cvv = "Valid CVV required";
+    }
+
+    setErrors(newErrs);
+    return Object.keys(newErrs).length === 0;
+  };
 
   if (cart.length === 0) return (
     <div className="mx-auto max-w-xl px-4 py-14 text-center">
@@ -50,18 +99,35 @@ export function CheckoutPage() {
                 Contact plus delivery
               </p>
               <div className="mt-4 grid sm:grid-cols-2 gap-3">
-                <input value={form.name} onChange={set("name")} required placeholder="Full name" className="rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#E53E00] transition" />
-                <input value={form.phone} onChange={set("phone")} required placeholder="Phone" className="rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#E53E00] transition" />
-                <input value={form.email} onChange={set("email")} required type="email" placeholder="Email for receipt plus tracking" className="sm:col-span-2 rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#E53E00] transition" />
-                <input value={form.address} onChange={set("address")} required placeholder="Street address" className="sm:col-span-2 rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#E53E00] transition" />
-                <input value={form.suburb} onChange={set("suburb")} required placeholder="Suburb" className="rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#E53E00] transition" />
+                <div>
+                  <input value={form.name} onChange={setF("name")} placeholder="Full name" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.name ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                  {errors.name && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.name}</p>}
+                </div>
+                <div>
+                  <input value={form.phone} onChange={setF("phone")} placeholder="Phone (e.g. 0412345678)" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.phone ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                  {errors.phone && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.phone}</p>}
+                </div>
+                <div className="sm:col-span-2">
+                  <input value={form.email} onChange={setF("email")} type="email" placeholder="Email for receipt plus tracking" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.email ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                  {errors.email && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.email}</p>}
+                </div>
+                <div className="sm:col-span-2">
+                  <input value={form.address} onChange={setF("address")} placeholder="Street address" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.address ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                  {errors.address && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.address}</p>}
+                </div>
+                <div>
+                  <input value={form.suburb} onChange={setF("suburb")} placeholder="Suburb" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.suburb ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                  {errors.suburb && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.suburb}</p>}
+                </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <select value={form.state} onChange={set("state")} className="rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E]">
+                  <select value={form.state} onChange={setF("state")} className="rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E]">
                     {["VIC", "NSW", "QLD", "SA", "WA", "TAS", "NT", "ACT"].map((s) => <option key={s}>{s}</option>)}
                   </select>
-                  <input value={form.postcode} onChange={set("postcode")} required placeholder="Postcode" className="rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#E53E00] transition" />
+                  <div>
+                    <input value={form.postcode} onChange={setF("postcode")} placeholder="Postcode" maxLength={4} className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.postcode ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                  </div>
                 </div>
-                <input value={form.notes} onChange={set("notes")} placeholder="Delivery notes or VIN, optional" className="sm:col-span-2 rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#E53E00] transition" />
+                <input value={form.notes} onChange={setF("notes")} placeholder="Delivery notes or VIN, optional" className="sm:col-span-2 rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#E53E00] transition" />
               </div>
               {!user && <p className="mt-3 text-[13px] text-[#6B7280]">Checking out as guest. <Link to="/login" className="text-[#E53E00] font-bold">Log in</Link> or <Link to="/signup" className="text-[#E53E00] font-bold">create an account</Link> to save history.</p>}
             </section>
@@ -96,7 +162,38 @@ export function CheckoutPage() {
                   </button>
                 ))}
               </div>
-              <p className="mt-3 text-[12px] text-[#9CA3AF] flex items-center gap-1.5"><Lock size={13} /> Demo checkout. No real charge is made.</p>
+
+              <AnimatePresence>
+                {pay === "Card" && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                    <div className="mt-5 p-5 bg-[#F7F8FA] border border-[#E5E7EB] rounded-xl space-y-3">
+                      <p className="text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase flex items-center gap-1.5"><Lock size={12}/> Secure Payment</p>
+                      
+                      <div className="relative">
+                        <input value={card.number} onChange={handleCardNumber} onPaste={(e) => e.preventDefault()} placeholder="Card number" className={`w-full rounded-lg px-4 py-3 bg-white border outline-none text-sm font-mono text-[#1A1A2E] transition ${errors.card ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                        {errors.card && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.card}</p>}
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <input value={card.expiry} onChange={handleCardExpiry} onPaste={(e) => e.preventDefault()} placeholder="MM/YY" className={`w-full rounded-lg px-4 py-3 bg-white border outline-none text-sm font-mono text-[#1A1A2E] transition ${errors.expiry ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                          {errors.expiry && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.expiry}</p>}
+                        </div>
+                        <div>
+                          <input value={card.cvv} onChange={handleCardCvv} onPaste={(e) => e.preventDefault()} type="password" placeholder="CVV" maxLength={4} className={`w-full rounded-lg px-4 py-3 bg-white border outline-none text-sm font-mono text-[#1A1A2E] transition ${errors.cvv ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                          {errors.cvv && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.cvv}</p>}
+                        </div>
+                      </div>
+                      <p className="text-[11px] text-[#9CA3AF] mt-2 flex items-start gap-1.5 leading-snug">
+                        <AlertTriangle size={12} className="text-[#F59E0B] shrink-0 mt-0.5" /> 
+                        This is a demo. Paste functionality is disabled. Do not enter real credit card details.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {pay !== "Card" && <p className="mt-3 text-[12px] text-[#9CA3AF] flex items-center gap-1.5"><Lock size={13} /> Demo checkout. You will not be charged.</p>}
             </section>
           </div>
 
@@ -121,7 +218,10 @@ export function CheckoutPage() {
               <p className="flex justify-between font-display font-bold text-xl pt-2 text-[#1A1A2E]"><span>Total</span><span>${grand.toFixed(2)}</span></p>
             </div>
             <button onClick={() => {
-              if (!form.name || !form.email || !form.address || !form.suburb || !form.postcode) { alert("Please complete name, email, address, suburb and postcode."); return; }
+              if (!validate()) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+              }
               const order = placeOrder({ items: cart, subtotal: total, shipping: shipOpt.label, shippingFee: fee, payment: pay, total: grand, address: form });
               setCart([]);
               nav(`/order-success/${order.id}`);
@@ -139,25 +239,100 @@ export function OrderSuccessPage() {
   const { id } = useParams();
   const { orders } = useAuth();
   const order = orders.find((o) => o.id === id);
+
   return (
-    <div className="mx-auto max-w-2xl px-4 py-14 text-center">
-      <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="mx-auto w-20 h-20 rounded-full bg-[#10B981] grid place-items-center">
-        <CheckCircle2 size={40} className="text-white" />
-      </motion.div>
-      <h1 className="font-display font-bold text-4xl mt-6 text-[#1A1A2E]">Order locked in</h1>
-      <p className="text-[#6B7280] text-sm mt-2">Order <b className="text-[#1A1A2E]">{id}</b> is packed in Campbellfield VIC.</p>
+    <div className="mx-auto max-w-3xl px-4 py-14">
+      <div className="text-center print:hidden">
+        <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="mx-auto w-20 h-20 rounded-full bg-[#10B981] grid place-items-center">
+          <CheckCircle2 size={40} className="text-white" />
+        </motion.div>
+        <h1 className="font-display font-bold text-4xl mt-6 text-[#1A1A2E]">Order locked in</h1>
+        <p className="text-[#6B7280] text-sm mt-2">Order <b className="text-[#1A1A2E]">{id}</b> is packed in Campbellfield VIC.</p>
+        
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Link to={`/track?order=${id || ""}`} className="bg-[#E53E00] text-white rounded-xl px-7 py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition">Track this order</Link>
+          <button onClick={() => window.print()} className="rounded-xl px-7 py-3.5 text-sm font-bold border border-[#E5E7EB] text-[#1A1A2E] flex items-center gap-2 hover:border-[#E53E00] transition bg-white">
+            <Printer size={16} /> Print Tax Invoice
+          </button>
+          <Link to="/shop" className="rounded-xl px-7 py-3.5 text-sm font-bold border border-[#E5E7EB] text-[#1A1A2E] flex items-center gap-2 hover:border-[#E53E00] transition bg-white">
+            Keep shopping <ArrowRight size={15} />
+          </Link>
+        </div>
+      </div>
+
       {order && (
-        <div className="mt-6 rounded-2xl border border-[#E5E7EB] bg-white p-6 text-left text-sm shadow-sm">
-          <p className="flex justify-between"><span className="text-[#6B7280]">Items</span><b className="text-[#1A1A2E]">{order.items.length} lines</b></p>
-          <p className="flex justify-between mt-1.5"><span className="text-[#6B7280]">Shipping</span><b className="text-[#1A1A2E]">{order.shipping}</b></p>
-          <p className="flex justify-between mt-1.5"><span className="text-[#6B7280]">Payment</span><b className="text-[#1A1A2E]">{order.payment}</b></p>
-          <p className="flex justify-between mt-1.5 font-display font-bold text-lg text-[#1A1A2E]"><span>Total</span><span>${order.total.toFixed(2)}</span></p>
+        <div className="mt-12 p-8 bg-white border border-[#E5E7EB] rounded-2xl shadow-sm print:shadow-none print:border-none print:mt-0 print:p-0">
+          <div className="flex justify-between items-start border-b border-[#E5E7EB] pb-6">
+            <div>
+              <p className="font-display font-black text-2xl text-[#1A1A2E]">TAX INVOICE</p>
+              <p className="text-[#6B7280] text-sm mt-1">Aurex Truck Parts Australia Pty Ltd</p>
+              <p className="text-[#6B7280] text-sm">ABN: 12 345 678 901</p>
+            </div>
+            <div className="text-right">
+              <p className="font-bold text-[#1A1A2E]">Order # {id}</p>
+              <p className="text-[#6B7280] text-sm mt-1">{new Date().toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            </div>
+          </div>
+
+          <div className="py-6 grid sm:grid-cols-2 gap-8 border-b border-[#E5E7EB]">
+            <div>
+              <p className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-widest mb-2">Billed To</p>
+              <p className="font-semibold text-[#1A1A2E]">{order.address.firstName} {order.address.lastName}</p>
+              <p className="text-[#6B7280] text-sm mt-1">{order.address.company}</p>
+              <p className="text-[#6B7280] text-sm">{order.address.address}</p>
+              <p className="text-[#6B7280] text-sm">{order.address.suburb} {order.address.state} {order.address.postcode}</p>
+            </div>
+            <div>
+              <p className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-widest mb-2">Payment</p>
+              <p className="font-semibold text-[#1A1A2E]">{order.payment}</p>
+              <p className="text-[#6B7280] text-sm mt-1">Paid in full</p>
+            </div>
+          </div>
+
+          <div className="py-6">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="text-[#9CA3AF] border-b border-[#E5E7EB]">
+                  <th className="pb-3 font-medium">Item</th>
+                  <th className="pb-3 font-medium text-right w-20">Qty</th>
+                  <th className="pb-3 font-medium text-right w-24">Total</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#F3F4F6]">
+                {order.items.map((i, idx) => (
+                  <tr key={idx}>
+                    <td className="py-4">
+                      <p className="font-semibold text-[#1A1A2E]">{i.name}</p>
+                      <p className="text-[11px] text-[#6B7280] mt-0.5">SKU: {i.sku}</p>
+                    </td>
+                    <td className="py-4 text-right font-medium">{i.qty}</td>
+                    <td className="py-4 text-right font-medium">${(i.price * i.qty).toFixed(2)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="pt-6 border-t border-[#E5E7EB] flex flex-col items-end gap-2 text-sm">
+            <div className="flex justify-between w-64 text-[#6B7280]">
+              <span>Subtotal</span>
+              <span className="text-[#1A1A2E] font-medium">${order.subtotal.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between w-64 text-[#6B7280]">
+              <span>Shipping ({order.shipping})</span>
+              <span className="text-[#1A1A2E] font-medium">${order.shippingFee.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between w-64 text-[#6B7280]">
+              <span>GST Included (10%)</span>
+              <span className="text-[#1A1A2E] font-medium">${(order.total / 11).toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between w-64 font-display font-bold text-xl text-[#1A1A2E] pt-3 border-t border-[#E5E7EB] mt-1">
+              <span>Total paid</span>
+              <span className="text-[#E53E00]">${order.total.toFixed(2)}</span>
+            </div>
+          </div>
         </div>
       )}
-      <div className="mt-6 flex flex-wrap justify-center gap-2.5">
-        <Link to={`/track?order=${id || ""}`} className="bg-[#E53E00] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition">Track this order</Link>
-        <Link to="/shop" className="rounded-lg px-7 py-3.5 text-sm font-bold border border-[#E5E7EB] text-[#1A1A2E] flex items-center gap-2 hover:border-[#E53E00] transition">Keep shopping <ArrowRight size={15} /></Link>
-      </div>
     </div>
   );
 }

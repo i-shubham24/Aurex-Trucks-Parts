@@ -2,6 +2,7 @@ import { useMemo, useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, X, ShieldCheck, Truck, RotateCcw, ArrowRight } from "lucide-react";
+import Fuse from "fuse.js";
 import { PRODUCTS as SEED, BRANDS, HERO } from "../data/catalog.js";
 import { FIT_RANK } from "../data/fitment.js";
 import { useProducts } from "../store/products.jsx";
@@ -31,15 +32,22 @@ export default function Shop() {
   useEffect(() => { setCat(catParam); }, [catParam]);
   useEffect(() => { if (qParam) setQuery(qParam); }, [qParam, setQuery]);
 
+  const fuse = useMemo(() => new Fuse(PRODUCTS, { keys: ['name', 'sku', 'brand'], threshold: 0.3 }), [PRODUCTS]);
+
   // Basic facet filter first.
-  const base = useMemo(() => PRODUCTS.filter((p) => {
-    const okCat = cat === "All" || p.cat === cat;
-    const okBrand = brand === "All brands" || p.brand === brand;
-    const okQ = query.trim() === "" || (p.name + " " + p.sku + " " + (p.brand || "")).toLowerCase().includes(query.toLowerCase());
-    const okP = p.price <= maxPrice;
-    const okS = !inStock || p.stock.includes("In stock");
-    return okCat && okBrand && okQ && okP && okS;
-  }), [PRODUCTS, cat, brand, query, maxPrice, inStock]);
+  const base = useMemo(() => {
+    let results = PRODUCTS;
+    if (query.trim() !== "") {
+      results = fuse.search(query).map(r => r.item);
+    }
+    return results.filter((p) => {
+      const okCat = cat === "All" || p.cat === cat;
+      const okBrand = brand === "All brands" || p.brand === brand;
+      const okP = p.price <= maxPrice;
+      const okS = !inStock || p.stock.includes("In stock");
+      return okCat && okBrand && okP && okS;
+    });
+  }, [PRODUCTS, cat, brand, query, maxPrice, inStock, fuse]);
 
   // Parts that fit the selected truck, for the banner count.
   const fitCount = useMemo(

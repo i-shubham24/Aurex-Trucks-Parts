@@ -13,8 +13,8 @@ function Field({ label, value, onChange, options, placeholder, disabled, dark })
   useEffect(() => {
     if (!open) return;
     const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
+    document.addEventListener("pointerdown", h);
+    return () => document.removeEventListener("pointerdown", h);
   }, [open]);
 
   return (
@@ -25,7 +25,7 @@ function Field({ label, value, onChange, options, placeholder, disabled, dark })
           type="button"
           disabled={disabled}
           onClick={() => setOpen((o) => !o)}
-          className={`clip-cut-sm w-full flex items-center justify-between gap-2 px-3.5 py-3 text-sm font-bold outline-none transition border-2 ${
+          className={`clip-cut-sm w-full flex items-center justify-between gap-2 px-3.5 py-3.5 text-base sm:text-sm font-bold outline-none transition border-2 ${
             dark ? "bg-white/[0.04] border-white/10 hover:border-[#FF6B35]" : "bg-[#F5F6F8] border-[#E5E7EB] hover:border-[#E53E00]"
           } ${value ? (dark ? "text-white" : "text-[#1A1A2E]") : (dark ? "text-white/45" : "text-[#9CA3AF]")}`}
         >
@@ -36,14 +36,14 @@ function Field({ label, value, onChange, options, placeholder, disabled, dark })
           {open && (
             <motion.ul
               initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.16 }}
-              className={`absolute left-0 right-0 z-[70] mt-1.5 max-h-52 overflow-auto no-scrollbar shadow-elevated ${dark ? "bg-[#1A1A2E] border-2 border-white/10" : "bg-white border-2 border-[#1A1A2E]"}`}
+              className={`absolute left-0 right-0 z-[70] mt-1.5 max-h-[40vh] sm:max-h-52 overflow-auto no-scrollbar shadow-elevated ${dark ? "bg-[#1A1A2E] border-2 border-white/10" : "bg-white border-2 border-[#1A1A2E]"}`}
             >
               {options.map((o) => (
                 <li key={o}>
                   <button
                     type="button"
                     onClick={() => { onChange(o); setOpen(false); }}
-                    className={`w-full text-left px-3.5 py-2.5 text-sm font-semibold transition ${o === value ? "bg-[#E53E00] text-white" : (dark ? "text-white/85 hover:bg-white/10" : "text-[#1A1A2E] hover:bg-[#FFF0EB]")}`}
+                    className={`w-full text-left px-4 py-3.5 sm:py-2.5 text-base sm:text-sm font-semibold transition ${o === value ? "bg-[#E53E00] text-white" : (dark ? "text-white/85 hover:bg-white/10" : "text-[#1A1A2E] hover:bg-[#FFF0EB]")}`}
                   >
                     {o}
                   </button>

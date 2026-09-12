@@ -2,13 +2,77 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://* http://*; connect-src 'self' ws://*;" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Aurex Truck Parts Australia. Heavy truck and trailer spare parts. Volvo, Scania, Kenworth, Mack, Hino, Isuzu. Australia wide delivery." />
     <title>Aurex Truck Parts Australia | Heavy Truck and Trailer Spares</title>
+    
+    <!-- SEO and Meta Tags -->
+    <meta name="description" content="Aurex Truck Parts Australia. Heavy truck and trailer spare parts. Volvo, Scania, Kenworth, Mack, Hino, Isuzu. Australia wide delivery." />
+    <meta name="keywords" content="truck parts, trailer parts, heavy vehicle spares, Aurex, Australia truck parts" />
+    <meta name="author" content="Aurex Truck Parts Australia" />
+    
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Aurex Truck Parts Australia" />
+    <meta property="og:description" content="Quality heavy truck and trailer spare parts. Same day dispatch across Australia." />
+    <!-- WhatsApp prefers < 300KB and specific dimensions. Using a fast, sized Unsplash image. -->
+    <meta property="og:image" itemprop="image" content="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=1200&h=630&fit=crop&q=80&fm=jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/jpeg" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="Aurex Truck Parts Australia" />
+    <meta property="twitter:description" content="Quality heavy truck and trailer spare parts. Same day dispatch across Australia." />
+    <meta property="twitter:image" content="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=1200&h=630&fit=crop&q=80&fm=jpg" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "AutoPartsStore",
+      "name": "Aurex Truck Parts Australia",
+      "image": "https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=1200",
+      "@id": "https://aurextruckparts.com.au",
+      "url": "https://aurextruckparts.com.au",
+      "telephone": "0390000000",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "41 Halley Court",
+        "addressLocality": "Campbellfield",
+        "addressRegion": "VIC",
+        "postalCode": "3061",
+        "addressCountry": "AU"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": -37.6690,
+        "longitude": 144.9570
+      },
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday"
+        ],
+        "opens": "08:00",
+        "closes": "17:00"
+      },
+      "sameAs": [
+        "https://www.facebook.com/aurextruckparts",
+        "https://www.instagram.com/aurextruckparts"
+      ]
+    }
+    </script>
   </head>
   <body>
     <div id="root"></div>

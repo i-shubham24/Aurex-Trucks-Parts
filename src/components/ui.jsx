@@ -7,21 +7,78 @@ import { useGarage } from "./garage/GarageContext.jsx";
 import { fitLabel } from "../data/fitment.js";
 
 // Styled dropdown that replaces raw select boxes. Angular house shape.
-export function Dropdown({ value, options, onChange, align = "left", className = "" }) {
-  const [open, setOpen] = useState(false);
+export function FocusTrap({ children, active, className }) {
   const ref = useRef(null);
   useEffect(() => {
-    if (!open) return;
+    if (!active || !ref.current) return;
+    const focusableElements = ref.current.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    const first = focusableElements[0];
+    const last = focusableElements[focusableElements.length - 1];
+    
+    const handleTab = (e) => {
+      if (e.key !== "Tab") return;
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          last.focus();
+          e.preventDefault();
+        }
+      } else {
+        if (document.activeElement === last) {
+          first.focus();
+          e.preventDefault();
+        }
+      }
+    };
+    
+    document.addEventListener("keydown", handleTab);
+    first?.focus();
+    return () => document.removeEventListener("keydown", handleTab);
+  }, [active]);
+
+  return <div ref={ref} className={className}>{children}</div>;
+}
+
+export function Dropdown({ value, options, onChange, align = "left", className = "" }) {
+  const [open, setOpen] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (!open) {
+      setFocusedIndex(-1);
+      return;
+    }
     const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
+    document.addEventListener("pointerdown", h);
+    return () => document.removeEventListener("pointerdown", h);
   }, [open]);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Escape") {
+      setOpen(false);
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (!open) setOpen(true);
+      else setFocusedIndex((i) => (i < options.length - 1 ? i + 1 : 0));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (!open) setOpen(true);
+      else setFocusedIndex((i) => (i > 0 ? i - 1 : options.length - 1));
+    } else if (e.key === "Enter" && open && focusedIndex >= 0) {
+      e.preventDefault();
+      onChange(options[focusedIndex]);
+      setOpen(false);
+    }
+  };
+
   return (
-    <div ref={ref} className={`relative ${className}`}>
+    <div ref={ref} className={`relative ${className}`} onKeyDown={handleKeyDown}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="clip-cut w-full flex items-center justify-between gap-3 bg-white border-2 border-[#E5E7EB] px-4 py-3 text-sm font-bold text-[#1A1A2E] hover:border-[#E53E00] transition"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className="clip-cut w-full flex items-center justify-between gap-3 bg-white border-2 border-[#E5E7EB] px-4 py-3.5 sm:py-3 text-base sm:text-sm font-bold text-[#1A1A2E] hover:border-[#E53E00] focus:border-[#E53E00] outline-none transition"
       >
         {value}
         <ChevronDown size={15} className={`text-[#9CA3AF] transition ${open ? "rotate-180" : ""}`} />
@@ -29,15 +86,19 @@ export function Dropdown({ value, options, onChange, align = "left", className =
       <AnimatePresence>
         {open && (
           <motion.ul
+            role="listbox"
             initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.16 }}
-            className={`absolute z-40 mt-1.5 min-w-full bg-white border-2 border-[#1A1A2E] shadow-elevated overflow-hidden ${align === "right" ? "right-0" : "left-0"}`}
+            className={`absolute z-40 mt-1.5 min-w-full max-h-[50vh] overflow-y-auto bg-white border-2 border-[#1A1A2E] shadow-elevated ${align === "right" ? "right-0" : "left-0"}`}
           >
-            {options.map((o) => (
-              <li key={o}>
+            {options.map((o, i) => (
+              <li key={o} role="option" aria-selected={o === value}>
                 <button
                   type="button"
+                  tabIndex={-1}
                   onClick={() => { onChange(o); setOpen(false); }}
-                  className={`w-full text-left px-4 py-2.5 text-sm font-semibold transition ${o === value ? "bg-[#E53E00] text-white" : "text-[#1A1A2E] hover:bg-[#FFF0EB]"}`}
+                  className={`w-full text-left px-4 py-3.5 sm:py-2.5 text-base sm:text-sm font-semibold transition ${
+                    o === value ? "bg-[#E53E00] text-white" : "text-[#1A1A2E] hover:bg-[#FFF0EB]"
+                  } ${focusedIndex === i ? "bg-[#FFF0EB] text-[#1A1A2E] outline-none" : ""}`}
                 >
                   {o}
                 </button>
@@ -144,6 +205,7 @@ export function SafeImg({ src, alt, className = "", label, wrapClass = "" }) {
       src={src}
       alt={alt}
       loading="lazy"
+      decoding="async"
       onError={() => setBroken(true)}
       className={className}
     />

@@ -118,14 +118,43 @@ export function LoginPage() {
   const nav = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [website, setWebsite] = useState(""); // honeypot
   const [err, setErr] = useState("");
+  
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setErr("");
+    
+    // Honeypot check
+    if (website) {
+      setErr("Bot detected.");
+      return;
+    }
+    
+    // Regex validation
+    const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRx.test(email)) {
+      setErr("Invalid email format.");
+      return;
+    }
+    
+    const r = login({ email, password });
+    if (!r.ok) setErr(r.msg); 
+    else nav("/account");
+  };
+
   return (
     <AuthShell
       title="Welcome back"
       sub="Log in to check out faster and track your orders."
       footer={<p className="text-sm text-[#6B7280]">New to Aurex? <Link to="/signup" className="text-[#E53E00] font-bold hover:underline">Create an account</Link></p>}
     >
-      <form onSubmit={(e) => { e.preventDefault(); const r = login({ email, password }); if (!r.ok) setErr(r.msg); else nav("/account"); }} className="grid gap-3">
+      <form onSubmit={handleLogin} className="grid gap-3">
+        {/* Honeypot field (hidden from real users) */}
+        <div style={{ display: "none" }} aria-hidden="true">
+          <label>Website <input type="text" name="_website" value={website} onChange={(e) => setWebsite(e.target.value)} tabIndex="-1" autoComplete="off" /></label>
+        </div>
+        
         <label className="grid gap-1.5">
           <span className="text-[12px] font-bold text-[#6B7280]">Email</span>
           <input value={email} onChange={(e) => setEmail(e.target.value)} required type="email" placeholder="you@company.com.au" className={inputClass} />
@@ -147,22 +176,58 @@ export function SignupPage() {
   const { signup } = useAuth();
   const nav = useNavigate();
   const [f, setF] = useState({ name: "", email: "", password: "", phone: "", company: "" });
+  const [website, setWebsite] = useState(""); // honeypot
   const [err, setErr] = useState("");
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  
+  const handleSignup = (e) => {
+    e.preventDefault();
+    setErr("");
+    
+    // Honeypot check
+    if (website) {
+      setErr("Bot detected.");
+      return;
+    }
+    
+    // Validations
+    const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRx = /^0[45]\d{8}$|^0[2378]\d{8}$/;
+    
+    if (!emailRx.test(f.email)) {
+      setErr("Invalid email format."); return;
+    }
+    if (f.phone && !phoneRx.test(f.phone.replace(/\s/g, ''))) {
+      setErr("Invalid 10-digit Australian phone format."); return;
+    }
+    if (f.password.length < 6 || !/\d/.test(f.password) || !/[A-Z]/.test(f.password)) { 
+      setErr("Password needs min 6 chars, 1 number, and 1 uppercase letter."); return; 
+    }
+    
+    const r = signup(f); 
+    if (!r.ok) setErr(r.msg); 
+    else nav("/account");
+  };
+
   return (
     <AuthShell
       title="Create your account"
       sub="Trade and fleet welcome. One login for quotes, checkout and tracking."
       footer={<p className="text-sm text-[#6B7280]">Already have an account? <Link to="/login" className="text-[#E53E00] font-bold hover:underline">Log in</Link></p>}
     >
-      <form onSubmit={(e) => { e.preventDefault(); if (f.password.length < 6) { setErr("Password needs at least 6 characters."); return; } const r = signup(f); if (!r.ok) setErr(r.msg); else nav("/account"); }} className="grid gap-3">
+      <form onSubmit={handleSignup} className="grid gap-3">
+        {/* Honeypot field (hidden from real users) */}
+        <div style={{ display: "none" }} aria-hidden="true">
+          <label>Website <input type="text" name="_website" value={website} onChange={(e) => setWebsite(e.target.value)} tabIndex="-1" autoComplete="off" /></label>
+        </div>
+        
         <div className="grid sm:grid-cols-2 gap-3">
           <input value={f.name} onChange={set("name")} required placeholder="Full name" className={inputClass} />
           <input value={f.phone} onChange={set("phone")} placeholder="Phone" className={inputClass} />
         </div>
         <input value={f.email} onChange={set("email")} required type="email" placeholder="Work email" className={inputClass} />
         <input value={f.company} onChange={set("company")} placeholder="Company or fleet, optional" className={inputClass} />
-        <PasswordField value={f.password} onChange={set("password")} placeholder="Create password, min 6 characters" inputClass={inputClass} />
+        <PasswordField value={f.password} onChange={set("password")} placeholder="Create password" inputClass={inputClass} />
         {err && <p className="text-[13px] text-red-500 font-semibold">{err}</p>}
         <button className="mt-2 bg-[#1A1A2E] text-white rounded-xl py-4 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#E53E00] active:scale-[0.99] transition">
           <UserPlus size={16} /> Create account

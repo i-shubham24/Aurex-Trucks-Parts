@@ -409,7 +409,21 @@ export function ContactPage() {
         </Reveal>
 
         <Reveal dir="right">
-          <form onSubmit={(e) => { e.preventDefault(); addEnquiry({ name: f.name, phone: f.phone, email: "", truck: f.truck || "Not specified", message: f.message }); setSent(true); setF({ name: "", phone: "", truck: "", message: "" }); }} className="bg-white border border-[#E5E7EB] overflow-hidden shadow-card">
+          <form onSubmit={(e) => { 
+            e.preventDefault(); 
+            // Honeypot check
+            if (f.website) { setSent(true); return; } // Pretend it sent
+            
+            const phoneRx = /^0[45]\d{8}$|^0[2378]\d{8}$/;
+            if (!phoneRx.test(f.phone.replace(/\s/g, ''))) {
+              alert("Please enter a valid 10-digit Australian phone number.");
+              return;
+            }
+            
+            addEnquiry({ name: f.name, phone: f.phone, email: "", truck: f.truck || "Not specified", message: f.message }); 
+            setSent(true); 
+            setF({ name: "", phone: "", truck: "", message: "", website: "" }); 
+          }} className="bg-white border border-[#E5E7EB] overflow-hidden shadow-card">
             <div className="relative overflow-hidden bg-[#1A1A2E] text-white px-7 py-6">
               <div className="absolute inset-0 grid-scrim opacity-40" />
               <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-[#E53E00]/25 blur-[70px]" />
@@ -418,6 +432,11 @@ export function ContactPage() {
             </div>
             <div className="p-7 grid gap-3.5">
               {sent && <p className="clip-cut-sm bg-emerald-50 border-2 border-emerald-200 text-emerald-700 text-[13px] font-semibold px-4 py-3">Thanks. Your enquiry is logged and our VIC team will reply within 4 business hours.</p>}
+              
+              <div style={{ display: "none" }} aria-hidden="true">
+                <label>Website <input type="text" name="_website" value={f.website || ""} onChange={set("website")} tabIndex="-1" autoComplete="off" /></label>
+              </div>
+
               <div className="grid sm:grid-cols-2 gap-3.5">
                 <label className="grid gap-1.5"><span className="text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase">Full name</span>
                   <input required value={f.name} onChange={set("name")} placeholder="John Smith" className="rounded-lg px-4 py-3.5 text-sm bg-[#F7F8FA] border-2 border-[#E5E7EB] outline-none text-[#1A1A2E] focus:border-[#E53E00] transition" /></label>

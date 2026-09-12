@@ -5,6 +5,7 @@ import { X, ChevronRight, Search } from "lucide-react";
 import { useSite } from "../../store/site.jsx";
 import { useShop } from "../../store/shop.jsx";
 import { LogoFull } from "../logo.jsx";
+import { FocusTrap } from "../ui.jsx";
 
 const LINKS = [
   ["Home", "/"], ["Shop", "/shop"], ["Categories", "/categories"], ["Brands", "/brands"],
@@ -33,8 +34,9 @@ export default function MobileDrawer({ open, onClose }) {
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "tween", ease: [0.16, 1, 0.3, 1], duration: 0.4 }}
-            className="absolute left-0 top-0 h-full w-[86%] max-w-sm bg-white border-r border-[#E5E7EB] p-6 overflow-auto"
+            className="absolute left-0 top-0 h-full w-[86%] max-w-sm bg-white border-r border-[#E5E7EB] flex flex-col min-h-0"
           >
+            <FocusTrap active={open} className="flex-1 overflow-auto p-6">
             <div className="flex items-center justify-between">
               <LogoFull />
               <button onClick={onClose} className="p-2 rounded-lg border border-[#E5E7EB] text-[#6B7280]" aria-label="close">
@@ -88,6 +90,7 @@ export default function MobileDrawer({ open, onClose }) {
                 </Link>
               ))}
             </div>
+            </FocusTrap>
           </motion.div>
         </div>
       )}

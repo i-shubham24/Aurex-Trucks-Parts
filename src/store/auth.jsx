@@ -17,18 +17,31 @@ export function AuthProvider({ children }) {
   useEffect(() => write(SESSION_KEY, session), [session]);
   useEffect(() => write(ORDERS_KEY, orders), [orders]);
 
-  const user = useMemo(() => users.find((u) => u.email === session) || null, [users, session]);
+  const user = useMemo(() => {
+    const u = users.find((u) => u.email === session);
+    if (!u) return null;
+    return { ...u, isAdmin: u.email === "admin@aurex.com.au" || u.role === "admin" };
+  }, [users, session]);
 
   const signup = ({ name, email, password, phone, company }) => {
     const clean = email.trim().toLowerCase();
     if (users.some((u) => u.email === clean)) return { ok: false, msg: "An account with this email already exists. Please log in." };
-    const nu = { name: name.trim(), email: clean, password, phone: phone || "", company: company || "", createdAt: new Date().toISOString() };
+    const nu = { name: name.trim(), email: clean, password, phone: phone || "", company: company || "", createdAt: new Date().toISOString(), role: "customer" };
     setUsers((u) => [...u, nu]);
     setSession(clean);
     return { ok: true };
   };
   const login = ({ email, password }) => {
     const clean = email.trim().toLowerCase();
+    
+    // Seed admin if it doesn't exist and they are trying to log in as admin
+    if (clean === "admin@aurex.com.au" && password === "admin123" && !users.some(u => u.email === "admin@aurex.com.au")) {
+      const adminUser = { name: "Aurex Admin", email: "admin@aurex.com.au", password: "admin123", role: "admin", createdAt: new Date().toISOString() };
+      setUsers(u => [...u, adminUser]);
+      setSession(clean);
+      return { ok: true };
+    }
+
     const f = users.find((u) => u.email === clean && u.password === password);
     if (!f) return { ok: false, msg: "Email or password did not match. Try again or create an account." };
     setSession(clean);

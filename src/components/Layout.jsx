@@ -5,7 +5,7 @@ import { ShoppingCart, Minus, Plus, Send, ArrowRight, MapPin, ArrowUp, Mail, Pho
 import { useShop } from "../store/shop.jsx";
 import { useSite } from "../store/site.jsx";
 import { LogoFull } from "./logo.jsx";
-import { ScrollProgress } from "./ui.jsx";
+import { ScrollProgress, FocusTrap } from "./ui.jsx";
 import { ShopWidgets } from "./shopwise.jsx";
 import EmailPopup from "./EmailPopup.jsx";
 import Header from "./layout/Header.jsx";
@@ -39,12 +39,28 @@ export default function Layout({ children }) {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    if (mobile || drawer) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+    };
+  }, [mobile, drawer]);
+
   return (
     <div className="min-h-screen bg-white text-[#1A1A2E] antialiased overflow-x-hidden flex flex-col" style={{ fontFamily: "Inter" }}>
       <ScrollProgress />
       <ScrollManager />
 
-      <Header onOpenMobile={() => setMobile(true)} />
+      <div className="print:hidden">
+        <Header onOpenMobile={() => setMobile(true)} />
+      </div>
 
       <motion.main
         key={pathname}
@@ -57,7 +73,7 @@ export default function Layout({ children }) {
       </motion.main>
 
       {/* Newsletter strip */}
-      <section className="bg-[#16213E]">
+      <section className="bg-[#16213E] print:hidden">
         <div className="mx-auto max-w-7xl px-4 py-8 flex flex-wrap items-center gap-6 justify-between">
           <div className="flex items-center gap-4">
             <span className="grid place-items-center w-12 h-12 rounded-xl bg-[#E53E00] text-white shrink-0"><Mail size={22} /></span>
@@ -74,7 +90,7 @@ export default function Layout({ children }) {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#1A1A2E] text-white">
+      <footer className="bg-[#1A1A2E] text-white print:hidden">
         <div className="mx-auto max-w-7xl px-4 py-14 grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 text-sm">
           <div>
             <LogoFull light />
@@ -111,6 +127,8 @@ export default function Layout({ children }) {
             <p className="font-bold text-[12px] tracking-widest text-white/40 uppercase">Company</p>
             <div className="mt-3 grid gap-2 text-white/65">
               <Link to="/about" className="hover:text-white transition w-fit">About us</Link>
+              <Link to="/partners" className="hover:text-white transition w-fit">Our Partners</Link>
+              <Link to="/catalogue" className="hover:text-white transition w-fit">Catalogue</Link>
               <Link to="/locations" className="hover:text-white transition w-fit">Locations</Link>
               <Link to="/trade" className="hover:text-white transition w-fit">Trade accounts</Link>
               <Link to="/policies/shipping" className="hover:text-white transition w-fit">Shipping</Link>
@@ -169,7 +187,8 @@ export default function Layout({ children }) {
               transition={{ type: "tween", ease: [0.16, 1, 0.3, 1], duration: 0.4 }}
               className="absolute right-0 top-0 h-full w-[92%] max-w-md bg-white border-l border-[#E5E7EB] flex flex-col"
             >
-              <div className="p-5 flex items-center justify-between border-b border-[#E5E7EB]">
+              <FocusTrap active={drawer} className="flex-1 flex flex-col min-h-0">
+                <div className="p-5 flex items-center justify-between border-b border-[#E5E7EB]">
                 <p className="font-bold text-lg text-[#1A1A2E] flex items-center gap-2"><ShoppingCart size={18} className="text-[#E53E00]" /> Cart ({count})</p>
                 <button onClick={() => setDrawer(false)} className="p-2 rounded-lg border border-[#E5E7EB] text-[#6B7280]" aria-label="close">
                   <X size={18} />
@@ -185,10 +204,10 @@ export default function Layout({ children }) {
                 )}
                 {cart.map((i) => (
                   <div key={i.sku} className="bg-[#F7F8FA] border border-[#E5E7EB] rounded-xl p-3 flex gap-3">
-                    <img src={i.product?.image} alt="" className="w-16 h-16 rounded-lg object-cover bg-white shrink-0" onError={(e) => { e.currentTarget.style.visibility = "hidden"; }} />
+                    <img src={i.image} alt="" className="w-16 h-16 rounded-lg object-cover bg-white shrink-0" onError={(e) => { e.currentTarget.style.visibility = "hidden"; }} />
                     <div className="flex-1 min-w-0">
                       <p className="text-[11px] font-semibold text-[#9CA3AF]">{i.sku}</p>
-                      <p className="font-semibold text-[13px] leading-snug text-[#1A1A2E] line-clamp-2">{i.product?.name}</p>
+                      <p className="font-semibold text-[13px] leading-snug text-[#1A1A2E] line-clamp-2">{i.name}</p>
                       <div className="mt-2 flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                           <button
@@ -205,7 +224,7 @@ export default function Layout({ children }) {
                             <Plus size={13} />
                           </button>
                         </div>
-                        <p className="font-bold text-[#1A1A2E] text-sm">${((i.product?.price || 0) * i.qty).toFixed(2)}</p>
+                        <p className="font-bold text-[#1A1A2E] text-sm">${((i.price || 0) * i.qty).toFixed(2)}</p>
                       </div>
                     </div>
                   </div>
@@ -240,7 +259,8 @@ export default function Layout({ children }) {
                   </Link>
                 </div>
               </div>
-            </motion.aside>
+            </FocusTrap>
+          </motion.aside>
           </div>
         )}
       </AnimatePresence>

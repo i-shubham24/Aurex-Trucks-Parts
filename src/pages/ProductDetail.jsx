@@ -87,8 +87,26 @@ export default function ProductDetail() {
   const fitMakes = [...new Set((p.fitment?.apps || []).map((a) => a.make))];
   const cut = { clipPath: "polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px))" };
 
+  const jsonLd = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": p.name,
+    "image": p.image,
+    "description": p.desc,
+    "sku": p.sku,
+    "offers": {
+      "@type": "Offer",
+      "url": window.location.href,
+      "priceCurrency": "AUD",
+      "price": p.price,
+      "itemCondition": "https://schema.org/NewCondition",
+      "availability": inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+    }
+  };
+
   return (
     <div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="bg-[#F7F8FA] border-b border-[#E5E7EB]">
         <div className="mx-auto max-w-7xl px-4 py-4">
           <p className="text-[12px] text-[#9CA3AF] font-semibold flex items-center gap-1.5">
