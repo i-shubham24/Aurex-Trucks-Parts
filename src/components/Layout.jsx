@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, Minus, Plus, Send, ArrowRight, MapPin, ArrowUp, Mail, Phone, X } from "lucide-react";
 import { useShop } from "../store/shop.jsx";
+import { useSite } from "../store/site.jsx";
 import { LogoFull } from "./logo.jsx";
 import { ScrollProgress } from "./ui.jsx";
 import { ShopWidgets } from "./shopwise.jsx";

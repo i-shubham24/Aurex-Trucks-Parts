@@ -1,13 +1,34 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { CATEGORIES } from "../../data/catalog.js";
+import { ArrowRight } from "lucide-react";
+import { useSite } from "../../store/site.jsx";
 import { SafeImg } from "../ui.jsx";
 
+function useBreakpoint() {
+  const get = () => (typeof window === "undefined" ? "lg" : window.innerWidth >= 1024 ? "lg" : window.innerWidth >= 640 ? "sm" : "base");
+  const [bp, setBp] = useState(get);
+  useEffect(() => {
+    const onResize = () => setBp(get());
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return bp;
+}
+
 // Compact category browse tiles in the house angular shape. Label sits under the tile.
+// Below desktop only three rows are shown so the section never sprawls;
+// the rest live on the All categories page, reached from the trailing tile.
 export default function CategoryCircles() {
+  const { liveCategories } = useSite();
+  const bp = useBreakpoint();
+  const cols = bp === "lg" ? 5 : bp === "sm" ? 3 : 2;
+  const capped = bp !== "lg";
+  const visible = capped ? liveCategories.slice(0, cols * 3) : liveCategories;
+
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-5 gap-y-8">
-      {CATEGORIES.slice(0, 10).map((c, i) => (
+      {visible.map((c, i) => (
         <motion.div
           key={c.name}
           initial={{ opacity: 0, y: 16 }}
@@ -36,6 +57,15 @@ export default function CategoryCircles() {
           </Link>
         </motion.div>
       ))}
+      {capped && liveCategories.length > visible.length && (
+        <Link to="/categories" className="group flex flex-col items-center justify-center text-center rounded-2xl border-2 border-dashed border-[#E5E7EB] hover:border-[#E53E00] transition min-h-[220px] p-6">
+          <span className="grid place-items-center w-12 h-12 rounded-full bg-[#E53E00] text-white group-hover:scale-110 transition">
+            <ArrowRight size={20} />
+          </span>
+          <p className="mt-4 text-[14px] font-bold text-[#1A1A2E]">All categories</p>
+          <p className="text-[11px] text-[#9CA3AF] mt-1">Plus {liveCategories.length - visible.length} more systems</p>
+        </Link>
+      )}
     </div>
   );
 }
