@@ -4,17 +4,18 @@ import { motion } from "framer-motion";
 import { Lock, Truck, CreditCard, CheckCircle2, ArrowRight } from "lucide-react";
 import { useShop } from "../store/shop.jsx";
 import { useAuth } from "../store/auth.jsx";
-
-const SHIPPING = [
-  { id: "Standard", label: "Standard road", eta: "1 to 5 days by zone", fee: (t) => (t >= 500 ? 0 : 24) },
-  { id: "Express", label: "Express priority", eta: "1 to 2 days metro", fee: () => 39 },
-  { id: "Pickup", label: "Click and Collect VIC", eta: "Ready in 4 hours", fee: () => 0 },
-];
-const PAYMENTS = ["Card", "Bank transfer", "Afterpay", "30 day fleet terms"];
+import { useSite } from "../store/site.jsx";
 
 export function CheckoutPage() {
   const { cart, total, count, setCart } = useShop();
   const { user, placeOrder } = useAuth();
+  const { settings } = useSite();
+  const SHIPPING = [
+    { id: "Standard", label: "Standard road", eta: "1 to 5 days by zone", fee: (t) => (t >= settings.freeFreightOver ? 0 : settings.standardFee) },
+    { id: "Express", label: "Express priority", eta: "1 to 2 days metro", fee: () => settings.expressFee },
+    { id: "Pickup", label: "Click and Collect VIC", eta: "Ready in 4 hours", fee: () => 0 },
+  ];
+  const PAYMENTS = ["Card", "Bank transfer", "Afterpay", "30 day fleet terms"];
   const nav = useNavigate();
   const [ship, setShip] = useState(SHIPPING[0].id);
   const [pay, setPay] = useState(PAYMENTS[0]);

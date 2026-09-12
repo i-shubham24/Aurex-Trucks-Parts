@@ -217,9 +217,11 @@ const RAW = [
 ];
 
 // Assign each product a category-matched photo, cycled so neighbours differ.
+import { IMG_OVERRIDES } from "./productImages.js";
 const cursor = {};
 export const PRODUCTS = RAW.map((p) => {
   const fitment = deriveFitment(p);
+  if (IMG_OVERRIDES[p.sku]) return { ...p, fitment, image: IMG_OVERRIDES[p.sku] };
   if (p.image) return { ...p, fitment };
   const set = CAT_IMAGES[p.cat] || [LIB.semiRed];
   const i = (cursor[p.cat] = (cursor[p.cat] ?? -1) + 1);

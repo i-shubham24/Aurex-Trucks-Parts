@@ -181,8 +181,8 @@ export default function ProductDetail() {
               </button>
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button onClick={() => toggleCompare(p.sku)} className={`clip-cut-sm flex-1 min-w-[150px] py-3 text-[13px] font-bold border-2 transition ${compare.includes(p.sku) ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#1A1A2E] hover:text-[#1A1A2E]"}`}>{compare.includes(p.sku) ? "Added to compare" : "Add to compare"}</button>
-              <button onClick={() => setEnquirySku(p.sku)} className="clip-cut-sm flex-1 min-w-[150px] py-3 text-[13px] font-bold border-2 border-[#E5E7EB] text-[#6B7280] hover:border-[#E53E00] hover:text-[#E53E00] transition">Enquire on this SKU</button>
+              <button onClick={() => toggleCompare(p.sku)} className={`flex-1 min-w-[150px] py-3 text-[13px] font-bold rounded-lg border transition ${compare.includes(p.sku) ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#1A1A2E] hover:text-[#1A1A2E]"}`}>{compare.includes(p.sku) ? "Added to compare" : "Add to compare"}</button>
+              <button onClick={() => setEnquirySku(p.sku)} className="flex-1 min-w-[150px] py-3 text-[13px] font-bold rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:border-[#E53E00] hover:text-[#E53E00] transition">Enquire on this SKU</button>
             </div>
 
             <div className="mt-4 grid grid-cols-3 gap-2.5 text-[12px]">

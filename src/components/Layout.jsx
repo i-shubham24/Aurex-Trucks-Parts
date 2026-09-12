@@ -26,6 +26,8 @@ function ScrollManager() {
 export default function Layout({ children }) {
   const { pathname } = useLocation();
   const { cart, setCart, count, total, drawer, setDrawer } = useShop();
+  const { settings } = useSite();
+  const freeOver = settings.freeFreightOver;
   const [mobile, setMobile] = useState(false);
   const [top, setTop] = useState(false);
 
@@ -202,12 +204,12 @@ export default function Layout({ children }) {
                   <span>Subtotal</span>
                   <span className="text-[#E53E00]">${total.toFixed(2)}</span>
                 </div>
-                <p className="mt-1 text-[12px] text-[#9CA3AF]">Free freight over $500. Login saves order history.</p>
+                <p className="mt-1 text-[12px] text-[#9CA3AF]">Free freight over ${freeOver}. Login saves order history.</p>
                 <div className="mt-2.5">
                   <div className="h-2 rounded-full bg-[#F3F4F6] overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-[#E53E00] to-[#FFBB00] transition-all" style={{ width: `${Math.min(100, (total / 500) * 100)}%` }} />
+                    <div className="h-full bg-gradient-to-r from-[#E53E00] to-[#FFBB00] transition-all" style={{ width: `${Math.min(100, (total / freeOver) * 100)}%` }} />
                   </div>
-                  <p className="mt-1.5 text-[12px] font-semibold text-[#6B7280]">{total >= 500 ? "Free freight unlocked." : `$${(500 - total).toFixed(2)} away from free freight.`}</p>
+                  <p className="mt-1.5 text-[12px] font-semibold text-[#6B7280]">{total >= freeOver ? "Free freight unlocked." : `$${(freeOver - total).toFixed(2)} away from free freight.`}</p>
                 </div>
                 <div className="mt-3 grid grid-cols-3 gap-2">
                   <Link

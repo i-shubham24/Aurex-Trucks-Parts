@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Phone, Send, PackageSearch, ArrowRight, BadgeCheck, MapPin, Mail, Clock, X } from "lucide-react";
+import { ChevronDown, Phone, Send, PackageSearch, ArrowRight, BadgeCheck, MapPin, Mail, Clock, X, Heart, ShoppingCart } from "lucide-react";
 import { BRANDS, GUIDES, NEWS, HERO } from "../data/catalog.js";
 import { ProductCard, Reveal, SafeImg, SectionHead, staggerParent, staggerChild } from "../components/ui.jsx";
 import { useShop } from "../store/shop.jsx";
@@ -115,34 +115,64 @@ export function BrandsPage() {
 }
 
 export function DealsPage() {
-  const { add } = useShop();
+  const { add, toggleCompare, compare, setEnquirySku, wishlist, setWishlist } = useShop();
   const { products: PRODUCTS } = useProducts();
   const deals = PRODUCTS.filter((p) => p.oldPrice).slice(0, 9);
   return (
     <div>
       <PageHero crumb="Deals" title="Live" accent="deals." sub="Clear pricing with stock bars showing how fast each offer moves." />
       <motion.div variants={staggerParent} initial="initial" whileInView="whileInView" viewport={{ once: true, margin: "-50px" }} className="mx-auto max-w-7xl px-4 py-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {deals.map((p, i) => (
-          <motion.div key={p.sku} variants={staggerChild} className="rounded-2xl overflow-hidden bg-white border border-[#E5E7EB] hover:border-[#E53E00]/40 hover:shadow-card-hover transition p-5">
-            <p className="flex justify-between text-[11px] font-bold">
-              <span className="bg-[#E53E00] text-white rounded-lg px-3 py-1">SAVE ${(p.oldPrice - p.price).toFixed(0)}</span>
-              <span className="text-[#9CA3AF]">{p.sku}</span>
-            </p>
-            <Link to={`/product/${p.sku}`} className="block rounded-xl overflow-hidden mt-3 shine">
-              <SafeImg src={p.image} alt={p.name} label={p.sku} className="w-full h-40 object-cover hover:scale-105 transition-transform duration-500" wrapClass="w-full h-40" />
-            </Link>
-            <Link to={`/product/${p.sku}`} className="font-display font-semibold text-[16px] mt-3 leading-snug min-h-[44px] block text-[#1A1A2E] hover:text-[#E53E00] transition">{p.name}</Link>
-            <p className="mt-2">
-              <span className="line-through text-[#9CA3AF] text-sm">${p.oldPrice.toFixed(2)}</span>{" "}
-              <span className="font-display font-bold text-[24px] text-[#E53E00] ml-1">${p.price.toFixed(2)}</span>
-            </p>
-            <div className="mt-3 h-2 rounded-full bg-[#F3F4F6] overflow-hidden">
-              <motion.div initial={{ width: 0 }} whileInView={{ width: `${62 + ((i * 11) % 30)}%` }} viewport={{ once: true }} transition={{ duration: 1 }} className="h-full bg-gradient-to-r from-[#E53E00] to-[#FFBB00]" />
+        {deals.map((p, i) => {
+          const save = p.oldPrice - p.price;
+          const pct = Math.round((save / p.oldPrice) * 100);
+          const claimed = 62 + ((i * 11) % 30);
+          const wished = wishlist.includes(p.sku);
+          const inCompare = compare.includes(p.sku);
+          return (
+          <motion.div key={p.sku} variants={staggerChild} className="group relative bg-white border border-[#E5E7EB] overflow-hidden hover:border-[#E53E00]/40 hover:shadow-card-hover hover:-translate-y-1 transition-all duration-500 flex flex-col" style={{ clipPath: "polygon(0 0,100% 0,100% 100%,26px 100%,0 calc(100% - 26px))" }}>
+            <div className="relative aspect-[4/3] overflow-hidden bg-[#F1F2F4] shine">
+              <Link to={`/product/${p.sku}`} className="block w-full h-full">
+                <SafeImg src={p.image} alt={p.name} label={p.sku} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out" wrapClass="w-full h-full" />
+              </Link>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition pointer-events-none" />
+              <span className="absolute top-3 left-3 z-10 bg-[#E53E00] text-white text-[11px] font-black px-2.5 py-1 shadow-primary" style={{ clipPath: "polygon(0 0,100% 0,100% 100%,8px 100%,0 calc(100% - 8px))" }}>
+                SAVE ${save.toFixed(0)} • {pct}%
+              </span>
+              <button
+                onClick={() => setWishlist((w) => (wished ? w.filter((x) => x !== p.sku) : [...w, p.sku]))}
+                aria-label="wishlist"
+                className="absolute top-3 right-3 z-10 w-9 h-9 grid place-items-center rounded-full bg-white/95 backdrop-blur border border-[#E5E7EB] hover:border-[#E53E00] hover:scale-110 transition shadow-sm"
+              >
+                <Heart size={15} className={wished ? "fill-[#E53E00] text-[#E53E00]" : "text-[#9CA3AF]"} />
+              </button>
+              <span className="absolute bottom-3 left-3 z-10 text-[11px] font-bold text-[#6B7280] bg-white/90 backdrop-blur px-2.5 py-1">{p.sku}</span>
             </div>
-            <p className="text-[11px] text-[#9CA3AF] mt-1.5">Selling fast this week</p>
-            <button onClick={() => add(p.sku)} className="mt-3 w-full bg-[#E53E00] text-white rounded-lg py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">Add deal to cart</button>
+            <div className="p-5 flex flex-col flex-1">
+              <p className="text-[11px] font-semibold tracking-wide text-[#9CA3AF] uppercase">{p.brand ? p.brand + " • " : ""}{p.cat}</p>
+              <Link to={`/product/${p.sku}`} className="font-display font-semibold text-[16px] mt-1.5 leading-snug min-h-[44px] block text-[#1A1A2E] hover:text-[#E53E00] transition">{p.name}</Link>
+              <p className="mt-2 flex items-baseline gap-2">
+                <span className="line-through text-[#9CA3AF] text-sm">${p.oldPrice.toFixed(2)}</span>
+                <span className="font-display font-bold text-[26px] text-[#E53E00]">${p.price.toFixed(2)}</span>
+              </p>
+              <div className="mt-3">
+                <div className="h-2 bg-[#F3F4F6] overflow-hidden" style={{ clipPath: "polygon(0 0,100% 0,100% 100%,6px 100%,0 calc(100% - 6px))" }}>
+                  <motion.div initial={{ width: 0 }} whileInView={{ width: `${claimed}%` }} viewport={{ once: true }} transition={{ duration: 1 }} className="h-full bg-gradient-to-r from-[#E53E00] to-[#FFBB00]" />
+                </div>
+                <p className="text-[11px] text-[#9CA3AF] mt-1.5"><b className="text-[#1A1A2E]">{claimed}% claimed</b> • Selling fast this week</p>
+              </div>
+              <div className="mt-3 flex gap-2">
+                <button onClick={() => add(p.sku)} className="flex-1 bg-[#E53E00] text-white py-3 text-sm font-bold hover:bg-[#1A1A2E] active:scale-[0.99] transition flex items-center justify-center gap-2" style={{ clipPath: "polygon(0 0,100% 0,100% 100%,12px 100%,0 calc(100% - 12px))" }}>
+                  <ShoppingCart size={14} /> Add deal to cart
+                </button>
+              </div>
+              <div className="mt-2 flex gap-2">
+                <button onClick={() => toggleCompare(p.sku)} className={`flex-1 py-2 text-[12px] font-bold border transition ${inCompare ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#1A1A2E] hover:text-[#1A1A2E]"}`}>{inCompare ? "Added to compare" : "Compare"}</button>
+                <button onClick={() => setEnquirySku(p.sku)} className="flex-1 py-2 text-[12px] font-bold border border-[#E5E7EB] text-[#6B7280] hover:border-[#E53E00] hover:text-[#E53E00] transition">Enquire</button>
+              </div>
+            </div>
           </motion.div>
-        ))}
+          );
+        })}
       </motion.div>
     </div>
   );

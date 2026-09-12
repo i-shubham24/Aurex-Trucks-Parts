@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { DollarSign, ShoppingCart, Users, Boxes, TrendingUp, AlertTriangle } from "lucide-react";
@@ -11,8 +11,14 @@ const readUsers = () => { try { const v = localStorage.getItem("aurex_users"); r
 export default function Dashboard() {
   const { products } = useProducts();
   const { enquiries, quotes, promos } = useSite();
-  const orders = useMemo(readOrders, []);
-  const users = useMemo(readUsers, []);
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const refresh = () => setTick((t) => t + 1);
+    window.addEventListener("focus", refresh);
+    return () => window.removeEventListener("focus", refresh);
+  }, []);
+  const orders = useMemo(readOrders, [tick]);
+  const users = useMemo(readUsers, [tick]);
   const revenue = orders.reduce((s, o) => s + (o.total || 0), 0);
   const lowStock = products.filter((p) => (p.stock || "").toLowerCase().includes("low") || (p.stock || "").toLowerCase().includes("built")).slice(0, 5);
   const top = [...products].sort((a, b) => (b.reviews || 0) - (a.reviews || 0)).slice(0, 5);
@@ -27,6 +33,7 @@ export default function Dashboard() {
     <div>
       <h1 className="font-display font-bold text-3xl sm:text-4xl">Good day, Admin</h1>
       <p className="text-white/50 text-sm mt-1">Store pulse across sales, stock and enquiries. All data persists in this browser.</p>
+      <button onClick={() => setTick((t) => t + 1)} className="mt-3 rounded-full border border-white/15 px-5 py-2 text-[13px] font-bold hover:border-[#d9ff3d] transition">Refresh figures</button>
       <div className="mt-6 grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {cards.map(([t, v, s, Icon], i) => (
           <motion.div key={t} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="rounded-[22px] border border-white/10 bg-[#0d1218] p-5">

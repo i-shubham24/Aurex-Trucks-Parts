@@ -4,6 +4,7 @@ import { Search, Plus, Pencil, Trash2, X, ImageIcon } from "lucide-react";
 import { useProducts } from "../../store/products.jsx";
 import { useSite } from "../../store/site.jsx";
 import { BRANDS } from "../../data/catalog.js";
+import { IMG_OVERRIDES } from "../../data/productImages.js";
 
 const img = (id, w = 320) => `https://images.unsplash.com/photo-${id}?q=80&w=${w}&auto=format&fit=crop`;
 const PRESETS = [
@@ -49,7 +50,8 @@ export default function AdminProducts() {
   const openNew = () => { setForm(empty); setErr(""); setModal("new"); };
   const openEdit = (p) => {
     const isPreset = PRESETS.some(([, id]) => p.image && p.image.includes(id));
-    setForm({ ...empty, ...p, price: String(p.price), oldPrice: p.oldPrice ? String(p.oldPrice) : "", onSale: !!p.oldPrice, specs: (p.specs || []).join(", "), image: isPreset ? "" : (p.image || ""), useCustom: !isPreset && !!(p.image || ""), preset: PRESETS.find(([, id]) => p.image && p.image.includes(id))?.[1] || PRESETS[2][1] });
+    const isLocal = Object.values(IMG_OVERRIDES).includes(p.image);
+    setForm({ ...empty, ...p, price: String(p.price), oldPrice: p.oldPrice ? String(p.oldPrice) : "", onSale: !!p.oldPrice, specs: (p.specs || []).join(", "), image: (isPreset || !p.image) ? "" : p.image, useCustom: !isPreset && !!(p.image || "") || isLocal, preset: PRESETS.find(([, id]) => p.image && p.image.includes(id))?.[1] || PRESETS[2][1] });
     setErr(""); setModal("edit");
   };
   const save = () => {
@@ -61,6 +63,7 @@ export default function AdminProducts() {
       reviews: Math.max(0, Number(form.reviews) || 0),
       specs: String(form.specs).split(",").map((s) => s.trim()).filter(Boolean),
       image: form.useCustom ? form.image.trim() : img(form.preset),
+      imgCustom: true,
     };
     delete payload.onSale; delete payload.preset; delete payload.useCustom;
     if (!payload.name.trim()) { setErr("Name is required."); return; }
@@ -117,8 +120,18 @@ export default function AdminProducts() {
                   <select value={form.preset} disabled={form.useCustom} onChange={(e) => setForm({ ...form, preset: e.target.value })} className="rounded-xl px-4 py-3 bg-black/40 border border-white/10 outline-none disabled:opacity-40">{PRESETS.map(([l, id]) => <option key={id} value={id}>{l}</option>)}</select>
                 </label>
                 <label className="grid gap-1.5 text-sm">
+                  <span className="text-[12px] font-bold text-white/50">Or on-site white-background shot</span>
+                  <select value={Object.values(IMG_OVERRIDES).includes(form.image) ? form.image : ""} onChange={(e) => setForm({ ...form, image: e.target.value, useCustom: true })} className="rounded-xl px-4 py-3 bg-black/40 border border-white/10 outline-none">
+                    <option value="">Pick from local library ({Object.keys(IMG_OVERRIDES).length} lines)</option>
+                    {Object.entries(IMG_OVERRIDES).map(([sku, path]) => {
+                      const nm = products.find((p) => p.sku === sku)?.name || sku;
+                      return <option key={sku} value={path}>{sku} - {nm.slice(0, 42)}</option>;
+                    })}
+                  </select>
+                </label>
+                <label className="grid gap-1.5 text-sm">
                   <span className="text-[12px] font-bold text-white/50">Or custom image URL</span>
-                  <input value={form.image} onChange={(e) => setForm({ ...form, image: e.target.value, useCustom: true })} placeholder="https://..." className="rounded-xl px-4 py-3 bg-black/40 border border-white/10 outline-none" />
+                  <input value={form.useCustom && !Object.values(IMG_OVERRIDES).includes(form.image) ? form.image : ""} onChange={(e) => setForm({ ...form, image: e.target.value, useCustom: true })} placeholder="https://..." className="rounded-xl px-4 py-3 bg-black/40 border border-white/10 outline-none" />
                 </label>
                 <label className="sm:col-span-2 flex items-center gap-2.5 text-sm font-semibold cursor-pointer">
                   <input type="checkbox" checked={form.useCustom} onChange={(e) => setForm({ ...form, useCustom: e.target.checked })} className="w-4 h-4 accent-[#ff4d00]" /> Use custom URL instead of library photo
