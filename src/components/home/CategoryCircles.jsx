@@ -38,7 +38,7 @@ export default function CategoryCircles() {
         >
           <Link to={`/shop?cat=${encodeURIComponent(c.name)}`} className="group flex flex-col items-center text-center">
             <div className="relative w-full aspect-square max-w-[200px] group-hover:-translate-y-1 transition-transform duration-500">
-              <div className="clip-cut-lg w-full h-full overflow-hidden bg-[#1A1A2E]">
+              <div className="clip-cut-lg w-full h-full overflow-hidden bg-[#12151C]">
                 <SafeImg
                   src={c.image}
                   alt={c.name}
@@ -46,13 +46,13 @@ export default function CategoryCircles() {
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   wrapClass="w-full h-full"
                 />
-                <span className="clip-cut-lg absolute inset-0 border-[3px] border-[#E53E00] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <span className="clip-cut-lg absolute inset-0 border-[3px] border-[#DE5718] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
-              <span className="clip-notch absolute -bottom-2 left-1/2 -translate-x-1/2 grid place-items-center w-9 h-9 bg-[#E53E00] text-white shadow-primary group-hover:scale-110 transition">
+              <span className="clip-notch absolute -bottom-2 left-1/2 -translate-x-1/2 grid place-items-center w-9 h-9 bg-gradient-to-r from-[#EE6724] to-[#DE5718] text-white shadow-copper group-hover:scale-110 transition">
                 <c.icon size={16} />
               </span>
             </div>
-            <p className="mt-5 text-[13px] font-bold text-[#1A1A2E] leading-tight group-hover:text-[#E53E00] transition">{c.name}</p>
+            <p className="mt-5 text-[13px] font-bold text-[#12151C] leading-tight group-hover:text-[#DE5718] transition">{c.name}</p>
             <p className="text-[11px] text-[#9CA3AF]">{c.count} lines</p>
           </Link>
         </motion.div>

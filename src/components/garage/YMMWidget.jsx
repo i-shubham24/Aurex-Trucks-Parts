@@ -19,14 +19,14 @@ function Field({ label, value, onChange, options, placeholder, disabled, dark })
 
   return (
     <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }} className={disabled ? "opacity-40 pointer-events-none" : ""}>
-      <span className="block text-[10px] font-black tracking-[0.22em] uppercase mb-1.5 text-[#FF6B35]">{label}</span>
+      <span className="block text-[10px] font-black tracking-[0.22em] uppercase mb-1.5 text-[#F57429]">{label}</span>
       <div className="relative" ref={ref}>
         <button
           type="button"
           disabled={disabled}
           onClick={() => setOpen((o) => !o)}
           className={`clip-cut-sm w-full flex items-center justify-between gap-2 px-3.5 py-3.5 text-base sm:text-sm font-bold outline-none transition border-2 ${
-            dark ? "bg-white/[0.04] border-white/10 hover:border-[#FF6B35]" : "bg-[#F5F6F8] border-[#E5E7EB] hover:border-[#E53E00]"
+            dark ? "bg-white/[0.04] border-white/10 hover:border-[#DE5718]" : "bg-[#F5F6F8] border-[#E5E7EB] hover:border-[#DE5718]"
           } ${value ? (dark ? "text-white" : "text-[#1A1A2E]") : (dark ? "text-white/45" : "text-[#9CA3AF]")}`}
         >
           <span className="truncate">{value || placeholder}</span>
@@ -43,7 +43,7 @@ function Field({ label, value, onChange, options, placeholder, disabled, dark })
                   <button
                     type="button"
                     onClick={() => { onChange(o); setOpen(false); }}
-                    className={`w-full text-left px-4 py-3.5 sm:py-2.5 text-base sm:text-sm font-semibold transition ${o === value ? "bg-[#E53E00] text-white" : (dark ? "text-white/85 hover:bg-white/10" : "text-[#1A1A2E] hover:bg-[#FFF0EB]")}`}
+                    className={`w-full text-left px-4 py-3.5 sm:py-2.5 text-base sm:text-sm font-semibold transition ${o === value ? "bg-[#DE5718] text-white" : (dark ? "text-white/85 hover:bg-white/10" : "text-[#1A1A2E] hover:bg-[#FFF0EB]")}`}
                   >
                     {o}
                   </button>
@@ -96,7 +96,7 @@ function Console({ dark = true, onDone }) {
         onClick={commit}
         disabled={!ready}
         style={CUT}
-        className="mt-3 w-full bg-[#E53E00] text-white py-3.5 text-sm font-black tracking-wide uppercase flex items-center justify-center gap-2 hover:bg-white hover:text-[#E53E00] active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed transition"
+        className="mt-3 w-full bg-gradient-to-r from-[#EE6724] to-[#DE5718] hover:from-[#DE5718] hover:to-[#B43808] text-white py-3.5 text-sm font-black tracking-wide uppercase flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed transition shadow-sm"
       >
         <Check size={16} /> Lock in my rig
       </motion.button>
@@ -121,9 +121,9 @@ export default function YMMWidget({ variant = "hero" }) {
   if (variant === "hero") {
     return (
       <div className="relative" style={CUT}>
-        <div className="bg-[#12121B] border-t-2 border-[#FF6B35] p-5 sm:p-6 shadow-elevated">
+        <div className="bg-[#12121B] border-t-2 border-[#DE5718] p-5 sm:p-6 shadow-elevated">
           <div className="flex items-center gap-3 mb-4">
-            <span className="grid place-items-center w-9 h-9 bg-[#E53E00] text-white" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
+            <span className="grid place-items-center w-9 h-9 bg-[#DE5718] text-white" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
               <Truck size={17} />
             </span>
             <div>
@@ -153,11 +153,11 @@ export default function YMMWidget({ variant = "hero" }) {
           style={CUT}
           className="flex items-center gap-2 bg-[#1A1A2E] text-white pl-2.5 pr-3 py-2 hover:bg-[#12121B] transition group"
         >
-          <span className="grid place-items-center w-6 h-6 bg-[#E53E00]" style={{ clipPath: "polygon(0 0,100% 0,100% 65%,65% 100%,0 100%)" }}>
+          <span className="grid place-items-center w-6 h-6 bg-[#DE5718]" style={{ clipPath: "polygon(0 0,100% 0,100% 65%,65% 100%,0 100%)" }}>
             <Truck size={13} />
           </span>
           <span className="text-left leading-none">
-            <span className="block text-[8px] font-black tracking-[0.2em] text-[#FF6B35] uppercase">Your rig</span>
+            <span className="block text-[8px] font-black tracking-[0.2em] text-[#F57429] uppercase">Your rig</span>
             <span className="block text-[12px] font-bold mt-0.5">{selectedVehicle.make} {selectedVehicle.model}</span>
           </span>
           <ChevronDown size={14} className="text-white/40 group-hover:text-white transition" />
@@ -166,7 +166,7 @@ export default function YMMWidget({ variant = "hero" }) {
         <button
           onClick={() => setOpen((o) => !o)}
           style={CUT}
-          className="flex items-center gap-2 bg-[#E53E00] text-white px-3.5 py-2.5 text-[13px] font-black uppercase tracking-wide hover:bg-[#1A1A2E] transition"
+          className="flex items-center gap-2 bg-gradient-to-r from-[#EE6724] to-[#DE5718] hover:from-[#DE5718] hover:to-[#B43808] text-white px-3.5 py-2 text-[13px] font-black uppercase tracking-wide shadow-sm transition"
         >
           <Wrench size={15} /> Add your truck
         </button>
@@ -180,10 +180,10 @@ export default function YMMWidget({ variant = "hero" }) {
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.22, ease: EASE }}
             style={CUT}
-            className="absolute right-0 top-full mt-2 w-[340px] max-w-[calc(100vw-2rem)] bg-[#12121B] border-t-2 border-[#FF6B35] p-4 shadow-elevated z-[65]"
+            className="absolute right-0 top-full mt-2 w-[340px] max-w-[calc(100vw-2rem)] bg-[#12121B] border-t-2 border-[#DE5718] p-4 shadow-elevated z-[65]"
           >
             <p className="text-white font-display font-bold text-sm mb-3 flex items-center gap-2">
-              <Truck size={15} className="text-[#FF6B35]" /> Select your truck
+              <Truck size={15} className="text-[#F57429]" /> Select your truck
             </p>
             <Console dark onDone={() => setOpen(false)} />
           </motion.div>

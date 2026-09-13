@@ -78,7 +78,7 @@ export function Dropdown({ value, options, onChange, align = "left", className =
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="clip-cut w-full flex items-center justify-between gap-3 bg-white border-2 border-[#E5E7EB] px-4 py-3.5 sm:py-3 text-base sm:text-sm font-bold text-[#1A1A2E] hover:border-[#E53E00] focus:border-[#E53E00] outline-none transition"
+        className="clip-cut w-full flex items-center justify-between gap-3 bg-white border-2 border-[#E5E7EB] px-4 py-3.5 sm:py-3 text-base sm:text-sm font-bold text-[#12151C] hover:border-[#DE5718] focus:border-[#DE5718] outline-none transition"
       >
         {value}
         <ChevronDown size={15} className={`text-[#9CA3AF] transition ${open ? "rotate-180" : ""}`} />
@@ -88,7 +88,7 @@ export function Dropdown({ value, options, onChange, align = "left", className =
           <motion.ul
             role="listbox"
             initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.16 }}
-            className={`absolute z-40 mt-1.5 min-w-full max-h-[50vh] overflow-y-auto bg-white border-2 border-[#1A1A2E] shadow-elevated ${align === "right" ? "right-0" : "left-0"}`}
+            className={`absolute z-40 mt-1.5 min-w-full max-h-[50vh] overflow-y-auto bg-white border-2 border-[#12151C] shadow-elevated ${align === "right" ? "right-0" : "left-0"}`}
           >
             {options.map((o, i) => (
               <li key={o} role="option" aria-selected={o === value}>
@@ -97,8 +97,8 @@ export function Dropdown({ value, options, onChange, align = "left", className =
                   tabIndex={-1}
                   onClick={() => { onChange(o); setOpen(false); }}
                   className={`w-full text-left px-4 py-3.5 sm:py-2.5 text-base sm:text-sm font-semibold transition ${
-                    o === value ? "bg-[#E53E00] text-white" : "text-[#1A1A2E] hover:bg-[#FFF0EB]"
-                  } ${focusedIndex === i ? "bg-[#FFF0EB] text-[#1A1A2E] outline-none" : ""}`}
+                    o === value ? "bg-gradient-to-r from-[#EE6724] to-[#DE5718] text-white" : "text-[#12151C] hover:bg-[#FFF5F0]"
+                  } ${focusedIndex === i ? "bg-[#FFF5F0] text-[#12151C] outline-none" : ""}`}
                 >
                   {o}
                 </button>
@@ -117,8 +117,8 @@ export function FitChip({ status, vehicle, className = "" }) {
   const cut = { clipPath: "polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px))" };
   const styles = {
     fits: "bg-[#10B981] text-white",
-    universal: "bg-[#1A1A2E]/85 text-white backdrop-blur",
-    no: "bg-[#F59E0B] text-[#1A1A2E]",
+    universal: "bg-[#12151C]/90 text-white backdrop-blur",
+    no: "bg-[#F59E0B] text-[#12151C]",
   }[status];
   const Icon = status === "no" ? TriangleAlert : Check;
   return (
@@ -183,7 +183,7 @@ export function ScrollProgress() {
   return (
     <motion.div
       style={{ scaleX }}
-      className="fixed top-0 left-0 right-0 z-[80] h-[3px] origin-left bg-gradient-to-r from-[#FF6B35] via-[#E53E00] to-[#C23400]"
+      className="fixed top-0 left-0 right-0 z-[80] h-[3px] origin-left bg-gradient-to-r from-[#F57429] via-[#DE5718] to-[#B43808]"
     />
   );
 }
@@ -193,7 +193,7 @@ export function SafeImg({ src, alt, className = "", label, wrapClass = "" }) {
   const [broken, setBroken] = useState(false);
   if (broken || !src) {
     return (
-      <div className={`grid place-items-center bg-gradient-to-br from-[#1A1A2E] via-[#241a2e] to-[#3a1c0c] ${className} ${wrapClass}`}>
+      <div className={`grid place-items-center bg-gradient-to-br from-[#12151C] via-[#1a1c24] to-[#331808] ${className} ${wrapClass}`}>
         <span className="font-display font-black tracking-widest text-white/25 text-2xl px-4 text-center">
           {label || "AUREX"}
         </span>
@@ -219,11 +219,11 @@ export function SectionHead({ kicker, title, sub, link, linkLabel, center }) {
       
       <div className={`max-w-2xl ${center ? "text-center mx-auto" : ""}`}>
         {kicker && (
-          <p className={`text-[12px] font-black tracking-[0.22em] text-[#E53E00] uppercase mb-2 flex items-center gap-2 ${center ? "justify-center" : ""}`}>
+          <p className={`text-[12px] font-black tracking-[0.22em] text-[#DE5718] uppercase mb-2 flex items-center gap-2 ${center ? "justify-center" : ""}`}>
             {kicker}
           </p>
         )}
-        <h2 className="font-display font-bold tracking-[-0.02em] text-[28px] sm:text-[38px] leading-[1.05] text-[#1A1A2E]">
+        <h2 className="font-display font-bold tracking-[-0.02em] text-[28px] sm:text-[38px] leading-[1.05] text-[#12151C]">
           {title}
         </h2>
         {sub && <p className="text-[#6B7280] text-[15px] mt-2.5 leading-relaxed">{sub}</p>}
@@ -233,7 +233,7 @@ export function SectionHead({ kicker, title, sub, link, linkLabel, center }) {
         <div className={`flex ${center ? "justify-center md:justify-end" : ""}`}>
           <Link
             to={link}
-            className={`clip-cut text-sm font-bold flex items-center gap-2 bg-[#F5F6F8] px-6 py-3 text-[#1A1A2E] hover:bg-[#1A1A2E] hover:text-white hover:gap-3 transition-all group`}
+            className={`clip-cut text-sm font-bold flex items-center gap-2 bg-[#F5F6F8] px-6 py-3 text-[#12151C] hover:bg-[#12151C] hover:text-white hover:gap-3 transition-all group`}
           >
             {linkLabel || "View all"}
             <ArrowRight size={15} className="group-hover:translate-x-0.5 transition" />
@@ -254,7 +254,7 @@ export function Stars({ rating, reviews, size = 12 }) {
           <Star key={s} size={size} className={s <= Math.round(rating) ? "fill-[#FFBB00] text-[#FFBB00]" : "fill-[#E5E7EB] text-[#E5E7EB]"} />
         ))}
       </span>
-      <b className="text-[#1A1A2E]">{rating}</b>
+      <b className="text-[#12151C]">{rating}</b>
       {reviews != null && <span className="text-[#9CA3AF]">({reviews})</span>}
     </p>
   );
@@ -291,7 +291,7 @@ export function AnimatedCounter({ target, suffix = "", duration = 1900, classNam
   }, [target, duration]);
 
   return (
-    <span ref={ref} className={`font-display font-bold text-[34px] sm:text-[40px] text-[#1A1A2E] tabular-nums ${className}`}>
+    <span ref={ref} className={`font-display font-bold text-[34px] sm:text-[40px] text-[#12151C] tabular-nums ${className}`}>
       {count}
       {suffix}
     </span>
@@ -314,10 +314,10 @@ export function ScrollRow({ children, className = "" }) {
         {children}
       </div>
       <div className="mt-5 flex gap-2 justify-end">
-        <button onClick={() => by(-1)} aria-label="previous" className="w-11 h-11 grid place-items-center rounded-full border border-[#E5E7EB] text-[#1A1A2E] bg-white hover:bg-[#1A1A2E] hover:text-white hover:border-[#1A1A2E] transition">
+        <button onClick={() => by(-1)} aria-label="previous" className="w-11 h-11 grid place-items-center rounded-full border border-[#E5E7EB] text-[#12151C] bg-white hover:bg-[#12151C] hover:text-white hover:border-[#12151C] transition">
           <ChevronLeft size={18} />
         </button>
-        <button onClick={() => by(1)} aria-label="next" className="w-11 h-11 grid place-items-center rounded-full border border-[#E5E7EB] text-[#1A1A2E] bg-white hover:bg-[#E53E00] hover:text-white hover:border-[#E53E00] transition">
+        <button onClick={() => by(1)} aria-label="next" className="w-11 h-11 grid place-items-center rounded-full border border-[#E5E7EB] text-[#12151C] bg-white hover:bg-[#DE5718] hover:text-white hover:border-[#DE5718] transition">
           <ChevronRight size={18} />
         </button>
       </div>
@@ -340,7 +340,7 @@ export function ProductCard({ p, index = 0 }) {
       whileInView="whileInView"
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.55, ease: EASE, delay: (index % 4) * 0.06 }}
-      className="group relative bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden hover:border-[#E53E00]/30 hover:shadow-card-hover hover:-translate-y-1.5 transition-all duration-500 flex flex-col"
+      className="group relative bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden hover:border-[#DE5718]/40 hover:shadow-card-hover hover:-translate-y-1.5 transition-all duration-500 flex flex-col"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-[#F1F2F4] shine">
         <Link to={`/product/${p.sku}`} className="block w-full h-full">
@@ -355,11 +355,11 @@ export function ProductCard({ p, index = 0 }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition pointer-events-none" />
 
         {discount ? (
-          <span className="clip-cut-sm absolute bottom-4 left-4 z-10 bg-[#E53E00] text-white text-[11px] font-black px-2.5 py-1 shadow-primary">
+          <span className="clip-cut-sm absolute bottom-4 left-4 z-10 bg-gradient-to-r from-[#EE6724] to-[#DE5718] text-white text-[11px] font-black px-2.5 py-1 shadow-copper">
             -{discount}%
           </span>
         ) : p.badge ? (
-          <span className="clip-cut-sm absolute bottom-4 left-4 z-10 bg-[#1A1A2E] text-white text-[11px] font-black px-2.5 py-1">
+          <span className="clip-cut-sm absolute bottom-4 left-4 z-10 bg-[#12151C] text-white text-[11px] font-black px-2.5 py-1">
             {p.badge}
           </span>
         ) : null}
@@ -372,7 +372,7 @@ export function ProductCard({ p, index = 0 }) {
 
         <span
           className={`clip-cut-sm absolute top-3 left-3 z-10 text-[11px] font-bold px-2.5 py-1 backdrop-blur ${
-            inStock ? "bg-[#1A1A2E]/90 text-white" : "bg-white/90 text-[#6B7280] border border-[#E5E7EB]"
+            inStock ? "bg-[#12151C]/90 text-white" : "bg-white/90 text-[#6B7280] border border-[#E5E7EB]"
           }`}
         >
           {p.stock}
@@ -380,7 +380,7 @@ export function ProductCard({ p, index = 0 }) {
 
         <Link
           to={`/product/${p.sku}`}
-          className="absolute bottom-3 right-3 z-10 w-9 h-9 grid place-items-center rounded-full bg-white/95 border border-[#E5E7EB] text-[#1A1A2E] translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 hover:bg-[#1A1A2E] hover:text-white transition-all shadow-sm"
+          className="absolute bottom-3 right-3 z-10 w-9 h-9 grid place-items-center rounded-full bg-white/95 border border-[#E5E7EB] text-[#12151C] translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 hover:bg-[#12151C] hover:text-white transition-all shadow-sm"
           aria-label="quick view"
         >
           <Eye size={15} />
@@ -394,7 +394,7 @@ export function ProductCard({ p, index = 0 }) {
         </p>
         <Link
           to={`/product/${p.sku}`}
-          className="font-display font-semibold text-[15px] leading-snug mt-1.5 text-[#1A1A2E] hover:text-[#E53E00] transition line-clamp-2 min-h-[42px]"
+          className="font-display font-semibold text-[15px] leading-snug mt-1.5 text-[#12151C] hover:text-[#DE5718] transition line-clamp-2 min-h-[42px]"
         >
           {p.name}
         </Link>
@@ -403,29 +403,27 @@ export function ProductCard({ p, index = 0 }) {
         </div>
         <div className="mt-auto pt-4 flex items-center justify-between gap-3 border-t border-[#F3F4F6]">
           <p>
-            <span className="font-display font-bold text-[20px] text-[#1A1A2E]">${p.price.toFixed(2)}</span>
+            <span className="font-display font-bold text-[20px] text-[#12151C]">${p.price.toFixed(2)}</span>
             {p.oldPrice && (
               <span className="block text-[12px] line-through text-[#9CA3AF]">${p.oldPrice.toFixed(2)}</span>
             )}
           </p>
           <button
             onClick={() => add(p.sku)}
-            className="clip-cut flex items-center gap-1.5 bg-[#E53E00] text-white px-4 py-2.5 text-[13px] font-bold hover:bg-[#1A1A2E] hover:gap-2.5 active:scale-95 transition-all"
+            className="clip-cut flex items-center gap-1.5 bg-gradient-to-r from-[#EE6724] to-[#DE5718] hover:from-[#DE5718] hover:to-[#B43808] text-white px-4 py-2.5 text-[13px] font-bold hover:gap-2.5 active:scale-95 shadow-sm transition-all"
           >
             <ShoppingCart size={14} />
             Add
           </button>
         </div>
         <div className="mt-2.5 flex gap-2">
-          <button onClick={() => toggleCompare(p.sku)} className={`clip-cut-sm flex-1 py-2 text-[12px] font-bold border transition ${inCompare ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#1A1A2E] hover:text-[#1A1A2E]"}`}>{inCompare ? "Added to compare" : "Compare"}</button>
-          <button onClick={() => setEnquirySku(p.sku)} className="clip-cut-sm flex-1 py-2 text-[12px] font-bold border border-[#E5E7EB] text-[#6B7280] hover:border-[#E53E00] hover:text-[#E53E00] transition">Enquire on SKU</button>
+          <button onClick={() => toggleCompare(p.sku)} className={`clip-cut-sm flex-1 py-2 text-[12px] font-bold border transition ${inCompare ? "bg-[#12151C] text-white border-[#12151C]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#12151C] hover:text-[#12151C]"}`}>{inCompare ? "Added to compare" : "Compare"}</button>
+          <button onClick={() => setEnquirySku(p.sku)} className="clip-cut-sm flex-1 py-2 text-[12px] font-bold border border-[#E5E7EB] text-[#6B7280] hover:border-[#DE5718] hover:text-[#DE5718] transition">Enquire on SKU</button>
         </div>
       </div>
     </motion.article>
   );
 }
-
-
 
 /* Simple countdown for deal sections */
 export function Countdown({ end }) {
@@ -440,7 +438,7 @@ export function Countdown({ end }) {
   const s = Math.floor((t % 60000) / 1000);
   const cell = (v, l) => (
     <div className="text-center">
-      <div className="w-14 h-14 rounded-xl bg-[#1A1A2E] text-white grid place-items-center font-display font-black text-xl tabular-nums">
+      <div className="w-14 h-14 rounded-xl bg-[#12151C] text-white grid place-items-center font-display font-black text-xl tabular-nums shadow-sm">
         {String(v).padStart(2, "0")}
       </div>
       <p className="text-[10px] font-bold text-[#9CA3AF] mt-1.5 tracking-widest uppercase">{l}</p>

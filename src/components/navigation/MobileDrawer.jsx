@@ -45,7 +45,7 @@ export default function MobileDrawer({ open, onClose }) {
             </div>
             <form
               onSubmit={(e) => { e.preventDefault(); setQuery(q); onClose(); nav("/shop"); }}
-              className="mt-4 flex items-center gap-2 bg-[#F7F8FA] border border-[#E5E7EB] rounded-xl pl-4 pr-1.5 py-1.5 focus-within:border-[#E53E00] transition"
+              className="mt-4 flex items-center gap-2 bg-[#F7F8FA] border border-[#E5E7EB] rounded-xl pl-4 pr-1.5 py-1.5 focus-within:border-[#DE5718] transition"
             >
               <Search size={16} className="text-[#9CA3AF] shrink-0" />
               <input
@@ -54,7 +54,7 @@ export default function MobileDrawer({ open, onClose }) {
                 placeholder="Search parts or SKU..."
                 className="flex-1 min-w-0 bg-transparent outline-none text-sm placeholder:text-[#9CA3AF]"
               />
-              <button type="submit" className="bg-[#E53E00] text-white rounded-lg px-4 py-2 text-[13px] font-bold shrink-0">Go</button>
+              <button type="submit" className="bg-gradient-to-r from-[#EE6724] to-[#DE5718] text-white rounded-lg px-4 py-2 text-[13px] font-bold shrink-0 shadow-sm">Go</button>
             </form>
             <div className="mt-5 grid gap-2 font-semibold">
               {LINKS.map(([t, h]) => (
@@ -62,7 +62,7 @@ export default function MobileDrawer({ open, onClose }) {
                   key={t}
                   to={h}
                   onClick={onClose}
-                  className="rounded-xl px-4 py-3 bg-[#F7F8FA] border border-[#E5E7EB] flex justify-between items-center text-[#1A1A2E] hover:border-[#E53E00] transition"
+                  className="rounded-xl px-4 py-3 bg-[#F7F8FA] border border-[#E5E7EB] flex justify-between items-center text-[#12151C] hover:border-[#DE5718] transition"
                 >
                   {t}
                   <ChevronRight size={16} className="text-[#9CA3AF]" />
@@ -70,10 +70,10 @@ export default function MobileDrawer({ open, onClose }) {
               ))}
             </div>
             <div className="mt-4 grid grid-cols-2 gap-2">
-              <Link to="/login" onClick={onClose} className="text-center bg-[#E53E00] text-white rounded-xl py-2.5 text-sm font-bold">
+              <Link to="/login" onClick={onClose} className="text-center bg-gradient-to-r from-[#EE6724] to-[#DE5718] text-white rounded-xl py-2.5 text-sm font-bold shadow-sm">
                 Login
               </Link>
-              <Link to="/signup" onClick={onClose} className="text-center border border-[#E5E7EB] rounded-xl py-2.5 text-sm font-bold text-[#1A1A2E]">
+              <Link to="/signup" onClick={onClose} className="text-center border border-[#E5E7EB] rounded-xl py-2.5 text-sm font-bold text-[#12151C]">
                 Signup
               </Link>
             </div>
@@ -84,9 +84,9 @@ export default function MobileDrawer({ open, onClose }) {
                   key={c.name}
                   to={`/shop?cat=${encodeURIComponent(c.name)}`}
                   onClick={onClose}
-                  className="text-sm rounded-xl px-4 py-2.5 bg-[#F7F8FA] border border-[#E5E7EB] text-[#6B7280] hover:text-[#E53E00] transition flex items-center gap-2.5"
+                  className="text-sm rounded-xl px-4 py-2.5 bg-[#F7F8FA] border border-[#E5E7EB] text-[#6B7280] hover:text-[#DE5718] transition flex items-center gap-2.5"
                 >
-                  <c.icon size={16} className="text-[#E53E00]" /> {c.name}
+                  <c.icon size={16} className="text-[#DE5718]" /> {c.name}
                 </Link>
               ))}
             </div>
