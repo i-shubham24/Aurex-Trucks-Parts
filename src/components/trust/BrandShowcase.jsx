@@ -95,8 +95,13 @@ export default function BrandShowcase({ compact = false }) {
       <div
         ref={scrollRef}
         onScroll={checkScroll}
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide scroll-smooth pb-4"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        style={{
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          overscrollBehaviorX: "contain",
+          overscrollBehaviorY: "auto",
+        }}
+        className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
       >
         {brands.map((brand, index) => (
           <motion.div
@@ -105,10 +110,10 @@ export default function BrandShowcase({ compact = false }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.05 }}
-            className="min-w-[120px] aspect-square bg-[#F5F6F8] border border-[#E5E7EB] rounded-xl flex items-center justify-center hover:border-[#E53E00] hover:shadow-md transition cursor-pointer group snap-start"
+            className="min-w-[120px] aspect-square bg-[#F5F6F8] border border-[#E5E7EB] rounded-xl flex items-center justify-center hover:border-[#DE5718] hover:shadow-md transition cursor-pointer group"
           >
             <div className="text-center">
-              <p className="font-display font-bold text-2xl text-[#1A1A2E] group-hover:text-[#E53E00] transition">
+              <p className="font-display font-bold text-2xl text-[#1A1A2E] group-hover:text-[#DE5718] transition">
                 {brand.logo}
               </p>
               <p className="text-xs text-[#9CA3AF] mt-1">{brand.name}</p>

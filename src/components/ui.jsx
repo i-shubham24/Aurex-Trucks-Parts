@@ -301,15 +301,63 @@ export function AnimatedCounter({ target, suffix = "", duration = 1900, classNam
 /* Horizontal scroll row for carousels */
 export function ScrollRow({ children, className = "" }) {
   const ref = useRef(null);
+  const isDown = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+  const hasMoved = useRef(false);
+
   const by = (dir) => {
     const el = ref.current;
     if (el) el.scrollBy({ left: dir * Math.min(el.clientWidth * 0.8, 520), behavior: "smooth" });
   };
+
+  const handleMouseDown = (e) => {
+    if (e.button !== 0) return;
+    isDown.current = true;
+    hasMoved.current = false;
+    startX.current = e.pageX - ref.current.offsetLeft;
+    scrollLeft.current = ref.current.scrollLeft;
+  };
+
+  const handleMouseLeave = () => {
+    isDown.current = false;
+  };
+
+  const handleMouseUp = () => {
+    isDown.current = false;
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDown.current) return;
+    const x = e.pageX - ref.current.offsetLeft;
+    const walk = (x - startX.current) * 1.4;
+    if (Math.abs(walk) > 4) {
+      hasMoved.current = true;
+    }
+    ref.current.scrollLeft = scrollLeft.current - walk;
+  };
+
+  const handleClickCapture = (e) => {
+    if (hasMoved.current) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  };
+
   return (
     <div className="relative">
       <div
         ref={ref}
-        className={`flex gap-5 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-2 mask-fade-x ${className}`}
+        onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeave}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+        onClickCapture={handleClickCapture}
+        style={{
+          overscrollBehaviorX: "contain",
+          overscrollBehaviorY: "auto",
+        }}
+        className={`flex gap-5 overflow-x-auto no-scrollbar pb-2 mask-fade-x select-none cursor-grab active:cursor-grabbing ${className}`}
       >
         {children}
       </div>

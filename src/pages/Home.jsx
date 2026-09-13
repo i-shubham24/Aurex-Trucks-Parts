@@ -148,7 +148,7 @@ export default function Home() {
           </div>
           <ScrollRow>
             {tabProducts.map((p, i) => (
-              <div key={p.sku} className="min-w-[270px] max-w-[270px] snap-start">
+              <div key={p.sku} className="min-w-[270px] max-w-[270px]">
                 <ProductCard p={p} index={i} />
               </div>
             ))}
