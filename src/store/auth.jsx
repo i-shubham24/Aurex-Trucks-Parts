@@ -33,15 +33,9 @@ export function AuthProvider({ children }) {
   };
   const login = ({ email, password }) => {
     const clean = email.trim().toLowerCase();
-    
-    // Seed admin if it doesn't exist and they are trying to log in as admin
-    if (clean === "admin@aurex.com.au" && password === "admin123" && !users.some(u => u.email === "admin@aurex.com.au")) {
-      const adminUser = { name: "Aurex Admin", email: "admin@aurex.com.au", password: "admin123", role: "admin", createdAt: new Date().toISOString() };
-      setUsers(u => [...u, adminUser]);
-      setSession(clean);
-      return { ok: true };
-    }
-
+    // NOTE: demo-only auth, credentials live in this browser's localStorage.
+    // Production must move to a real backend with hashed passwords and sessions.
+    // The admin account is seeded by AdminLayout (ensureAdmin), not here.
     const f = users.find((u) => u.email === clean && u.password === password);
     if (!f) return { ok: false, msg: "Email or password did not match. Try again or create an account." };
     setSession(clean);

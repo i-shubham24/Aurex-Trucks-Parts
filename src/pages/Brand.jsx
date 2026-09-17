@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { BRANDS } from "../data/catalog.js";
-import { ProductCard, Reveal } from "../components/ui.jsx";
+import { ProductCard } from "../components/ui.jsx";
 import { useProducts } from "../store/products.jsx";
 
 const MODELS = {

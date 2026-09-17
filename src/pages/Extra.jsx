@@ -382,6 +382,7 @@ export function CompliancePage() {
 export function ContactPage() {
   const { addEnquiry } = useSite();
   const [sent, setSent] = useState(false);
+  const [formErr, setFormErr] = useState("");
   const [f, setF] = useState({ name: "", phone: "", truck: "", message: "" });
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   return (
@@ -418,12 +419,13 @@ export function ContactPage() {
         <Reveal dir="right">
           <form onSubmit={(e) => { 
             e.preventDefault(); 
+            setFormErr("");
             // Honeypot check
             if (f.website) { setSent(true); return; } // Pretend it sent
             
             const phoneRx = /^0[45]\d{8}$|^0[2378]\d{8}$/;
             if (!phoneRx.test(f.phone.replace(/\s/g, ''))) {
-              alert("Please enter a valid 10-digit Australian phone number.");
+              setFormErr("Please enter a valid 10-digit Australian phone number.");
               return;
             }
             
@@ -439,6 +441,7 @@ export function ContactPage() {
             </div>
             <div className="p-7 grid gap-3.5">
               {sent && <p className="clip-cut-sm bg-emerald-50 border-2 border-emerald-200 text-emerald-700 text-[13px] font-semibold px-4 py-3">Thanks. Your enquiry is logged and our VIC team will reply within 4 business hours.</p>}
+              {formErr && <p className="clip-cut-sm bg-red-50 border-2 border-red-200 text-red-600 text-[13px] font-semibold px-4 py-3">{formErr}</p>}
               
               <div style={{ display: "none" }} aria-hidden="true">
                 <label>Website <input type="text" name="_website" value={f.website || ""} onChange={set("website")} tabIndex="-1" autoComplete="off" /></label>
@@ -514,8 +517,12 @@ export function QuotePage() {
             {est && <p className="mt-2 text-[13px] text-[#1A1A2E]"><b>{est.zone}</b> • {est.eta} • <b>{est.fee === 0 ? "Free" : `$${est.fee.toFixed(2)}`}</b>{est.free && " (order over threshold)"}</p>}
           </div>
           {saved && <p className="mt-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-[13px] font-semibold px-4 py-3">Saved as {saved}. Our desk replies shortly.</p>}
-          <button onClick={() => { const id = addQuote({ email: "", items: cart, total }); setSaved(id); }} className="mt-3 w-full border border-[#E5E7EB] rounded-xl py-3.5 text-sm font-bold hover:border-[#1A1A2E] transition">Save as quote request</button>
+          <button disabled={cart.length === 0} onClick={() => { const id = addQuote({ email: "", items: cart, total }); setSaved(id); }} className="mt-3 w-full border border-[#E5E7EB] rounded-xl py-3.5 text-sm font-bold hover:border-[#1A1A2E] transition disabled:opacity-40 disabled:pointer-events-none">Save as quote request</button>
+          {cart.length === 0 ? (
+            <span className="mt-2.5 flex items-center justify-center gap-2 bg-[#E5E7EB] text-[#9CA3AF] rounded-xl py-4 text-sm font-bold">Go to checkout</span>
+          ) : (
           <Link to="/checkout" className="mt-2.5 flex items-center justify-center gap-2 bg-[#0B2F5C] text-white rounded-xl py-4 text-sm font-bold hover:bg-[#1A1A2E] transition"><Send size={15} /> Go to checkout</Link>
+          )}
         </aside>
       </div>
     </div>

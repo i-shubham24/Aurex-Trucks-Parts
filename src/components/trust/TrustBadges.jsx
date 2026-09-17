@@ -18,10 +18,6 @@ export default function TrustBadges({ compact = false, darkTheme = false }) {
 
   const displayBadges = compact ? badges : extendedBadges;
 
-  const themeClasses = darkTheme 
-    ? "bg-white/10 border-white/20 text-white" 
-    : "bg-white border-[#E5E7EB] text-[#1A1A2E]";
-
   return (
     <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6`}>
       {displayBadges.map(([Icon, title, description], index) => (

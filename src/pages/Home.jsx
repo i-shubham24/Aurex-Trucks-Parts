@@ -1,9 +1,9 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowRight, ShieldCheck, BadgeCheck, Truck, RotateCcw, Headphones,
-  Quote, ChevronRight, Star, Flame,
+  ChevronRight, Star, Flame,
 } from "lucide-react";
 import { PANELS, GUIDES, NEWS, TESTIMONIALS } from "../data/catalog.js";
 import {

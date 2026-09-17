@@ -5,7 +5,7 @@ import { useShop } from "../../store/shop.jsx";
 
 export default function SearchBar({ placeholder = "Search parts, SKU, or brand...", compact = false }) {
   const { query, setQuery } = useShop();
-  const [focused, setFocused] = useState(false);
+  const [, setFocused] = useState(false);
 
   const handleSearch = () => {
     if (query.trim()) {

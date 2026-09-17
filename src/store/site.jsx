@@ -1,8 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { Disc3, Settings2, Cog, BatteryCharging, Filter, CircleDot, Lightbulb, Anchor, Container, Truck, Bolt, Lock, Wrench, Package, Sparkles, RefreshCcw } from "lucide-react";
+import { Disc3, Cog, BatteryCharging, Filter, CircleDot, Lightbulb, Anchor, Container, Truck, Bolt, Lock, Wrench, Package, Sparkles, RefreshCcw } from "lucide-react";
 import { CATEGORIES as SEED_CATS } from "../data/catalog.js";
 
-export const ICONS = { Disc3, Settings2, Cog, BatteryCharging, Filter, CircleDot, Lightbulb, Anchor, Container, Truck, Bolt, Lock, Wrench, Package, Sparkles, RefreshCcw };
+export const ICONS = { Disc3, Cog, BatteryCharging, Filter, CircleDot, Lightbulb, Anchor, Container, Truck, Bolt, Lock, Wrench, Package, Sparkles, RefreshCcw };
 export const ICON_OPTIONS = Object.keys(ICONS);
 
 const Ctx = createContext(null);

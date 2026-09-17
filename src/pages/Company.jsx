@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowRight, MapPin, Phone, Mail, Clock, ShieldCheck, Truck, BadgeCheck, Building2, FileText } from "lucide-react";
+import { ArrowRight, MapPin, Phone, Clock, ShieldCheck, Truck, BadgeCheck, Building2, FileText } from "lucide-react";
 import { Reveal } from "../components/ui.jsx";
 import { useSite } from "../store/site.jsx";
 

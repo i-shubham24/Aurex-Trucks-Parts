@@ -1,9 +1,9 @@
 import { useMemo, useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X, ShieldCheck, Truck, RotateCcw, ArrowRight } from "lucide-react";
+import { Search, X, ShieldCheck, Truck, RotateCcw } from "lucide-react";
 import Fuse from "fuse.js";
-import { PRODUCTS as SEED, BRANDS, HERO } from "../data/catalog.js";
+import { BRANDS, HERO } from "../data/catalog.js";
 import { FIT_RANK } from "../data/fitment.js";
 import { useProducts } from "../store/products.jsx";
 import { useSite } from "../store/site.jsx";

@@ -13,14 +13,9 @@ const Shop = lazy(() => import("./pages/Shop.jsx"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail.jsx"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage.jsx"));
 
-const Extra = lazy(() => import("./pages/Extra.jsx").then(m => ({ default: m.CategoriesPage }))); 
-// We will just lazy load the whole modules and map them to wrapper components if needed, or better yet, since they are named exports, we can write a small wrapper.
-// Actually, it's easier to just lazy import the default exports, and for named exports, we can use the promise syntax.
 const CategoriesPage = lazy(() => import("./pages/Extra.jsx").then(m => ({ default: m.CategoriesPage })));
 const BrandsPage = lazy(() => import("./pages/Extra.jsx").then(m => ({ default: m.BrandsPage })));
 const DealsPage = lazy(() => import("./pages/Extra.jsx").then(m => ({ default: m.DealsPage })));
-const ProductPage = lazy(() => import("./pages/Extra.jsx").then(m => ({ default: m.ProductPage })));
-const CartPage = lazy(() => import("./pages/Extra.jsx").then(m => ({ default: m.CartPage })));
 const CheckoutPage = lazy(() => import("./pages/Checkout.jsx").then(m => ({ default: m.CheckoutPage })));
 const OrderSuccessPage = lazy(() => import("./pages/Checkout.jsx").then(m => ({ default: m.OrderSuccessPage })));
 const TrackPage = lazy(() => import("./pages/Extra.jsx").then(m => ({ default: m.TrackPage })));

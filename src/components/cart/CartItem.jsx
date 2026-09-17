@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import { Minus, Plus, Trash2, ChevronRight } from "lucide-react";
+import { Minus, Plus, Trash2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useShop } from "../../store/shop.jsx";
 import { useProducts } from "../../store/products.jsx";
 import { SafeImg } from "../ui.jsx";
 
 export default function CartItem({ item, onRemove }) {
-  const { updateQuantity, add } = useShop();
+  const { updateQuantity } = useShop();
   const { products: PRODUCTS } = useProducts();
   const product = PRODUCTS.find((p) => p.sku === item.sku);
 

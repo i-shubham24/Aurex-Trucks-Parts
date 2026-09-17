@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, ShoppingCart, Boxes, LayoutGrid, Users, FileText, Tag, PenLine, Settings, LogOut, Menu, X, Eye, EyeOff, Search, Bell, ChevronDown, ChevronRight, Loader2, CheckCircle2, AlertTriangle } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, Boxes, LayoutGrid, Users, FileText, Tag, PenLine, Settings, LogOut, Menu, X, Eye, EyeOff, Search, Bell, ChevronDown, ChevronRight, Loader2, AlertTriangle } from "lucide-react";
 import { useAuth } from "../../store/auth.jsx";
 import logoWhite from "../../assets/aurex-logo-white.png";
 
@@ -82,7 +82,7 @@ export default function AdminLayout() {
     e.preventDefault();
     setLoading(true);
     const r = login({ email, password });
-    if (!r.ok) setErr(r.msg + " Hint: admin@aurex.com.au / Admin123!");
+    if (!r.ok) setErr(r.msg);
     else setErr("");
     setLoading(false);
   };

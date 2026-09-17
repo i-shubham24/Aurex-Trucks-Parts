@@ -4,7 +4,7 @@ import { Car, ChevronDown, Check, Trash2, Plus } from "lucide-react";
 import { useGarage } from "./GarageContext.jsx";
 
 export default function VehicleSelector({ compact = false }) {
-  const { vehicles, selectedVehicleId, selectVehicle, addVehicle, removeVehicle } = useGarage();
+  const { vehicles, selectedVehicleId, selectVehicle, removeVehicle } = useGarage();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSelectVehicle = (vehicleId) => {

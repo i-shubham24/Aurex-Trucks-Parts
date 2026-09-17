@@ -14,7 +14,7 @@ const LINKS = [
 
 export default function MobileDrawer({ open, onClose }) {
   const { liveCategories: CATEGORIES } = useSite();
-  const { query, setQuery } = useShop();
+  const { setQuery } = useShop();
   const [q, setQ] = useState("");
   const nav = useNavigate();
 

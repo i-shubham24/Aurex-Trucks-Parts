@@ -1,4 +1,5 @@
-import { Download, FileText } from "lucide-react";
+import { FileText, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function CataloguePage() {
   return (
@@ -29,12 +30,15 @@ export function CataloguePage() {
               Covers all 36 approved lines across tail lifts, tool boxes, trailer parts, accessories, replacement parts and tools, including specifications, dimensions and materials.
             </p>
             <div className="flex flex-wrap gap-4 justify-center md:justify-start mt-6">
-              <a href="/Aurex_Catalogue_2026.pdf" download="Aurex_Catalogue_2026.pdf" className="bg-[#0B2F5C] text-white px-6 py-3.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-[#1A1A2E] transition">
-                <Download size={18} /> Download PDF (12MB)
-              </a>
+              <Link to="/shop" className="bg-[#0B2F5C] text-white px-6 py-3.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-[#1A1A2E] transition">
+                Browse the live catalogue <ArrowRight size={16} />
+              </Link>
+              <Link to="/contact" className="border border-[#E5E7EB] px-6 py-3.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:border-[#0B2F5C] transition">
+                Request PDF catalogue
+              </Link>
             </div>
             <p className="text-xs text-[#9CA3AF] mt-4">
-              Last updated: August 2026. Prices in the catalogue may be subject to change. For live pricing, please search the part number on our website.
+              Last updated: September 2026. For live pricing, please search the part number on our website.
             </p>
           </div>
         </div>
