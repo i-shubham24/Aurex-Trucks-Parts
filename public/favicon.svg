@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#DE5718" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-=======
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#0B2F5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
->>>>>>> b1fa46e (feat: rebuild to 36-line approved catalogue with navy theme, Sunrise pricing and gears loader)
   <path d="M10 17h4V5H2v12h3" />
   <path d="M20 17h2v-3.34a4 4 0 0 0-1.17-2.83L19 9h-5" />
   <path d="M14 17h1" />

@@ -9,11 +9,13 @@ import { useProducts } from "../../store/products.jsx";
 import { LogoFull } from "../logo.jsx";
 import YMMWidget from "../garage/YMMWidget.jsx";
 
-const NAV = ["Braking", "Suspension", "Engine", "Air and Electrical", "Lighting", "Towing and Winches"];
+// Only the first 4 categories sit in the nav row so it always fits one line.
+// The remaining categories live under All categories + the categories page.
+const NAV = ["Tail Lifts", "Tool Boxes", "Trailer Parts", "Accessories"];
 
 // Inline social glyphs (brand icons are not exported by this lucide build).
 const Social = ({ d }) => (
-  <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" className="hover:text-[#FF6B35] transition cursor-pointer" aria-hidden="true"><path d={d} /></svg>
+  <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" className="hover:text-[#2F5E93] transition cursor-pointer" aria-hidden="true"><path d={d} /></svg>
 );
 const IG = "M12 2.2c3.2 0 3.6 0 4.9.07 1.2.06 1.8.25 2.2.42.6.22 1 .48 1.4.9.4.4.7.8.9 1.4.17.4.36 1 .42 2.2.06 1.3.07 1.7.07 4.9s0 3.6-.07 4.9c-.06 1.2-.25 1.8-.42 2.2-.22.6-.48 1-.9 1.4-.4.4-.8.7-1.4.9-.4.17-1 .36-2.2.42-1.3.06-1.7.07-4.9.07s-3.6 0-4.9-.07c-1.2-.06-1.8-.25-2.2-.42-.6-.22-1-.48-1.4-.9-.4-.4-.7-.8-.9-1.4-.17-.4-.36-1-.42-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.07-4.9c.06-1.2.25-1.8.42-2.2.22-.6.48-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.17 1-.36 2.2-.42C8.4 2.2 8.8 2.2 12 2.2Zm0 3.5A6.3 6.3 0 1 0 18.3 12 6.3 6.3 0 0 0 12 5.7Zm0 10.4A4.1 4.1 0 1 1 16.1 12 4.1 4.1 0 0 1 12 16.1Zm6.5-10.6a1.47 1.47 0 1 1-1.47-1.47 1.47 1.47 0 0 1 1.47 1.47Z";
 const FB = "M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12Z";
@@ -47,13 +49,13 @@ export default function Header({ onOpenMobile }) {
   const submitSearch = (e) => { e.preventDefault(); go("/shop"); };
 
   return (
-    <>
-      {/* Utility strip: dark graphite steel, 36px tall. Scrolls away naturally with the page. */}
-      <div className="bg-[#12151C] text-white border-b border-white/10 print:hidden">
+    <header className="sticky top-[-36px] z-50 shadow-[0_6px_20px_-12px_rgba(16,24,40,0.35)]">
+      {/* Utility strip: dark, 36px tall. Will scroll out of view and then stick. */}
+      <div className="bg-[#1A1A2E] text-white">
         <div className="mx-auto max-w-7xl px-4 h-9 flex items-center justify-between text-[12px] font-semibold">
           <div className="flex items-center gap-5 text-white/80">
-            <a href={`mailto:${settings.email}`} className="flex items-center gap-1.5 hover:text-white transition"><Mail size={13} className="text-[#F57429]" /> <span className="hidden sm:inline">{settings.email}</span></a>
-            <a href={`tel:${settings.phone}`} className="flex items-center gap-1.5 hover:text-white transition"><Phone size={13} className="text-[#F57429]" /> {settings.phone}</a>
+            <a href={`mailto:${settings.email}`} className="flex items-center gap-1.5 hover:text-white transition"><Mail size={13} className="text-[#2F5E93]" /> <span className="hidden sm:inline">{settings.email}</span></a>
+            <a href={`tel:${settings.phone}`} className="flex items-center gap-1.5 hover:text-white transition"><Phone size={13} className="text-[#2F5E93]" /> {settings.phone}</a>
           </div>
           <div className="flex items-center gap-3 text-white/80">
             <span className="hidden md:inline">Australian owned. ADR compliant. Freight Australia wide.</span>
@@ -64,144 +66,141 @@ export default function Header({ onOpenMobile }) {
         </div>
       </div>
 
-      {/* Main navigation: sticky top-0 pins to top as soon as utility strip scrolls out */}
-      <header className="print:hidden sticky top-0 z-50 shadow-[0_6px_20px_-12px_rgba(16,24,40,0.35)]">
-        <div>
-          {/* Main bar (white) */}
-          <div className="bg-white border-b border-[#E5E7EB]">
-            <div className="mx-auto max-w-7xl px-4 flex items-center gap-4 py-1.5 sm:py-2">
-              <button onClick={onOpenMobile} className="lg:hidden p-2 -ml-1 text-[#12151C]" aria-label="menu"><Menu size={22} /></button>
+      <div>
+        {/* Main bar (white) */}
+        <div className="bg-white border-b border-[#E5E7EB]">
+          <div className="mx-auto max-w-7xl px-4 flex items-center gap-4 py-3">
+            <button onClick={onOpenMobile} className="lg:hidden p-2 -ml-1 text-[#1A1A2E]" aria-label="menu"><Menu size={22} /></button>
 
-              <Link to="/" aria-label="Aurex Truck Parts home" className="shrink-0 flex items-center">
-                <LogoFull />
-              </Link>
+            <Link to="/" aria-label="Aurex Truck Parts home" className="shrink-0">
+              <LogoFull />
+            </Link>
 
-              <div ref={searchRef} className="hidden md:block relative flex-1 max-w-xl mx-2">
-                <form onSubmit={submitSearch}>
-                  <div className="flex items-center w-full bg-[#F5F6F8] border border-[#E5E7EB] rounded-full pl-4 pr-1 py-1 focus-within:border-[#DE5718] focus-within:bg-white transition">
-                    <Search size={16} className="text-[#9CA3AF]" />
-                    <input
-                      value={query}
-                      onChange={(e) => { setQuery(e.target.value); setSugOpen(true); }}
-                      onFocus={() => setSugOpen(true)}
-                      placeholder="Search part number, OEM, or keyword"
-                      className="flex-1 bg-transparent outline-none px-3 text-[14px] text-[#12151C] placeholder:text-[#9CA3AF]"
-                    />
-                    <button type="submit" className="bg-gradient-to-r from-[#EE6724] to-[#DE5718] hover:from-[#DE5718] hover:to-[#B43808] text-white rounded-full w-8 h-8 grid place-items-center transition shadow-sm" aria-label="search"><Search size={15} /></button>
-                  </div>
-                </form>
-                <AnimatePresence>
-                  {sugOpen && query.trim().length >= 2 && (suggestions.prods.length > 0 || suggestions.cats.length > 0) && (
-                    <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.16 }} className="absolute left-0 right-0 top-full mt-2 bg-white border-2 border-[#12151C] shadow-elevated z-[60] max-h-[440px] overflow-auto">
-                      {suggestions.cats.length > 0 && (
-                        <div className="p-2">
-                          <p className="px-3 py-1 text-[10px] font-black tracking-widest text-[#9CA3AF] uppercase">Categories</p>
-                          {suggestions.cats.map((c) => (
-                            <button key={c.name} onClick={() => go(`/shop?cat=${encodeURIComponent(c.name)}`)} className="w-full flex items-center gap-3 px-3 py-2 hover:bg-[#FFF5F0] text-left transition">
-                              <c.icon size={16} className="text-[#DE5718] shrink-0" />
-                              <span className="text-sm font-semibold text-[#12151C]">{c.name}</span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                      {suggestions.prods.length > 0 && (
-                        <div className="p-2 border-t border-[#F1F2F4]">
-                          <p className="px-3 py-1 text-[10px] font-black tracking-widest text-[#9CA3AF] uppercase">Parts</p>
-                          {suggestions.prods.map((p) => (
-                            <button key={p.sku} onClick={() => { setQuery(""); go(`/product/${p.sku}`); }} className="w-full flex items-center gap-3 px-3 py-2 hover:bg-[#FFF5F0] text-left transition">
-                              <img src={p.image} alt="" className="w-10 h-10 object-cover rounded shrink-0 bg-[#F1F2F4]" onError={(e) => { e.currentTarget.style.visibility = "hidden"; }} />
-                              <span className="min-w-0 flex-1">
-                                <span className="block text-[13px] font-semibold text-[#12151C] truncate">{p.name}</span>
-                                <span className="block text-[11px] text-[#9CA3AF]">{p.sku}</span>
-                              </span>
-                              <span className="text-[13px] font-black text-[#DE5718] shrink-0">${p.price.toFixed(2)}</span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              <div className="ml-auto flex items-center gap-2 sm:gap-3">
-                <Link to={user ? "/account" : "/login"} className="hidden sm:flex items-center gap-2 text-[#12151C] hover:text-[#DE5718] transition">
-                  <User size={19} />
-                  <span className="leading-tight text-left hidden lg:block">
-                    <span className="block text-[10px] font-semibold text-[#9CA3AF] uppercase tracking-wide">{user ? "Account" : "Sign in"}</span>
-                    <span className="block text-[13px] font-bold">{user ? user.name.split(" ")[0] : "Business account"}</span>
-                  </span>
-                </Link>
-                <div className="relative">
-                  <button onClick={() => setDrawer(true)} className="clip-cut flex items-center gap-2 bg-gradient-to-r from-[#EE6724] to-[#DE5718] hover:from-[#DE5718] hover:to-[#B43808] text-white pl-3.5 pr-4 py-2 text-sm font-bold shadow-sm transition">
-                    <ShoppingCart size={16} />
-                    <span className="hidden sm:inline">Cart</span>
-                  </button>
-                  {count > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 grid place-items-center rounded-full bg-[#12151C] text-white text-[11px] font-black border-2 border-white">{count}</span>
-                  )}
+            <div ref={searchRef} className="hidden md:block relative flex-1 max-w-xl mx-2">
+              <form onSubmit={submitSearch}>
+                <div className="flex items-center w-full bg-[#F5F6F8] border border-[#E5E7EB] rounded-full pl-5 pr-1.5 py-1.5 focus-within:border-[#0B2F5C] focus-within:bg-white transition">
+                  <Search size={17} className="text-[#9CA3AF]" />
+                  <input
+                    value={query}
+                    onChange={(e) => { setQuery(e.target.value); setSugOpen(true); }}
+                    onFocus={() => setSugOpen(true)}
+                    placeholder="Search part number, OEM, or keyword"
+                    className="flex-1 bg-transparent outline-none px-3 text-[14px] text-[#1A1A2E] placeholder:text-[#9CA3AF]"
+                  />
+                  <button type="submit" className="bg-[#0B2F5C] hover:bg-[#1A1A2E] text-white rounded-full w-9 h-9 grid place-items-center transition" aria-label="search"><Search size={16} /></button>
                 </div>
-                <div className="hidden xl:block"><YMMWidget variant="pill" /></div>
-              </div>
-            </div>
-          </div>
-
-          {/* Category nav: rich metallic copper */}
-          <div className="bg-gradient-to-r from-[#B43808] via-[#DE5718] to-[#C2410C] text-white hidden lg:block relative border-t border-[#F57429]/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)]" onMouseLeave={() => setMega(false)}>
-            <div className="mx-auto max-w-7xl px-4 flex items-center gap-1 text-[13px] font-bold uppercase tracking-wide">
-              <button
-                onMouseEnter={() => setMega(true)}
-                onClick={() => nav("/shop")}
-                className={`flex items-center gap-2 px-4 py-3 transition ${mega ? "bg-white text-[#DE5718]" : "hover:bg-black/15"}`}
-              >
-                <Menu size={16} /> All categories <ChevronDown size={14} className={`transition ${mega ? "rotate-180" : ""}`} />
-              </button>
-              {NAV.map((c) => (
-                <Link key={c} to={`/shop?cat=${encodeURIComponent(c)}`} onMouseEnter={() => setMega(false)} className="px-3.5 py-3 hover:bg-black/15 transition whitespace-nowrap">
-                  {c === "Air and Electrical" ? "Electrical" : c === "Towing and Winches" ? "Towing" : c}
-                </Link>
-              ))}
-              <Link to="/deals" onMouseEnter={() => setMega(false)} className="px-3.5 py-3 hover:bg-black/15 transition">Deals</Link>
-              <Link to="/contact" onMouseEnter={() => setMega(false)} className="px-3.5 py-3 hover:bg-black/15 transition">Contact</Link>
-              <span className="ml-auto flex items-center gap-2 text-[12px] font-semibold normal-case tracking-normal text-white/90 pr-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" /> 60,000+ lines ready to ship
-              </span>
-            </div>
-
-            <AnimatePresence>
-              {mega && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} transition={{ duration: 0.2 }}
-                  onMouseEnter={() => setMega(true)}
-                  className="absolute left-0 right-0 top-full bg-white text-[#12151C] shadow-elevated border-b-4 border-[#DE5718] z-50"
-                >
-                  <div className="mx-auto max-w-7xl px-4 py-6 grid grid-cols-[1fr_320px] gap-6">
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {CATEGORIES.map((c) => (
-                        <Link key={c.name} to={`/shop?cat=${encodeURIComponent(c.name)}`} onClick={() => setMega(false)} className="group flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-[#FFF5F0] transition">
-                          <span className="grid place-items-center w-10 h-10 rounded-lg bg-[#F5F6F8] text-[#DE5718] group-hover:bg-[#DE5718] group-hover:text-white transition shrink-0"><c.icon size={18} /></span>
-                          <span className="min-w-0">
-                            <span className="block text-[13px] font-bold truncate">{c.name}</span>
-                            <span className="block text-[11px] text-[#9CA3AF]">{c.count} lines</span>
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
-                    <Link to="/deals" onClick={() => setMega(false)} className="relative overflow-hidden group grid place-items-center p-6 text-white" style={{ background: "linear-gradient(135deg,#12151C,#331508)" }}>
-                      <div className="absolute inset-0 grid-scrim opacity-40" />
-                      <div className="relative text-center">
-                        <p className="text-[11px] font-black tracking-[0.2em] text-[#F57429]">THIS WEEK</p>
-                        <p className="font-display font-bold text-2xl mt-1 leading-tight">Fleet deals up to 30% off</p>
-                        <span className="mt-4 inline-flex items-center gap-1.5 bg-[#DE5718] text-white rounded-lg px-4 py-2 text-[13px] font-bold group-hover:gap-2.5 transition-all">See deals <ArrowRight size={14} /></span>
+              </form>
+              <AnimatePresence>
+                {sugOpen && query.trim().length >= 2 && (suggestions.prods.length > 0 || suggestions.cats.length > 0) && (
+                  <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.16 }} className="absolute left-0 right-0 top-full mt-2 bg-white border-2 border-[#1A1A2E] shadow-elevated z-[60] max-h-[440px] overflow-auto">
+                    {suggestions.cats.length > 0 && (
+                      <div className="p-2">
+                        <p className="px-3 py-1 text-[10px] font-black tracking-widest text-[#9CA3AF] uppercase">Categories</p>
+                        {suggestions.cats.map((c) => (
+                          <button key={c.name} onClick={() => go(`/shop?cat=${encodeURIComponent(c.name)}`)} className="w-full flex items-center gap-3 px-3 py-2 hover:bg-[#E8EEF5] text-left transition">
+                            <c.icon size={16} className="text-[#0B2F5C] shrink-0" />
+                            <span className="text-sm font-semibold text-[#1A1A2E]">{c.name}</span>
+                          </button>
+                        ))}
                       </div>
-                    </Link>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                    )}
+                    {suggestions.prods.length > 0 && (
+                      <div className="p-2 border-t border-[#F1F2F4]">
+                        <p className="px-3 py-1 text-[10px] font-black tracking-widest text-[#9CA3AF] uppercase">Parts</p>
+                        {suggestions.prods.map((p) => (
+                          <button key={p.sku} onClick={() => { setQuery(""); go(`/product/${p.sku}`); }} className="w-full flex items-center gap-3 px-3 py-2 hover:bg-[#E8EEF5] text-left transition">
+                            <img src={p.image} alt="" className="w-10 h-10 object-cover rounded shrink-0 bg-[#F1F2F4]" onError={(e) => { e.currentTarget.style.visibility = "hidden"; }} />
+                            <span className="min-w-0 flex-1">
+                              <span className="block text-[13px] font-semibold text-[#1A1A2E] truncate">{p.name}</span>
+                              <span className="block text-[11px] text-[#9CA3AF]">{p.sku}</span>
+                            </span>
+                            <span className="text-[13px] font-black text-[#0B2F5C] shrink-0">{p.price == null ? "Enquire" : `$${p.price.toFixed(2)}`}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <div className="ml-auto flex items-center gap-2 sm:gap-3">
+              <Link to={user ? "/account" : "/login"} className="hidden sm:flex items-center gap-2 text-[#1A1A2E] hover:text-[#0B2F5C] transition">
+                <User size={20} />
+                <span className="leading-tight text-left hidden lg:block">
+                  <span className="block text-[10px] font-semibold text-[#9CA3AF] uppercase tracking-wide">{user ? "Account" : "Sign in"}</span>
+                  <span className="block text-[13px] font-bold">{user ? user.name.split(" ")[0] : "Business account"}</span>
+                </span>
+              </Link>
+              <div className="relative">
+                <button onClick={() => setDrawer(true)} className="clip-cut flex items-center gap-2 bg-[#0B2F5C] text-white pl-3.5 pr-4 py-2.5 text-sm font-bold hover:bg-[#1A1A2E] transition">
+                  <ShoppingCart size={17} />
+                  <span className="hidden sm:inline">Cart</span>
+                </button>
+                {count > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 min-w-5 h-5 px-1 grid place-items-center rounded-full bg-[#1A1A2E] text-white text-[11px] font-black border-2 border-white">{count}</span>
+                )}
+              </div>
+              <div className="hidden xl:block"><YMMWidget variant="pill" /></div>
+            </div>
           </div>
         </div>
-      </header>
-    </>
+
+        {/* Category nav (orange) */}
+        <div className="bg-[#0B2F5C] text-white hidden lg:block relative" onMouseLeave={() => setMega(false)}>
+          <div className="mx-auto max-w-7xl px-4 flex items-center gap-0.5 text-[12px] font-bold uppercase tracking-wide whitespace-nowrap overflow-x-auto no-scrollbar">
+            <button
+              onMouseEnter={() => setMega(true)}
+              onClick={() => nav("/shop")}
+              className={`flex items-center gap-1.5 px-3 py-2.5 shrink-0 transition ${mega ? "bg-white text-[#0B2F5C]" : "hover:bg-black/10"}`}
+            >
+              <Menu size={15} /> All categories <ChevronDown size={13} className={`transition ${mega ? "rotate-180" : ""}`} />
+            </button>
+            {NAV.map((c) => (
+              <Link key={c} to={`/shop?cat=${encodeURIComponent(c)}`} onMouseEnter={() => setMega(false)} className="px-2.5 py-2.5 hover:bg-black/10 transition shrink-0">
+                {c}
+              </Link>
+            ))}
+            <Link to="/deals" onMouseEnter={() => setMega(false)} className="px-2.5 py-2.5 hover:bg-black/10 transition shrink-0">Deals</Link>
+            <Link to="/contact" onMouseEnter={() => setMega(false)} className="px-2.5 py-2.5 hover:bg-black/10 transition shrink-0">Contact</Link>
+            <span className="ml-auto hidden 2xl:flex items-center gap-1.5 text-[11px] font-semibold normal-case tracking-normal text-white/85 pl-3 shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" /> 36 lines ready to ship
+            </span>
+          </div>
+
+          <AnimatePresence>
+            {mega && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} transition={{ duration: 0.2 }}
+                onMouseEnter={() => setMega(true)}
+                className="absolute left-0 right-0 top-full bg-white text-[#1A1A2E] shadow-elevated border-b-4 border-[#0B2F5C] z-50"
+              >
+                <div className="mx-auto max-w-7xl px-4 py-6 grid grid-cols-[1fr_320px] gap-6">
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {CATEGORIES.map((c) => (
+                      <Link key={c.name} to={`/shop?cat=${encodeURIComponent(c.name)}`} onClick={() => setMega(false)} className="group flex items-center gap-3 rounded-lg px-3 py-2.5 hover:bg-[#E8EEF5] transition">
+                        <span className="grid place-items-center w-10 h-10 rounded-lg bg-[#F5F6F8] text-[#0B2F5C] group-hover:bg-[#0B2F5C] group-hover:text-white transition shrink-0"><c.icon size={18} /></span>
+                        <span className="min-w-0">
+                          <span className="block text-[13px] font-bold truncate">{c.name}</span>
+                          <span className="block text-[11px] text-[#9CA3AF]">{c.count} lines</span>
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                  <Link to="/deals" onClick={() => setMega(false)} className="relative overflow-hidden group grid place-items-center p-6 text-white" style={{ background: "linear-gradient(135deg,#1A1A2E,#3a1c0c)" }}>
+                    <div className="absolute inset-0 grid-scrim opacity-40" />
+                    <div className="relative text-center">
+                      <p className="text-[11px] font-black tracking-[0.2em] text-[#2F5E93]">THIS WEEK</p>
+                      <p className="font-display font-bold text-2xl mt-1 leading-tight">Fleet deals up to 30% off</p>
+                      <span className="mt-4 inline-flex items-center gap-1.5 bg-[#0B2F5C] text-white rounded-lg px-4 py-2 text-[13px] font-bold group-hover:gap-2.5 transition-all">See deals <ArrowRight size={14} /></span>
+                    </div>
+                  </Link>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </header>
   );
 }

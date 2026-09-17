@@ -1,25 +1,16 @@
-import logoOrange from "../assets/aurex-logo.png";
+import logoBlue from "../assets/aurex-logo-blue.png";
 import logoWhite from "../assets/aurex-logo-white.png";
-import mainLogo from "../assets/mainlogo.png";
 
-// The official Aurex 3D emblem is the primary mark across the site (nav bar, footer, cards).
-// Only explicit mono={true} uses the flat white knockout wordmark.
-export function LogoFull({ className = "", imgClassName = "", light = false, mono = false, size }) {
-  const chosenSrc = mono ? logoWhite : mainLogo;
-  const defaultHeightStyle = size !== undefined ? { height: size } : undefined;
-
+// Chrome/blue Aurex wordmark (copper recoloured to brand blue). Default for
+// light surfaces; pass mono for the flat white knockout on dark panels.
+export function LogoFull({ className = "", light = false, mono = false, size = 40 }) {
   return (
     <span className={`inline-flex items-center shrink-0 ${className}`}>
       <img
-        src={chosenSrc}
+        src={mono ? logoWhite : logoBlue}
         alt="Aurex Truck Parts"
-        style={defaultHeightStyle}
-        className={
-          imgClassName ||
-          (size !== undefined
-            ? "w-auto select-none object-contain"
-            : "h-8 sm:h-9 md:h-10 w-auto select-none object-contain")
-        }
+        style={{ height: size }}
+        className="w-auto select-none"
         draggable={false}
       />
       <span className="sr-only">Aurex Truck Parts Australia</span>
@@ -27,20 +18,14 @@ export function LogoFull({ className = "", imgClassName = "", light = false, mon
   );
 }
 
-export function LogoCompact({ className = "", size, mono = false, light = false }) {
-  const chosenSrc = mono ? logoWhite : mainLogo;
+export function LogoCompact({ className = "", size = 40, mono = false }) {
   return (
     <img
-      src={chosenSrc}
+      src={mono ? logoWhite : logoBlue}
       alt="Aurex Truck Parts"
-      style={size !== undefined ? { height: size } : undefined}
-      className={
-        size !== undefined
-          ? `w-auto select-none object-contain ${className}`
-          : `h-8 sm:h-9 w-auto select-none object-contain ${className}`
-      }
+      style={{ height: size }}
+      className={`w-auto select-none ${className}`}
       draggable={false}
     />
   );
 }
-
