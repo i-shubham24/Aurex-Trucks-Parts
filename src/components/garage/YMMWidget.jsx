@@ -80,6 +80,19 @@ function Console({ dark = true, onDone }) {
       animate="show"
       variants={{ show: { transition: { staggerChildren: 0.06, delayChildren: 0.04 } } }}
     >
+      <div className="mb-4 flex items-center gap-2">
+        {["Make", "Model", "Shop"].map((s, i) => {
+          const step = !make ? 0 : !model ? 1 : 2;
+          const on = i <= step;
+          return (
+            <div key={s} className="flex items-center gap-2 flex-1">
+              <span className={`grid place-items-center w-6 h-6 rounded-full text-[11px] font-black shrink-0 transition ${on ? "bg-[#0B2F5C] text-white" : dark ? "bg-white/10 text-white/40" : "bg-[#E8EEF5] text-[#9CA3AF]"}`}>{i + 1}</span>
+              <span className={`text-[12px] font-bold ${on ? (dark ? "text-white" : "text-[#0B2F5C]") : (dark ? "text-white/40" : "text-[#9CA3AF]")}`}>{s}</span>
+              {i < 2 && <span className={`flex-1 h-0.5 rounded-full ${i < step ? "bg-[#0B2F5C]" : dark ? "bg-white/10" : "bg-[#E5E7EB]"}`} />}
+            </div>
+          );
+        })}
+      </div>
       <div className="grid gap-3 sm:grid-cols-3">
         <Field label="Make" value={make} dark={dark} placeholder="Select make"
           options={Object.keys(TRUCK_MAKES)}
@@ -119,7 +132,6 @@ export default function YMMWidget({ variant = "hero" }) {
 
   // ===== Hero console: always open, light readable card =====
   if (variant === "hero") {
-    const step = !make ? 0 : !model ? 1 : 2;
     return (
       <div className="relative rounded-3xl bg-white border-2 border-[#0B2F5C]/15 shadow-elevated overflow-hidden">
         <span className="absolute top-0 left-8 right-8 h-1.5 rounded-full bg-gradient-to-r from-[#0B2F5C] via-[#5B93D1] to-[#B9D6F2]" />
@@ -139,15 +151,6 @@ export default function YMMWidget({ variant = "hero" }) {
                 <X size={13} /> Clear
               </button>
             )}
-          </div>
-          <div className="mt-4 flex items-center gap-2">
-            {["Make", "Model", "Shop"].map((s, i) => (
-              <div key={s} className="flex items-center gap-2 flex-1">
-                <span className={`grid place-items-center w-6 h-6 rounded-full text-[11px] font-black shrink-0 transition ${i <= step ? "bg-[#0B2F5C] text-white" : "bg-[#E8EEF5] text-[#9CA3AF]"}`}>{i + 1}</span>
-                <span className={`text-[12px] font-bold ${i <= step ? "text-[#0B2F5C]" : "text-[#9CA3AF]"}`}>{s}</span>
-                {i < 2 && <span className={`flex-1 h-0.5 rounded-full ${i < step ? "bg-[#0B2F5C]" : "bg-[#E5E7EB]"}`} />}
-              </div>
-            ))}
           </div>
           <div className="mt-4"><Console dark={false} onDone={() => {}} /></div>
         </div>
