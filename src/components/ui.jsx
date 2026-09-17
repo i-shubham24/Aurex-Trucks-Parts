@@ -440,8 +440,9 @@ export function ProductCard({ p, index = 0 }) {
 
 
 
-/* Compact rail card: image-first with bottom-left cut. On hover a blue
-   panel rises from below with the product name plus a View details action. */
+/* Compact rail card: mirrors the category tile exactly (image, overlapping
+   notch badge, title below). On hover a blue tone rises from below with the
+   product name plus a View details action. */
 export function ProductRailCard({ p, index = 0 }) {
   return (
     <motion.article
@@ -450,40 +451,42 @@ export function ProductRailCard({ p, index = 0 }) {
       whileInView="whileInView"
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, ease: EASE, delay: (index % 4) * 0.06 }}
-      className="group relative bg-white border border-[#E5E7EB] overflow-hidden hover:border-[#0B2F5C]/40 hover:shadow-card-hover transition-all duration-400 flex flex-col"
-      style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 18px 100%, 0 calc(100% - 18px))" }}
+      className="group flex flex-col items-center text-center"
     >
-      <Link to={`/product/${p.sku}`} className="relative block aspect-[16/11] overflow-hidden bg-[#F1F2F4]" aria-label={p.name}>
-        <SafeImg
-          src={p.image}
-          alt={p.name}
-          label={p.sku}
-          className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
-          wrapClass="w-full h-full"
-        />
-        {p.badge && (
-          <span className="absolute top-2.5 left-2.5 z-10 bg-[#1A1A2E]/90 backdrop-blur text-white text-[10px] font-black px-2 py-1">
-            {p.badge}
-          </span>
-        )}
-        {/* Hover reveal: blue tone rises from below with name + action */}
-        <span className="absolute inset-x-0 bottom-0 z-10 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out bg-gradient-to-t from-[#0B2F5C] via-[#0B2F5C]/95 to-[#0B2F5C]/10 pt-8 pb-3 px-3.5 block">
-          <span className="block font-display font-bold text-white text-[13px] leading-snug line-clamp-2 min-h-[36px]">{p.name}</span>
-          <span className="mt-2 inline-flex items-center gap-1.5 bg-white text-[#0B2F5C] px-3.5 py-2 text-[11px] font-black uppercase tracking-wide">
-            View details <Eye size={13} />
-          </span>
+      <div className="relative w-full aspect-[4/3] group-hover:-translate-y-1.5 transition-transform duration-500">
+        <div className="clip-cut-lg w-full h-full overflow-hidden bg-[#F1F2F4]">
+          <SafeImg
+            src={p.image}
+            alt={p.name}
+            label={p.sku}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+            wrapClass="w-full h-full"
+          />
+          <span className="absolute inset-0 bg-gradient-to-t from-[#0B2F5C]/55 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <span className="clip-cut-lg absolute inset-0 border-[3px] border-[#0B2F5C] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+        </div>
+        <span className="clip-notch absolute -bottom-2 left-1/2 -translate-x-1/2 grid place-items-center w-10 h-10 bg-[#0B2F5C] text-white shadow-primary group-hover:scale-110 group-hover:rotate-6 transition duration-300">
+          <ShoppingCart size={16} />
         </span>
-      </Link>
-      <div className="p-3.5 flex items-center justify-between gap-2">
-        <p className="text-[10px] font-bold tracking-wider text-[#9CA3AF] uppercase truncate">
-          {p.brand ? `${p.brand} · ` : ""}{p.cat}
-        </p>
-        {p.price == null ? (
-          <span className="text-[13px] font-black text-[#0B2F5C] shrink-0">Enquire</span>
-        ) : (
-          <span className="font-display font-bold text-[16px] text-[#1A1A2E] shrink-0">${p.price.toFixed(2)}</span>
-        )}
+        <span className="absolute top-3 right-3 grid place-items-center w-8 h-8 rounded-full bg-white/95 text-[#0B2F5C] opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300">
+          <Eye size={15} />
+        </span>
+        {/* Hover reveal: name rises from below with action */}
+        <Link
+          to={`/product/${p.sku}`}
+          className="absolute inset-x-3 bottom-8 z-10 translate-y-[130%] group-hover:translate-y-0 transition-transform duration-400 ease-out bg-[#0B2F5C]/95 backdrop-blur px-3.5 py-3 text-left block"
+          style={{ clipPath: "polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))" }}
+        >
+          <span className="block font-display font-bold text-white text-[13px] leading-snug line-clamp-2">{p.name}</span>
+          <span className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wide text-white/90">
+            View details <ArrowRight size={12} />
+          </span>
+        </Link>
       </div>
+      <p className="mt-5 text-[15px] font-bold text-[#1A1A2E] leading-snug line-clamp-2 min-h-[42px] group-hover:text-[#0B2F5C] transition px-1">{p.name}</p>
+      <p className="text-[12px] text-[#9CA3AF] mt-1">
+        {p.brand ? `${p.brand} · ` : ""}{p.price == null ? <span className="text-[#0B2F5C] font-bold">Enquire</span> : <span className="text-[#1A1A2E] font-bold">${p.price.toFixed(2)}</span>} · <Link to={`/product/${p.sku}`} className="text-[#0B2F5C] font-semibold">View details</Link>
+      </p>
     </motion.article>
   );
 }

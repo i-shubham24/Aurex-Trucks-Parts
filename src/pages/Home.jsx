@@ -15,7 +15,6 @@ import { useProducts } from "../store/products.jsx";
 import YMMWidget from "../components/garage/YMMWidget.jsx";
 import HeroFeature from "../components/home/HeroFeature.jsx";
 import CategoryBoxes from "../components/home/CategoryBoxes.jsx";
-import CategoryCircles from "../components/home/CategoryCircles.jsx";
 import BrandWall from "../components/home/BrandWall.jsx";
 import TestimonialCarousel from "../components/home/TestimonialCarousel.jsx";
 import { RangeBento, TrustTabs, StatsBand, RangeShowcase } from "../components/home/Showcase.jsx";
@@ -68,12 +67,6 @@ export default function Home() {
       {/* CarParts style category boxes */}
       <section className="mx-auto max-w-7xl px-4 py-10">
         <CategoryBoxes />
-      </section>
-
-      {/* Shop by category medallions */}
-      <section className="mx-auto max-w-7xl px-4 pb-4">
-        <SectionHead kicker="Shop by category" title="Every part on the truck" sub="From tail lifts to tool boxes. Six approved categories, one catalogue." link="/categories" linkLabel="All categories" center />
-        <CategoryCircles />
       </section>
 
       <RangeBento />
@@ -137,6 +130,20 @@ export default function Home() {
         </div>
       </section>
 
+      <StatsBand />
+
+      {/* Trusted brands wall */}
+      <section className="mx-auto max-w-7xl px-4 py-16">
+        <SectionHead kicker="Brands we stock" title="The names your workshop trusts" sub="Tail lifts, door hardware and trailer gear from our approved suppliers." center />
+        <BrandWall />
+        <div className="mt-8 rounded-2xl border border-[#E5E7EB] bg-[#F7F8FA] px-6 py-5 flex flex-wrap items-center gap-x-8 gap-y-3 justify-center">
+          <span className="text-[11px] font-black tracking-[0.2em] text-[#9CA3AF] uppercase">Stockists include</span>
+          {["Beauway", "Ganland", "Caiyuan", "Aurex"].map((b) => (
+            <Link key={b} to="/brands" className="font-display font-bold tracking-wide text-[#1A1A2E]/70 hover:text-[#0B2F5C] transition text-[15px]">{b}</Link>
+          ))}
+        </div>
+      </section>
+
       {/* Deal of the week */}
       {deal && deal.price != null && (
         <section className="relative overflow-hidden bg-[#1A1A2E] text-white">
@@ -173,21 +180,7 @@ export default function Home() {
         </section>
       )}
 
-      <StatsBand />
-
       <TrustTabs />
-
-      {/* Trusted brands wall */}
-      <section className="mx-auto max-w-7xl px-4 py-16">
-        <SectionHead kicker="Brands we stock" title="The names your workshop trusts" sub="Tail lifts, door hardware and trailer gear from our approved suppliers." center />
-        <BrandWall />
-        <div className="mt-8 rounded-2xl border border-[#E5E7EB] bg-[#F7F8FA] px-6 py-5 flex flex-wrap items-center gap-x-8 gap-y-3 justify-center">
-          <span className="text-[11px] font-black tracking-[0.2em] text-[#9CA3AF] uppercase">Stockists include</span>
-          {["Beauway", "Ganland", "Caiyuan", "Aurex"].map((b) => (
-            <Link key={b} to="/brands" className="font-display font-bold tracking-wide text-[#1A1A2E]/70 hover:text-[#0B2F5C] transition text-[15px]">{b}</Link>
-          ))}
-        </div>
-      </section>
 
       {/* Testimonials carousel */}
       <TestimonialCarousel items={TESTIMONIALS} />

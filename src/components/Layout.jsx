@@ -44,6 +44,30 @@ function ScrollManager() {
   return null;
 }
 
+function NewsBox() {
+  const [email, setEmail] = useState("");
+  const [done, setDone] = useState(false);
+  return (
+    <div className="px-6 sm:px-10 pt-10 flex flex-wrap items-center gap-6 justify-between">
+      <div className="flex items-center gap-4">
+        <span className="grid place-items-center w-12 h-12 rounded-xl bg-[#0B2F5C] text-white shrink-0"><Mail size={22} /></span>
+        <div>
+          <p className="font-display font-bold text-xl text-white">Get fleet pricing and new arrivals</p>
+          <p className="text-white/80 text-[13px] mt-0.5">Join the trade list. No spam, unsubscribe anytime.</p>
+        </div>
+      </div>
+      {done ? (
+        <p className="rounded-xl bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-sm font-semibold px-5 py-3.5">Thanks. You are on the trade list.</p>
+      ) : (
+        <form onSubmit={(e) => { e.preventDefault(); if (email.trim()) setDone(true); }} className="flex gap-2 flex-1 min-w-[280px] max-w-md">
+          <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Work email" className="flex-1 rounded-xl px-4 py-3.5 bg-white/10 border border-white/15 text-white placeholder:text-white/40 outline-none focus:border-[#8FB4E0] transition text-sm" />
+          <button className="clip-cut bg-[#0B2F5C] text-white px-6 py-3.5 text-sm font-bold hover:bg-white hover:text-[#0B2F5C] transition">Subscribe</button>
+        </form>
+      )}
+    </div>
+  );
+}
+
 export default function Layout({ children }) {
   const { pathname } = useLocation();
   const { cart, setCart, count, total, drawer, setDrawer } = useShop();
@@ -93,27 +117,12 @@ export default function Layout({ children }) {
         {children}
       </motion.main>
 
-      {/* Newsletter strip */}
-      <section className="bg-[#16213E] print:hidden">
-        <div className="mx-auto max-w-7xl px-4 py-8 flex flex-wrap items-center gap-6 justify-between">
-          <div className="flex items-center gap-4">
-            <span className="grid place-items-center w-12 h-12 rounded-xl bg-[#0B2F5C] text-white shrink-0"><Mail size={22} /></span>
-            <div>
-              <p className="font-display font-bold text-xl text-white">Get fleet pricing and new arrivals</p>
-              <p className="text-white/80 text-[13px] mt-0.5">Join the trade list. No spam, unsubscribe anytime.</p>
-            </div>
-          </div>
-          <form onSubmit={(e) => { e.preventDefault(); alert("Thanks. You are on the trade list."); }} className="flex gap-2 flex-1 min-w-[280px] max-w-md">
-            <input required type="email" placeholder="Work email" className="flex-1 rounded-xl px-4 py-3.5 bg-white/10 border border-white/15 text-white placeholder:text-white/40 outline-none focus:border-[#2F5E93] transition text-sm" />
-            <button className="clip-cut bg-[#0B2F5C] text-white px-6 py-3.5 text-sm font-bold hover:bg-white hover:text-[#0B2F5C] transition">Subscribe</button>
-          </form>
-        </div>
-      </section>
-
-      {/* Footer: floating modular card */}
+      {/* Footer: floating modular card (square corners, bottom-left cut) */}
       <div className="bg-white print:hidden px-3 sm:px-5 pb-8 pt-4 [filter:drop-shadow(0_30px_45px_rgba(11,47,92,0.22))]">
-        <footer className="mx-auto max-w-7xl bg-[#1A1A2E] text-white overflow-hidden rounded-[26px]" style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 34px 100%, 0 calc(100% - 34px))" }}>
-          <div className="px-6 sm:px-10 pt-12 grid sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1.2fr] gap-10 text-sm lg:divide-x lg:divide-white/10">
+        <footer className="mx-auto max-w-7xl bg-[#1A1A2E] text-white overflow-hidden" style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 34px 100%, 0 calc(100% - 34px))" }}>
+          <NewsBox />
+          <div aria-hidden className="mx-6 sm:mx-10 border-t border-white/10" />
+          <div className="px-6 sm:px-10 pt-10 grid sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1.2fr] gap-10 text-sm lg:divide-x lg:divide-white/10">
           <div className="lg:pr-8">
             <LogoFull light />
             <p className="text-white/75 text-[13px] mt-4 leading-relaxed">

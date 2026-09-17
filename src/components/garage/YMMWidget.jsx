@@ -117,28 +117,39 @@ export default function YMMWidget({ variant = "hero" }) {
     return () => document.removeEventListener("mousedown", onDoc);
   }, [open, variant]);
 
-  // ===== Hero console: always open, industrial panel =====
+  // ===== Hero console: always open, light readable card =====
   if (variant === "hero") {
+    const step = !make ? 0 : !model ? 1 : 2;
     return (
-      <div className="relative" style={CUT}>
-        <div className="bg-[#12121B] border-t-2 border-[#2F5E93] p-5 sm:p-6 shadow-elevated">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="grid place-items-center w-9 h-9 bg-[#0B2F5C] text-white" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
-              <Truck size={17} />
+      <div className="relative rounded-3xl bg-white border-2 border-[#0B2F5C]/15 shadow-elevated overflow-hidden">
+        <span className="absolute top-0 left-8 right-8 h-1.5 rounded-full bg-gradient-to-r from-[#0B2F5C] via-[#5B93D1] to-[#B9D6F2]" />
+        <div className="p-5 sm:p-7">
+          <div className="flex items-center gap-3">
+            <span className="grid place-items-center w-11 h-11 rounded-2xl bg-[#0B2F5C] text-white shrink-0">
+              <Truck size={20} />
             </span>
-            <div>
-              <p className="text-white font-display font-bold text-[15px] leading-none">Find parts that fit</p>
-              <p className="text-white/45 text-[11px] mt-1 font-mono tracking-wide">
-                {hasValidVehicle ? `ACTIVE: ${selectedVehicle.year || "any"} ${selectedVehicle.make} ${selectedVehicle.model}` : "SET YOUR TRUCK ONCE, WE FILTER EVERYTHING"}
+            <div className="min-w-0">
+              <p className="text-[#1A1A2E] font-display font-bold text-[17px] leading-none">Find parts that fit</p>
+              <p className="text-[#6B7280] text-[12px] mt-1">
+                {hasValidVehicle ? `Filtering for ${selectedVehicle.year || "any"} ${selectedVehicle.make} ${selectedVehicle.model}` : "Set your truck once, we filter everything."}
               </p>
             </div>
             {hasValidVehicle && (
-              <button onClick={clearSelectedVehicle} className="ml-auto text-white/40 hover:text-white text-[11px] font-bold uppercase tracking-widest flex items-center gap-1">
+              <button onClick={clearSelectedVehicle} className="ml-auto text-[#9CA3AF] hover:text-[#0B2F5C] text-[11px] font-bold uppercase tracking-widest flex items-center gap-1 shrink-0">
                 <X size={13} /> Clear
               </button>
             )}
           </div>
-          <Console dark onDone={() => {}} />
+          <div className="mt-4 flex items-center gap-2">
+            {["Make", "Model", "Shop"].map((s, i) => (
+              <div key={s} className="flex items-center gap-2 flex-1">
+                <span className={`grid place-items-center w-6 h-6 rounded-full text-[11px] font-black shrink-0 transition ${i <= step ? "bg-[#0B2F5C] text-white" : "bg-[#E8EEF5] text-[#9CA3AF]"}`}>{i + 1}</span>
+                <span className={`text-[12px] font-bold ${i <= step ? "text-[#0B2F5C]" : "text-[#9CA3AF]"}`}>{s}</span>
+                {i < 2 && <span className={`flex-1 h-0.5 rounded-full ${i < step ? "bg-[#0B2F5C]" : "bg-[#E5E7EB]"}`} />}
+              </div>
+            ))}
+          </div>
+          <div className="mt-4"><Console dark={false} onDone={() => {}} /></div>
         </div>
       </div>
     );
