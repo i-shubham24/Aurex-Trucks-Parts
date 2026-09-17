@@ -69,7 +69,7 @@ export default function EmailPopup() {
                 </div>
               ) : (
                 <>
-                  <p className="text-white/55 text-[14px] mt-3 leading-relaxed">
+                  <p className="text-white/85 text-[14px] mt-3 leading-relaxed">
                     New stock, weekly specials and fitment tips for Australian truck and trailer fleets. No spam, unsubscribe anytime.
                   </p>
                   <form onSubmit={submit} className="mt-6 space-y-2.5">

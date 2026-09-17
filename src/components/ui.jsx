@@ -440,6 +440,56 @@ export function ProductCard({ p, index = 0 }) {
 
 
 
+/* Compact rail card: image-first with bottom-left cut. On hover a blue
+   panel rises from below with the product name plus a View details action. */
+export function ProductRailCard({ p, index = 0 }) {
+  return (
+    <motion.article
+      variants={staggerChild}
+      initial="initial"
+      whileInView="whileInView"
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, ease: EASE, delay: (index % 4) * 0.06 }}
+      className="group relative bg-white border border-[#E5E7EB] overflow-hidden hover:border-[#0B2F5C]/40 hover:shadow-card-hover transition-all duration-400 flex flex-col"
+      style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 18px 100%, 0 calc(100% - 18px))" }}
+    >
+      <Link to={`/product/${p.sku}`} className="relative block aspect-[16/11] overflow-hidden bg-[#F1F2F4]" aria-label={p.name}>
+        <SafeImg
+          src={p.image}
+          alt={p.name}
+          label={p.sku}
+          className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
+          wrapClass="w-full h-full"
+        />
+        {p.badge && (
+          <span className="absolute top-2.5 left-2.5 z-10 bg-[#1A1A2E]/90 backdrop-blur text-white text-[10px] font-black px-2 py-1">
+            {p.badge}
+          </span>
+        )}
+        {/* Hover reveal: blue tone rises from below with name + action */}
+        <span className="absolute inset-x-0 bottom-0 z-10 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out bg-gradient-to-t from-[#0B2F5C] via-[#0B2F5C]/95 to-[#0B2F5C]/10 pt-8 pb-3 px-3.5 block">
+          <span className="block font-display font-bold text-white text-[13px] leading-snug line-clamp-2 min-h-[36px]">{p.name}</span>
+          <span className="mt-2 inline-flex items-center gap-1.5 bg-white text-[#0B2F5C] px-3.5 py-2 text-[11px] font-black uppercase tracking-wide">
+            View details <Eye size={13} />
+          </span>
+        </span>
+      </Link>
+      <div className="p-3.5 flex items-center justify-between gap-2">
+        <p className="text-[10px] font-bold tracking-wider text-[#9CA3AF] uppercase truncate">
+          {p.brand ? `${p.brand} · ` : ""}{p.cat}
+        </p>
+        {p.price == null ? (
+          <span className="text-[13px] font-black text-[#0B2F5C] shrink-0">Enquire</span>
+        ) : (
+          <span className="font-display font-bold text-[16px] text-[#1A1A2E] shrink-0">${p.price.toFixed(2)}</span>
+        )}
+      </div>
+    </motion.article>
+  );
+}
+
+
+
 /* Simple countdown for deal sections */
 export function Countdown({ end }) {
   const [t, setT] = useState(() => Math.max(0, end - Date.now()));

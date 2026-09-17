@@ -33,7 +33,7 @@ function PageHero({ crumb, title, accent, sub, right }) {
           <h1 className="font-display font-bold tracking-[-0.02em] text-[36px] sm:text-[50px] leading-[0.98] mt-3">
             {title} <span className="text-[#C7CDD6]">{accent}</span>
           </h1>
-          {sub && <p className="text-white/60 text-[15px] mt-3 max-w-xl">{sub}</p>}
+          {sub && <p className="text-white/85 text-[15px] mt-3 max-w-xl">{sub}</p>}
         </Reveal>
         {right && <div className="ml-auto relative">{right}</div>}
       </div>

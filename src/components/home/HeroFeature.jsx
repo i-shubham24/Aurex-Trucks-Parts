@@ -90,7 +90,7 @@ export default function HeroFeature() {
             <div className="absolute -right-16 top-1/3 w-[420px] h-[420px] rounded-full bg-[#0B2F5C]/20 blur-[120px]" />
 
             <div className="relative z-10 p-8 sm:p-12 flex flex-col justify-center max-w-2xl">
-              <motion.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-[12px] sm:text-[13px] font-black tracking-[0.3em] text-white/60 uppercase">
+              <motion.p initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="text-[12px] sm:text-[13px] font-black tracking-[0.3em] text-[#9DB9DD] uppercase">
                 Australian truck and trailer specialists
               </motion.p>
 
@@ -123,9 +123,9 @@ export default function HeroFeature() {
                 <Link to="/contact" className="border-2 border-white/25 hover:border-white/70 text-white px-7 py-4 text-sm font-bold transition">Talk to the parts desk</Link>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[12px] font-semibold text-white/70">
-                <span className="flex items-center gap-1.5"><ShieldCheck size={15} className="text-[#2F5E93]" /> ADR compliant range</span>
-                <span className="flex items-center gap-1.5"><Truck size={15} className="text-[#2F5E93]" /> Same day dispatch from VIC</span>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[12px] font-semibold text-white/85">
+                <span className="flex items-center gap-1.5"><ShieldCheck size={15} className="text-[#8FB4E0]" /> ADR compliant range</span>
+                <span className="flex items-center gap-1.5"><Truck size={15} className="text-[#8FB4E0]" /> Same day dispatch from VIC</span>
               </motion.div>
             </div>
           </div>

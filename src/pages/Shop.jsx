@@ -119,7 +119,7 @@ export default function Shop() {
                 <h1 className="font-display font-bold tracking-[-0.02em] text-[36px] sm:text-[54px] leading-[0.92]">
                   {activeCat ? <CategoryTitle name={activeCat.name} /> : <>Shop truck <span className="text-[#C7CDD6]">parts.</span></>}
                 </h1>
-                <p className="text-white/60 text-[15px] mt-3 max-w-xl leading-relaxed">
+                <p className="text-white/85 text-[15px] mt-3 max-w-xl leading-relaxed">
                   {activeCat ? `${activeCat.blurb}. In stock in VIC and freighted Australia wide.` : "Filter by system, brand and price. Every card opens full specs plus OEM cross plus fitment."}
                 </p>
                 {activeCat && activeCat.subs?.length > 0 && (

@@ -18,7 +18,7 @@ export default function FitmentBanner({ fitCount, onlyFits, setOnlyFits }) {
           </span>
           <div>
             <p className="font-display font-bold text-[15px]">Shopping blind?</p>
-            <p className="text-white/50 text-[13px]">Add your truck and we grey out anything that will not fit.</p>
+            <p className="text-white/80 text-[13px]">Add your truck and we grey out anything that will not fit.</p>
           </div>
         </div>
         <div className="shrink-0"><YMMWidget variant="pill" /></div>

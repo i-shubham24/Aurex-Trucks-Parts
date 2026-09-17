@@ -100,7 +100,7 @@ export default function Layout({ children }) {
             <span className="grid place-items-center w-12 h-12 rounded-xl bg-[#0B2F5C] text-white shrink-0"><Mail size={22} /></span>
             <div>
               <p className="font-display font-bold text-xl text-white">Get fleet pricing and new arrivals</p>
-              <p className="text-white/55 text-[13px] mt-0.5">Join the trade list. No spam, unsubscribe anytime.</p>
+              <p className="text-white/80 text-[13px] mt-0.5">Join the trade list. No spam, unsubscribe anytime.</p>
             </div>
           </div>
           <form onSubmit={(e) => { e.preventDefault(); alert("Thanks. You are on the trade list."); }} className="flex gap-2 flex-1 min-w-[280px] max-w-md">
@@ -110,62 +110,70 @@ export default function Layout({ children }) {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-[#1A1A2E] text-white print:hidden">
-        <div className="mx-auto max-w-7xl px-4 py-14 grid sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 text-sm">
-          <div>
+      {/* Footer: floating modular card */}
+      <div className="bg-white print:hidden px-3 sm:px-5 pb-8 pt-4 [filter:drop-shadow(0_30px_45px_rgba(11,47,92,0.22))]">
+        <footer className="mx-auto max-w-7xl bg-[#1A1A2E] text-white overflow-hidden rounded-[26px]" style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 34px 100%, 0 calc(100% - 34px))" }}>
+          <div className="px-6 sm:px-10 pt-12 grid sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1.2fr] gap-10 text-sm lg:divide-x lg:divide-white/10">
+          <div className="lg:pr-8">
             <LogoFull light />
-            <p className="text-white/60 text-[13px] mt-4 leading-relaxed">
+            <p className="text-white/75 text-[13px] mt-4 leading-relaxed">
               Australian owned truck hardware: tail lifts, tool boxes, trailer parts and accessories. Honest advice plus fast freight to every state.
             </p>
-            <div className="mt-4 space-y-1.5 text-[12px] text-white/50">
-              <p className="flex items-center gap-2"><MapPin size={13} className="text-[#2F5E93]" /> 41 Halley Court, Campbellfield VIC 3061</p>
-              <p className="flex items-center gap-2"><Phone size={13} className="text-[#2F5E93]" /> 03 9000 0000</p>
-              <p className="flex items-center gap-2"><Mail size={13} className="text-[#2F5E93]" /> sales@aurextruckparts.com.au</p>
+            <div className="mt-4 space-y-2 text-[12px] text-white/70">
+              <p className="flex items-center gap-2"><MapPin size={13} className="text-[#8FB4E0]" /> 41 Halley Court, Campbellfield VIC 3061</p>
+              <p className="flex items-center gap-2"><Phone size={13} className="text-[#8FB4E0]" /> 03 9000 0000</p>
+              <p className="flex items-center gap-2"><Mail size={13} className="text-[#8FB4E0]" /> sales@aurextruckparts.com.au</p>
+            </div>
+            <div className="mt-5 flex gap-2">
+              {[["Instagram", "IG"], ["Facebook", "FB"], ["LinkedIn", "IN"]].map(([label, short]) => (
+                <a key={label} href="/contact" aria-label={label} className="grid place-items-center w-9 h-9 rounded-full border border-white/20 text-white/70 text-[11px] font-black hover:bg-white hover:text-[#0B2F5C] hover:border-white transition">
+                  {short}
+                </a>
+              ))}
             </div>
           </div>
           <div>
-            <p className="font-bold text-[12px] tracking-widest text-white/40 uppercase">Shop</p>
-            <div className="mt-3 grid gap-2 text-white/65">
-              <Link to="/shop" className="hover:text-white transition w-fit">All parts</Link>
-              <Link to="/shop?cat=Tail%20Lifts" className="hover:text-white transition w-fit">Tail Lifts</Link>
-              <Link to="/shop?cat=Tool%20Boxes" className="hover:text-white transition w-fit">Tool Boxes</Link>
-              <Link to="/shop?cat=Trailer%20Parts" className="hover:text-white transition w-fit">Trailer Parts</Link>
-              <Link to="/shop?cat=Accessories" className="hover:text-white transition w-fit">Accessories</Link>
-              <Link to="/shop?cat=Replacement%20Parts" className="hover:text-white transition w-fit">Replacement Parts</Link>
-              <Link to="/shop?cat=Tools%20and%20Others" className="hover:text-white transition w-fit">Tools and Others</Link>
-              <Link to="/brands" className="hover:text-white transition w-fit">Brands</Link>
-              <Link to="/deals" className="hover:text-white transition w-fit">Deals</Link>
+            <p className="font-bold text-[12px] tracking-widest text-white/45 uppercase">Shop</p>
+            <div className="mt-4 grid gap-2.5 text-white/75">
+              <Link to="/shop" className="hover:text-white hover:translate-x-1 transition-all w-fit">All parts</Link>
+              <Link to="/shop?cat=Tail%20Lifts" className="hover:text-white hover:translate-x-1 transition-all w-fit">Tail Lifts</Link>
+              <Link to="/shop?cat=Tool%20Boxes" className="hover:text-white hover:translate-x-1 transition-all w-fit">Tool Boxes</Link>
+              <Link to="/shop?cat=Trailer%20Parts" className="hover:text-white hover:translate-x-1 transition-all w-fit">Trailer Parts</Link>
+              <Link to="/shop?cat=Accessories" className="hover:text-white hover:translate-x-1 transition-all w-fit">Accessories</Link>
+              <Link to="/shop?cat=Replacement%20Parts" className="hover:text-white hover:translate-x-1 transition-all w-fit">Replacement Parts</Link>
+              <Link to="/shop?cat=Tools%20and%20Others" className="hover:text-white hover:translate-x-1 transition-all w-fit">Tools and Others</Link>
+              <Link to="/brands" className="hover:text-white hover:translate-x-1 transition-all w-fit">Brands</Link>
+              <Link to="/deals" className="hover:text-white hover:translate-x-1 transition-all w-fit">Deals</Link>
             </div>
           </div>
           <div>
-            <p className="font-bold text-[12px] tracking-widest text-white/40 uppercase">Support</p>
-            <div className="mt-3 grid gap-2 text-white/65">
-              <Link to="/resources" className="hover:text-white transition w-fit">Resources</Link>
-              <Link to="/compliance" className="hover:text-white transition w-fit">ADR Compliance</Link>
-              <Link to="/track" className="hover:text-white transition w-fit">Track order</Link>
-              <Link to="/quote" className="hover:text-white transition w-fit">Quote cart</Link>
-              <Link to="/checkout" className="hover:text-white transition w-fit">Checkout</Link>
-              <Link to="/contact" className="hover:text-white transition w-fit">Contact</Link>
+            <p className="font-bold text-[12px] tracking-widest text-white/45 uppercase">Support</p>
+            <div className="mt-4 grid gap-2.5 text-white/75">
+              <Link to="/resources" className="hover:text-white hover:translate-x-1 transition-all w-fit">Resources</Link>
+              <Link to="/compliance" className="hover:text-white hover:translate-x-1 transition-all w-fit">ADR Compliance</Link>
+              <Link to="/track" className="hover:text-white hover:translate-x-1 transition-all w-fit">Track order</Link>
+              <Link to="/quote" className="hover:text-white hover:translate-x-1 transition-all w-fit">Quote cart</Link>
+              <Link to="/checkout" className="hover:text-white hover:translate-x-1 transition-all w-fit">Checkout</Link>
+              <Link to="/contact" className="hover:text-white hover:translate-x-1 transition-all w-fit">Contact</Link>
             </div>
           </div>
           <div>
-            <p className="font-bold text-[12px] tracking-widest text-white/40 uppercase">Company</p>
-            <div className="mt-3 grid gap-2 text-white/65">
-              <Link to="/about" className="hover:text-white transition w-fit">About us</Link>
-              <Link to="/partners" className="hover:text-white transition w-fit">Our Partners</Link>
-              <Link to="/catalogue" className="hover:text-white transition w-fit">Catalogue</Link>
-              <Link to="/locations" className="hover:text-white transition w-fit">Locations</Link>
-              <Link to="/trade" className="hover:text-white transition w-fit">Trade accounts</Link>
-              <Link to="/policies/shipping" className="hover:text-white transition w-fit">Shipping</Link>
-              <Link to="/policies/returns" className="hover:text-white transition w-fit">Returns</Link>
-              <Link to="/policies/warranty" className="hover:text-white transition w-fit">Warranty</Link>
+            <p className="font-bold text-[12px] tracking-widest text-white/45 uppercase">Company</p>
+            <div className="mt-4 grid gap-2.5 text-white/75">
+              <Link to="/about" className="hover:text-white hover:translate-x-1 transition-all w-fit">About us</Link>
+              <Link to="/partners" className="hover:text-white hover:translate-x-1 transition-all w-fit">Our Partners</Link>
+              <Link to="/catalogue" className="hover:text-white hover:translate-x-1 transition-all w-fit">Catalogue</Link>
+              <Link to="/locations" className="hover:text-white hover:translate-x-1 transition-all w-fit">Locations</Link>
+              <Link to="/trade" className="hover:text-white hover:translate-x-1 transition-all w-fit">Trade accounts</Link>
+              <Link to="/policies/shipping" className="hover:text-white hover:translate-x-1 transition-all w-fit">Shipping</Link>
+              <Link to="/policies/returns" className="hover:text-white hover:translate-x-1 transition-all w-fit">Returns</Link>
+              <Link to="/policies/warranty" className="hover:text-white hover:translate-x-1 transition-all w-fit">Warranty</Link>
             </div>
           </div>
-          <div>
-            <p className="font-bold text-[12px] tracking-widest text-white/40 uppercase">Fleet Desk</p>
-            <p className="mt-3 text-white/65">Mon to Fri, 8am to 5pm AEST</p>
-            <p className="text-white/45 text-[13px] mt-1">Priority quotes for trade and fleet accounts.</p>
+          <div className="rounded-2xl bg-white/[0.04] border border-white/10 p-6 h-fit">
+            <p className="font-display font-bold text-[16px]">Fleet Desk</p>
+            <p className="mt-1 text-white/75 text-[13px]">Mon to Fri, 8am to 5pm AEST</p>
+            <p className="text-white/75 text-[13px] mt-1">Priority quotes for trade and fleet accounts.</p>
             <Link
               to="/contact"
               className="clip-cut mt-4 inline-flex items-center gap-1.5 bg-[#0B2F5C] text-white px-5 py-2.5 font-bold hover:bg-white hover:text-[#0B2F5C] text-[13px] transition"
@@ -174,13 +182,15 @@ export default function Layout({ children }) {
             </Link>
           </div>
         </div>
-        <div className="border-t border-white/10">
-          <p className="mx-auto max-w-7xl px-4 py-4 text-[12px] text-white/35 flex flex-wrap justify-between gap-2">
+        <div aria-hidden className="mx-6 sm:mx-10 mt-10 border-t border-white/10" />
+        <div className="px-6 sm:px-10 relative">
+          <p className="py-4 text-[12px] text-white/50 flex flex-wrap justify-between gap-2">
             <span>&copy; 2026 Aurex Truck Parts Australia. All rights reserved.</span>
             <span>Visa, Mastercard, Afterpay, Bank transfer · Category imagery via Wikimedia Commons contributors (CC BY-SA)</span>
           </p>
         </div>
-      </footer>
+        </footer>
+      </div>
 
       {/* Back to top */}
       <AnimatePresence>

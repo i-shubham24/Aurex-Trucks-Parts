@@ -149,18 +149,18 @@ export const PANELS = [
 ];
 
 export const GUIDES = [
-  { title: "How to pick the right tail lift", desc: "Capacity, platform size and body match in five minutes.", tag: "Tail Lifts", img: u(LIB.semiBlue, 700, 460) },
-  { title: "Door gear and hinge checklist", desc: "Left/right, latch and stainless options explained.", tag: "Trailer Parts", img: u(LIB.mechDark, 700, 460) },
-  { title: "Q track vs F track", desc: "Lengths, materials and end caps matched.", tag: "Accessories", img: u(LIB.serviceBay, 700, 460) },
-  { title: "Toolbox lock and latch guide", desc: "Paddle latches, locks and handles sized.", tag: "Tool Boxes", img: u(LIB.warehouse, 700, 460) },
-  { title: "Canvas stand measuring guide", desc: "Widths and heights for tautliner bodies.", tag: "Trailer Parts", img: u(LIB.underCar, 700, 460) },
-  { title: "Cargo control basics", desc: "Bars, buffers and end fittings that hold.", tag: "Accessories", img: u(LIB.semiBlue, 700, 460) },
+  { title: "How to pick the right tail lift", desc: "Capacity, platform size and body match in five minutes.", tag: "Tail Lifts", img: "/images/TAIL-LIFTS-CAT.jpg" },
+  { title: "Door gear and hinge checklist", desc: "Left/right, latch and stainless options explained.", tag: "Trailer Parts", img: "/images/products/GL-11113.jpg" },
+  { title: "Q track vs F track", desc: "Lengths, materials and end caps matched.", tag: "Accessories", img: "/images/products/GL-19113H1.jpg" },
+  { title: "Toolbox lock and latch guide", desc: "Paddle latches, locks and handles sized.", tag: "Tool Boxes", img: "/images/products/GL-25126.jpg" },
+  { title: "Canvas stand measuring guide", desc: "Widths and heights for tautliner bodies.", tag: "Trailer Parts", img: "/images/products/CANVAS-1995-1600.jpg" },
+  { title: "Cargo control basics", desc: "Bars, buffers and end fittings that hold.", tag: "Accessories", img: "/images/products/GL-15616.jpg" },
 ];
 
 export const NEWS = [
-  { title: "New Aurex range: tail lifts land in VIC", date: "02 Sep 2026", tag: "Tail Lifts", img: u(LIB.semiBlue, 700, 460) },
-  { title: "Toolbox and door hardware refresh", date: "21 Aug 2026", tag: "Tool Boxes", img: u(LIB.warehouse, 700, 460) },
-  { title: "Tracks, caps and fittings explained", date: "09 Aug 2026", tag: "Trailer Parts", img: u(LIB.serviceBay, 700, 460) },
+  { title: "New Aurex range: tail lifts land in VIC", date: "02 Sep 2026", tag: "Tail Lifts", img: "/images/TAIL-LIFTS-CAT.jpg" },
+  { title: "Toolbox and door hardware refresh", date: "21 Aug 2026", tag: "Tool Boxes", img: "/images/products/GL-25126.jpg" },
+  { title: "Tracks, caps and fittings explained", date: "09 Aug 2026", tag: "Trailer Parts", img: "/images/products/GL-19111H1.jpg" },
 ];
 
 export const TESTIMONIALS = [

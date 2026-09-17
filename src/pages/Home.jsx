@@ -2,12 +2,12 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  ArrowRight, ShieldCheck, BadgeCheck, Truck, RotateCcw, Headphones,
-  ChevronRight, Star, Flame,
+  ArrowRight, ShieldCheck, Truck, RotateCcw, Headphones,
+  ChevronRight, Flame,
 } from "lucide-react";
-import { PANELS, GUIDES, NEWS, TESTIMONIALS } from "../data/catalog.js";
+import { GUIDES, NEWS, TESTIMONIALS } from "../data/catalog.js";
 import {
-  SectionHead, ProductCard, Reveal, ScrollRow, Countdown, SafeImg,
+  SectionHead, ProductCard, ProductRailCard, Reveal, ScrollRow, Countdown, SafeImg,
   staggerParent, staggerChild,
 } from "../components/ui.jsx";
 import { useShop } from "../store/shop.jsx";
@@ -17,6 +17,8 @@ import HeroFeature from "../components/home/HeroFeature.jsx";
 import CategoryBoxes from "../components/home/CategoryBoxes.jsx";
 import CategoryCircles from "../components/home/CategoryCircles.jsx";
 import BrandWall from "../components/home/BrandWall.jsx";
+import TestimonialCarousel from "../components/home/TestimonialCarousel.jsx";
+import { RangeBento, TrustTabs, StatsBand, RangeShowcase } from "../components/home/Showcase.jsx";
 
 export default function Home() {
   const { add } = useShop();
@@ -29,8 +31,8 @@ export default function Home() {
 
   const tabs = ["Most Reordered", "Tail Lifts", "Trailer Parts", "Tool Boxes"];
   const tabProducts = useMemo(() => {
-    if (tab === "Most Reordered") return PRODUCTS.slice(0, 10);
-    return PRODUCTS.filter((p) => p.cat === tab).slice(0, 10);
+    if (tab === "Most Reordered") return [...PRODUCTS].sort((a, b) => (b.reviews || 0) - (a.reviews || 0));
+    return PRODUCTS.filter((p) => p.cat === tab);
   }, [tab, PRODUCTS]);
 
   return (
@@ -69,68 +71,48 @@ export default function Home() {
       </section>
 
       {/* Shop by category medallions */}
-      <section className="mx-auto max-w-7xl px-4 pb-14">
+      <section className="mx-auto max-w-7xl px-4 pb-4">
         <SectionHead kicker="Shop by category" title="Every part on the truck" sub="From tail lifts to tool boxes. Six approved categories, one catalogue." link="/categories" linkLabel="All categories" center />
         <CategoryCircles />
       </section>
 
-      {/* Garage filter band */}
-      <section className="relative overflow-hidden bg-[#1A1A2E]">
-        <div className="absolute inset-0 grid-scrim opacity-40" />
-        <div className="relative mx-auto max-w-7xl px-4 py-12 grid lg:grid-cols-[1fr_1.1fr] gap-8 items-center">
-          <Reveal>
-            <p className="text-[12px] font-black tracking-[0.22em] text-[#2F5E93] uppercase">Stop scrolling parts that will not fit</p>
-            <h2 className="font-display font-black text-white text-[30px] sm:text-[40px] leading-[1.03] mt-2">
-              Tell us your truck once.<br />We filter the whole store.
-            </h2>
-            <p className="text-white/55 text-[15px] mt-3 max-w-md leading-relaxed">
-              Pick your make, model and year. Every part gets a clear fits, universal, or not a match flag so you order right the first time.
-            </p>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <YMMWidget variant="hero" />
-          </Reveal>
-        </div>
-      </section>
+      <RangeBento />
 
-      {/* Featured 3 panels */}
-      <section className="mx-auto max-w-7xl px-4 py-16 space-y-14">
-        {PANELS.map((item, i) => {
-          const prod = findP(item.sku);
-          const reverse = i % 2 === 1;
-          return (
-            <div key={item.kicker} className={`grid lg:grid-cols-2 gap-8 lg:gap-12 items-center ${reverse ? "lg:grid-flow-dense" : ""}`}>
-              <Reveal dir={reverse ? "right" : "left"} className={reverse ? "lg:col-start-2" : ""}>
-                <p className="text-[12px] font-black tracking-[0.2em] text-[#0B2F5C] flex items-center gap-2">
-{item.kicker}
-                </p>
-                <h3 className="font-display font-bold text-[30px] sm:text-[40px] leading-[1.05] text-[#1A1A2E] mt-3">{item.title}</h3>
-                <p className="text-[#6B7280] text-[15px] mt-3 leading-relaxed max-w-lg">{item.desc}</p>
-                <ul className="mt-5 space-y-2.5">
-                  {item.points.map((pt) => (
-                    <li key={pt} className="flex items-center gap-2.5 text-[14px] text-[#1A1A2E] font-medium">
-                      <BadgeCheck size={18} className="text-[#10B981] shrink-0" />{pt}
-                    </li>
+      {/* Garage filter band */}
+      <section className="mx-auto max-w-7xl px-4 py-14">
+        <div className="relative overflow-hidden rounded-[28px] bg-[#EAF2FA] border border-[#D7E4F2]">
+          <div className="absolute -right-24 -top-24 w-[380px] h-[380px] rounded-full bg-[#8FB4E0]/25 blur-[110px]" />
+          <div className="absolute -left-24 -bottom-24 w-[380px] h-[380px] rounded-full bg-[#0B2F5C]/10 blur-[110px]" />
+          <div className="relative grid lg:grid-cols-2 gap-6 items-stretch p-6 sm:p-10">
+            <div className="relative overflow-hidden rounded-3xl bg-[#1A1A2E] text-white p-7 sm:p-10 flex flex-col justify-center">
+              <div className="absolute inset-0 grid-scrim opacity-20" />
+              <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-[#0B2F5C]/40 blur-[90px]" />
+              <Reveal className="relative">
+                <p className="inline-flex items-center gap-2 text-[11px] font-black tracking-[0.22em] text-[#0B2F5C] uppercase bg-white rounded-full px-4 py-2">Stop scrolling parts that will not fit</p>
+                <h2 className="font-display font-black text-[30px] sm:text-[42px] leading-[1.02] mt-4">
+                  Tell us your truck once.<br /><span className="text-[#9DB9DD]">We filter the whole store.</span>
+                </h2>
+                <div className="mt-6 grid grid-cols-3 gap-3">
+                  {[["1", "Pick make"], ["2", "Pick model"], ["3", "Shop filtered"]].map(([n, t]) => (
+                    <div key={n} className="rounded-2xl bg-white/[0.06] border border-white/10 p-3 text-center">
+                      <p className="font-display font-black text-[#9DB9DD] text-xl">{n}</p>
+                      <p className="text-white/85 text-[12px] font-semibold mt-1">{t}</p>
+                    </div>
                   ))}
-                </ul>
-                <div className="mt-6 flex items-center gap-4">
-                  <Link to={item.link} className="inline-flex items-center gap-2 bg-[#0B2F5C] text-white px-6 py-3.5 text-sm font-black uppercase tracking-wide hover:bg-[#1A1A2E] hover:gap-3 transition-all" style={{ clipPath: "polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))" }}>
-                    View range <ArrowRight size={15} />
-                  </Link>
-                  {prod && prod.price != null && <span className="text-sm text-[#6B7280]">from <b className="font-display text-[#1A1A2E] text-lg">${prod.price.toFixed(2)}</b></span>}
-                </div>
-              </Reveal>
-              <Reveal dir={reverse ? "left" : "right"} className={reverse ? "lg:col-start-1 lg:row-start-1" : ""}>
-                <div className="relative overflow-hidden shine group" style={{ clipPath: "polygon(0 0,100% 0,100% 100%,32px 100%,0 calc(100% - 32px))" }}>
-                  <SafeImg src={item.img} alt={item.title} label={item.kicker} className="w-full h-[340px] object-cover group-hover:scale-105 transition-transform duration-700" wrapClass="w-full h-[340px]" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-                  <span className="clip-cut-sm absolute bottom-5 left-6 bg-white/95 backdrop-blur px-4 py-2 text-[12px] font-bold text-[#1A1A2E]">Australian owned. Fleet trusted.</span>
                 </div>
               </Reveal>
             </div>
-          );
-        })}
+            <Reveal delay={0.1} className="relative rounded-3xl bg-white border border-[#D7E4F2] shadow-elevated p-6 sm:p-8 flex flex-col justify-center overflow-hidden">
+              <span className="absolute top-0 left-8 right-8 h-1 rounded-full bg-gradient-to-r from-[#0B2F5C] via-[#5B93D1] to-[#B9D6F2]" />
+              <p className="text-[12px] font-black tracking-[0.22em] text-[#0B2F5C] uppercase">Find parts that fit</p>
+              <p className="text-[13px] text-[#6B7280] mt-1">Set your truck once, we filter everything.</p>
+              <div className="mt-4"><YMMWidget variant="hero" /></div>
+            </Reveal>
+          </div>
+        </div>
       </section>
+
+      <RangeShowcase />
 
       {/* Featured products tabs */}
       <section className="bg-[#F7F8FA] py-16 border-y border-[#E5E7EB]">
@@ -140,19 +122,18 @@ export default function Home() {
               <p className="text-[12px] font-black tracking-[0.22em] text-[#0B2F5C] uppercase mb-2">Featured products</p>
               <h2 className="font-display font-bold text-[28px] sm:text-[38px] text-[#1A1A2E] leading-[1.05]">Most reordered lines</h2>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {tabs.map((t) => (
                 <button key={t} onClick={() => setTab(t)} className={`px-4 py-2.5 text-[13px] font-bold border transition ${tab === t ? "bg-[#0B2F5C] text-white border-[#0B2F5C]" : "bg-white border-[#E5E7EB] text-[#6B7280] hover:border-[#0B2F5C] hover:text-[#0B2F5C]"}`}>{t}</button>
               ))}
+              <Link to="/shop" className="inline-flex items-center gap-1.5 px-4 py-2.5 text-[13px] font-black text-[#0B2F5C] hover:gap-3 transition-all">See all products <ArrowRight size={15} /></Link>
             </div>
           </div>
-          <ScrollRow>
-            {tabProducts.map((p, i) => (
-              <div key={p.sku} className="min-w-[270px] max-w-[270px] snap-start">
-                <ProductCard p={p} index={i} />
-              </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {tabProducts.slice(0, tab === "Most Reordered" ? 8 : 4).map((p, i) => (
+              <ProductRailCard key={p.sku} p={p} index={i} />
             ))}
-          </ScrollRow>
+          </div>
         </div>
       </section>
 
@@ -171,9 +152,9 @@ export default function Home() {
               </div>
             </Reveal>
             <Reveal dir="right">
-              <p className="text-[12px] font-black tracking-[0.22em] text-[#2F5E93] uppercase flex items-center gap-2"><Flame size={16} /> Deal of the week</p>
+              <p className="text-[12px] font-black tracking-[0.22em] text-[#8FB4E0] uppercase flex items-center gap-2"><Flame size={16} /> Deal of the week</p>
               <h2 className="font-display font-bold text-[32px] sm:text-[42px] leading-[1.05] mt-3">{deal.name}</h2>
-              <p className="text-white/60 text-[15px] mt-3 max-w-md leading-relaxed">{deal.desc}</p>
+              <p className="text-white/85 text-[15px] mt-3 max-w-md leading-relaxed">{deal.desc}</p>
               <div className="mt-5 flex items-end gap-4">
                 <span className="font-display font-bold text-[44px] text-white">${deal.price.toFixed(2)}</span>
                 {deal.oldPrice ? (
@@ -192,6 +173,10 @@ export default function Home() {
         </section>
       )}
 
+      <StatsBand />
+
+      <TrustTabs />
+
       {/* Trusted brands wall */}
       <section className="mx-auto max-w-7xl px-4 py-16">
         <SectionHead kicker="Brands we stock" title="The names your workshop trusts" sub="Tail lifts, door hardware and trailer gear from our approved suppliers." center />
@@ -204,70 +189,51 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials: workshop wall */}
-      <section className="relative overflow-hidden bg-[#1A1A2E] py-20">
-        <div className="absolute inset-0 grid-scrim opacity-25" />
-        <div className="absolute -left-24 top-0 w-[380px] h-[380px] rounded-full bg-[#0B2F5C]/25 blur-[130px]" />
-        <div className="absolute -right-24 bottom-0 w-[380px] h-[380px] rounded-full bg-[#2F5E93]/15 blur-[130px]" />
-        <div className="relative mx-auto max-w-7xl px-4">
-          <div className="max-w-2xl">
-            <p className="text-[12px] font-black tracking-[0.22em] text-[#8FA6C4] uppercase">Customer reviews</p>
-            <h2 className="font-display font-bold text-white text-[30px] sm:text-[42px] leading-[1.03] mt-2">Word from the workshop floor.</h2>
-            <p className="text-white/55 text-[15px] mt-3">Real orders, real fitments. Every review below is tied to a part you can open.</p>
-          </div>
-          <motion.div variants={staggerParent} initial="initial" whileInView="whileInView" viewport={{ once: true, margin: "-50px" }} className="mt-10 grid md:grid-cols-3 gap-5 items-stretch">
-            {TESTIMONIALS.map((t, idx) => {
-              const bought = t.sku ? findP(t.sku) : null;
-              return (
-              <motion.figure key={t.name} variants={staggerChild} className={`relative bg-white rounded-[22px] p-7 flex flex-col overflow-hidden hover:-translate-y-1.5 transition-transform duration-500 ${idx === 1 ? "md:-mt-4 md:mb-[-1rem] ring-2 ring-[#2F5E93]" : ""}`}>
-                <span aria-hidden className="absolute -top-3 right-4 font-display font-black text-[92px] leading-none text-[#E8EEF5] select-none">0{idx + 1}</span>
-                <div className="relative flex gap-1">{[...Array(t.rating)].map((_, i) => <Star key={i} size={16} className="fill-[#E8A90C] text-[#E8A90C]" />)}</div>
-                <blockquote className="relative mt-4 text-[17px] font-medium text-[#1A1A2E] leading-relaxed flex-1">&ldquo;{t.quote}&rdquo;</blockquote>
-                {bought && (
-                  <Link to={`/product/${bought.sku}`} className="relative mt-5 flex items-center gap-3 rounded-2xl bg-[#F2F5F9] border border-[#E5E7EB] p-2.5 pr-4 hover:border-[#0B2F5C]/50 transition group">
-                    <SafeImg src={bought.image} alt={bought.name} label={bought.sku} className="w-12 h-12 rounded-xl object-cover shrink-0" wrapClass="w-12 h-12 rounded-xl shrink-0" />
-                    <span className="min-w-0">
-                      <span className="block text-[10px] font-black tracking-widest text-[#9CA3AF] uppercase">Verified purchase</span>
-                      <span className="block text-[13px] font-bold text-[#1A1A2E] truncate group-hover:text-[#0B2F5C] transition">{bought.name}</span>
-                    </span>
-                    <ArrowRight size={15} className="ml-auto text-[#9CA3AF] group-hover:text-[#0B2F5C] group-hover:translate-x-0.5 transition shrink-0" />
-                  </Link>
-                )}
-                <figcaption className="relative mt-5 flex items-center gap-3 pt-4 border-t border-[#F1F2F4]">
-                  <span className="grid place-items-center w-11 h-11 rounded-full bg-[#0B2F5C] text-white font-bold">{t.name.charAt(0)}</span>
-                  <span>
-                    <span className="block font-bold text-[14px] text-[#1A1A2E]">{t.name}</span>
-                    <span className="block text-[12px] text-[#9CA3AF]">{t.role}</span>
-                  </span>
-                </figcaption>
-              </motion.figure>
-              );
-            })}
-          </motion.div>
-        </div>
-      </section>
+      {/* Testimonials carousel */}
+      <TestimonialCarousel items={TESTIMONIALS} />
 
-      {/* Guides */}
-      <section className="py-16">
+      {/* Guides: magazine */}
+      <section className="py-16 bg-[#F2F6FB] border-y border-[#D7E4F2]">
         <div className="mx-auto max-w-7xl px-4">
           <SectionHead kicker="Resources" title="Guides that save downtime" sub="Short reads from the workshop. The full library lives on Resources." link="/resources" linkLabel="All guides" />
-          <motion.div variants={staggerParent} initial="initial" whileInView="whileInView" viewport={{ once: true, margin: "-50px" }} className="grid md:grid-cols-3 gap-5">
-            {[...GUIDES, ...NEWS].slice(0, 3).map((g) => (
-              <motion.div key={g.title} variants={staggerChild}>
-                <Link to="/resources" className="group block overflow-hidden bg-white border border-[#E5E7EB] hover:border-[#0B2F5C]/40 hover:shadow-card-hover transition h-full">
-                  <div className="h-48 overflow-hidden relative shine">
-                    <SafeImg src={g.img} alt={g.title} label={g.tag} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" wrapClass="w-full h-full" />
-                    <span className="absolute top-3 left-3 text-[11px] font-bold bg-white/95 px-3 py-1.5 text-[#1A1A2E]">{g.tag}</span>
-                  </div>
-                  <div className="p-5">
-                    <p className="font-display font-semibold text-[16px] text-[#1A1A2E] group-hover:text-[#0B2F5C] transition leading-snug">{g.title}</p>
-                    <p className="text-[13px] text-[#6B7280] mt-1.5">{g.desc || "Read the full workshop guide and fitment tips."}</p>
-                    <span className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-bold text-[#0B2F5C]">Read more <ChevronRight size={14} className="group-hover:translate-x-1 transition" /></span>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
+          {(() => {
+            const [lead, ...rest] = [...GUIDES, ...NEWS].slice(0, 4);
+            return (
+              <div className="grid lg:grid-cols-2 gap-5 items-stretch">
+                <motion.div variants={staggerChild} initial="initial" whileInView="whileInView" viewport={{ once: true, margin: "-40px" }}>
+                  <Link to="/resources" className="group relative block h-full min-h-[380px] overflow-hidden clip-cut-lg">
+                    <SafeImg src={lead.img} alt={lead.title} label={lead.tag} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" wrapClass="absolute inset-0 w-full h-full" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0d1526]/95 via-[#0d1526]/30 to-transparent" />
+                    <span className="absolute top-5 left-5 text-[11px] font-black uppercase tracking-widest bg-white text-[#0B2F5C] px-3.5 py-2" style={{ clipPath: "polygon(0 0,100% 0,100% 100%,8px 100%,0 calc(100% - 8px))" }}>{lead.tag} · Featured</span>
+                    <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
+                      <p className="font-display font-bold text-white text-[26px] sm:text-[32px] leading-tight">{lead.title}</p>
+                      <p className="text-white/80 text-[14px] mt-2 max-w-md">{lead.desc}</p>
+                      <span className="mt-4 inline-flex items-center gap-2 text-[13px] font-black uppercase tracking-wide text-white">Read guide <span className="grid place-items-center w-8 h-8 rounded-full bg-white text-[#0B2F5C] group-hover:gap-3 transition-all"><ArrowRight size={15} /></span></span>
+                    </div>
+                  </Link>
+                </motion.div>
+                <div className="grid gap-4 content-start">
+                  {rest.map((g, i) => (
+                    <motion.div key={g.title} variants={staggerChild} initial="initial" whileInView="whileInView" viewport={{ once: true, margin: "-40px" }} transition={{ delay: i * 0.07 }}>
+                      <Link to="/resources" className="group flex gap-4 bg-white border border-[#E5E7EB] p-3 pr-5 hover:border-[#0B2F5C]/50 hover:shadow-card-hover transition items-center" style={{ clipPath: "polygon(0 0,100% 0,100% 100%,14px 100%,0 calc(100% - 14px))" }}>
+                        <span className="font-display font-black text-[15px] text-[#9CA3AF] group-hover:text-[#0B2F5C] transition pl-2">0{i + 2}</span>
+                        <span className="w-24 h-20 shrink-0 overflow-hidden rounded-xl">
+                          <SafeImg src={g.img} alt={g.title} label={g.tag} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" wrapClass="w-full h-full" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-[10px] font-black tracking-[0.18em] text-[#0B2F5C] uppercase">{g.tag}</span>
+                          <span className="block font-display font-bold text-[16px] text-[#1A1A2E] leading-snug truncate">{g.title}</span>
+                          <span className="block text-[12px] text-[#6B7280] truncate mt-0.5">{g.desc}</span>
+                        </span>
+                        <ChevronRight size={17} className="text-[#C7CBD1] group-hover:text-[#0B2F5C] group-hover:translate-x-1 transition shrink-0" />
+                      </Link>
+                    </motion.div>
+                  ))}
+                  <Link to="/resources" className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#B9D0E8] text-[#0B2F5C] font-bold text-[14px] py-4 hover:bg-white hover:border-[#0B2F5C] transition">Open the full library <ArrowRight size={15} /></Link>
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </section>
     </div>
