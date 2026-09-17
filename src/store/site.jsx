@@ -1,12 +1,12 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { Disc3, Settings2, Cog, BatteryCharging, Filter, CircleDot, Lightbulb, Anchor, Container, Truck, Bolt, Lock, Wrench } from "lucide-react";
+import { Disc3, Settings2, Cog, BatteryCharging, Filter, CircleDot, Lightbulb, Anchor, Container, Truck, Bolt, Lock, Wrench, Package, Sparkles, RefreshCcw } from "lucide-react";
 import { CATEGORIES as SEED_CATS } from "../data/catalog.js";
 
-export const ICONS = { Disc3, Settings2, Cog, BatteryCharging, Filter, CircleDot, Lightbulb, Anchor, Container, Truck, Bolt, Lock, Wrench };
+export const ICONS = { Disc3, Settings2, Cog, BatteryCharging, Filter, CircleDot, Lightbulb, Anchor, Container, Truck, Bolt, Lock, Wrench, Package, Sparkles, RefreshCcw };
 export const ICON_OPTIONS = Object.keys(ICONS);
 
 const Ctx = createContext(null);
-const K = { settings: "aurex_settings_v1", content: "aurex_content_v1", promos: "aurex_promos_v1", enquiries: "aurex_enquiries_v1", quotes: "aurex_quotes_v1", categories: "aurex_categories_v1" };
+const K = { settings: "aurex_settings_v1", content: "aurex_content_v1", promos: "aurex_promos_v1", enquiries: "aurex_enquiries_v1", quotes: "aurex_quotes_v1", categories: "aurex_categories_v5" };
 
 const seedCats = () => SEED_CATS.map((c) => ({ name: c.name, count: c.count, blurb: c.blurb, subs: [...(c.subs || [])], icon: Object.keys(ICONS).find((k) => ICONS[k] === c.icon) || "Cog", image: c.image || "" }));
 
@@ -39,8 +39,8 @@ const DEFAULT_PROMOS = [
   { code: "FLEET5", label: "5 plus units", pct: 5, active: false },
 ];
 const SEED_ENQUIRIES = [
-  { id: "ENQ-1001", name: "Mark D.", phone: "0400 111 222", email: "mark@lavertonfleet.com.au", truck: "Kenworth T610 2022", message: "Need backing plates plus bearing kits for 6 trailers. Can you confirm fitment?", status: "New", at: new Date(Date.now() - 86400000 * 1).toISOString() },
-  { id: "ENQ-1002", name: "Sarah K.", phone: "0400 333 444", email: "sarah@brisbanehaul.com.au", truck: "Isuzu FTR 2021", message: "Winch plus LED lamp kit for car trailer. Price with freight to Brisbane?", status: "Replied", at: new Date(Date.now() - 86400000 * 3).toISOString() },
+  { id: "ENQ-1001", name: "Mark D.", phone: "0400 111 222", email: "mark@lavertonfleet.com.au", truck: "Rigid with tail lift", message: "Need door locking gear plus hinges for 6 trailers. Can you confirm left/right?", status: "New", at: new Date(Date.now() - 86400000 * 1).toISOString() },
+  { id: "ENQ-1002", name: "Sarah K.", phone: "0400 333 444", email: "sarah@brisbanehaul.com.au", truck: "Box trailer", message: "Steel toolbox plus paddle latch and lock. Price with freight to Brisbane?", status: "Replied", at: new Date(Date.now() - 86400000 * 3).toISOString() },
 ];
 
 const read = (k, fb) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } };

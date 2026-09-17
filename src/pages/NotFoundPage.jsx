@@ -11,7 +11,7 @@ export default function NotFoundPage() {
           The page or part you're looking for might have been moved or doesn't exist.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-          <Link to="/" className="bg-[#E53E00] text-white px-6 py-3.5 rounded-xl font-bold text-sm hover:bg-[#1A1A2E] transition">
+          <Link to="/" className="bg-[#0B2F5C] text-white px-6 py-3.5 rounded-xl font-bold text-sm hover:bg-[#1A1A2E] transition">
             Back to homepage
           </Link>
           <Link to="/shop" className="bg-white text-[#1A1A2E] border-2 border-[#E5E7EB] px-6 py-3.5 rounded-xl font-bold text-sm hover:border-[#1A1A2E] transition flex items-center justify-center gap-2">

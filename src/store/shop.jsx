@@ -3,7 +3,7 @@ import { PRODUCTS } from "../data/catalog.js";
 
 const lookup = (sku) => {
   try {
-    const raw = localStorage.getItem("aurex_products_v1");
+    const raw = localStorage.getItem("aurex_products_v4");
     if (raw) {
       const arr = JSON.parse(raw);
       const f = arr.find((x) => x.sku === sku);
@@ -31,11 +31,11 @@ export function ShopProvider({ children }) {
   }, [wishlist]);
   const toggleCompare = (sku) => setCompare((c) => (c.includes(sku) ? c.filter((x) => x !== sku) : [...c, sku].slice(-3)));
   const add = (sku, qty = 1) => {
+    const p = lookup(sku);
+    if (!p || p.price == null) { setEnquirySku(sku); return; } // Enquire-only lines never enter the cart
     setCart((c) => {
       const f = c.find((i) => i.sku === sku);
       if (f) return c.map((i) => (i.sku === sku ? { ...i, qty: i.qty + qty } : i));
-      const p = lookup(sku);
-      if (!p) return c;
       return [...c, { ...p, qty }];
     });
     setDrawer(true);

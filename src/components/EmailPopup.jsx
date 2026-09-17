@@ -58,7 +58,7 @@ export default function EmailPopup() {
 
             {/* Copy side */}
             <div className="relative p-7 sm:p-9">
-              <p className="text-[11px] font-black tracking-[0.25em] text-[#FF6B35] uppercase">Join the trade list</p>
+              <p className="text-[11px] font-black tracking-[0.25em] text-[#2F5E93] uppercase">Join the trade list</p>
               <h2 className="font-display font-black text-white text-[30px] sm:text-[36px] leading-[0.98] mt-2">
                 GET FLEET<br />DEALS FIRST
               </h2>
@@ -79,9 +79,9 @@ export default function EmailPopup() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Your work email"
-                      className="w-full bg-white/[0.06] border-2 border-white/12 rounded-md px-4 py-3.5 text-sm text-white placeholder:text-white/40 outline-none focus:border-[#FF6B35] transition"
+                      className="w-full bg-white/[0.06] border-2 border-white/12 rounded-md px-4 py-3.5 text-sm text-white placeholder:text-white/40 outline-none focus:border-[#2F5E93] transition"
                     />
-                    <button className="w-full bg-[#E53E00] hover:bg-white hover:text-[#E53E00] text-white py-3.5 text-sm font-black uppercase tracking-wide flex items-center justify-center gap-2 transition" style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
+                    <button className="w-full bg-[#0B2F5C] hover:bg-white hover:text-[#0B2F5C] text-white py-3.5 text-sm font-black uppercase tracking-wide flex items-center justify-center gap-2 transition" style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
                       Sign me up <ArrowRight size={16} />
                     </button>
                   </form>

@@ -42,7 +42,7 @@ function AuthShell({ title, sub, children, footer }) {
         <SafeImg src={HERO.primary} alt="" label="AUREX" className="absolute inset-0 w-full h-full object-cover opacity-25" wrapClass="absolute inset-0 w-full h-full" />
         <div className="absolute inset-0 grid-scrim opacity-50" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A2E] via-[#1A1A2E]/70 to-[#1A1A2E]/40" />
-        <div className="absolute -right-24 top-1/3 w-96 h-96 rounded-full bg-[#E53E00]/20 blur-[120px]" />
+        <div className="absolute -right-24 top-1/3 w-96 h-96 rounded-full bg-[#0B2F5C]/20 blur-[120px]" />
 
         <Link to="/" className="relative w-fit">
           <LogoFull mono size={58} />
@@ -54,12 +54,12 @@ function AuthShell({ title, sub, children, footer }) {
           </h2>
           <div className="mt-8 space-y-4 max-w-sm">
             {[
-              [Boxes, "60,000+ product lines ready to ship"],
+              [Boxes, "36 approved lines ready to ship"],
               [Truck, "Dispatch in 1 to 2 business days Australia wide"],
               [ShieldCheck, "ADR compliant range with OEM cross references"],
             ].map(([Icon, txt]) => (
               <div key={txt} className="flex items-center gap-3">
-                <span className="grid place-items-center w-10 h-10 rounded-xl bg-white/10 border border-white/15 text-[#FF6B35] shrink-0">
+                <span className="grid place-items-center w-10 h-10 rounded-xl bg-white/10 border border-white/15 text-[#2F5E93] shrink-0">
                   <Icon size={18} />
                 </span>
                 <span className="text-white/80 text-[14px] font-medium">{txt}</span>
@@ -84,7 +84,7 @@ function AuthShell({ title, sub, children, footer }) {
             <LogoFull />
           </Link>
           <span className="hidden lg:block" />
-          <Link to="/" className="flex items-center gap-2 text-[13px] font-semibold text-[#6B7280] hover:text-[#E53E00] transition">
+          <Link to="/" className="flex items-center gap-2 text-[13px] font-semibold text-[#6B7280] hover:text-[#0B2F5C] transition">
             <ArrowLeft size={15} /> Back to store
           </Link>
         </div>
@@ -111,7 +111,7 @@ function AuthShell({ title, sub, children, footer }) {
   );
 }
 
-const inputClass = "w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#E53E00] focus:bg-white transition";
+const inputClass = "w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#0B2F5C] focus:bg-white transition";
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -147,7 +147,7 @@ export function LoginPage() {
     <AuthShell
       title="Welcome back"
       sub="Log in to check out faster and track your orders."
-      footer={<p className="text-sm text-[#6B7280]">New to Aurex? <Link to="/signup" className="text-[#E53E00] font-bold hover:underline">Create an account</Link></p>}
+      footer={<p className="text-sm text-[#6B7280]">New to Aurex? <Link to="/signup" className="text-[#0B2F5C] font-bold hover:underline">Create an account</Link></p>}
     >
       <form onSubmit={handleLogin} className="grid gap-3">
         {/* Honeypot field (hidden from real users) */}
@@ -164,7 +164,7 @@ export function LoginPage() {
           <PasswordField value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" inputClass={inputClass} />
         </label>
         {err && <p className="text-[13px] text-red-500 font-semibold">{err}</p>}
-        <button className="mt-2 bg-[#E53E00] text-white rounded-xl py-4 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#1A1A2E] active:scale-[0.99] transition shadow-primary">
+        <button className="mt-2 bg-[#0B2F5C] text-white rounded-xl py-4 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#1A1A2E] active:scale-[0.99] transition shadow-primary">
           <LogIn size={16} /> Log in
         </button>
       </form>
@@ -213,7 +213,7 @@ export function SignupPage() {
     <AuthShell
       title="Create your account"
       sub="Trade and fleet welcome. One login for quotes, checkout and tracking."
-      footer={<p className="text-sm text-[#6B7280]">Already have an account? <Link to="/login" className="text-[#E53E00] font-bold hover:underline">Log in</Link></p>}
+      footer={<p className="text-sm text-[#6B7280]">Already have an account? <Link to="/login" className="text-[#0B2F5C] font-bold hover:underline">Log in</Link></p>}
     >
       <form onSubmit={handleSignup} className="grid gap-3">
         {/* Honeypot field (hidden from real users) */}
@@ -229,7 +229,7 @@ export function SignupPage() {
         <input value={f.company} onChange={set("company")} placeholder="Company or fleet, optional" className={inputClass} />
         <PasswordField value={f.password} onChange={set("password")} placeholder="Create password" inputClass={inputClass} />
         {err && <p className="text-[13px] text-red-500 font-semibold">{err}</p>}
-        <button className="mt-2 bg-[#1A1A2E] text-white rounded-xl py-4 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#E53E00] active:scale-[0.99] transition">
+        <button className="mt-2 bg-[#1A1A2E] text-white rounded-xl py-4 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#0B2F5C] active:scale-[0.99] transition">
           <UserPlus size={16} /> Create account
         </button>
       </form>
@@ -255,10 +255,10 @@ export function AccountPage() {
   };
   if (!user) return (
     <div className="mx-auto max-w-xl px-4 py-14 text-center">
-      <Package size={36} className="mx-auto text-[#E53E00]" />
+      <Package size={36} className="mx-auto text-[#0B2F5C]" />
       <h1 className="font-display font-bold text-3xl mt-4 text-[#1A1A2E]">Please log in</h1>
       <p className="text-[#6B7280] text-sm mt-2">Your account holds your details plus order history.</p>
-      <button onClick={() => nav("/login")} className="mt-5 bg-[#E53E00] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition">Go to login</button>
+      <button onClick={() => nav("/login")} className="mt-5 bg-[#0B2F5C] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition">Go to login</button>
     </div>
   );
   return (
@@ -269,7 +269,7 @@ export function AccountPage() {
         <p className="text-[#6B7280] text-sm mt-1">{user.email}</p>
         <p className="text-[#9CA3AF] text-[13px] mt-1">{user.company || "Independent buyer"} {user.phone ? ", " + user.phone : ""}</p>
         <button onClick={() => { logout(); nav("/"); }} className="mt-5 w-full rounded-xl border border-[#E5E7EB] py-3 text-sm font-bold text-[#6B7280] hover:border-red-400 hover:text-red-500 transition">Log out</button>
-        <Link to="/shop" className="mt-2 block text-center rounded-xl bg-[#E53E00] text-white py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">Continue shopping</Link>
+        <Link to="/shop" className="mt-2 block text-center rounded-xl bg-[#0B2F5C] text-white py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">Continue shopping</Link>
       </div>
       <div>
         <h1 className="font-display font-bold text-3xl text-[#1A1A2E]">Order history ({myOrders.length})</h1>
@@ -285,7 +285,7 @@ export function AccountPage() {
               <p className="text-[12px] text-[#9CA3AF] mt-1.5">
                 {new Date(o.placedAt).toLocaleString()} | {o.items.length} lines | {o.shipping} | {o.payment}
               </p>
-              <Link to={`/order-success/${o.id}`} className="mt-3 inline-block text-[13px] font-bold text-[#E53E00]">View receipt</Link>
+              <Link to={`/order-success/${o.id}`} className="mt-3 inline-block text-[13px] font-bold text-[#0B2F5C]">View receipt</Link>
               <button onClick={() => reorder(o)} className="mt-3 ml-4 inline-block text-[13px] font-bold text-[#1A1A2E] underline">Reorder these lines</button>
             </div>
           ))}

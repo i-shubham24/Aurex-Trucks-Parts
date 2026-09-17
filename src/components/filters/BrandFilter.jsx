@@ -36,7 +36,7 @@ export default function BrandFilter({ brands, selected, onChange, compact = fals
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search brands..."
-                className="w-full bg-[#F5F6F8] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#E53E00] transition"
+                className="w-full bg-[#F5F6F8] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#0B2F5C] transition"
               />
               {searchTerm && (
                 <button
@@ -56,8 +56,8 @@ export default function BrandFilter({ brands, selected, onChange, compact = fals
                 onClick={() => handleBrandClick(brand)}
                 className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold border transition ${
                   selected === brand
-                    ? "bg-[#E53E00] text-white border-[#E53E00]"
-                    : "border-[#E5E7EB] text-[#6B7280] hover:border-[#E53E00] hover:text-[#E53E00]"
+                    ? "bg-[#0B2F5C] text-white border-[#0B2F5C]"
+                    : "border-[#E5E7EB] text-[#6B7280] hover:border-[#0B2F5C] hover:text-[#0B2F5C]"
                 }`}
               >
                 {brand}

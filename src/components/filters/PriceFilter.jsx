@@ -49,7 +49,7 @@ export default function PriceFilter({ range = [0, 1600], onChange, min = 0, max 
             max={max}
             value={localRange[1]}
             onChange={handleSliderChange}
-            className="w-full accent-[#E53E00] h-2 bg-[#E5E7EB] rounded-lg appearance-none cursor-pointer"
+            className="w-full accent-[#0B2F5C] h-2 bg-[#E5E7EB] rounded-lg appearance-none cursor-pointer"
           />
           
           {!compact && (
@@ -62,7 +62,7 @@ export default function PriceFilter({ range = [0, 1600], onChange, min = 0, max 
                   onChange={(e) => handleMinChange(e.target.value)}
                   min={min}
                   max={max}
-                  className="mt-1 w-full bg-[#F5F6F8] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#E53E00] transition"
+                  className="mt-1 w-full bg-[#F5F6F8] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#0B2F5C] transition"
                 />
               </div>
               <div>
@@ -73,7 +73,7 @@ export default function PriceFilter({ range = [0, 1600], onChange, min = 0, max 
                   onChange={(e) => handleMaxChange(e.target.value)}
                   min={min}
                   max={max}
-                  className="mt-1 w-full bg-[#F5F6F8] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#E53E00] transition"
+                  className="mt-1 w-full bg-[#F5F6F8] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#0B2F5C] transition"
                 />
               </div>
             </div>

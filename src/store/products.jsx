@@ -2,13 +2,13 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { PRODUCTS as SEED } from "../data/catalog.js";
 import { deriveFitment } from "../data/fitment.js";
 
-const KEY = "aurex_products_v1";
+const KEY = "aurex_products_v4";
 const Ctx = createContext(null);
 
 // Older saved catalogues predate the fitment field, so backfill it from the product text.
 const withFitment = (p) => (p.fitment ? p : { ...p, fitment: deriveFitment(p) });
 
-const DKEY = "aurex_products_deleted_v1";
+const DKEY = "aurex_products_deleted_v4";
 const readDeleted = () => { try { const a = JSON.parse(localStorage.getItem(DKEY) || "[]"); return new Set(Array.isArray(a) ? a : []); } catch { return new Set(); } };
 
 const load = () => {
@@ -45,7 +45,7 @@ export function ProductsProvider({ children }) {
     const sku = (p.sku || "").trim().toUpperCase();
     if (!sku) return { ok: false, msg: "SKU is required." };
     if (products.some((x) => x.sku === sku)) return { ok: false, msg: "SKU already exists." };
-    const built = { ...p, sku, rating: Number(p.rating) || 4.5, reviews: Number(p.reviews) || 0, price: Number(p.price) || 0, oldPrice: p.oldPrice ? Number(p.oldPrice) : null };
+    const built = { ...p, sku, rating: Number(p.rating) || 4.5, reviews: Number(p.reviews) || 0, price: p.price === "" || p.price == null ? null : Number(p.price) || 0, oldPrice: p.oldPrice ? Number(p.oldPrice) : null };
     setProducts((list) => [{ ...built, fitment: deriveFitment(built) }, ...list]);
     return { ok: true };
   };

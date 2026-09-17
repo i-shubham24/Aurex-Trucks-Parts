@@ -15,9 +15,9 @@ export function CataloguePage() {
       <div className="max-w-3xl mx-auto px-4 mt-12">
         <div className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-[#E5E7EB] flex flex-col md:flex-row items-center gap-8">
           <div className="w-48 h-64 bg-[#F3F4F6] rounded-xl flex items-center justify-center border border-[#E5E7EB] flex-shrink-0 shadow-inner relative overflow-hidden">
-             <div className="absolute top-0 left-0 w-full h-1/2 bg-[#E53E00]/10"></div>
+             <div className="absolute top-0 left-0 w-full h-1/2 bg-[#0B2F5C]/10"></div>
              <div className="z-10 flex flex-col items-center">
-                <FileText size={48} className="text-[#E53E00] mb-2" />
+                <FileText size={48} className="text-[#0B2F5C] mb-2" />
                 <span className="font-display font-black text-[#1A1A2E] text-xl">AUREX</span>
                 <span className="text-xs font-bold text-[#6B7280] tracking-widest mt-1">CATALOGUE 2026</span>
              </div>
@@ -26,10 +26,10 @@ export function CataloguePage() {
           <div className="flex-1 text-center md:text-left">
             <h2 className="font-display font-bold text-2xl text-[#1A1A2E]">2026 Parts & Accessories Catalogue</h2>
             <p className="text-[#6B7280] mt-3">
-              Features over 200 of our most popular trailer and truck parts, including detailed specifications, load ratings, and technical drawings for axles and braking systems.
+              Covers all 36 approved lines across tail lifts, tool boxes, trailer parts, accessories, replacement parts and tools, including specifications, dimensions and materials.
             </p>
             <div className="flex flex-wrap gap-4 justify-center md:justify-start mt-6">
-              <a href="/Aurex_Catalogue_2026.pdf" download="Aurex_Catalogue_2026.pdf" className="bg-[#E53E00] text-white px-6 py-3.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-[#1A1A2E] transition">
+              <a href="/Aurex_Catalogue_2026.pdf" download="Aurex_Catalogue_2026.pdf" className="bg-[#0B2F5C] text-white px-6 py-3.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-[#1A1A2E] transition">
                 <Download size={18} /> Download PDF (12MB)
               </a>
             </div>

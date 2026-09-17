@@ -11,9 +11,9 @@ export default function FitmentBanner({ fitCount, onlyFits, setOnlyFits }) {
 
   if (!hasValidVehicle) {
     return (
-      <div className="relative bg-[#12121B] text-white p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4 border-l-4 border-[#E53E00]">
+      <div className="relative bg-[#12121B] text-white p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4 border-l-4 border-[#0B2F5C]">
         <div className="flex items-center gap-3 flex-1">
-          <span className="grid place-items-center w-10 h-10 bg-white/5 border border-white/10 text-[#FF6B35] shrink-0" style={NOTCH}>
+          <span className="grid place-items-center w-10 h-10 bg-white/5 border border-white/10 text-[#2F5E93] shrink-0" style={NOTCH}>
             <Truck size={18} />
           </span>
           <div>
@@ -27,7 +27,7 @@ export default function FitmentBanner({ fitCount, onlyFits, setOnlyFits }) {
   }
 
   return (
-    <div className="relative bg-[#E53E00] text-white p-4 sm:px-5 flex flex-col sm:flex-row sm:items-center gap-3 border-l-4 border-[#1A1A2E]">
+    <div className="relative bg-[#0B2F5C] text-white p-4 sm:px-5 flex flex-col sm:flex-row sm:items-center gap-3 border-l-4 border-[#1A1A2E]">
       <span className="grid place-items-center w-10 h-10 bg-black/15 shrink-0" style={NOTCH}>
         <Truck size={18} />
       </span>
@@ -41,7 +41,7 @@ export default function FitmentBanner({ fitCount, onlyFits, setOnlyFits }) {
       <button
         onClick={() => setOnlyFits(!onlyFits)}
         className={`flex items-center gap-2 px-3.5 py-2.5 text-[12px] font-black uppercase tracking-wide border-2 transition ${
-          onlyFits ? "bg-white text-[#E53E00] border-white" : "border-white/40 text-white hover:border-white"
+          onlyFits ? "bg-white text-[#0B2F5C] border-white" : "border-white/40 text-white hover:border-white"
         }`}
       >
         <Filter size={13} /> {onlyFits ? "Fit only: on" : "Fit only: off"}

@@ -39,7 +39,7 @@ export default function Breadcrumbs({ customItems = [] }) {
           ) : (
             <Link 
               to={item.path} 
-              className="hover:text-[#E53E00] transition flex items-center gap-1.5"
+              className="hover:text-[#0B2F5C] transition flex items-center gap-1.5"
             >
               {item.icon && <item.icon size={12} />}
               {item.label}

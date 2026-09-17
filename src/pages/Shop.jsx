@@ -12,6 +12,14 @@ import { useShop } from "../store/shop.jsx";
 import { useGarage } from "../components/garage/GarageContext.jsx";
 import FitmentBanner from "../components/garage/FitmentBanner.jsx";
 
+// Category names already contain their noun ("Trailer Parts", "Tail Lifts"),
+// so highlight the last word in silver instead of appending "parts." again.
+function CategoryTitle({ name }) {
+  const words = name.trim().split(/\s+/);
+  if (words.length < 2) return <>{name}<span className="text-[#C7CDD6]">.</span></>;
+  return <>{words.slice(0, -1).join(" ")} <span className="text-[#C7CDD6]">{words[words.length - 1]}.</span></>;
+}
+
 export default function Shop() {
   const { query, setQuery } = useShop();
   const { products: PRODUCTS } = useProducts();
@@ -43,7 +51,7 @@ export default function Shop() {
     return results.filter((p) => {
       const okCat = cat === "All" || p.cat === cat;
       const okBrand = brand === "All brands" || p.brand === brand;
-      const okP = p.price <= maxPrice;
+      const okP = p.price == null || p.price <= maxPrice;
       const okS = !inStock || p.stock.includes("In stock");
       return okCat && okBrand && okP && okS;
     });
@@ -59,8 +67,8 @@ export default function Shop() {
     let l = base;
     if (hasValidVehicle && onlyFits) l = l.filter((p) => ["fits", "universal"].includes(fitStatus(p)));
     const bySort = (a, b) => {
-      if (sort === "Low to High") return a.price - b.price;
-      if (sort === "High to Low") return b.price - a.price;
+      if (sort === "Low to High") return (a.price ?? Infinity) - (b.price ?? Infinity);
+      if (sort === "High to Low") return (b.price ?? -1) - (a.price ?? -1);
       if (sort === "Top Rated") return b.rating - a.rating;
       return 0;
     };
@@ -85,19 +93,19 @@ export default function Shop() {
         <div className="absolute inset-0 overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.div key={activeCat?.name || "all"} initial={{ opacity: 0, scale: 1.06 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="absolute inset-0">
-              <SafeImg src={activeCat?.image || HERO.dark} alt="" label="AUREX" className="w-full h-full object-cover opacity-25" wrapClass="w-full h-full" />
+              <SafeImg src={activeCat?.image || HERO.dark} alt="" label="AUREX" className="w-full h-full object-cover opacity-45" wrapClass="w-full h-full" />
             </motion.div>
           </AnimatePresence>
-          <div className="absolute inset-0 grid-scrim opacity-40" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#1A1A2E] via-[#1A1A2E]/85 to-[#1A1A2E]/45" />
-          <motion.div aria-hidden animate={{ x: [0, 36, 0], y: [0, -20, 0], opacity: [0.2, 0.35, 0.2] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }} className="absolute -right-24 -top-12 w-[420px] h-[420px] rounded-full bg-[#E53E00]/25 blur-[130px]" />
+          <div className="absolute inset-0 grid-scrim opacity-30" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#1A1A2E]/85 via-[#1A1A2E]/60 to-transparent" />
+          <motion.div aria-hidden animate={{ x: [0, 36, 0], y: [0, -20, 0], opacity: [0.12, 0.22, 0.12] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }} className="absolute -right-24 -top-12 w-[420px] h-[420px] rounded-full bg-[#0B2F5C]/15 blur-[130px]" />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-4 pt-8 pb-9 min-h-[380px] flex flex-col justify-center">
           <p className="text-[12px] font-semibold text-white/50">
-            <Link to="/" className="hover:text-[#FF6B35] transition">Home</Link>
+            <Link to="/" className="hover:text-[#2F5E93] transition">Home</Link>
             <span className="mx-1.5">/</span>
-            <Link to="/shop" className="hover:text-[#FF6B35] transition">Shop</Link>
+            <Link to="/shop" className="hover:text-[#2F5E93] transition">Shop</Link>
             {activeCat && <><span className="mx-1.5">/</span><span className="text-white/80">{activeCat.name}</span></>}
           </p>
           <div className="mt-4 flex flex-wrap items-start justify-between gap-6">
@@ -107,9 +115,9 @@ export default function Shop() {
                 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 className="min-w-0 max-w-2xl"
               >
-                <p className="text-[12px] font-black tracking-[0.22em] text-[#FF6B35] uppercase mb-2">{activeCat ? "System" : "Full catalogue"}</p>
+                <p className="text-[12px] font-black tracking-[0.22em] text-[#2F5E93] uppercase mb-2">{activeCat ? "System" : "Full catalogue"}</p>
                 <h1 className="font-display font-bold tracking-[-0.02em] text-[36px] sm:text-[54px] leading-[0.92]">
-                  {activeCat ? <>{activeCat.name} <span className="text-gradient">parts.</span></> : <>Shop truck <span className="text-gradient">parts.</span></>}
+                  {activeCat ? <CategoryTitle name={activeCat.name} /> : <>Shop truck <span className="text-[#C7CDD6]">parts.</span></>}
                 </h1>
                 <p className="text-white/60 text-[15px] mt-3 max-w-xl leading-relaxed">
                   {activeCat ? `${activeCat.blurb}. In stock in VIC and freighted Australia wide.` : "Filter by system, brand and price. Every card opens full specs plus OEM cross plus fitment."}
@@ -122,9 +130,9 @@ export default function Shop() {
                   </div>
                 )}
                 <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-[13px] font-semibold text-white/70">
-                  <span className="flex items-center gap-1.5"><ShieldCheck size={15} className="text-[#FF6B35]" /> ADR compliant range</span>
-                  <span className="flex items-center gap-1.5"><Truck size={15} className="text-[#FF6B35]" /> Same day dispatch from VIC</span>
-                  <span className="flex items-center gap-1.5"><RotateCcw size={15} className="text-[#FF6B35]" /> Free returns on fit errors</span>
+                  <span className="flex items-center gap-1.5"><ShieldCheck size={15} className="text-[#2F5E93]" /> ADR compliant range</span>
+                  <span className="flex items-center gap-1.5"><Truck size={15} className="text-[#2F5E93]" /> Same day dispatch from VIC</span>
+                  <span className="flex items-center gap-1.5"><RotateCcw size={15} className="text-[#2F5E93]" /> Free returns on fit errors</span>
                 </div>
               </motion.div>
             </AnimatePresence>
@@ -166,10 +174,10 @@ export default function Shop() {
           <div className="flex items-center justify-between">
             <p className="font-display font-bold text-lg text-[#1A1A2E]">Filters</p>
             <span className="flex items-center gap-3">
-              <button onClick={clearAll} className="text-[12px] font-semibold text-[#9CA3AF] hover:text-[#E53E00] transition">
+              <button onClick={clearAll} className="text-[12px] font-semibold text-[#9CA3AF] hover:text-[#0B2F5C] transition">
                 Clear all
               </button>
-              <button onClick={() => setFiltersOpen(!filtersOpen)} className="lg:hidden text-[12px] font-bold text-[#E53E00]">
+              <button onClick={() => setFiltersOpen(!filtersOpen)} className="lg:hidden text-[12px] font-bold text-[#0B2F5C]">
                 {filtersOpen ? "Hide ▲" : "Show ▼"}
               </button>
             </span>
@@ -184,7 +192,7 @@ export default function Shop() {
                 onClick={() => setCat(t)}
                 className={`clip-cut-sm flex justify-between items-center text-left px-3.5 py-2.5 text-[13px] font-semibold transition ${
                   cat === t
-                    ? "bg-[#E53E00] text-white"
+                    ? "bg-[#0B2F5C] text-white"
                     : "hover:bg-[#F7F8FA] text-[#6B7280]"
                 }`}
               >
@@ -202,8 +210,8 @@ export default function Shop() {
                 onClick={() => setBrand(b)}
                 className={`clip-cut-sm px-3 py-1.5 text-[12px] font-semibold border transition ${
                   brand === b
-                    ? "bg-[#E53E00] text-white border-[#E53E00]"
-                    : "border-[#E5E7EB] text-[#6B7280] hover:border-[#E53E00] hover:text-[#E53E00]"
+                    ? "bg-[#0B2F5C] text-white border-[#0B2F5C]"
+                    : "border-[#E5E7EB] text-[#6B7280] hover:border-[#0B2F5C] hover:text-[#0B2F5C]"
                 }`}
               >
                 {b}
@@ -234,7 +242,7 @@ export default function Shop() {
             {inStock ? "In stock VIC: ON" : "In stock VIC: OFF"}
           </button>
 
-          <div className="mt-5 rounded-xl bg-gradient-to-br from-[#E53E00] to-[#C23400] text-white p-4">
+          <div className="mt-5 rounded-xl bg-gradient-to-br from-[#0B2F5C] to-[#071E3C] text-white p-4">
             <p className="font-bold">Fleet top up?</p>
             <p className="text-[12px] font-medium mt-1 text-white/80">5 plus units unlocks extra pricing in the quote cart.</p>
           </div>
@@ -250,8 +258,8 @@ export default function Shop() {
           {list.length === 0 && (
             <div className="mt-6 rounded-2xl border border-dashed border-[#E5E7EB] p-12 text-center">
               <p className="font-display font-bold text-2xl text-[#1A1A2E]">No matches at these filters</p>
-              <p className="text-[#6B7280] text-sm mt-2">Try a shorter term like brake, LED or filter, or clear filters.</p>
-              <button onClick={clearAll} className="clip-cut mt-5 bg-[#E53E00] text-white px-6 py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">
+              <p className="text-[#6B7280] text-sm mt-2">Try a shorter term like hinge, lock or track, or clear filters.</p>
+              <button onClick={clearAll} className="clip-cut mt-5 bg-[#0B2F5C] text-white px-6 py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">
                 Clear all filters
               </button>
             </div>

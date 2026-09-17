@@ -25,7 +25,7 @@ const PRESETS = [
 const STOCKS = ["In stock VIC", "Low stock", "Built to order", "Out of stock"];
 const BADGES = ["New", "Best Seller", "Deal", "ADR", "Kit", "Fleet Pick", "Value", "Workshop", "Heavy Duty", "OEM Spec"];
 
-const empty = { sku: "", name: "", price: "", oldPrice: "", onSale: false, cat: "Braking", brand: "Aurex", badge: "New", fit: "", stock: "In stock VIC", oem: "", rating: 4.5, reviews: 0, desc: "", specs: "", image: "", preset: PRESETS[2][1], useCustom: false };
+const empty = { sku: "", name: "", price: "", oldPrice: "", onSale: false, cat: "Trailer Parts", brand: "Ganland", badge: "New", fit: "", stock: "In stock VIC", oem: "", rating: 4.5, reviews: 0, desc: "", specs: "", image: "", preset: PRESETS[2][1], useCustom: false };
 const inp = "rounded-xl px-4 py-3 bg-black/40 border border-white/10 outline-none text-sm w-full";
 const lab = "text-[11px] font-black tracking-widest text-white/35";
 
@@ -50,13 +50,13 @@ export default function AdminProducts() {
   const openEdit = (p) => {
     const isPreset = PRESETS.some(([, id]) => p.image && p.image.includes(id));
     const isLocal = Object.values(IMG_OVERRIDES).includes(p.image);
-    setForm({ ...empty, ...p, price: String(p.price), oldPrice: p.oldPrice ? String(p.oldPrice) : "", onSale: !!p.oldPrice, specs: (p.specs || []).join(", "), image: (isPreset || !p.image) ? "" : p.image, useCustom: !isPreset && !!(p.image || "") || isLocal, preset: PRESETS.find(([, id]) => p.image && p.image.includes(id))?.[1] || PRESETS[2][1] });
+    setForm({ ...empty, ...p, price: p.price == null ? "" : String(p.price), oldPrice: p.oldPrice ? String(p.oldPrice) : "", onSale: !!p.oldPrice, specs: (p.specs || []).join(", "), image: (isPreset || !p.image) ? "" : p.image, useCustom: !isPreset && !!(p.image || "") || isLocal, preset: PRESETS.find(([, id]) => p.image && p.image.includes(id))?.[1] || PRESETS[2][1] });
     setErr(""); setModal("edit");
   };
   const save = () => {
     const payload = {
       ...form,
-      price: Number(form.price) || 0,
+      price: form.price === "" || form.price == null ? null : Number(form.price) || 0,
       oldPrice: form.onSale && form.oldPrice ? Number(form.oldPrice) : null,
       rating: Math.min(5, Math.max(1, Number(form.rating) || 4.5)),
       reviews: Math.max(0, Number(form.reviews) || 0),
@@ -92,7 +92,7 @@ export default function AdminProducts() {
               <td className="px-2 py-3 font-bold text-[12px]">{p.sku}</td>
               <td className="px-4 py-3"><b className="block max-w-[300px] truncate">{p.name}</b><span className="text-[11px] text-white/35">{p.brand}, {p.reviews} rev</span></td>
               <td className="px-4 py-3 text-white/60 text-[13px]">{p.cat}</td>
-              <td className="px-4 py-3 font-bold">${p.price.toFixed(2)}{p.oldPrice && <span className="block text-[11px] line-through text-white/30 font-medium">${p.oldPrice.toFixed(2)}</span>}</td>
+              <td className="px-4 py-3 font-bold">${p.price == null ? "POA" : p.price.toFixed(2)}{p.oldPrice && <span className="block text-[11px] line-through text-white/30 font-medium">${p.oldPrice.toFixed(2)}</span>}</td>
               <td className="px-4 py-3"><span className="text-[11px] font-black bg-white/10 rounded-full px-2.5 py-1">{p.stock}</span></td>
               <td className="px-4 py-3"><span className="flex gap-1.5"><button onClick={() => openEdit(p)} className="p-2 border border-white/10 rounded-lg hover:border-[#d9ff3d]"><Pencil size={14} /></button><button onClick={() => { if (confirm(`Delete ${p.sku}?`)) deleteProduct(p.sku); }} className="p-2 border border-white/10 rounded-lg hover:border-red-400"><Trash2 size={14} /></button></span></td>
             </tr>))}
@@ -188,7 +188,7 @@ export default function AdminProducts() {
               </div>
 
               <p className={`${lab} mt-5 mb-1.5`}>SPECS (COMMA SEPARATED)</p>
-              <input value={form.specs} onChange={(e) => setForm({ ...form, specs: e.target.value })} placeholder="850kg rated, Australian made, 90mm clamp" className={`${inp}`} />
+              <input value={form.specs} onChange={(e) => setForm({ ...form, specs: e.target.value })} placeholder="27mm steel, 200L plus 200R" className={`${inp}`} />
               {err && <p className="mt-3 text-[13px] text-red-400 font-semibold">{err}</p>}
               <button onClick={save} className="mt-4 w-full bg-[#ff4d00] rounded-2xl py-3.5 text-sm font-black hover:bg-white hover:text-black transition">{modal === "new" ? "Add to catalogue" : "Save changes"}</button>
             </motion.div>

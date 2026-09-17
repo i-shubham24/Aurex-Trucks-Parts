@@ -21,7 +21,7 @@ export default function CartSummary({ compact = false, showCheckout = true }) {
         {showCheckout && (
           <Link
             to="/checkout"
-            className="bg-[#E53E00] text-white rounded-lg px-6 py-3 text-sm font-bold hover:bg-[#1A1A2E] transition flex items-center gap-2"
+            className="bg-[#0B2F5C] text-white rounded-lg px-6 py-3 text-sm font-bold hover:bg-[#1A1A2E] transition flex items-center gap-2"
           >
             Checkout <ArrowRight size={16} />
           </Link>
@@ -33,16 +33,16 @@ export default function CartSummary({ compact = false, showCheckout = true }) {
   return (
     <div className="space-y-4">
       {/* Free freight indicator */}
-      <div className={`rounded-xl p-4 ${qualifiesForFreeFreight ? "bg-[#10B981]/10 border border-[#10B981]/20" : "bg-[#FFF0EB] border border-[#E53E00]/20"}`}>
+      <div className={`rounded-xl p-4 ${qualifiesForFreeFreight ? "bg-[#10B981]/10 border border-[#10B981]/20" : "bg-[#E8EEF5] border border-[#0B2F5C]/20"}`}>
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${qualifiesForFreeFreight ? "bg-[#10B981]" : "bg-[#E53E00]"}`}>
+          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${qualifiesForFreeFreight ? "bg-[#10B981]" : "bg-[#0B2F5C]"}`}>
             <Truck size={18} className="text-white" />
           </div>
           <div className="flex-1">
             {qualifiesForFreeFreight ? (
               <p className="text-sm font-bold text-[#10B981]">You qualify for free shipping!</p>
             ) : (
-              <p className="text-sm font-bold text-[#E53E00]">
+              <p className="text-sm font-bold text-[#0B2F5C]">
                 Add ${remainingForFreeFreight.toFixed(2)} more for free shipping
               </p>
             )}
@@ -82,7 +82,7 @@ export default function CartSummary({ compact = false, showCheckout = true }) {
         ].map(([Icon, label]) => (
           <div key={label} className="flex flex-col items-center gap-1 text-center">
             <div className="w-8 h-8 rounded-lg bg-[#F5F6F8] flex items-center justify-center">
-              <Icon size={14} className="text-[#E53E00]" />
+              <Icon size={14} className="text-[#0B2F5C]" />
             </div>
             <span className="text-[10px] font-semibold text-[#6B7280]">{label}</span>
           </div>
@@ -93,7 +93,7 @@ export default function CartSummary({ compact = false, showCheckout = true }) {
       {showCheckout && (
         <Link
           to="/checkout"
-          className="w-full bg-[#E53E00] text-white rounded-xl py-4 text-sm font-bold hover:bg-[#1A1A2E] transition flex items-center justify-center gap-2"
+          className="w-full bg-[#0B2F5C] text-white rounded-xl py-4 text-sm font-bold hover:bg-[#1A1A2E] transition flex items-center justify-center gap-2"
         >
           Proceed to Checkout <ArrowRight size={16} />
         </Link>

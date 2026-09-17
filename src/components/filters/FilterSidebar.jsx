@@ -45,8 +45,8 @@ export default function FilterSidebar({
           onClick={() => setIsExpanded(!isExpanded)}
           className={`flex items-center gap-2 rounded-xl px-4 py-3 font-semibold transition ${
             hasActiveFilters 
-              ? "bg-[#E53E00] text-white" 
-              : "bg-[#F5F6F8] border border-[#E5E7EB] text-[#6B7280] hover:border-[#E53E00]"
+              ? "bg-[#0B2F5C] text-white" 
+              : "bg-[#F5F6F8] border border-[#E5E7EB] text-[#6B7280] hover:border-[#0B2F5C]"
           }`}
         >
           <SlidersHorizontal size={16} />
@@ -88,7 +88,7 @@ export default function FilterSidebar({
       <div className="flex items-center justify-between">
         <p className="font-display font-bold text-lg text-[#1A1A2E]">Filters</p>
         {hasActiveFilters && (
-          <button onClick={handleClearAll} className="text-[12px] font-semibold text-[#9CA3AF] hover:text-[#E53E00] transition">
+          <button onClick={handleClearAll} className="text-[12px] font-semibold text-[#9CA3AF] hover:text-[#0B2F5C] transition">
             Clear all
           </button>
         )}
@@ -150,7 +150,7 @@ function FilterContent({
         onChange={onStockChange}
       />
 
-      <div className="rounded-xl bg-gradient-to-br from-[#E53E00] to-[#C23400] text-white p-4">
+      <div className="rounded-xl bg-gradient-to-br from-[#0B2F5C] to-[#071E3C] text-white p-4">
         <p className="font-bold">Fleet top up?</p>
         <p className="text-[12px] font-medium mt-1 text-white/80">5 plus units unlocks extra pricing in the quote cart.</p>
       </div>

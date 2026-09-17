@@ -15,7 +15,7 @@ export default function SearchBar({ placeholder = "Search parts, SKU, or brand..
 
   return (
     <div 
-      className={`flex items-center bg-[#F5F6F8] border border-[#E5E7EB] rounded-xl ${compact ? 'px-3 py-2' : 'pl-4 pr-1.5 py-1.5'} focus-within:border-[#E53E00] focus-within:bg-white transition`}
+      className={`flex items-center bg-[#F5F6F8] border border-[#E5E7EB] rounded-xl ${compact ? 'px-3 py-2' : 'pl-4 pr-1.5 py-1.5'} focus-within:border-[#0B2F5C] focus-within:bg-white transition`}
     >
       <Search size={compact ? 14 : 16} className="text-[#9CA3AF]" />
       <input
@@ -44,7 +44,7 @@ export default function SearchBar({ placeholder = "Search parts, SKU, or brand..
       {!compact && (
         <button 
           onClick={handleSearch}
-          className="bg-[#E53E00] text-white rounded-lg w-9 h-9 grid place-items-center hover:bg-[#1A1A2E] active:scale-95 transition ml-1"
+          className="bg-[#0B2F5C] text-white rounded-lg w-9 h-9 grid place-items-center hover:bg-[#1A1A2E] active:scale-95 transition ml-1"
           aria-label="search"
         >
           <Search size={15} />

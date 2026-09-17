@@ -91,7 +91,7 @@ export default function AdminLayout() {
     return (
       <div className="min-h-screen bg-[#06080b] flex items-center justify-center p-4 relative overflow-hidden">
         <div className="absolute inset-0 grid-scrim opacity-20" />
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#E53E00]/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#0B2F5C]/10 to-transparent" />
         <div className="absolute -left-1/4 -top-1/4 w-[150%] h-[150%] blur-3xl opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#ff4d00]/20 via-[#06080b]/0 to-transparent pointer-events-none" />
         
         <div className="w-full max-w-[420px] relative z-10">
@@ -200,7 +200,7 @@ export default function AdminLayout() {
                     <div className="flex gap-3">
                       <div className="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0"><AlertTriangle size={14} /></div>
                       <div>
-                        <p className="text-[13px] text-white/90">Stock alert: <b>Bendix Brake Pads</b> running low.</p>
+                        <p className="text-[13px] text-white/90">Stock alert: <b>Steel Hinges GL-13112</b> running low.</p>
                         <p className="text-[11px] text-white/40 mt-0.5">1 hour ago</p>
                       </div>
                     </div>
@@ -273,7 +273,7 @@ function CommandPalette() {
 
   const results = q.length > 1 ? [
     { type: 'Page', title: 'Product Settings', url: '/admin/settings', icon: Settings },
-    { type: 'Product', title: 'Bendix Brake Pads (BNDX-100)', url: '/admin/products', icon: Boxes },
+    { type: 'Product', title: 'Steel Hinges (GL-13112)', url: '/admin/products', icon: Boxes },
     { type: 'Customer', title: 'Westside Freight (westside@gmail.com)', url: '/admin/customers', icon: Users },
     { type: 'Order', title: '#AUX-9021', url: '/admin/orders', icon: ShoppingCart },
   ].filter(r => r.title.toLowerCase().includes(q.toLowerCase()) || r.type.toLowerCase().includes(q.toLowerCase())) : [];

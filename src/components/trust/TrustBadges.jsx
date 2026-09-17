@@ -26,7 +26,7 @@ export default function TrustBadges({ compact = false, darkTheme = false }) {
     <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6`}>
       {displayBadges.map(([Icon, title, description], index) => (
         <div key={index} className="flex items-start gap-3">
-          <span className={`grid place-items-center w-11 h-11 rounded-xl ${darkTheme ? 'bg-white/20' : 'bg-white border border-[#E5E7EB]'} text-[#E53E00] shrink-0 shadow-sm`}>
+          <span className={`grid place-items-center w-11 h-11 rounded-xl ${darkTheme ? 'bg-white/20' : 'bg-white border border-[#E5E7EB]'} text-[#0B2F5C] shrink-0 shadow-sm`}>
             <Icon size={20} />
           </span>
           <div>

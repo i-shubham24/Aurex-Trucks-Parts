@@ -26,7 +26,7 @@ export default function CategoryFilter({ categories, selected, onChange, compact
               onClick={() => handleCategoryClick(categoryName)}
               className={`flex justify-between items-center text-left rounded-xl px-3.5 py-2.5 text-[13px] font-semibold transition ${
                 selected === categoryName
-                  ? "bg-[#E53E00] text-white"
+                  ? "bg-[#0B2F5C] text-white"
                   : "hover:bg-[#F7F8FA] text-[#6B7280]"
               }`}
             >

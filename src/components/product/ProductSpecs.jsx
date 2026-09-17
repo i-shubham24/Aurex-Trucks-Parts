@@ -30,7 +30,7 @@ export default function ProductSpecs({ product }) {
             onClick={() => setActiveTab(tab.id)}
             className={`flex-1 py-4 text-sm font-bold transition border-b-2 flex items-center justify-center gap-2 ${
               activeTab === tab.id
-                ? "border-[#E53E00] text-[#E53E00] bg-[#FFF8F5]"
+                ? "border-[#0B2F5C] text-[#0B2F5C] bg-[#FFF8F5]"
                 : "border-transparent text-[#6B7280] hover:text-[#1A1A2E]"
             }`}
           >
@@ -77,12 +77,12 @@ export default function ProductSpecs({ product }) {
                   <p className="text-[#1A1A2E] font-medium mb-4">{product.fit}</p>
                   <div className="bg-[#F7F8FA] border border-[#E5E7EB] rounded-xl p-4">
                     <div className="flex items-start gap-3">
-                      <Package size={20} className="text-[#E53E00] mt-0.5" />
+                      <Package size={20} className="text-[#0B2F5C] mt-0.5" />
                       <div>
                         <p className="text-[#1A1A2E] font-semibold mb-1">Vehicle Compatibility</p>
                         <p className="text-sm">
                           For mixed fleets, add your make and year in the Quote page notes and we cross check OEM{" "}
-                          <span className="font-mono bg-[#E5E7EB] px-1.5 py-0.5 rounded text-[#E53E00]">{product?.oem || "N/A"}</span> before you pay.
+                          <span className="font-mono bg-[#E5E7EB] px-1.5 py-0.5 rounded text-[#0B2F5C]">{product?.oem || "N/A"}</span> before you pay.
                         </p>
                       </div>
                     </div>
@@ -111,7 +111,7 @@ export default function ProductSpecs({ product }) {
             <div>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <Truck size={20} className="text-[#E53E00] mt-0.5" />
+                  <Truck size={20} className="text-[#0B2F5C] mt-0.5" />
                   <div>
                     <p className="text-[#1A1A2E] font-semibold mb-1">Shipping Timeline</p>
                     <p className="text-sm">
@@ -131,7 +131,7 @@ export default function ProductSpecs({ product }) {
                 </div>
 
                 <div className="flex items-start gap-3">
-                  <Package size={20} className="text-[#E53E00] mt-0.5" />
+                  <Package size={20} className="text-[#0B2F5C] mt-0.5" />
                   <div>
                     <p className="text-[#1A1A2E] font-semibold mb-1">Heavy Freight</p>
                     <p className="text-sm">

@@ -94,9 +94,9 @@ export default function CompareDrawer({ open, onClose }) {
                         </button>
                       </div>
                       <div className="p-4">
-                        <p className="text-xs font-bold text-[#E53E00] uppercase">{product.cat}</p>
+                        <p className="text-xs font-bold text-[#0B2F5C] uppercase">{product.cat}</p>
                         <p className="font-semibold text-sm text-[#1A1A2E] mt-1 line-clamp-2">{product.name}</p>
-                        <p className="font-display font-bold text-lg text-[#1A1A2E] mt-2">${product.price.toFixed(2)}</p>
+                        <p className="font-display font-bold text-lg text-[#1A1A2E] mt-2">{product.price == null ? "Enquire for price" : `$${product.price.toFixed(2)}`}</p>
                         <div className="mt-3 space-y-2">
                           <div className="flex justify-between text-xs">
                             <span className="text-[#6B7280]">SKU:</span>
@@ -124,7 +124,7 @@ export default function CompareDrawer({ open, onClose }) {
               <div className="p-5 border-t border-[#E5E7EB] bg-[#F7F8FA]">
                 <button
                   onClick={onClose}
-                  className="w-full bg-[#E53E00] text-white rounded-xl py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition flex items-center justify-center gap-2"
+                  className="w-full bg-[#0B2F5C] text-white rounded-xl py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition flex items-center justify-center gap-2"
                 >
                   Continue Shopping <ArrowRight size={16} />
                 </button>

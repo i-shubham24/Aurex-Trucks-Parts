@@ -4,20 +4,10 @@ import { Link } from "react-router-dom";
 // Distinct typographic lockups so the wall reads as logos, not a text list.
 // These are stylised wordmarks, not reproductions of any registered logo.
 const BRANDS = [
-  { name: "BENDIX", ff: "var(--font-display)", w: 900, it: true, ls: "-0.04em", color: "#C2181B" },
-  { name: "narva", ff: "var(--font-display)", w: 800, ls: "-0.02em", color: "#0A3D91", lower: true },
-  { name: "BOSCH", ff: "var(--font-body)", w: 700, ls: "0.14em", color: "#E2001A" },
-  { name: "KOYO", ff: "var(--font-display)", w: 800, ls: "0.02em", color: "#0057A8" },
-  { name: "DONALDSON", ff: "var(--font-body)", w: 800, ls: "-0.01em", color: "#0F5AA5" },
-  { name: "WABCO", ff: "var(--font-display)", w: 900, ls: "0.04em", color: "#1A1A2E" },
-  { name: "KYB", ff: "var(--font-display)", w: 900, it: true, ls: "0em", color: "#E0001B" },
-  { name: "Exedy", ff: "var(--font-display)", w: 800, it: true, ls: "-0.02em", color: "#C8102E" },
-  { name: "FLEETGUARD", ff: "var(--font-body)", w: 800, ls: "-0.02em", color: "#D4380D" },
-  { name: "Century", ff: "var(--font-display)", w: 700, ls: "0.02em", color: "#0A7D34" },
-  { name: "HENDRICKSON", ff: "var(--font-body)", w: 800, ls: "-0.02em", color: "#00529B" },
-  { name: "GATES", ff: "var(--font-display)", w: 900, ls: "0.06em", color: "#111827" },
-  { name: "SAKURA", ff: "var(--font-display)", w: 800, ls: "0.08em", color: "#C2181B" },
-  { name: "MERITOR", ff: "var(--font-body)", w: 800, ls: "0.02em", color: "#004A98" },
+  { name: "BEAUWAY", ff: "var(--font-display)", w: 900, ls: "0.02em", color: "#0B2F5C" },
+  { name: "GANLAND", ff: "var(--font-display)", w: 900, ls: "0.02em", color: "#1A1A2E" },
+  { name: "CAIYUAN", ff: "var(--font-display)", w: 800, ls: "0.04em", color: "#2F5E93" },
+  { name: "AUREX", ff: "var(--font-display)", w: 900, it: true, ls: "-0.02em", color: "#0B2F5C" },
 ];
 
 function Mark({ b }) {
@@ -43,7 +33,7 @@ function Mark({ b }) {
 export default function BrandWall() {
   return (
     <div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-px bg-[#E5E7EB] border border-[#E5E7EB]">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-[#E5E7EB] border border-[#E5E7EB]">
         {BRANDS.map((b, i) => (
           <motion.div
             key={b.name}

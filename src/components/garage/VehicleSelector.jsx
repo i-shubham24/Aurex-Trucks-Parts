@@ -27,9 +27,9 @@ export default function VehicleSelector({ compact = false }) {
       <div className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 bg-[#F5F6F8] border border-[#E5E7EB] rounded-lg px-3 py-2 hover:border-[#E53E00] transition"
+          className="flex items-center gap-2 bg-[#F5F6F8] border border-[#E5E7EB] rounded-lg px-3 py-2 hover:border-[#0B2F5C] transition"
         >
-          <Car size={16} className="text-[#E53E00]" />
+          <Car size={16} className="text-[#0B2F5C]" />
           <span className="text-sm font-semibold text-[#1A1A2E]">
             {selectedVehicle 
               ? `${selectedVehicle.year} ${selectedVehicle.make} ${selectedVehicle.model}`
@@ -52,7 +52,7 @@ export default function VehicleSelector({ compact = false }) {
                   <p className="text-sm text-[#6B7280]">No vehicles saved</p>
                   <button
                     onClick={handleAddNewVehicle}
-                    className="mt-2 text-sm font-semibold text-[#E53E00] hover:text-[#C23400] flex items-center gap-1 mx-auto"
+                    className="mt-2 text-sm font-semibold text-[#0B2F5C] hover:text-[#071E3C] flex items-center gap-1 mx-auto"
                   >
                     <Plus size={14} /> Add Vehicle
                   </button>
@@ -83,7 +83,7 @@ export default function VehicleSelector({ compact = false }) {
                   ))}
                   <button
                     onClick={handleAddNewVehicle}
-                    className="w-full px-4 py-3 flex items-center gap-2 text-sm font-semibold text-[#E53E00] hover:bg-[#FFF0EB] transition border-t border-[#E5E7EB]"
+                    className="w-full px-4 py-3 flex items-center gap-2 text-sm font-semibold text-[#0B2F5C] hover:bg-[#E8EEF5] transition border-t border-[#E5E7EB]"
                   >
                     <Plus size={14} /> Add New Vehicle
                   </button>
@@ -102,7 +102,7 @@ export default function VehicleSelector({ compact = false }) {
         <h3 className="font-bold text-sm text-[#1A1A2E]">My Vehicles</h3>
         <button
           onClick={handleAddNewVehicle}
-          className="text-sm font-semibold text-[#E53E00] hover:text-[#C23400] flex items-center gap-1"
+          className="text-sm font-semibold text-[#0B2F5C] hover:text-[#071E3C] flex items-center gap-1"
         >
           <Plus size={14} /> Add New
         </button>
@@ -122,7 +122,7 @@ export default function VehicleSelector({ compact = false }) {
               className={`p-3 rounded-lg border transition ${
                 vehicle.id === selectedVehicleId
                   ? "border-[#10B981] bg-[#10B981]/5"
-                  : "border-[#E5E7EB] hover:border-[#E53E00]"
+                  : "border-[#E5E7EB] hover:border-[#0B2F5C]"
               }`}
             >
               <div className="flex items-center justify-between">

@@ -48,7 +48,7 @@ function Reviews({ sku }) {
         <input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="Name or workshop" className="mt-3 w-full rounded-xl px-4 py-3 text-sm bg-[#F7F8FA] border border-[#E5E7EB] outline-none" />
         <select value={f.rating} onChange={(e) => setF({ ...f, rating: e.target.value })} className="mt-2.5 w-full rounded-xl px-4 py-3 text-sm bg-[#F7F8FA] border border-[#E5E7EB] outline-none">{[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{n} stars</option>)}</select>
         <textarea required value={f.text} onChange={(e) => setF({ ...f, text: e.target.value })} rows={4} placeholder="How did it fit and perform?" className="mt-2.5 w-full rounded-xl px-4 py-3 text-sm bg-[#F7F8FA] border border-[#E5E7EB] outline-none" />
-        <button className="mt-3 w-full bg-[#1A1A2E] text-white rounded-xl py-3.5 text-sm font-bold hover:bg-[#E53E00] transition">Submit review</button>
+        <button className="mt-3 w-full bg-[#1A1A2E] text-white rounded-xl py-3.5 text-sm font-bold hover:bg-[#0B2F5C] transition">Submit review</button>
       </form>
     </div>
   );
@@ -67,16 +67,13 @@ export default function ProductDetail() {
   const [vinOk, setVinOk] = useState(null);
   const [activeImg, setActiveImg] = useState(0);
 
-  const gallery = useMemo(() => {
-    if (!p) return [];
-    const others = PRODUCTS.filter((x) => x.cat === p.cat && x.sku !== p.sku).map((x) => x.image);
-    return [p.image, ...others].filter(Boolean).slice(0, 4);
-  }, [p]);
+  const gallery = useMemo(() => (p?.image ? [p.image] : []), [p]);
+  useEffect(() => { setActiveImg(0); }, [sku]);
 
   if (!p) return (
     <div className="mx-auto max-w-7xl px-4 py-16">
       <p className="text-[#1A1A2E]">Product not found.</p>
-      <Link to="/shop" className="underline text-[#E53E00]">Back to shop</Link>
+      <Link to="/shop" className="underline text-[#0B2F5C]">Back to shop</Link>
     </div>
   );
 
@@ -110,9 +107,9 @@ export default function ProductDetail() {
       <div className="bg-[#F7F8FA] border-b border-[#E5E7EB]">
         <div className="mx-auto max-w-7xl px-4 py-4">
           <p className="text-[12px] text-[#9CA3AF] font-semibold flex items-center gap-1.5">
-            <Link to="/" className="hover:text-[#E53E00] transition">Home</Link>
+            <Link to="/" className="hover:text-[#0B2F5C] transition">Home</Link>
             <ChevronRight size={12} />
-            <Link to="/shop" className="hover:text-[#E53E00] transition">Shop</Link>
+            <Link to="/shop" className="hover:text-[#0B2F5C] transition">Shop</Link>
             <ChevronRight size={12} />
             <span className="text-[#1A1A2E]">{p.sku}</span>
           </p>
@@ -131,7 +128,7 @@ export default function ProductDetail() {
                   </motion.div>
                 </AnimatePresence>
                 {discount && (
-                  <span className="absolute top-4 left-4 z-10 bg-[#E53E00] text-white text-[12px] font-black px-3 py-1.5 rounded-lg shadow-primary">-{discount}%</span>
+                  <span className="absolute top-4 left-4 z-10 bg-[#0B2F5C] text-white text-[12px] font-black px-3 py-1.5 rounded-lg shadow-primary">-{discount}%</span>
                 )}
                 <span className={`absolute top-4 right-4 z-10 text-[12px] font-bold px-3 py-1.5 rounded-lg ${inStock ? "bg-[#10B981] text-white" : "bg-white text-[#6B7280] border border-[#E5E7EB]"}`}>{p.stock}</span>
               </div>
@@ -139,7 +136,7 @@ export default function ProductDetail() {
             {gallery.length > 1 && (
               <div className="mt-3 grid grid-cols-4 gap-3">
                 {gallery.map((g, i) => (
-                  <button key={i} onClick={() => setActiveImg(i)} className={`rounded-xl overflow-hidden border-2 transition aspect-square ${activeImg === i ? "border-[#E53E00]" : "border-[#E5E7EB] hover:border-[#9CA3AF]"}`}>
+                  <button key={i} onClick={() => setActiveImg(i)} className={`rounded-xl overflow-hidden border-2 transition aspect-square ${activeImg === i ? "border-[#0B2F5C]" : "border-[#E5E7EB] hover:border-[#9CA3AF]"}`}>
                     <SafeImg src={g} alt="" label={p.sku} className="w-full h-full object-cover" wrapClass="w-full h-full" />
                   </button>
                 ))}
@@ -157,21 +154,25 @@ export default function ProductDetail() {
 
           {/* Info */}
           <Reveal dir="right">
-            <p className="text-[12px] font-bold tracking-[0.2em] text-[#E53E00] uppercase">{p.cat}</p>
+            <p className="text-[12px] font-bold tracking-[0.2em] text-[#0B2F5C] uppercase">{p.cat}</p>
             <h1 className="font-display font-bold tracking-[-0.02em] text-[28px] sm:text-[38px] leading-[1.05] mt-2 text-[#1A1A2E]">{p.name}</h1>
             <div className="flex items-center gap-2 mt-3 text-sm flex-wrap">
               <Stars rating={p.rating} reviews={null} size={15} />
               <span className="text-[#9CA3AF]">({p.reviews} verified reviews)</span>
-              <span className="ml-1 text-[11px] font-bold bg-[#FFF0EB] text-[#E53E00] rounded-lg px-3 py-1">FREE FREIGHT OVER $500</span>
+              <span className="ml-1 text-[11px] font-bold bg-[#E8EEF5] text-[#0B2F5C] rounded-lg px-3 py-1">FREE FREIGHT OVER $500</span>
             </div>
             <p className="mt-4 text-[#6B7280] leading-relaxed text-[15px]">{p.desc}</p>
 
             <div className="mt-5 flex items-end gap-4">
+              {p.price == null ? (
+                <p className="font-display font-bold text-[32px] text-[#0B2F5C]">Enquire for price</p>
+              ) : (
               <p className="font-display font-bold text-[40px] text-[#1A1A2E]">${p.price.toFixed(2)}</p>
+              )}
               {p.oldPrice && (
                 <p className="mb-2">
                   <span className="line-through text-[#9CA3AF]">${p.oldPrice.toFixed(2)}</span>
-                  <span className="ml-2 text-[12px] font-bold bg-[#E53E00] text-white rounded-lg px-2.5 py-1">SAVE ${(p.oldPrice - p.price).toFixed(0)}</span>
+                  <span className="ml-2 text-[12px] font-bold bg-[#0B2F5C] text-white rounded-lg px-2.5 py-1">SAVE ${(p.oldPrice - p.price).toFixed(0)}</span>
                 </p>
               )}
             </div>
@@ -189,7 +190,7 @@ export default function ProductDetail() {
               )}
               {fit === "universal" && (
                 <div style={cut} className="bg-[#12121B] text-white p-4 flex items-center gap-3">
-                  <Truck size={22} className="text-[#FF6B35] shrink-0" />
+                  <Truck size={22} className="text-[#2F5E93] shrink-0" />
                   <div>
                     <p className="font-display font-bold text-[15px]">Universal fit</p>
                     <p className="text-white/60 text-[13px]">Cross make part. Works with your {selectedVehicle.make} and most trucks and trailers.</p>
@@ -206,8 +207,8 @@ export default function ProductDetail() {
                 </div>
               )}
               {!hasValidVehicle && (
-                <div className="bg-[#F7F8FA] border border-[#E5E7EB] border-l-4 border-l-[#E53E00] p-4 flex flex-wrap items-center gap-3">
-                  <Truck size={20} className="text-[#E53E00] shrink-0" />
+                <div className="bg-[#F7F8FA] border border-[#E5E7EB] border-l-4 border-l-[#0B2F5C] p-4 flex flex-wrap items-center gap-3">
+                  <Truck size={20} className="text-[#0B2F5C] shrink-0" />
                   <div className="flex-1 min-w-[180px]">
                     <p className="font-bold text-[#1A1A2E] text-[15px]">Add your truck to confirm fit</p>
                     <p className="text-[#6B7280] text-[13px]">We check OEM {p.oem} against your make before dispatch.</p>
@@ -219,11 +220,11 @@ export default function ProductDetail() {
 
             <div className="mt-4 rounded-xl border border-[#E5E7EB] bg-[#F7F8FA] p-4">
               <p className="text-[12px] font-bold tracking-widest text-[#9CA3AF] flex items-center gap-1.5 uppercase">
-                <ScanLine size={14} className="text-[#E53E00]" /> Check Fitment by VIN
+                <ScanLine size={14} className="text-[#0B2F5C]" /> Check Fitment by VIN
               </p>
               <div className="mt-2.5 flex gap-2">
-                <input value={vin} onChange={(e) => setVin(e.target.value)} placeholder="Enter VIN, 17 characters" className="flex-1 rounded-lg px-4 py-3 bg-white border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#E53E00] transition" />
-                <button onClick={() => setVinOk(vin.trim().length >= 6)} className="clip-cut bg-[#E53E00] text-white px-5 py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">Check</button>
+                <input value={vin} onChange={(e) => setVin(e.target.value)} placeholder="Enter VIN, 17 characters" className="flex-1 rounded-lg px-4 py-3 bg-white border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#0B2F5C] transition" />
+                <button onClick={() => setVinOk(vin.trim().length >= 6)} className="clip-cut bg-[#0B2F5C] text-white px-5 py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">Check</button>
               </div>
               {vinOk === true && (
                 <p className="mt-2 text-[13px] text-[#10B981] font-semibold flex items-center gap-1.5">
@@ -235,23 +236,29 @@ export default function ProductDetail() {
 
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <span className="flex items-center gap-2 bg-[#F7F8FA] border border-[#E5E7EB] rounded-lg px-2 py-1.5">
-                <button onClick={() => setQty(Math.max(1, qty - 1))} className="w-10 h-10 grid place-items-center rounded-lg border border-[#E5E7EB] hover:border-[#E53E00] transition text-[#6B7280]"><Minus size={15} /></button>
+                <button onClick={() => setQty(Math.max(1, qty - 1))} className="w-10 h-10 grid place-items-center rounded-lg border border-[#E5E7EB] hover:border-[#0B2F5C] transition text-[#6B7280]"><Minus size={15} /></button>
                 <b className="w-8 text-center font-display text-lg text-[#1A1A2E]">{qty}</b>
-                <button onClick={() => setQty(qty + 1)} className="w-10 h-10 grid place-items-center rounded-lg border border-[#E5E7EB] hover:border-[#E53E00] transition text-[#6B7280]"><Plus size={15} /></button>
+                <button onClick={() => setQty(qty + 1)} className="w-10 h-10 grid place-items-center rounded-lg border border-[#E5E7EB] hover:border-[#0B2F5C] transition text-[#6B7280]"><Plus size={15} /></button>
               </span>
-              <button onClick={() => add(p.sku, qty)} className="clip-cut flex-1 min-w-[220px] bg-[#E53E00] py-4 text-sm font-bold hover:bg-[#1A1A2E] active:scale-[0.99] transition flex items-center justify-center gap-2 text-white shadow-primary">
+              {p.price == null ? (
+                <button onClick={() => setEnquirySku(p.sku)} className="clip-cut flex-1 min-w-[220px] bg-[#1A1A2E] py-4 text-sm font-bold hover:bg-[#0B2F5C] active:scale-[0.99] transition flex items-center justify-center gap-2 text-white shadow-primary">
+                  Enquire on this SKU
+                </button>
+              ) : (
+              <button onClick={() => add(p.sku, qty)} className="clip-cut flex-1 min-w-[220px] bg-[#0B2F5C] py-4 text-sm font-bold hover:bg-[#1A1A2E] active:scale-[0.99] transition flex items-center justify-center gap-2 text-white shadow-primary">
                 <ShoppingCart size={16} /> Add {qty} to quote cart
               </button>
+              )}
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
               <button onClick={() => toggleCompare(p.sku)} className={`flex-1 min-w-[150px] py-3 text-[13px] font-bold rounded-lg border transition ${compare.includes(p.sku) ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#1A1A2E] hover:text-[#1A1A2E]"}`}>{compare.includes(p.sku) ? "Added to compare" : "Add to compare"}</button>
-              <button onClick={() => setEnquirySku(p.sku)} className="flex-1 min-w-[150px] py-3 text-[13px] font-bold rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:border-[#E53E00] hover:text-[#E53E00] transition">Enquire on this SKU</button>
+              <button onClick={() => setEnquirySku(p.sku)} className="flex-1 min-w-[150px] py-3 text-[13px] font-bold rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:border-[#0B2F5C] hover:text-[#0B2F5C] transition">Enquire on this SKU</button>
             </div>
 
             <div className="mt-4 grid grid-cols-3 gap-2.5 text-[12px]">
               {[[ShieldCheck, "ADR checked"], [Truck, "1 to 2 day dispatch"], [RotateCcw, "Easy returns"]].map(([Icon, t]) => (
                 <span key={t} className="flex items-center gap-2 bg-[#F7F8FA] border border-[#E5E7EB] rounded-xl px-3 py-2.5 font-semibold text-[#6B7280]">
-                  <Icon size={15} className="text-[#E53E00]" />{t}
+                  <Icon size={15} className="text-[#0B2F5C]" />{t}
                 </span>
               ))}
             </div>
@@ -263,7 +270,7 @@ export default function ProductDetail() {
           <div className="rounded-2xl border border-[#E5E7EB] bg-white overflow-hidden">
             <div className="flex border-b border-[#E5E7EB]">
               {["Specs", "Fitment", "Freight"].map((t) => (
-                <button key={t} onClick={() => setTab(t)} className={`flex-1 py-4 text-sm font-bold transition border-b-2 ${tab === t ? "border-[#E53E00] text-[#E53E00] bg-[#FFF8F5]" : "border-transparent text-[#6B7280] hover:text-[#1A1A2E]"}`}>
+                <button key={t} onClick={() => setTab(t)} className={`flex-1 py-4 text-sm font-bold transition border-b-2 ${tab === t ? "border-[#0B2F5C] text-[#0B2F5C] bg-[#FFF8F5]" : "border-transparent text-[#6B7280] hover:text-[#1A1A2E]"}`}>
                   {t}
                 </button>
               ))}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, Minus, Plus, Send, ArrowRight, MapPin, ArrowUp, Mail, Phone, X } from "lucide-react";
@@ -10,6 +10,26 @@ import { ShopWidgets } from "./shopwise.jsx";
 import EmailPopup from "./EmailPopup.jsx";
 import Header from "./layout/Header.jsx";
 import MobileDrawer from "./navigation/MobileDrawer.jsx";
+import { GearsOverlay } from "./GearsLoader.jsx";
+
+const ROUTE_GEAR_MS = 2000;
+
+// Transparent centred gears on top of the page for every route change.
+function RouteGears() {
+  const { pathname, search } = useLocation();
+  const first = useRef(true);
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    if (first.current) { first.current = false; return; }
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    if (pathname.startsWith("/admin")) return;
+    setShow(true);
+    const t = setTimeout(() => setShow(false), ROUTE_GEAR_MS);
+    return () => clearTimeout(t);
+  }, [pathname, search]);
+  if (!show) return null;
+  return <GearsOverlay />;
+}
 
 function ScrollManager() {
   const { pathname, search } = useLocation();
@@ -57,6 +77,7 @@ export default function Layout({ children }) {
     <div className="min-h-screen bg-white text-[#12151C] antialiased overflow-x-clip flex flex-col" style={{ fontFamily: "Inter" }}>
       <ScrollProgress />
       <ScrollManager />
+      <RouteGears />
 
       <Header onOpenMobile={() => setMobile(true)} />
 
@@ -74,15 +95,24 @@ export default function Layout({ children }) {
       <section className="bg-[#181C26] border-y border-white/10 print:hidden">
         <div className="mx-auto max-w-7xl px-4 py-8 flex flex-wrap items-center gap-6 justify-between">
           <div className="flex items-center gap-4">
+<<<<<<< HEAD
             <span className="grid place-items-center w-12 h-12 rounded-xl bg-gradient-to-r from-[#EE6724] to-[#DE5718] text-white shrink-0 shadow-copper"><Mail size={22} /></span>
+=======
+            <span className="grid place-items-center w-12 h-12 rounded-xl bg-[#0B2F5C] text-white shrink-0"><Mail size={22} /></span>
+>>>>>>> b1fa46e (feat: rebuild to 36-line approved catalogue with navy theme, Sunrise pricing and gears loader)
             <div>
               <p className="font-display font-bold text-xl text-white">Get fleet pricing and new arrivals</p>
               <p className="text-white/55 text-[13px] mt-0.5">Join the trade list. No spam, unsubscribe anytime.</p>
             </div>
           </div>
           <form onSubmit={(e) => { e.preventDefault(); alert("Thanks. You are on the trade list."); }} className="flex gap-2 flex-1 min-w-[280px] max-w-md">
+<<<<<<< HEAD
             <input required type="email" placeholder="Work email" className="flex-1 rounded-xl px-4 py-3.5 bg-white/10 border border-white/15 text-white placeholder:text-white/40 outline-none focus:border-[#F57429] transition text-sm" />
             <button className="clip-cut bg-gradient-to-r from-[#EE6724] to-[#DE5718] text-white px-6 py-3.5 text-sm font-bold hover:from-[#DE5718] hover:to-[#B43808] transition shadow-sm">Subscribe</button>
+=======
+            <input required type="email" placeholder="Work email" className="flex-1 rounded-xl px-4 py-3.5 bg-white/10 border border-white/15 text-white placeholder:text-white/40 outline-none focus:border-[#2F5E93] transition text-sm" />
+            <button className="clip-cut bg-[#0B2F5C] text-white px-6 py-3.5 text-sm font-bold hover:bg-white hover:text-[#0B2F5C] transition">Subscribe</button>
+>>>>>>> b1fa46e (feat: rebuild to 36-line approved catalogue with navy theme, Sunrise pricing and gears loader)
           </form>
         </div>
       </section>
@@ -93,19 +123,30 @@ export default function Layout({ children }) {
           <div>
             <LogoFull imgClassName="h-14 sm:h-16 w-auto select-none object-contain" />
             <p className="text-white/60 text-[13px] mt-4 leading-relaxed">
-              Australian owned heavy truck and trailer parts. Honest advice plus fast freight to every state.
+              Australian owned truck hardware: tail lifts, tool boxes, trailer parts and accessories. Honest advice plus fast freight to every state.
             </p>
             <div className="mt-4 space-y-1.5 text-[12px] text-white/50">
+<<<<<<< HEAD
               <p className="flex items-center gap-2"><MapPin size={13} className="text-[#F57429]" /> 41 Halley Court, Campbellfield VIC 3061</p>
               <p className="flex items-center gap-2"><Phone size={13} className="text-[#F57429]" /> 03 9000 0000</p>
               <p className="flex items-center gap-2"><Mail size={13} className="text-[#F57429]" /> sales@aurextruckparts.com.au</p>
+=======
+              <p className="flex items-center gap-2"><MapPin size={13} className="text-[#2F5E93]" /> 41 Halley Court, Campbellfield VIC 3061</p>
+              <p className="flex items-center gap-2"><Phone size={13} className="text-[#2F5E93]" /> 03 9000 0000</p>
+              <p className="flex items-center gap-2"><Mail size={13} className="text-[#2F5E93]" /> sales@aurextruckparts.com.au</p>
+>>>>>>> b1fa46e (feat: rebuild to 36-line approved catalogue with navy theme, Sunrise pricing and gears loader)
             </div>
           </div>
           <div>
             <p className="font-bold text-[12px] tracking-widest text-white/40 uppercase">Shop</p>
             <div className="mt-3 grid gap-2 text-white/65">
               <Link to="/shop" className="hover:text-white transition w-fit">All parts</Link>
-              <Link to="/categories" className="hover:text-white transition w-fit">Categories</Link>
+              <Link to="/shop?cat=Tail%20Lifts" className="hover:text-white transition w-fit">Tail Lifts</Link>
+              <Link to="/shop?cat=Tool%20Boxes" className="hover:text-white transition w-fit">Tool Boxes</Link>
+              <Link to="/shop?cat=Trailer%20Parts" className="hover:text-white transition w-fit">Trailer Parts</Link>
+              <Link to="/shop?cat=Accessories" className="hover:text-white transition w-fit">Accessories</Link>
+              <Link to="/shop?cat=Replacement%20Parts" className="hover:text-white transition w-fit">Replacement Parts</Link>
+              <Link to="/shop?cat=Tools%20and%20Others" className="hover:text-white transition w-fit">Tools and Others</Link>
               <Link to="/brands" className="hover:text-white transition w-fit">Brands</Link>
               <Link to="/deals" className="hover:text-white transition w-fit">Deals</Link>
             </div>
@@ -140,7 +181,11 @@ export default function Layout({ children }) {
             <p className="text-white/45 text-[13px] mt-1">Priority quotes for trade and fleet accounts.</p>
             <Link
               to="/contact"
+<<<<<<< HEAD
               className="clip-cut mt-4 inline-flex items-center gap-1.5 bg-gradient-to-r from-[#EE6724] to-[#DE5718] hover:from-[#DE5718] hover:to-[#B43808] text-white px-5 py-2.5 font-bold text-[13px] transition shadow-sm"
+=======
+              className="clip-cut mt-4 inline-flex items-center gap-1.5 bg-[#0B2F5C] text-white px-5 py-2.5 font-bold hover:bg-white hover:text-[#0B2F5C] text-[13px] transition"
+>>>>>>> b1fa46e (feat: rebuild to 36-line approved catalogue with navy theme, Sunrise pricing and gears loader)
             >
               Get a quote <ArrowRight size={14} />
             </Link>
@@ -149,7 +194,7 @@ export default function Layout({ children }) {
         <div className="border-t border-white/10">
           <p className="mx-auto max-w-7xl px-4 py-4 text-[12px] text-white/35 flex flex-wrap justify-between gap-2">
             <span>&copy; 2026 Aurex Truck Parts Australia. All rights reserved.</span>
-            <span>Visa, Mastercard, Afterpay, Bank transfer</span>
+            <span>Visa, Mastercard, Afterpay, Bank transfer · Category imagery via Wikimedia Commons contributors (CC BY-SA)</span>
           </p>
         </div>
       </footer>
@@ -162,7 +207,11 @@ export default function Layout({ children }) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.7 }}
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+<<<<<<< HEAD
             className="fixed bottom-6 right-6 z-[60] w-12 h-12 grid place-items-center rounded-full bg-[#12151C] text-white shadow-elevated hover:bg-[#DE5718] transition"
+=======
+            className="fixed bottom-6 right-6 z-[60] w-12 h-12 grid place-items-center rounded-full bg-[#1A1A2E] text-white shadow-elevated hover:bg-[#0B2F5C] transition"
+>>>>>>> b1fa46e (feat: rebuild to 36-line approved catalogue with navy theme, Sunrise pricing and gears loader)
             aria-label="back to top"
           >
             <ArrowUp size={20} />
@@ -187,7 +236,11 @@ export default function Layout({ children }) {
             >
               <FocusTrap active={drawer} className="flex-1 flex flex-col min-h-0">
                 <div className="p-5 flex items-center justify-between border-b border-[#E5E7EB]">
+<<<<<<< HEAD
                 <p className="font-bold text-lg text-[#12151C] flex items-center gap-2"><ShoppingCart size={18} className="text-[#DE5718]" /> Cart ({count})</p>
+=======
+                <p className="font-bold text-lg text-[#1A1A2E] flex items-center gap-2"><ShoppingCart size={18} className="text-[#0B2F5C]" /> Cart ({count})</p>
+>>>>>>> b1fa46e (feat: rebuild to 36-line approved catalogue with navy theme, Sunrise pricing and gears loader)
                 <button onClick={() => setDrawer(false)} className="p-2 rounded-lg border border-[#E5E7EB] text-[#6B7280]" aria-label="close">
                   <X size={18} />
                 </button>
@@ -197,7 +250,11 @@ export default function Layout({ children }) {
                   <div className="text-center py-16">
                     <ShoppingCart size={40} className="mx-auto text-[#E5E7EB]" />
                     <p className="text-[#9CA3AF] text-sm mt-3">Cart is empty. Add parts from Shop.</p>
+<<<<<<< HEAD
                     <Link to="/shop" onClick={() => setDrawer(false)} className="clip-cut mt-4 inline-block bg-gradient-to-r from-[#EE6724] to-[#DE5718] text-white px-6 py-2.5 text-sm font-bold shadow-sm">Browse shop</Link>
+=======
+                    <Link to="/shop" onClick={() => setDrawer(false)} className="clip-cut mt-4 inline-block bg-[#0B2F5C] text-white px-6 py-2.5 text-sm font-bold">Browse shop</Link>
+>>>>>>> b1fa46e (feat: rebuild to 36-line approved catalogue with navy theme, Sunrise pricing and gears loader)
                   </div>
                 )}
                 {cart.map((i) => (
@@ -210,14 +267,22 @@ export default function Layout({ children }) {
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => setCart((c) => c.map((x) => (x.sku === i.sku ? { ...x, qty: Math.max(1, x.qty - 1) } : x)))}
+<<<<<<< HEAD
                             className="w-7 h-7 grid place-items-center rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:border-[#DE5718] transition"
+=======
+                            className="w-7 h-7 grid place-items-center rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:border-[#0B2F5C] transition"
+>>>>>>> b1fa46e (feat: rebuild to 36-line approved catalogue with navy theme, Sunrise pricing and gears loader)
                           >
                             <Minus size={13} />
                           </button>
                           <span className="font-bold text-sm w-6 text-center text-[#12151C]">{i.qty}</span>
                           <button
                             onClick={() => setCart((c) => c.map((x) => (x.sku === i.sku ? { ...x, qty: x.qty + 1 } : x)))}
+<<<<<<< HEAD
                             className="w-7 h-7 grid place-items-center rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:border-[#DE5718] transition"
+=======
+                            className="w-7 h-7 grid place-items-center rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:border-[#0B2F5C] transition"
+>>>>>>> b1fa46e (feat: rebuild to 36-line approved catalogue with navy theme, Sunrise pricing and gears loader)
                           >
                             <Plus size={13} />
                           </button>
@@ -231,12 +296,20 @@ export default function Layout({ children }) {
               <div className="p-5 border-t border-[#E5E7EB]">
                 <div className="flex justify-between font-bold text-lg text-[#12151C]">
                   <span>Subtotal</span>
+<<<<<<< HEAD
                   <span className="text-[#DE5718]">${total.toFixed(2)}</span>
+=======
+                  <span className="text-[#0B2F5C]">${total.toFixed(2)}</span>
+>>>>>>> b1fa46e (feat: rebuild to 36-line approved catalogue with navy theme, Sunrise pricing and gears loader)
                 </div>
                 <p className="mt-1 text-[12px] text-[#9CA3AF]">Free freight over ${freeOver}. Login saves order history.</p>
                 <div className="mt-2.5">
                   <div className="h-2 rounded-full bg-[#F3F4F6] overflow-hidden">
+<<<<<<< HEAD
                     <div className="h-full bg-gradient-to-r from-[#DE5718] to-[#F59E0B] transition-all" style={{ width: `${Math.min(100, (total / freeOver) * 100)}%` }} />
+=======
+                    <div className="h-full bg-gradient-to-r from-[#0B2F5C] to-[#FFBB00] transition-all" style={{ width: `${Math.min(100, (total / freeOver) * 100)}%` }} />
+>>>>>>> b1fa46e (feat: rebuild to 36-line approved catalogue with navy theme, Sunrise pricing and gears loader)
                   </div>
                   <p className="mt-1.5 text-[12px] font-semibold text-[#6B7280]">{total >= freeOver ? "Free freight unlocked." : `$${(freeOver - total).toFixed(2)} away from free freight.`}</p>
                 </div>
@@ -244,14 +317,22 @@ export default function Layout({ children }) {
                   <Link
                     to="/quote"
                     onClick={() => setDrawer(false)}
+<<<<<<< HEAD
                     className="clip-cut-sm py-3 text-sm font-bold border-2 border-[#E5E7EB] text-center text-[#12151C] hover:border-[#DE5718] transition"
+=======
+                    className="clip-cut-sm py-3 text-sm font-bold border-2 border-[#E5E7EB] text-center text-[#1A1A2E] hover:border-[#0B2F5C] transition"
+>>>>>>> b1fa46e (feat: rebuild to 36-line approved catalogue with navy theme, Sunrise pricing and gears loader)
                   >
                     Quote
                   </Link>
                   <Link
                     to="/checkout"
                     onClick={() => setDrawer(false)}
+<<<<<<< HEAD
                     className="clip-cut-sm col-span-2 py-3 text-sm font-bold bg-gradient-to-r from-[#EE6724] to-[#DE5718] hover:from-[#DE5718] hover:to-[#B43808] text-white text-center flex items-center justify-center gap-2 shadow-sm transition"
+=======
+                    className="clip-cut-sm col-span-2 py-3 text-sm font-bold bg-[#0B2F5C] text-white text-center flex items-center justify-center gap-2 hover:bg-[#1A1A2E] transition"
+>>>>>>> b1fa46e (feat: rebuild to 36-line approved catalogue with navy theme, Sunrise pricing and gears loader)
                   >
                     <Send size={14} /> Checkout
                   </Link>

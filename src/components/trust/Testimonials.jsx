@@ -79,7 +79,7 @@ export default function Testimonials({ compact = false }) {
             </div>
             <p className="text-sm text-[#6B7280] line-clamp-3">{testimonial.text}</p>
             <div className="mt-3 flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-[#E53E00] flex items-center justify-center text-white font-bold text-xs">
+              <div className="w-8 h-8 rounded-full bg-[#0B2F5C] flex items-center justify-center text-white font-bold text-xs">
                 {testimonial.name.charAt(0)}
               </div>
               <div>
@@ -105,7 +105,7 @@ export default function Testimonials({ compact = false }) {
           className="bg-[#F7F8FA] border border-[#E5E7EB] rounded-2xl p-6 md:p-8"
         >
           <div className="flex items-start gap-4 mb-4">
-            <Quote size={32} className="text-[#E53E00] shrink-0" />
+            <Quote size={32} className="text-[#0B2F5C] shrink-0" />
             <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
@@ -123,7 +123,7 @@ export default function Testimonials({ compact = false }) {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-[#E53E00] flex items-center justify-center text-white font-bold text-lg">
+              <div className="w-12 h-12 rounded-full bg-[#0B2F5C] flex items-center justify-center text-white font-bold text-lg">
                 {currentTestimonial.name.charAt(0)}
               </div>
               <div>
@@ -154,7 +154,7 @@ export default function Testimonials({ compact = false }) {
               setAutoPlay(false);
             }}
             className={`w-2 h-2 rounded-full transition ${
-              index === currentIndex ? "bg-[#E53E00] w-6" : "bg-[#E5E7EB]"
+              index === currentIndex ? "bg-[#0B2F5C] w-6" : "bg-[#E5E7EB]"
             }`}
             aria-label={`Go to testimonial ${index + 1}`}
           />
@@ -165,14 +165,14 @@ export default function Testimonials({ compact = false }) {
       <div className="flex justify-between mt-4">
         <button
           onClick={handlePrevious}
-          className="w-10 h-10 rounded-full bg-white border border-[#E5E7EB] flex items-center justify-center hover:border-[#E53E00] transition"
+          className="w-10 h-10 rounded-full bg-white border border-[#E5E7EB] flex items-center justify-center hover:border-[#0B2F5C] transition"
           aria-label="Previous testimonial"
         >
           <ChevronLeft size={20} />
         </button>
         <button
           onClick={handleNext}
-          className="w-10 h-10 rounded-full bg-white border border-[#E5E7EB] flex items-center justify-center hover:border-[#E53E00] transition"
+          className="w-10 h-10 rounded-full bg-white border border-[#E5E7EB] flex items-center justify-center hover:border-[#0B2F5C] transition"
           aria-label="Next testimonial"
         >
           <ChevronRight size={20} />

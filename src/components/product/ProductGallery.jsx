@@ -94,7 +94,7 @@ export default function ProductGallery({ product, images = [] }) {
           {/* Badges */}
           <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
             {product?.oldPrice && (
-              <span className="bg-[#E53E00] text-white text-[12px] font-black px-3 py-1.5 rounded-lg shadow-primary">
+              <span className="bg-[#0B2F5C] text-white text-[12px] font-black px-3 py-1.5 rounded-lg shadow-primary">
                 -{Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%
               </span>
             )}
@@ -117,7 +117,7 @@ export default function ProductGallery({ product, images = [] }) {
               key={i}
               onClick={() => setActiveIndex(i)}
               className={`rounded-xl overflow-hidden border-2 transition aspect-square ${
-                activeIndex === i ? "border-[#E53E00]" : "border-[#E5E7EB] hover:border-[#9CA3AF]"
+                activeIndex === i ? "border-[#0B2F5C]" : "border-[#E5E7EB] hover:border-[#9CA3AF]"
               }`}
               aria-label={`View image ${i + 1}`}
             >

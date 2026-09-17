@@ -78,7 +78,7 @@ export function CheckoutPage() {
     <div className="mx-auto max-w-xl px-4 py-14 text-center">
       <h1 className="font-display font-bold text-3xl text-[#1A1A2E]">Cart is empty</h1>
       <p className="text-[#6B7280] text-sm mt-2">Add parts before checkout.</p>
-      <Link to="/shop" className="mt-5 inline-block bg-[#E53E00] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition">Back to shop</Link>
+      <Link to="/shop" className="mt-5 inline-block bg-[#0B2F5C] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition">Back to shop</Link>
     </div>
   );
 
@@ -95,28 +95,28 @@ export function CheckoutPage() {
             {/* Contact + Delivery */}
             <section className="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
               <p className="font-display font-bold text-lg flex items-center gap-2 text-[#1A1A2E]">
-                <span className="grid place-items-center w-7 h-7 rounded-full bg-[#E53E00] text-white text-[13px] font-black">1</span>
+                <span className="grid place-items-center w-7 h-7 rounded-full bg-[#0B2F5C] text-white text-[13px] font-black">1</span>
                 Contact plus delivery
               </p>
               <div className="mt-4 grid sm:grid-cols-2 gap-3">
                 <div>
-                  <input value={form.name} onChange={setF("name")} placeholder="Full name" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.name ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                  <input value={form.name} onChange={setF("name")} placeholder="Full name" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.name ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
                   {errors.name && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.name}</p>}
                 </div>
                 <div>
-                  <input value={form.phone} onChange={setF("phone")} placeholder="Phone (e.g. 0412345678)" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.phone ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                  <input value={form.phone} onChange={setF("phone")} placeholder="Phone (e.g. 0412345678)" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.phone ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
                   {errors.phone && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.phone}</p>}
                 </div>
                 <div className="sm:col-span-2">
-                  <input value={form.email} onChange={setF("email")} type="email" placeholder="Email for receipt plus tracking" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.email ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                  <input value={form.email} onChange={setF("email")} type="email" placeholder="Email for receipt plus tracking" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.email ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
                   {errors.email && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.email}</p>}
                 </div>
                 <div className="sm:col-span-2">
-                  <input value={form.address} onChange={setF("address")} placeholder="Street address" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.address ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                  <input value={form.address} onChange={setF("address")} placeholder="Street address" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.address ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
                   {errors.address && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.address}</p>}
                 </div>
                 <div>
-                  <input value={form.suburb} onChange={setF("suburb")} placeholder="Suburb" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.suburb ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                  <input value={form.suburb} onChange={setF("suburb")} placeholder="Suburb" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.suburb ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
                   {errors.suburb && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.suburb}</p>}
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -124,24 +124,24 @@ export function CheckoutPage() {
                     {["VIC", "NSW", "QLD", "SA", "WA", "TAS", "NT", "ACT"].map((s) => <option key={s}>{s}</option>)}
                   </select>
                   <div>
-                    <input value={form.postcode} onChange={setF("postcode")} placeholder="Postcode" maxLength={4} className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.postcode ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                    <input value={form.postcode} onChange={setF("postcode")} placeholder="Postcode" maxLength={4} className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.postcode ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
                   </div>
                 </div>
-                <input value={form.notes} onChange={setF("notes")} placeholder="Delivery notes or VIN, optional" className="sm:col-span-2 rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#E53E00] transition" />
+                <input value={form.notes} onChange={setF("notes")} placeholder="Delivery notes or VIN, optional" className="sm:col-span-2 rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#0B2F5C] transition" />
               </div>
-              {!user && <p className="mt-3 text-[13px] text-[#6B7280]">Checking out as guest. <Link to="/login" className="text-[#E53E00] font-bold">Log in</Link> or <Link to="/signup" className="text-[#E53E00] font-bold">create an account</Link> to save history.</p>}
+              {!user && <p className="mt-3 text-[13px] text-[#6B7280]">Checking out as guest. <Link to="/login" className="text-[#0B2F5C] font-bold">Log in</Link> or <Link to="/signup" className="text-[#0B2F5C] font-bold">create an account</Link> to save history.</p>}
             </section>
 
             {/* Shipping */}
             <section className="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
               <p className="font-display font-bold text-lg flex items-center gap-2 text-[#1A1A2E]">
-                <span className="grid place-items-center w-7 h-7 rounded-full bg-[#E53E00] text-white text-[13px] font-black">2</span>
+                <span className="grid place-items-center w-7 h-7 rounded-full bg-[#0B2F5C] text-white text-[13px] font-black">2</span>
                 Shipping
               </p>
               <div className="mt-4 grid sm:grid-cols-3 gap-2.5">
                 {SHIPPING.map((s) => (
-                  <button key={s.id} type="button" onClick={() => setShip(s.id)} className={`text-left rounded-xl border p-4 transition ${ship === s.id ? "border-[#E53E00] bg-[#FFF0EB]" : "border-[#E5E7EB] hover:border-[#E53E00]/50"}`}>
-                    <p className="font-semibold text-sm flex items-center gap-1.5 text-[#1A1A2E]"><Truck size={15} className="text-[#E53E00]" />{s.label}</p>
+                  <button key={s.id} type="button" onClick={() => setShip(s.id)} className={`text-left rounded-xl border p-4 transition ${ship === s.id ? "border-[#0B2F5C] bg-[#E8EEF5]" : "border-[#E5E7EB] hover:border-[#0B2F5C]/50"}`}>
+                    <p className="font-semibold text-sm flex items-center gap-1.5 text-[#1A1A2E]"><Truck size={15} className="text-[#0B2F5C]" />{s.label}</p>
                     <p className="text-[12px] text-[#9CA3AF] mt-1">{s.eta}</p>
                     <p className="text-[13px] font-bold mt-1.5 text-[#1A1A2E]">{s.fee(total) === 0 ? "Free" : `$${s.fee(total).toFixed(2)}`}</p>
                   </button>
@@ -152,12 +152,12 @@ export function CheckoutPage() {
             {/* Payment */}
             <section className="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
               <p className="font-display font-bold text-lg flex items-center gap-2 text-[#1A1A2E]">
-                <span className="grid place-items-center w-7 h-7 rounded-full bg-[#E53E00] text-white text-[13px] font-black">3</span>
+                <span className="grid place-items-center w-7 h-7 rounded-full bg-[#0B2F5C] text-white text-[13px] font-black">3</span>
                 Payment
               </p>
               <div className="mt-4 grid sm:grid-cols-2 gap-2.5">
                 {PAYMENTS.map((m) => (
-                  <button key={m} type="button" onClick={() => setPay(m)} className={`rounded-xl border p-4 text-left text-sm font-semibold transition flex items-center gap-2 ${pay === m ? "border-[#E53E00] bg-[#FFF0EB] text-[#1A1A2E]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#E53E00]/50"}`}>
+                  <button key={m} type="button" onClick={() => setPay(m)} className={`rounded-xl border p-4 text-left text-sm font-semibold transition flex items-center gap-2 ${pay === m ? "border-[#0B2F5C] bg-[#E8EEF5] text-[#1A1A2E]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#0B2F5C]/50"}`}>
                     <CreditCard size={15} className="text-[#9CA3AF]" />{m}
                   </button>
                 ))}
@@ -170,17 +170,17 @@ export function CheckoutPage() {
                       <p className="text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase flex items-center gap-1.5"><Lock size={12}/> Secure Payment</p>
                       
                       <div className="relative">
-                        <input value={card.number} onChange={handleCardNumber} onPaste={(e) => e.preventDefault()} placeholder="Card number" className={`w-full rounded-lg px-4 py-3 bg-white border outline-none text-sm font-mono text-[#1A1A2E] transition ${errors.card ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                        <input value={card.number} onChange={handleCardNumber} onPaste={(e) => e.preventDefault()} placeholder="Card number" className={`w-full rounded-lg px-4 py-3 bg-white border outline-none text-sm font-mono text-[#1A1A2E] transition ${errors.card ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
                         {errors.card && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.card}</p>}
                       </div>
                       
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <input value={card.expiry} onChange={handleCardExpiry} onPaste={(e) => e.preventDefault()} placeholder="MM/YY" className={`w-full rounded-lg px-4 py-3 bg-white border outline-none text-sm font-mono text-[#1A1A2E] transition ${errors.expiry ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                          <input value={card.expiry} onChange={handleCardExpiry} onPaste={(e) => e.preventDefault()} placeholder="MM/YY" className={`w-full rounded-lg px-4 py-3 bg-white border outline-none text-sm font-mono text-[#1A1A2E] transition ${errors.expiry ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
                           {errors.expiry && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.expiry}</p>}
                         </div>
                         <div>
-                          <input value={card.cvv} onChange={handleCardCvv} onPaste={(e) => e.preventDefault()} type="password" placeholder="CVV" maxLength={4} className={`w-full rounded-lg px-4 py-3 bg-white border outline-none text-sm font-mono text-[#1A1A2E] transition ${errors.cvv ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#E53E00]'}`} />
+                          <input value={card.cvv} onChange={handleCardCvv} onPaste={(e) => e.preventDefault()} type="password" placeholder="CVV" maxLength={4} className={`w-full rounded-lg px-4 py-3 bg-white border outline-none text-sm font-mono text-[#1A1A2E] transition ${errors.cvv ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
                           {errors.cvv && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.cvv}</p>}
                         </div>
                       </div>
@@ -225,7 +225,7 @@ export function CheckoutPage() {
               const order = placeOrder({ items: cart, subtotal: total, shipping: shipOpt.label, shippingFee: fee, payment: pay, total: grand, address: form });
               setCart([]);
               nav(`/order-success/${order.id}`);
-            }} className="mt-5 w-full bg-[#E53E00] text-white rounded-xl py-4 text-sm font-bold hover:bg-[#1A1A2E] transition flex items-center justify-center gap-2">
+            }} className="mt-5 w-full bg-[#0B2F5C] text-white rounded-xl py-4 text-sm font-bold hover:bg-[#1A1A2E] transition flex items-center justify-center gap-2">
               <Lock size={15} /> Pay ${grand.toFixed(2)}, Place order
             </button>
           </aside>
@@ -250,11 +250,11 @@ export function OrderSuccessPage() {
         <p className="text-[#6B7280] text-sm mt-2">Order <b className="text-[#1A1A2E]">{id}</b> is packed in Campbellfield VIC.</p>
         
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link to={`/track?order=${id || ""}`} className="bg-[#E53E00] text-white rounded-xl px-7 py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition">Track this order</Link>
-          <button onClick={() => window.print()} className="rounded-xl px-7 py-3.5 text-sm font-bold border border-[#E5E7EB] text-[#1A1A2E] flex items-center gap-2 hover:border-[#E53E00] transition bg-white">
+          <Link to={`/track?order=${id || ""}`} className="bg-[#0B2F5C] text-white rounded-xl px-7 py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition">Track this order</Link>
+          <button onClick={() => window.print()} className="rounded-xl px-7 py-3.5 text-sm font-bold border border-[#E5E7EB] text-[#1A1A2E] flex items-center gap-2 hover:border-[#0B2F5C] transition bg-white">
             <Printer size={16} /> Print Tax Invoice
           </button>
-          <Link to="/shop" className="rounded-xl px-7 py-3.5 text-sm font-bold border border-[#E5E7EB] text-[#1A1A2E] flex items-center gap-2 hover:border-[#E53E00] transition bg-white">
+          <Link to="/shop" className="rounded-xl px-7 py-3.5 text-sm font-bold border border-[#E5E7EB] text-[#1A1A2E] flex items-center gap-2 hover:border-[#0B2F5C] transition bg-white">
             Keep shopping <ArrowRight size={15} />
           </Link>
         </div>
@@ -328,7 +328,7 @@ export function OrderSuccessPage() {
             </div>
             <div className="flex justify-between w-64 font-display font-bold text-xl text-[#1A1A2E] pt-3 border-t border-[#E5E7EB] mt-1">
               <span>Total paid</span>
-              <span className="text-[#E53E00]">${order.total.toFixed(2)}</span>
+              <span className="text-[#0B2F5C]">${order.total.toFixed(2)}</span>
             </div>
           </div>
         </div>

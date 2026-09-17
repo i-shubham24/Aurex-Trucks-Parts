@@ -50,7 +50,7 @@ export default function CartItem({ item, onRemove }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <Link to={`/product/${item.sku}`} className="font-semibold text-sm text-[#1A1A2E] hover:text-[#E53E00] transition line-clamp-2">
+            <Link to={`/product/${item.sku}`} className="font-semibold text-sm text-[#1A1A2E] hover:text-[#0B2F5C] transition line-clamp-2">
               {product.name}
             </Link>
             <p className="text-xs text-[#9CA3AF] mt-1">{product.sku}</p>
