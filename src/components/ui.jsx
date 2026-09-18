@@ -193,7 +193,7 @@ export function SafeImg({ src, alt, className = "", label, wrapClass = "" }) {
   const [broken, setBroken] = useState(false);
   if (broken || !src) {
     return (
-      <div className={`grid place-items-center bg-gradient-to-br from-[#1A1A2E] via-[#241a2e] to-[#3a1c0c] ${className} ${wrapClass}`}>
+      <div className={`grid place-items-center bg-gradient-to-br from-[#1A1A2E] via-[#0B2F5C] to-[#2F5E93] ${className} ${wrapClass}`}>
         <span className="font-display font-black tracking-widest text-white/25 text-2xl px-4 text-center">
           {label || "AUREX"}
         </span>

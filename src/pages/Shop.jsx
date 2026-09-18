@@ -142,15 +142,15 @@ export default function Shop() {
             </div>
           </div>
           <div className="mt-6 flex flex-wrap gap-2 items-center justify-end">
-            <div className="clip-cut flex items-center gap-2 bg-white/[0.09] px-5 py-3 w-full sm:w-72 focus-within:bg-white/[0.14] transition">
-              <Search size={16} className="text-white/50 shrink-0" />
-              <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search name, SKU or brand..."
-                className="flex-1 min-w-0 bg-transparent outline-none text-sm placeholder:text-white/40 text-white"
-              />
-              {query && <button onClick={() => setQuery("")}><X size={15} className="text-white/50" /></button>}
+              <div className="clip-cut flex items-center gap-2 bg-white/[0.09] px-5 py-3 w-full sm:w-72 focus-within:bg-white/[0.14] transition">
+                <Search size={16} className="text-white/70 shrink-0" />
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search name, SKU or brand..."
+                  className="flex-1 min-w-0 bg-transparent outline-none text-sm placeholder:text-white/60 text-white"
+                />
+                {query && <button onClick={() => setQuery("")}><X size={15} className="text-white/70" /></button>}
             </div>
             <Dropdown
               value={sort}
@@ -170,7 +170,7 @@ export default function Shop() {
 
       {/* Filters + Grid */}
       <div className="mx-auto max-w-7xl px-4 py-8 grid lg:grid-cols-[260px_1fr] gap-6 items-start">
-        <aside className="rounded-2xl bg-white border border-[#E5E7EB] p-5 lg:sticky lg:top-28 shadow-sm">
+        <aside className="bg-white border border-[#E5E7EB] p-5 lg:sticky lg:top-28 shadow-sm">
           <div className="flex items-center justify-between">
             <p className="font-display font-bold text-lg text-[#1A1A2E]">Filters</p>
             <span className="flex items-center gap-3">

@@ -105,7 +105,7 @@ export default function HeroFeature() {
                     animate={{ y: "0%", opacity: 1 }}
                     exit={{ y: "-110%", opacity: 0 }}
                     transition={{ duration: 0.5, ease: EASE }}
-                    className="block font-display font-black text-[46px] sm:text-[70px] lg:text-[82px] leading-none tracking-[-0.03em] text-gradient-hero"
+                    className="block font-display font-black text-[46px] sm:text-[70px] lg:text-[82px] leading-none tracking-[-0.03em] text-[#8FB4E0]"
                   >
                     {WORDS[i]}
                   </motion.span>
