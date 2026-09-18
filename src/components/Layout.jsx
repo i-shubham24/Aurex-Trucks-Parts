@@ -10,26 +10,6 @@ import { ShopWidgets } from "./shopwise.jsx";
 import EmailPopup from "./EmailPopup.jsx";
 import Header from "./layout/Header.jsx";
 import MobileDrawer from "./navigation/MobileDrawer.jsx";
-import { GearsOverlay } from "./GearsLoader.jsx";
-
-const ROUTE_GEAR_MS = 2000;
-
-// Transparent centred gears on top of the page for every route change.
-function RouteGears() {
-  const { pathname, search } = useLocation();
-  const first = useRef(true);
-  const [show, setShow] = useState(false);
-  useEffect(() => {
-    if (first.current) { first.current = false; return; }
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    if (pathname.startsWith("/admin")) return;
-    setShow(true);
-    const t = setTimeout(() => setShow(false), ROUTE_GEAR_MS);
-    return () => clearTimeout(t);
-  }, [pathname, search]);
-  if (!show) return null;
-  return <GearsOverlay />;
-}
 
 function ScrollManager() {
   const { pathname, search } = useLocation();
@@ -59,9 +39,9 @@ function NewsBox() {
       {done ? (
         <p className="rounded-xl bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-sm font-semibold px-5 py-3.5">Thanks. You are on the trade list.</p>
       ) : (
-        <form onSubmit={(e) => { e.preventDefault(); if (email.trim()) setDone(true); }} className="flex gap-2 flex-1 min-w-[280px] max-w-md">
-          <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Work email" className="flex-1 rounded-xl px-4 py-3.5 bg-white/10 border border-white/15 text-white placeholder:text-white/40 outline-none focus:border-[#8FB4E0] transition text-sm" />
-          <button className="clip-cut bg-[#0B2F5C] text-white px-6 py-3.5 text-sm font-bold hover:bg-white hover:text-[#0B2F5C] transition">Subscribe</button>
+        <form onSubmit={(e) => { e.preventDefault(); if (email.trim()) setDone(true); }} className="flex flex-col sm:flex-row gap-2 flex-1 min-w-[200px] w-full sm:w-auto sm:max-w-md">
+          <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Work email" className="flex-1 rounded-xl px-4 py-3.5 bg-white/10 border border-white/15 text-white placeholder:text-white/40 outline-none focus:border-[#8FB4E0] transition text-sm min-w-0" />
+          <button className="clip-cut bg-[#0B2F5C] text-white px-6 py-3.5 text-sm font-bold hover:bg-white hover:text-[#0B2F5C] transition whitespace-nowrap">Subscribe</button>
         </form>
       )}
     </div>
@@ -101,7 +81,6 @@ export default function Layout({ children }) {
     <div className="min-h-screen bg-white text-[#1A1A2E] antialiased overflow-x-hidden flex flex-col" style={{ fontFamily: "Inter" }}>
       <ScrollProgress />
       <ScrollManager />
-      <RouteGears />
 
       <div className="print:hidden">
         <Header onOpenMobile={() => setMobile(true)} />

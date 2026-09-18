@@ -13,8 +13,9 @@ export default function BootLoader() {
       setGone(true);
       return;
     }
-    // No loader inside the admin portal.
-    if (window.location.pathname.startsWith("/admin")) {
+    // Gears run only on the homepage load/reload, never inside admin or other pages.
+    const path = window.location.pathname;
+    if (path.startsWith("/admin") || (path !== "/" && path !== "/index.html")) {
       setGone(true);
       return;
     }
