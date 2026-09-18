@@ -5,9 +5,14 @@ import { Lock, Truck, CreditCard, CheckCircle2, ArrowRight, AlertTriangle, Print
 import { useShop } from "../store/shop.jsx";
 import { useAuth } from "../store/auth.jsx";
 import { useSite } from "../store/site.jsx";
+import { useGarage } from "../components/garage/GarageContext.jsx";
 
 export function CheckoutPage() {
   const { cart, total, count, setCart } = useShop();
+  const { selectedVehicle, hasValidVehicle } = useGarage();
+  const rigLabel = hasValidVehicle
+    ? `${selectedVehicle.year ? selectedVehicle.year + " " : ""}${selectedVehicle.make} ${selectedVehicle.model}`.trim()
+    : "";
   const { user, placeOrder } = useAuth();
   const { settings } = useSite();
   
@@ -89,6 +94,14 @@ export function CheckoutPage() {
           Cart <span className="mx-1.5">/</span> <span className="text-[#1A1A2E]">Checkout</span> <span className="mx-1.5">/</span> Done
         </p>
         <h1 className="font-display font-bold tracking-[-0.02em] text-[32px] sm:text-[44px] mt-2 text-[#1A1A2E]">Checkout ({count})</h1>
+        {hasValidVehicle && (
+          <div className="mt-4 flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 px-4 py-3 max-w-2xl">
+            <CheckCircle2 size={17} className="text-emerald-600 shrink-0" />
+            <p className="text-[13.5px] font-semibold text-emerald-800">
+              Quoted for your <b>{rigLabel}</b> — our desk double-checks fitment before dispatch.
+            </p>
+          </div>
+        )}
 
         <div className="mt-7 grid lg:grid-cols-[1fr_380px] gap-6 items-start">
           <div className="space-y-5">

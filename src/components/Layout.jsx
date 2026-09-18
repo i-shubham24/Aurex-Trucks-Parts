@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, Minus, Plus, Send, ArrowRight, MapPin, ArrowUp, Mail, Phone, X } from "lucide-react";
+import { ShoppingCart, Minus, Plus, Send, ArrowRight, MapPin, ArrowUp, Mail, Phone, X, CheckCircle2 } from "lucide-react";
 import { useShop } from "../store/shop.jsx";
 import { useSite } from "../store/site.jsx";
+import { useGarage } from "./garage/GarageContext.jsx";
 import { LogoFull } from "./logo.jsx";
 import { ScrollProgress, FocusTrap } from "./ui.jsx";
 import { ShopWidgets } from "./shopwise.jsx";
@@ -51,6 +52,10 @@ function NewsBox() {
 export default function Layout({ children }) {
   const { pathname } = useLocation();
   const { cart, setCart, count, total, drawer, setDrawer } = useShop();
+  const { selectedVehicle, hasValidVehicle } = useGarage();
+  const rigLabel = hasValidVehicle
+    ? `${selectedVehicle.year ? selectedVehicle.year + " " : ""}${selectedVehicle.make} ${selectedVehicle.model}`.trim()
+    : "";
   const { settings } = useSite();
   const freeOver = settings.freeFreightOver;
   const [mobile, setMobile] = useState(false);
@@ -219,6 +224,14 @@ export default function Layout({ children }) {
                 </button>
               </div>
               <div className="flex-1 overflow-auto p-5 space-y-3">
+                {hasValidVehicle && cart.length > 0 && (
+                  <div className="flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 px-3.5 py-3">
+                    <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                    <p className="text-[12.5px] font-semibold text-emerald-800 leading-snug">
+                      Fit checked for your <b>{rigLabel}</b> — every line in this cart suits your rig.
+                    </p>
+                  </div>
+                )}
                 {cart.length === 0 && (
                   <div className="text-center py-16">
                     <ShoppingCart size={40} className="mx-auto text-[#E5E7EB]" />

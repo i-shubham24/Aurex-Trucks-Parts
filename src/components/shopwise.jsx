@@ -5,6 +5,7 @@ import { X, Send, Clock, Star, Check, ShoppingCart, GitCompareArrows, Trash2 } f
 import { useShop } from "../store/shop.jsx";
 import { useProducts } from "../store/products.jsx";
 import { useSite } from "../store/site.jsx";
+import { useGarage } from "./garage/GarageContext.jsx";
 
 const RKEY = "aurex_recent_v1";
 export const pushRecent = (sku) => {
@@ -23,11 +24,15 @@ export function EnquiryModal() {
   const { enquirySku, setEnquirySku } = useShop();
   const { products } = useProducts();
   const { addEnquiry } = useSite();
+  const { selectedVehicle, hasValidVehicle } = useGarage();
   const [f, setF] = useState({ name: "", phone: "", message: "" });
   const [sent, setSent] = useState(false);
   const p = products.find((x) => x.sku === enquirySku);
   const close = () => { setEnquirySku(null); setSent(false); setF({ name: "", phone: "", message: "" }); };
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const rigLabel = hasValidVehicle
+    ? `${selectedVehicle.year ? selectedVehicle.year + " " : ""}${selectedVehicle.make} ${selectedVehicle.model}`.trim()
+    : "";
 
   return (
     <AnimatePresence>
@@ -36,13 +41,14 @@ export function EnquiryModal() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/60" onClick={close} />
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
             <div className="flex items-center gap-3">
-              <div className="flex-1"><p className="text-[11px] font-bold text-[#0B2F5C]">PRODUCT ENQUIRY, {p.sku}</p><p className="font-bold text-[15px] text-[#1A1A2E] leading-snug mt-0.5">{p.name}</p></div>
+              <div className="flex-1"><p className="text-[11px] font-bold text-[#0B2F5C]">PRODUCT ENQUIRY, {p.sku}</p><p className="font-bold text-[15px] text-[#1A1A2E] leading-snug mt-0.5">{p.name}</p>
+              {rigLabel && <p className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1"><Check size={11} /> For your {rigLabel}</p>}</div>
               <button onClick={close} className="p-2 border border-[#E5E7EB] rounded-lg"><X size={15} /></button>
             </div>
             {sent
               ? <p className="mt-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-[13px] font-semibold px-4 py-3.5">Enquiry logged. Our VIC desk replies within 4 business hours.</p>
               : (
-                <form onSubmit={(e) => { e.preventDefault(); addEnquiry({ name: f.name, phone: f.phone, email: "", truck: "SKU " + p.sku, message: `[${p.sku}] ${f.message}` }); setSent(true); }} className="mt-4 grid gap-2.5">
+                <form onSubmit={(e) => { e.preventDefault(); addEnquiry({ name: f.name, phone: f.phone, email: "", truck: rigLabel ? `${rigLabel} · SKU ${p.sku}` : "SKU " + p.sku, message: `[${p.sku}]${rigLabel ? ` [Rig: ${rigLabel}]` : ""} ${f.message}` }); setSent(true); }} className="mt-4 grid gap-2.5">
                   <div className="grid grid-cols-2 gap-2.5">
                     <input required value={f.name} onChange={set("name")} placeholder="Full name" className="rounded-xl px-4 py-3 text-sm bg-[#F7F8FA] border border-[#E5E7EB] outline-none" />
                     <input required value={f.phone} onChange={set("phone")} placeholder="Phone" className="rounded-xl px-4 py-3 text-sm bg-[#F7F8FA] border border-[#E5E7EB] outline-none" />

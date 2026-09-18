@@ -69,11 +69,15 @@ export function deriveFitment(p) {
 
 // One source of truth for the fit state of a part against the selected truck.
 // Returns one of: "fits" | "universal" | "no" | "unknown".
+// The catalogue is cross-make hardware (hinges, gear, tracks, boxes), so a
+// generic line with no make-specific application genuinely suits any selected
+// rig and reports "fits". "no" only fires for lines with explicit make
+// applications that exclude the selected make — never guessed.
 export function matchFit(product, vehicle) {
   if (!vehicle || !vehicle.make) return "unknown";
   const f = product?.fitment;
   if (!f) return "unknown";
-  if (f.universal) return "universal";
+  if (f.universal) return "fits";
   if (!f.apps || f.apps.length === 0) return "unknown";
   return f.apps.some((a) => a.make === vehicle.make) ? "fits" : "no";
 }

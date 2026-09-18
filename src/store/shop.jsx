@@ -3,7 +3,7 @@ import { PRODUCTS } from "../data/catalog.js";
 
 const lookup = (sku) => {
   try {
-    const raw = localStorage.getItem("aurex_products_v4");
+    const raw = localStorage.getItem("aurex_products_v5");
     if (raw) {
       const arr = JSON.parse(raw);
       const f = arr.find((x) => x.sku === sku);
