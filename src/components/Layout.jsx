@@ -118,10 +118,10 @@ export default function Layout({ children }) {
       </motion.main>
 
       {/* Footer: floating modular card (square corners, bottom-left cut) */}
-      <div className="bg-white print:hidden px-3 sm:px-5 pb-8 pt-4 [filter:drop-shadow(0_30px_45px_rgba(11,47,92,0.22))]">
+      <div className="bg-[#EAF2FA] print:hidden px-3 sm:px-5 pb-8 pt-4 [filter:drop-shadow(0_30px_45px_rgba(11,47,92,0.22))]">
         <footer className="mx-auto max-w-7xl bg-[#1A1A2E] text-white overflow-hidden" style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 34px 100%, 0 calc(100% - 34px))" }}>
           <NewsBox />
-          <div aria-hidden className="mx-6 sm:mx-10 border-t border-white/10" />
+          <div aria-hidden className="mx-6 sm:mx-10 mt-10 border-t border-white/10" />
           <div className="px-6 sm:px-10 pt-10 grid sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1.2fr] gap-10 text-sm lg:divide-x lg:divide-white/10">
           <div className="lg:pr-8">
             <LogoFull light />
@@ -135,7 +135,7 @@ export default function Layout({ children }) {
             </div>
             <div className="mt-5 flex gap-2">
               {[["Instagram", "IG"], ["Facebook", "FB"], ["LinkedIn", "IN"]].map(([label, short]) => (
-                <a key={label} href="/contact" aria-label={label} className="grid place-items-center w-9 h-9 rounded-full border border-white/20 text-white/70 text-[11px] font-black hover:bg-white hover:text-[#0B2F5C] hover:border-white transition">
+                <a key={label} href="/contact" aria-label={label} className="grid place-items-center w-9 h-9 border border-white/20 text-white/70 text-[11px] font-black hover:bg-white hover:text-[#0B2F5C] hover:border-white transition" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
                   {short}
                 </a>
               ))}
@@ -179,7 +179,7 @@ export default function Layout({ children }) {
               <Link to="/policies/warranty" className="hover:text-white hover:translate-x-1 transition-all w-fit">Warranty</Link>
             </div>
           </div>
-          <div className="rounded-2xl bg-white/[0.04] border border-white/10 p-6 h-fit">
+          <div className="bg-white/[0.04] border border-white/10 p-6 h-fit" style={{ clipPath: "polygon(0 0,100% 0,100% 100%,14px 100%,0 calc(100% - 14px))" }}>
             <p className="font-display font-bold text-[16px]">Fleet Desk</p>
             <p className="mt-1 text-white/75 text-[13px]">Mon to Fri, 8am to 5pm AEST</p>
             <p className="text-white/75 text-[13px] mt-1">Priority quotes for trade and fleet accounts.</p>
@@ -209,7 +209,7 @@ export default function Layout({ children }) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.7 }}
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="fixed bottom-6 right-6 z-[60] w-12 h-12 grid place-items-center rounded-full bg-[#1A1A2E] text-white shadow-elevated hover:bg-[#0B2F5C] transition"
+            className="fixed bottom-6 right-6 z-[60] w-12 h-12 grid place-items-center bg-[#1A1A2E] text-white shadow-elevated hover:bg-[#0B2F5C] transition" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}
             aria-label="back to top"
           >
             <ArrowUp size={20} />

@@ -43,7 +43,7 @@ function BentoCell({ to, img, label, sub, count, tall = false }) {
 
 export function RangeBento() {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-14">
+    <section className="mx-auto max-w-6xl px-4 py-14">
       <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
         <div>
           <p className="text-[12px] font-black tracking-[0.22em] text-[#0B2F5C] uppercase">Shop the range</p>
@@ -97,7 +97,8 @@ export function TrustTabs() {
               <button
                 key={x.n}
                 onClick={() => setActive(i)}
-                className={`text-left rounded-2xl border p-5 transition-all duration-300 ${i === active ? "bg-white/[0.07] border-white/20" : "bg-transparent border-white/10 hover:border-white/30"}`}
+                className={`text-left border p-5 transition-all duration-300 ${i === active ? "bg-white/[0.07] border-white/20" : "bg-transparent border-white/10 hover:border-white/30"}`}
+                style={{ clipPath: "polygon(0 0,100% 0,100% 100%,12px 100%,0 calc(100% - 12px))" }}
               >
                 <span className="flex items-center gap-4">
                   <span className={`font-display font-black text-[14px] ${i === active ? "text-white" : "text-white/40"}`}>{x.n}</span>
@@ -218,14 +219,15 @@ export function RangeShowcase() {
             </div>
           ))}
         </div>
-        <div className="rounded-3xl bg-[#F2F6FB] border border-[#D7E4F2] p-6 sm:p-9 flex flex-col justify-center relative overflow-hidden">
+        <div className="bg-[#F2F6FB] border border-[#D7E4F2] p-6 sm:p-9 flex flex-col justify-center relative overflow-hidden clip-cut-lg">
           <span className="absolute top-0 left-10 right-10 h-1 rounded-full bg-gradient-to-r from-[#0B2F5C] via-[#5B93D1] to-[#B9D6F2]" />
           <div className="flex gap-2.5">
             {PANELS.map((p, i) => (
               <button
                 key={p.kicker}
                 onClick={() => setActive(i)}
-                className={`flex-1 rounded-2xl border p-3.5 text-left transition-all duration-300 ${i === active ? "bg-[#1A1A2E] text-white border-[#1A1A2E] shadow-elevated" : "bg-white text-[#1A1A2E] border-[#E5E7EB] hover:border-[#0B2F5C]/50"}`}
+                className={`flex-1 border p-3.5 text-left transition-all duration-300 ${i === active ? "bg-[#1A1A2E] text-white border-[#1A1A2E] shadow-elevated" : "bg-white text-[#1A1A2E] border-[#E5E7EB] hover:border-[#0B2F5C]/50"}`}
+                style={{ clipPath: "polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))" }}
               >
                 <span className={`block text-[10px] font-black tracking-[0.18em] uppercase ${i === active ? "text-[#9DB9DD]" : "text-[#0B2F5C]"}`}>0{i + 1}</span>
                 <span className="block font-display font-bold text-[14px] mt-1 leading-snug">{p.kicker}</span>

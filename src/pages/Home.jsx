@@ -14,7 +14,6 @@ import { useShop } from "../store/shop.jsx";
 import { useProducts } from "../store/products.jsx";
 import YMMWidget from "../components/garage/YMMWidget.jsx";
 import HeroFeature from "../components/home/HeroFeature.jsx";
-import CategoryBoxes from "../components/home/CategoryBoxes.jsx";
 import BrandWall from "../components/home/BrandWall.jsx";
 import TestimonialCarousel from "../components/home/TestimonialCarousel.jsx";
 import { RangeBento, TrustTabs, StatsBand, RangeShowcase } from "../components/home/Showcase.jsx";
@@ -64,11 +63,6 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* CarParts style category boxes */}
-      <section className="mx-auto max-w-7xl px-4 py-10">
-        <CategoryBoxes />
-      </section>
-
       <RangeBento />
 
       {/* Garage filter band */}
@@ -77,7 +71,7 @@ export default function Home() {
           <div className="absolute -right-24 -top-24 w-[380px] h-[380px] rounded-full bg-[#8FB4E0]/25 blur-[110px]" />
           <div className="absolute -left-24 -bottom-24 w-[380px] h-[380px] rounded-full bg-[#0B2F5C]/10 blur-[110px]" />
           <div className="relative grid lg:grid-cols-2 gap-6 items-stretch p-6 sm:p-10">
-            <div className="relative overflow-hidden rounded-3xl bg-[#1A1A2E] text-white p-7 sm:p-10 flex flex-col justify-center">
+            <div className="relative overflow-hidden bg-[#1A1A2E] text-white p-7 sm:p-10 flex flex-col justify-center clip-cut-lg">
               <div className="absolute inset-0 grid-scrim opacity-20" />
               <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-[#0B2F5C]/40 blur-[90px]" />
               <Reveal className="relative">
@@ -95,7 +89,7 @@ export default function Home() {
                 </div>
               </Reveal>
             </div>
-            <Reveal delay={0.1} className="relative rounded-3xl bg-white border border-[#D7E4F2] shadow-elevated p-6 sm:p-8 flex flex-col justify-center overflow-hidden">
+            <Reveal delay={0.1} className="relative bg-white border border-[#D7E4F2] shadow-elevated p-6 sm:p-8 flex flex-col justify-center overflow-hidden clip-cut-lg">
               <span className="absolute top-0 left-8 right-8 h-1 rounded-full bg-gradient-to-r from-[#0B2F5C] via-[#5B93D1] to-[#B9D6F2]" />
               <p className="text-[12px] font-black tracking-[0.22em] text-[#0B2F5C] uppercase">Find parts that fit</p>
               <p className="text-[13px] text-[#6B7280] mt-1">Set your truck once, we filter everything.</p>

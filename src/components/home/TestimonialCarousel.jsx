@@ -50,7 +50,7 @@ export default function TestimonialCarousel({ items }) {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -56 * dir }}
               transition={{ duration: 0.45, ease: EASE }}
-              className="bg-white rounded-[22px] p-7 sm:p-9 overflow-hidden"
+              className="bg-white p-7 sm:p-9 overflow-hidden clip-cut-lg"
             >
               <div className="flex gap-1">
                 {[...Array(t.rating)].map((_, i) => <Star key={i} size={17} className="fill-[#E8A90C] text-[#E8A90C]" />)}
@@ -81,10 +81,10 @@ export default function TestimonialCarousel({ items }) {
 
         <div className="mt-6 flex items-center gap-4">
           <div className="flex gap-2">
-            <button onClick={() => go(-1)} aria-label="Previous review" className="grid place-items-center w-11 h-11 rounded-full border border-white/25 text-white hover:bg-white hover:text-[#0B2F5C] transition">
+            <button onClick={() => go(-1)} aria-label="Previous review" className="grid place-items-center w-11 h-11 border border-white/25 text-white hover:bg-white hover:text-[#0B2F5C] transition clip-cut-sm">
               <ArrowLeft size={17} />
             </button>
-            <button onClick={() => go(1)} aria-label="Next review" className="grid place-items-center w-11 h-11 rounded-full bg-white text-[#0B2F5C] hover:bg-[#8FB4E0] transition">
+            <button onClick={() => go(1)} aria-label="Next review" className="grid place-items-center w-11 h-11 bg-white text-[#0B2F5C] hover:bg-[#8FB4E0] transition clip-cut-sm">
               <ArrowRight size={17} />
             </button>
           </div>

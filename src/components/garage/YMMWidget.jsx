@@ -86,7 +86,7 @@ function Console({ dark = true, onDone }) {
           const on = i <= step;
           return (
             <div key={s} className="flex items-center gap-2 flex-1">
-              <span className={`grid place-items-center w-6 h-6 rounded-full text-[11px] font-black shrink-0 transition ${on ? "bg-[#0B2F5C] text-white" : dark ? "bg-white/10 text-white/40" : "bg-[#E8EEF5] text-[#9CA3AF]"}`}>{i + 1}</span>
+              <span className={`grid place-items-center w-6 h-6 text-[11px] font-black shrink-0 transition ${on ? "bg-[#0B2F5C] text-white" : dark ? "bg-white/10 text-white/40" : "bg-[#E8EEF5] text-[#9CA3AF]"}`}>{i + 1}</span>
               <span className={`text-[12px] font-bold ${on ? (dark ? "text-white" : "text-[#0B2F5C]") : (dark ? "text-white/40" : "text-[#9CA3AF]")}`}>{s}</span>
               {i < 2 && <span className={`flex-1 h-0.5 rounded-full ${i < step ? "bg-[#0B2F5C]" : dark ? "bg-white/10" : "bg-[#E5E7EB]"}`} />}
             </div>
@@ -133,11 +133,11 @@ export default function YMMWidget({ variant = "hero" }) {
   // ===== Hero console: always open, light readable card =====
   if (variant === "hero") {
     return (
-      <div className="relative rounded-3xl bg-white border-2 border-[#0B2F5C]/15 shadow-elevated overflow-hidden">
+      <div className="relative bg-white border-2 border-[#0B2F5C]/15 shadow-elevated overflow-hidden clip-cut-lg">
         <span className="absolute top-0 left-8 right-8 h-1.5 rounded-full bg-gradient-to-r from-[#0B2F5C] via-[#5B93D1] to-[#B9D6F2]" />
         <div className="p-5 sm:p-7">
           <div className="flex items-center gap-3">
-            <span className="grid place-items-center w-11 h-11 rounded-2xl bg-[#0B2F5C] text-white shrink-0">
+            <span className="grid place-items-center w-11 h-11 bg-[#0B2F5C] text-white shrink-0" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
               <Truck size={20} />
             </span>
             <div className="min-w-0">
