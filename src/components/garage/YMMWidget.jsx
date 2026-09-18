@@ -136,11 +136,11 @@ export default function YMMWidget({ variant = "hero" }) {
     return (
       <div className="relative bg-white border-2 border-[#0B2F5C]/15 shadow-elevated">
         <div className="p-5 sm:p-7">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <span className="grid place-items-center w-11 h-11 bg-[#0B2F5C] text-white shrink-0" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
               <Truck size={20} />
             </span>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1 basis-36">
               <p className="text-[#1A1A2E] font-display font-bold text-[17px] leading-none">Find parts that fit</p>
               <p className="text-[#6B7280] text-[12px] mt-1">
                 {hasValidVehicle ? `Filtering for ${selectedVehicle.year || "any"} ${selectedVehicle.make} ${selectedVehicle.model}` : "Set your truck once, we filter everything."}

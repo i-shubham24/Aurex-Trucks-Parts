@@ -6,8 +6,6 @@ import { SafeImg, staggerParent, staggerChild } from "../ui.jsx";
 import { PANELS } from "../../data/catalog.js";
 import { useProducts } from "../../store/products.jsx";
 
-const EASE = [0.16, 1, 0.3, 1];
-
 /* ---------------- Bento: shop the range ---------------- */
 
 function BentoCell({ to, img, label, sub, count, tall = false }) {
@@ -221,7 +219,7 @@ export function RangeShowcase() {
         </div>
         <div className="bg-[#F2F6FB] border border-[#D7E4F2] p-6 sm:p-9 flex flex-col justify-center relative overflow-hidden clip-cut-lg">
           <span className="absolute top-0 left-10 right-10 h-1 rounded-full bg-gradient-to-r from-[#0B2F5C] via-[#5B93D1] to-[#B9D6F2]" />
-          <div className="flex gap-2.5">
+          <div className="grid grid-cols-1 min-[480px]:grid-cols-3 gap-2.5">
             {PANELS.map((p, i) => (
               <button
                 key={p.kicker}
