@@ -3,73 +3,140 @@
 @theme {
   --font-display: "Space Grotesk", "Inter", system-ui, sans-serif;
   --font-body: "Inter", system-ui, sans-serif;
-  --color-primary: #0B2F5C;
-  --color-primary-dark: #071E3C;
-  --color-primary-light: #2F5E93;
-  --color-dark: #1A1A2E;
-  --color-dark-alt: #16213E;
+  --color-primary: #134E8D;
+  --color-primary-dark: #0C2B52;
+  --color-primary-light: #3873B3;
+  --color-dark: #222538;
+  --color-dark-alt: #1D2B4E;
   --color-surface: #FFFFFF;
   --color-surface-alt: #F7F8FA;
   --color-surface-warm: #F2F5F9;
   --color-card: #FFFFFF;
   --color-border: #E5E7EB;
-  --color-text: #1A1A2E;
+  --color-text: #222538;
   --color-muted: #6B7280;
   --color-text-light: #9CA3AF;
   --color-accent: #B9C0CC;
   --color-silver: #C7CDD6;
-  --color-navy: #0B2F5C;
+  --color-navy: #134E8D;
   --color-success: #10B981;
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: var(--font-body);
   background: #FFFFFF;
-  color: #1A1A2E;
+  color: #222538;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-.font-display { font-family: var(--font-display); }
 
-::selection { background: #0B2F5C; color: #fff; }
-::-webkit-scrollbar { width: 9px; height: 9px; }
-::-webkit-scrollbar-track { background: #F1F2F4; }
-::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 8px; }
-::-webkit-scrollbar-thumb:hover { background: #0B2F5C; }
+.font-display {
+  font-family: var(--font-display);
+}
+
+::selection {
+  background: #134E8D;
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F2F4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #134E8D;
+}
 
 /* Rotating gears loader (blue/silver, transparent stage) */
-@keyframes gear-rot { to { transform: rotate(360deg); } }
-@keyframes gear-rot-rev { to { transform: rotate(-360deg); } }
-.gears-cw { animation: gear-rot linear infinite; }
-.gears-ccw { animation: gear-rot-rev linear infinite; }
+@keyframes gear-rot {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes gear-rot-rev {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.gears-cw {
+  animation: gear-rot linear infinite;
+}
+
+.gears-ccw {
+  animation: gear-rot-rev linear infinite;
+}
+
 /* Soft white floor shadow beneath the gears */
 .gears-floor {
   width: 72%;
   height: 26px;
   margin-top: -14px;
   border-radius: 9999px;
-  background: radial-gradient(ellipse at center, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 70%);
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 70%);
   filter: blur(5px);
 }
 
 /* Marquee */
-@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-.animate-marquee { animation: marquee 38s linear infinite; }
-.animate-marquee-slow { animation: marquee 60s linear infinite; }
-.marquee-track:hover { animation-play-state: paused; }
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 38s linear infinite;
+}
+
+.animate-marquee-slow {
+  animation: marquee 60s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
 
 /* Shadows */
-.shadow-card { box-shadow: 0 1px 3px rgba(16,24,40,0.06), 0 1px 2px rgba(16,24,40,0.04); }
-.shadow-card-hover { box-shadow: 0 18px 40px -12px rgba(16,24,40,0.16), 0 8px 16px -8px rgba(16,24,40,0.08); }
-.shadow-elevated { box-shadow: 0 30px 60px -18px rgba(16,24,40,0.22); }
-.shadow-primary { box-shadow: 0 14px 30px -10px rgba(11,47,92,0.45); }
+.shadow-card {
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+
+.shadow-card-hover {
+  box-shadow: 0 18px 40px -12px rgba(16, 24, 40, 0.16), 0 8px 16px -8px rgba(16, 24, 40, 0.08);
+}
+
+.shadow-elevated {
+  box-shadow: 0 30px 60px -18px rgba(16, 24, 40, 0.22);
+}
+
+.shadow-primary {
+  box-shadow: 0 14px 30px -10px rgba(19, 78, 141, 0.45);
+}
 
 /* Gradient text */
 .text-gradient {
-  background: linear-gradient(100deg, #C7CDD6 0%, #0B2F5C 55%, #071E3C 100%);
+  background: linear-gradient(100deg, #C7CDD6 0%, #134E8D 55%, #0C2B52 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -84,25 +151,34 @@ body {
 }
 
 /* Tasteful hover sheen that sweeps across a card */
-.shine { position: relative; overflow: hidden; }
+.shine {
+  position: relative;
+  overflow: hidden;
+}
+
 .shine::after {
   content: "";
   position: absolute;
-  top: 0; left: -75%;
-  width: 50%; height: 100%;
-  background: linear-gradient(100deg, transparent, rgba(255,255,255,0.55), transparent);
+  top: 0;
+  left: -75%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
   transform: skewX(-18deg);
   transition: left 0.7s var(--ease-out-expo);
   pointer-events: none;
   z-index: 5;
 }
-.shine:hover::after { left: 130%; }
+
+.shine:hover::after {
+  left: 130%;
+}
 
 /* Subtle engineering grid for dark hero panels */
 .grid-scrim {
   background-image:
-    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
   background-size: 44px 44px;
   mask-image: radial-gradient(ellipse 80% 70% at 30% 20%, #000 40%, transparent 100%);
   -webkit-mask-image: radial-gradient(ellipse 80% 70% at 30% 20%, #000 40%, transparent 100%);
@@ -115,34 +191,74 @@ body {
 }
 
 /* Hide scrollbar for draggable rows */
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
 
 /* Animated underline for links */
-.link-underline { position: relative; }
+.link-underline {
+  position: relative;
+}
+
 .link-underline::after {
   content: "";
-  position: absolute; left: 0; bottom: -3px;
-  width: 100%; height: 2px;
-  background: #0B2F5C;
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 2px;
+  background: #134E8D;
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.35s var(--ease-out-expo);
 }
-.link-underline:hover::after { transform: scaleX(1); }
+
+.link-underline:hover::after {
+  transform: scaleX(1);
+}
 
 /* Slow float for hero chips */
-@keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
-.animate-floaty { animation: floaty 5.5s ease-in-out infinite; }
+@keyframes floaty {
 
-/* House button shape: square with the bottom left corner cropped */
-.clip-cut { clip-path: polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px)); }
-.clip-cut-sm { clip-path: polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px)); }
-.clip-cut-lg { clip-path: polygon(0 0, 100% 0, 100% 100%, 18px 100%, 0 calc(100% - 18px)); }
-.clip-notch { clip-path: polygon(0 0, 100% 0, 100% 70%, 70% 100%, 0 100%); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+.animate-floaty {
+  animation: floaty 5.5s ease-in-out infinite;
+}
+
+/* Modern clean button and card radii */
+.clip-cut {
+  border-radius: 0.625rem;
+}
+
+.clip-cut-sm {
+  border-radius: 0.5rem;
+}
+
+.clip-cut-lg {
+  border-radius: 1rem;
+}
+
+.clip-notch {
+  border-radius: 0.625rem;
+}
 
 /* Sticky first column for wide admin tables on small screens */
-.sticky-col th:first-child, .sticky-col td:first-child {
+.sticky-col th:first-child,
+.sticky-col td:first-child {
   position: sticky;
   left: 0;
   z-index: 2;
@@ -151,6 +267,14 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-marquee, .animate-marquee-slow, .animate-floaty { animation: none; }
-  html { scroll-behavior: auto; }
+
+  .animate-marquee,
+  .animate-marquee-slow,
+  .animate-floaty {
+    animation: none;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
 }

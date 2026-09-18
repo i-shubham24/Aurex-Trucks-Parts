@@ -85,7 +85,7 @@ export default function Dashboard() {
             <Download size={16} />
           </button>
           
-          <button onClick={handleRefresh} className="bg-[#5B93D1] rounded-xl p-2.5 text-white hover:bg-[#8FB4E0] transition shadow-[0_0_15px_rgba(255,77,0,0.3)]" title="Refresh">
+          <button onClick={handleRefresh} className="bg-[#5B93D1] rounded-xl p-2.5 text-white hover:bg-[#9AC1EE] transition shadow-[0_0_15px_rgba(255,77,0,0.3)]" title="Refresh">
             <RefreshCw size={16} className={isRefreshing ? "animate-spin" : ""} />
           </button>
         </div>
@@ -154,7 +154,7 @@ export default function Dashboard() {
               <div className="flex items-center gap-3 text-sm p-2 hover:bg-white/5 rounded-xl transition mt-2">
                 <span className="text-[10px] font-black uppercase tracking-wider bg-blue-400/10 text-blue-400 rounded-md px-2 py-1 border border-blue-400/20 w-24 text-center shrink-0">Enquiries</span>
                 <span className="flex-1 text-white/80">{enquiries.filter((e) => e.status === "New").length} new trade quote requests pending</span>
-                <Link to="/admin/quotes" className="text-[12px] font-bold text-white bg-[#5B93D1] hover:bg-[#8FB4E0] px-3 py-1.5 rounded-lg transition shrink-0">Review</Link>
+                <Link to="/admin/quotes" className="text-[12px] font-bold text-white bg-[#5B93D1] hover:bg-[#9AC1EE] px-3 py-1.5 rounded-lg transition shrink-0">Review</Link>
               </div>
             )}
           </div>

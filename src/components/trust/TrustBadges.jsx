@@ -22,11 +22,11 @@ export default function TrustBadges({ compact = false, darkTheme = false }) {
     <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-6`}>
       {displayBadges.map(([Icon, title, description], index) => (
         <div key={index} className="flex items-start gap-3">
-          <span className={`grid place-items-center w-11 h-11 rounded-xl ${darkTheme ? 'bg-white/20' : 'bg-white border border-[#E5E7EB]'} text-[#0B2F5C] shrink-0 shadow-sm`}>
+          <span className={`grid place-items-center w-11 h-11 rounded-xl ${darkTheme ? 'bg-white/20' : 'bg-white border border-[#E5E7EB]'} text-[#134E8D] shrink-0 shadow-sm`}>
             <Icon size={20} />
           </span>
           <div>
-            <p className="font-bold text-[14px] text-[#1A1A2E]">{title}</p>
+            <p className="font-bold text-[14px] text-[#222538]">{title}</p>
             <p className="text-[12px] text-[#6B7280] mt-0.5 leading-snug">{description}</p>
           </div>
         </div>

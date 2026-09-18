@@ -26,7 +26,7 @@ export function PasswordField({ value, onChange, placeholder, inputClass }) {
         type="button"
         onClick={() => setShow(!show)}
         aria-label={show ? "Hide password" : "Show password"}
-        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-[#6B7280] hover:text-[#1A1A2E] hover:bg-black/5 transition"
+        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-[#6B7280] hover:text-[#222538] hover:bg-black/5 transition"
       >
         {show ? <EyeOff size={17} /> : <Eye size={17} />}
       </button>
@@ -38,19 +38,19 @@ function AuthShell({ title, sub, children, footer }) {
   return (
     <div className="min-h-screen grid lg:grid-cols-[1.05fr_1fr] bg-white">
       {/* Brand panel */}
-      <div className="relative hidden lg:flex flex-col justify-between p-12 overflow-hidden bg-[#1A1A2E] text-white">
+      <div className="relative hidden lg:flex flex-col justify-between p-12 overflow-hidden bg-[#222538] text-white">
         <SafeImg src={HERO.primary} alt="" label="AUREX" className="absolute inset-0 w-full h-full object-cover opacity-25" wrapClass="absolute inset-0 w-full h-full" />
         <div className="absolute inset-0 grid-scrim opacity-50" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A2E] via-[#1A1A2E]/70 to-[#1A1A2E]/40" />
-        <div className="absolute -right-24 top-1/3 w-96 h-96 rounded-full bg-[#0B2F5C]/20 blur-[120px]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#222538] via-[#222538]/70 to-[#222538]/40" />
+        <div className="absolute -right-24 top-1/3 w-96 h-96 rounded-full bg-[#134E8D]/20 blur-[120px]" />
 
-        <Link to="/" className="relative w-fit bg-white px-6 py-4 inline-block" style={{ clipPath: "polygon(0 0,100% 0,100% 100%,16px 100%,0 calc(100% - 16px))" }}>
+        <Link to="/" className="relative w-fit bg-white px-6 py-4 inline-block rounded-xl">
           <LogoFull size={52} />
         </Link>
 
         <div className="relative">
           <h2 className="font-display font-bold text-[40px] leading-[1.05] tracking-[-0.02em] max-w-md">
-            The parts desk that <span className="text-[#8FB4E0]">moves as fast</span> as your fleet.
+            The parts desk that <span className="text-[#9AC1EE]">moves as fast</span> as your fleet.
           </h2>
           <div className="mt-8 space-y-4 max-w-sm">
             {[
@@ -59,7 +59,7 @@ function AuthShell({ title, sub, children, footer }) {
               [ShieldCheck, "ADR compliant range with OEM cross references"],
             ].map(([Icon, txt]) => (
               <div key={txt} className="flex items-center gap-3">
-                <span className="grid place-items-center w-10 h-10 bg-white/10 border border-white/15 text-[#8FB4E0] shrink-0" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
+                <span className="grid place-items-center w-10 h-10 bg-white/10 border border-white/15 text-[#9AC1EE] shrink-0 rounded-xl">
                   <Icon size={18} />
                 </span>
                 <span className="text-white/85 text-[14px] font-medium">{txt}</span>
@@ -68,7 +68,7 @@ function AuthShell({ title, sub, children, footer }) {
           </div>
         </div>
 
-        <div className="relative bg-white/5 border border-white/10 backdrop-blur p-5 max-w-md" style={{ clipPath: "polygon(0 0,100% 0,100% 100%,20px 100%,0 calc(100% - 20px))" }}>
+        <div className="relative bg-white/5 border border-white/10 backdrop-blur p-5 max-w-md rounded-2xl">
           <div className="flex gap-0.5">
             {[...Array(t.rating)].map((_, i) => <Star key={i} size={14} className="fill-[#E8A90C] text-[#E8A90C]" />)}
           </div>
@@ -84,7 +84,7 @@ function AuthShell({ title, sub, children, footer }) {
             <LogoFull />
           </Link>
           <span className="hidden lg:block" />
-          <Link to="/" className="flex items-center gap-2 text-[13px] font-semibold text-[#6B7280] hover:text-[#0B2F5C] transition">
+          <Link to="/" className="flex items-center gap-2 text-[13px] font-semibold text-[#6B7280] hover:text-[#134E8D] transition">
             <ArrowLeft size={15} /> Back to store
           </Link>
         </div>
@@ -96,7 +96,7 @@ function AuthShell({ title, sub, children, footer }) {
             transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
             className="w-full max-w-md"
           >
-            <h1 className="font-display font-bold text-[32px] sm:text-[38px] tracking-[-0.02em] text-[#1A1A2E]">{title}</h1>
+            <h1 className="font-display font-bold text-[32px] sm:text-[38px] tracking-[-0.02em] text-[#222538]">{title}</h1>
             <p className="text-[#6B7280] text-[15px] mt-2">{sub}</p>
             <div className="mt-7">{children}</div>
             {footer && <div className="mt-6">{footer}</div>}
@@ -111,7 +111,7 @@ function AuthShell({ title, sub, children, footer }) {
   );
 }
 
-const inputClass = "w-full px-4 py-3.5 bg-[#F7F8FA] border-2 border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#0B2F5C] focus:bg-white transition";
+const inputClass = "w-full px-4 py-3.5 bg-[#F7F8FA] border-2 border-[#E5E7EB] outline-none text-sm text-[#222538] focus:border-[#134E8D] focus:bg-white transition";
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -147,7 +147,7 @@ export function LoginPage() {
     <AuthShell
       title="Welcome back"
       sub="Log in to check out faster and track your orders."
-      footer={<p className="text-sm text-[#6B7280]">New to Aurex? <Link to="/signup" className="text-[#0B2F5C] font-bold hover:underline">Create an account</Link></p>}
+      footer={<p className="text-sm text-[#6B7280]">New to Aurex? <Link to="/signup" className="text-[#134E8D] font-bold hover:underline">Create an account</Link></p>}
     >
       <form onSubmit={handleLogin} className="grid gap-3">
         {/* Honeypot field (hidden from real users) */}
@@ -164,7 +164,7 @@ export function LoginPage() {
           <PasswordField value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" inputClass={inputClass} />
         </label>
         {err && <p className="text-[13px] text-red-500 font-semibold">{err}</p>}
-        <button className="mt-2 bg-[#0B2F5C] text-white py-4 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#1A1A2E] active:scale-[0.99] transition shadow-primary clip-cut">
+        <button className="mt-2 bg-[#134E8D] text-white py-4 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#222538] active:scale-[0.99] transition shadow-primary clip-cut">
           <LogIn size={16} /> Log in
         </button>
       </form>
@@ -213,7 +213,7 @@ export function SignupPage() {
     <AuthShell
       title="Create your account"
       sub="Trade and fleet welcome. One login for quotes, checkout and tracking."
-      footer={<p className="text-sm text-[#6B7280]">Already have an account? <Link to="/login" className="text-[#0B2F5C] font-bold hover:underline">Log in</Link></p>}
+      footer={<p className="text-sm text-[#6B7280]">Already have an account? <Link to="/login" className="text-[#134E8D] font-bold hover:underline">Log in</Link></p>}
     >
       <form onSubmit={handleSignup} className="grid gap-3">
         {/* Honeypot field (hidden from real users) */}
@@ -229,7 +229,7 @@ export function SignupPage() {
         <input value={f.company} onChange={set("company")} placeholder="Company or fleet, optional" className={inputClass} />
         <PasswordField value={f.password} onChange={set("password")} placeholder="Create password" inputClass={inputClass} />
         {err && <p className="text-[13px] text-red-500 font-semibold">{err}</p>}
-        <button className="mt-2 bg-[#1A1A2E] text-white py-4 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#0B2F5C] active:scale-[0.99] transition clip-cut">
+        <button className="mt-2 bg-[#222538] text-white py-4 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#134E8D] active:scale-[0.99] transition clip-cut">
           <UserPlus size={16} /> Create account
         </button>
       </form>
@@ -255,38 +255,38 @@ export function AccountPage() {
   };
   if (!user) return (
     <div className="mx-auto max-w-xl px-4 py-14 text-center">
-      <Package size={36} className="mx-auto text-[#0B2F5C]" />
-      <h1 className="font-display font-bold text-3xl mt-4 text-[#1A1A2E]">Please log in</h1>
+      <Package size={36} className="mx-auto text-[#134E8D]" />
+      <h1 className="font-display font-bold text-3xl mt-4 text-[#222538]">Please log in</h1>
       <p className="text-[#6B7280] text-sm mt-2">Your account holds your details plus order history.</p>
-      <button onClick={() => nav("/login")} className="mt-5 bg-[#0B2F5C] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition">Go to login</button>
+      <button onClick={() => nav("/login")} className="mt-5 bg-[#134E8D] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#222538] transition">Go to login</button>
     </div>
   );
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 grid lg:grid-cols-[300px_1fr] gap-6 items-start">
       <div className="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm lg:sticky lg:top-28">
-        <span className="grid place-items-center w-14 h-14 rounded-full bg-[#1A1A2E] text-white font-display font-black text-xl">{user.name.charAt(0)}</span>
-        <p className="font-display font-bold text-2xl text-[#1A1A2E] mt-3">{user.name}</p>
+        <span className="grid place-items-center w-14 h-14 rounded-full bg-[#222538] text-white font-display font-black text-xl">{user.name.charAt(0)}</span>
+        <p className="font-display font-bold text-2xl text-[#222538] mt-3">{user.name}</p>
         <p className="text-[#6B7280] text-sm mt-1">{user.email}</p>
         <p className="text-[#9CA3AF] text-[13px] mt-1">{user.company || "Independent buyer"} {user.phone ? ", " + user.phone : ""}</p>
         <button onClick={() => { logout(); nav("/"); }} className="mt-5 w-full rounded-xl border border-[#E5E7EB] py-3 text-sm font-bold text-[#6B7280] hover:border-red-400 hover:text-red-500 transition">Log out</button>
-        <Link to="/shop" className="mt-2 block text-center bg-[#0B2F5C] text-white py-3 text-sm font-bold hover:bg-[#1A1A2E] transition clip-cut-sm">Continue shopping</Link>
+        <Link to="/shop" className="mt-2 block text-center bg-[#134E8D] text-white py-3 text-sm font-bold hover:bg-[#222538] transition clip-cut-sm">Continue shopping</Link>
       </div>
       <div>
-        <h1 className="font-display font-bold text-3xl text-[#1A1A2E]">Order history ({myOrders.length})</h1>
+        <h1 className="font-display font-bold text-3xl text-[#222538]">Order history ({myOrders.length})</h1>
         <div className="mt-4 space-y-3">
           {myOrders.length === 0 && <p className="rounded-2xl border border-dashed border-[#E5E7EB] p-8 text-center text-[#9CA3AF] text-sm">No orders yet. Checkout creates an order you can track.</p>}
           {myOrders.map((o) => (
             <div key={o.id} className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
               <div className="flex flex-wrap gap-2 items-center">
-                <p className="font-bold text-[#1A1A2E]">{o.id}</p>
+                <p className="font-bold text-[#222538]">{o.id}</p>
                 <span className="text-[11px] font-bold bg-[#10B981] text-white rounded-lg px-3 py-1">{o.status}</span>
-                <span className="ml-auto font-display font-bold text-lg text-[#1A1A2E]">${o.total.toFixed(2)}</span>
+                <span className="ml-auto font-display font-bold text-lg text-[#222538]">${o.total.toFixed(2)}</span>
               </div>
               <p className="text-[12px] text-[#9CA3AF] mt-1.5">
                 {new Date(o.placedAt).toLocaleString()} | {o.items.length} lines | {o.shipping} | {o.payment}
               </p>
-              <Link to={`/order-success/${o.id}`} className="mt-3 inline-block text-[13px] font-bold text-[#0B2F5C]">View receipt</Link>
-              <button onClick={() => reorder(o)} className="mt-3 ml-4 inline-block text-[13px] font-bold text-[#1A1A2E] underline">Reorder these lines</button>
+              <Link to={`/order-success/${o.id}`} className="mt-3 inline-block text-[13px] font-bold text-[#134E8D]">View receipt</Link>
+              <button onClick={() => reorder(o)} className="mt-3 ml-4 inline-block text-[13px] font-bold text-[#222538] underline">Reorder these lines</button>
             </div>
           ))}
         </div>

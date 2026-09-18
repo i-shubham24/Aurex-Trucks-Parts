@@ -95,7 +95,7 @@ export default function AdminLayout() {
     return (
       <div className="min-h-screen bg-[#060B13] flex items-center justify-center p-4 relative overflow-hidden">
         <div className="absolute inset-0 grid-scrim opacity-20" />
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#0B2F5C]/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#134E8D]/10 to-transparent" />
         <div className="absolute -left-1/4 -top-1/4 w-[150%] h-[150%] blur-3xl opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#5B93D1]/20 via-[#060B13]/0 to-transparent pointer-events-none" />
         
         <div className="w-full max-w-[420px] relative z-10">
@@ -104,7 +104,7 @@ export default function AdminLayout() {
           </div>
           
           <form onSubmit={handleLogin} className="rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-8 sm:p-10 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#5B93D1] to-[#8FB4E0]" />
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#5B93D1] to-[#9AC1EE]" />
             
             <p className="text-[11px] font-black tracking-[0.2em] text-[#5B93D1] uppercase mb-2">Secure Gateway</p>
             <h1 className="font-display font-bold text-3xl text-white">Staff Login</h1>
@@ -129,7 +129,7 @@ export default function AdminLayout() {
 
             {err && <p className="mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-[13px] text-red-400 font-semibold">{err}</p>}
             
-            <button disabled={loading} className="mt-8 w-full bg-[#5B93D1] rounded-xl py-3.5 text-[14px] font-bold text-white hover:bg-[#8FB4E0] transition flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+            <button disabled={loading} className="mt-8 w-full bg-[#5B93D1] rounded-xl py-3.5 text-[14px] font-bold text-white hover:bg-[#9AC1EE] transition flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
               {loading ? <><Loader2 size={18} className="animate-spin" /> Authenticating...</> : "Sign into portal"}
             </button>
             
@@ -217,7 +217,7 @@ export default function AdminLayout() {
             
             <div ref={profileRef} className="relative">
               <div onClick={() => setShowProfile(!showProfile)} className="flex items-center gap-3 cursor-pointer group p-1.5 rounded-xl hover:bg-white/5 transition">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#5B93D1] to-[#8FB4E0] flex items-center justify-center font-bold shadow-inner">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#5B93D1] to-[#9AC1EE] flex items-center justify-center font-bold shadow-inner">
                   {user.name.charAt(0)}
                 </div>
                 <div className="hidden md:block text-left">

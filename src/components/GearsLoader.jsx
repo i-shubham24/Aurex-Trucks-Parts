@@ -35,7 +35,7 @@ function Gear({ cx, cy, r, teeth, from, to, ring = "#D7DEE8", dur = 8, reverse =
       </defs>
       <polygon points={pts} fill={`url(#${gid})`} strokeLinejoin="round" style={{ filter: "drop-shadow(0 6px 10px rgba(7,20,40,0.35))" }} />
       <circle cx={cx} cy={cy} r={r * 0.55} fill="none" stroke={ring} strokeWidth={r * 0.07} opacity="0.9" />
-      <circle cx={cx} cy={cy} r={r * 0.2} fill="#071E3C" opacity="0.88" />
+      <circle cx={cx} cy={cy} r={r * 0.2} fill="#0C2B52" opacity="0.88" />
       <circle cx={cx - r * 0.06} cy={cy - r * 0.07} r={r * 0.06} fill="#FFFFFF" opacity="0.5" />
     </g>
   );
@@ -44,9 +44,9 @@ function Gear({ cx, cy, r, teeth, from, to, ring = "#D7DEE8", dur = 8, reverse =
 export function GearsMark({ size = 168 }) {
   return (
     <svg width={size} height={size * 0.86} viewBox="0 0 220 190" role="img" aria-label="Loading">
-      <Gear id="g1" cx={72} cy={122} r={54} teeth={14} from="#17508B" to="#071E3C" dur={9} />
-      <Gear id="g2" cx={152} cy={104} r={40} teeth={12} from="#1E5A9E" to="#0B2F5C" dur={7.7} reverse />
-      <Gear id="g3" cx={106} cy={42} r={27} teeth={10} from="#6AA3DC" to="#2F5E93" dur={6.4} />
+      <Gear id="g1" cx={72} cy={122} r={54} teeth={14} from="#17508B" to="#0C2B52" dur={9} />
+      <Gear id="g2" cx={152} cy={104} r={40} teeth={12} from="#1E5A9E" to="#134E8D" dur={7.7} reverse />
+      <Gear id="g3" cx={106} cy={42} r={27} teeth={10} from="#6AA3DC" to="#3873B3" dur={6.4} />
       <Gear id="g4" cx={150} cy={20} r={17} teeth={8} from="#C4D9F0" to="#7FA8D6" dur={5.1} reverse />
     </svg>
   );

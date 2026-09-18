@@ -29,7 +29,7 @@ export default function PriceFilter({ range = [0, 6000], onChange, min = 0, max 
     <div>
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center justify-between w-full text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase hover:text-[#1A1A2E] transition"
+        className="flex items-center justify-between w-full text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase hover:text-[#222538] transition"
       >
         <span>Price Range</span>
         {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -49,7 +49,7 @@ export default function PriceFilter({ range = [0, 6000], onChange, min = 0, max 
             max={max}
             value={localRange[1]}
             onChange={handleSliderChange}
-            className="w-full accent-[#0B2F5C] h-2 bg-[#E5E7EB] rounded-lg appearance-none cursor-pointer"
+            className="w-full accent-[#134E8D] h-2 bg-[#E5E7EB] rounded-lg appearance-none cursor-pointer"
           />
           
           {!compact && (
@@ -62,7 +62,7 @@ export default function PriceFilter({ range = [0, 6000], onChange, min = 0, max 
                   onChange={(e) => handleMinChange(e.target.value)}
                   min={min}
                   max={max}
-                  className="mt-1 w-full bg-[#F5F6F8] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#0B2F5C] transition"
+                  className="mt-1 w-full bg-[#F5F6F8] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#134E8D] transition"
                 />
               </div>
               <div>
@@ -73,7 +73,7 @@ export default function PriceFilter({ range = [0, 6000], onChange, min = 0, max 
                   onChange={(e) => handleMaxChange(e.target.value)}
                   min={min}
                   max={max}
-                  className="mt-1 w-full bg-[#F5F6F8] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#0B2F5C] transition"
+                  className="mt-1 w-full bg-[#F5F6F8] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#134E8D] transition"
                 />
               </div>
             </div>

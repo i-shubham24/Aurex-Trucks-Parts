@@ -22,7 +22,7 @@ export default function BrandPage() {
 
   return (
     <div className="bg-[#F7F8FA]">
-      <div className="bg-[#1A1A2E] text-white">
+      <div className="bg-[#222538] text-white">
         <div className="mx-auto max-w-7xl px-4 py-12">
           <p className="text-[12px] font-semibold text-white/40">Home <span className="mx-1">/</span> <Link to="/brands" className="hover:text-white">Brands</Link> <span className="mx-1">/</span> {label}</p>
           <h1 className="font-display font-bold tracking-[-0.02em] text-[36px] sm:text-[52px] mt-2">{known ? label : "Brand"}</h1>
@@ -32,13 +32,13 @@ export default function BrandPage() {
       <div className="mx-auto max-w-7xl px-4 py-10">
         <p className="text-[12px] font-black tracking-[0.2em] text-[#6B7280] uppercase">Supported models</p>
         <div className="mt-3 flex flex-wrap gap-2">
-          {models.map((m) => <Link key={m} to={`/shop?cat=All`} className="rounded-xl bg-white border border-[#E5E7EB] px-4 py-2.5 text-[13px] font-bold hover:border-[#0B2F5C] transition">{m}</Link>)}
+          {models.map((m) => <Link key={m} to={`/shop?cat=All`} className="rounded-xl bg-white border border-[#E5E7EB] px-4 py-2.5 text-[13px] font-bold hover:border-[#134E8D] transition">{m}</Link>)}
         </div>
-        <h2 className="font-display font-bold text-2xl text-[#1A1A2E] mt-8">All {label} lines ({lines.length})</h2>
+        <h2 className="font-display font-bold text-2xl text-[#222538] mt-8">All {label} lines ({lines.length})</h2>
         {lines.length === 0
-          ? <p className="mt-3 text-sm text-[#6B7280]">No lines under this badge yet. <Link to="/shop" className="text-[#0B2F5C] font-bold">Browse the full shop →</Link></p>
+          ? <p className="mt-3 text-sm text-[#6B7280]">No lines under this badge yet. <Link to="/shop" className="text-[#134E8D] font-bold">Browse the full shop →</Link></p>
           : <div className="mt-5 grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-4 gap-4">{lines.map((p, i) => <ProductCard key={p.sku} p={p} index={i} />)}</div>}
-        <Link to="/brands" className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-[#1A1A2E] hover:text-[#0B2F5C]">← All brands <ArrowRight size={14} className="rotate-180" /></Link>
+        <Link to="/brands" className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-[#222538] hover:text-[#134E8D]">← All brands <ArrowRight size={14} className="rotate-180" /></Link>
       </div>
     </div>
   );

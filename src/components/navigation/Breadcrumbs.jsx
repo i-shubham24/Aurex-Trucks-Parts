@@ -35,11 +35,11 @@ export default function Breadcrumbs({ customItems = [] }) {
         <div key={item.path} className="flex items-center gap-2">
           {index > 0 && <ChevronRight size={12} />}
           {item.active ? (
-            <span className="text-[#1A1A2E]">{item.label}</span>
+            <span className="text-[#222538]">{item.label}</span>
           ) : (
             <Link 
               to={item.path} 
-              className="hover:text-[#0B2F5C] transition flex items-center gap-1.5"
+              className="hover:text-[#134E8D] transition flex items-center gap-1.5"
             >
               {item.icon && <item.icon size={12} />}
               {item.label}

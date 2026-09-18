@@ -77,7 +77,7 @@ export function Dropdown({ value, options, onChange, align = "left", className =
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
-        className="clip-cut w-full flex items-center justify-between gap-3 bg-white border-2 border-[#E5E7EB] px-4 py-3.5 sm:py-3 text-base sm:text-sm font-bold text-[#1A1A2E] hover:border-[#0B2F5C] focus:border-[#0B2F5C] outline-none transition"
+        className="clip-cut w-full flex items-center justify-between gap-3 bg-white border-2 border-[#E5E7EB] px-4 py-3.5 sm:py-3 text-base sm:text-sm font-bold text-[#222538] hover:border-[#134E8D] focus:border-[#134E8D] outline-none transition"
       >
         {value}
         <ChevronDown size={15} className={`text-[#9CA3AF] transition ${open ? "rotate-180" : ""}`} />
@@ -87,7 +87,7 @@ export function Dropdown({ value, options, onChange, align = "left", className =
           <motion.ul
             role="listbox"
             initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.16 }}
-            className={`absolute z-40 mt-1.5 min-w-full max-h-[50vh] overflow-y-auto bg-white border-2 border-[#1A1A2E] shadow-elevated ${align === "right" ? "right-0" : "left-0"}`}
+            className={`absolute z-40 mt-1.5 min-w-full max-h-[50vh] overflow-y-auto bg-white border-2 border-[#222538] shadow-elevated ${align === "right" ? "right-0" : "left-0"}`}
           >
             {options.map((o, i) => (
               <li key={o} role="option" aria-selected={o === value}>
@@ -96,8 +96,8 @@ export function Dropdown({ value, options, onChange, align = "left", className =
                   tabIndex={-1}
                   onClick={() => { onChange(o); setOpen(false); }}
                   className={`w-full text-left px-4 py-3.5 sm:py-2.5 text-base sm:text-sm font-semibold transition ${
-                    o === value ? "bg-[#0B2F5C] text-white" : "text-[#1A1A2E] hover:bg-[#E8EEF5]"
-                  } ${focusedIndex === i ? "bg-[#E8EEF5] text-[#1A1A2E] outline-none" : ""}`}
+                    o === value ? "bg-[#134E8D] text-white" : "text-[#222538] hover:bg-[#EDF3FA]"
+                  } ${focusedIndex === i ? "bg-[#EDF3FA] text-[#222538] outline-none" : ""}`}
                 >
                   {o}
                 </button>
@@ -110,18 +110,17 @@ export function Dropdown({ value, options, onChange, align = "left", className =
   );
 }
 
-// Angular fit chip. Hidden when there is no selected truck (status unknown).
+// Clean fit chip. Hidden when there is no selected truck (status unknown).
 export function FitChip({ status, vehicle, className = "" }) {
   if (!status || status === "unknown") return null;
-  const cut = { clipPath: "polygon(0 0, 100% 0, 100% 100%, 8px 100%, 0 calc(100% - 8px))" };
   const styles = {
     fits: "bg-[#10B981] text-white",
-    universal: "bg-[#1A1A2E]/85 text-white backdrop-blur",
-    no: "bg-[#F59E0B] text-[#1A1A2E]",
+    universal: "bg-[#222538]/85 text-white backdrop-blur",
+    no: "bg-[#F59E0B] text-[#222538]",
   }[status];
   const Icon = status === "no" ? TriangleAlert : Check;
   return (
-    <span style={cut} className={`inline-flex items-center gap-1 px-2 py-1 text-[10px] font-black uppercase tracking-wide ${styles} ${className}`}>
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded text-[10px] font-black uppercase tracking-wide ${styles} ${className}`}>
       <Icon size={11} /> {fitLabel(status, vehicle)}
     </span>
   );
@@ -182,7 +181,7 @@ export function ScrollProgress() {
   return (
     <motion.div
       style={{ scaleX }}
-      className="fixed top-0 left-0 right-0 z-[80] h-[3px] origin-left bg-gradient-to-r from-[#2F5E93] via-[#0B2F5C] to-[#071E3C]"
+      className="fixed top-0 left-0 right-0 z-[80] h-[3px] origin-left bg-gradient-to-r from-[#3873B3] via-[#134E8D] to-[#0C2B52]"
     />
   );
 }
@@ -192,7 +191,7 @@ export function SafeImg({ src, alt, className = "", label, wrapClass = "" }) {
   const [broken, setBroken] = useState(false);
   if (broken || !src) {
     return (
-      <div className={`grid place-items-center bg-gradient-to-br from-[#1A1A2E] via-[#0B2F5C] to-[#2F5E93] ${className} ${wrapClass}`}>
+      <div className={`grid place-items-center bg-gradient-to-br from-[#222538] via-[#134E8D] to-[#3873B3] ${className} ${wrapClass}`}>
         <span className="font-display font-black tracking-widest text-white/25 text-2xl px-4 text-center">
           {label || "AUREX"}
         </span>
@@ -218,11 +217,11 @@ export function SectionHead({ kicker, title, sub, link, linkLabel, center }) {
       
       <div className={`max-w-2xl ${center ? "text-center mx-auto" : ""}`}>
         {kicker && (
-          <p className={`text-[12px] font-black tracking-[0.22em] text-[#0B2F5C] uppercase mb-2 flex items-center gap-2 ${center ? "justify-center" : ""}`}>
+          <p className={`text-[12px] font-black tracking-[0.22em] text-[#134E8D] uppercase mb-2 flex items-center gap-2 ${center ? "justify-center" : ""}`}>
             {kicker}
           </p>
         )}
-        <h2 className="font-display font-bold tracking-[-0.02em] text-[28px] sm:text-[38px] leading-[1.05] text-[#1A1A2E]">
+        <h2 className="font-display font-bold tracking-[-0.02em] text-[28px] sm:text-[38px] leading-[1.05] text-[#222538]">
           {title}
         </h2>
         {sub && <p className="text-[#6B7280] text-[15px] mt-2.5 leading-relaxed">{sub}</p>}
@@ -232,7 +231,7 @@ export function SectionHead({ kicker, title, sub, link, linkLabel, center }) {
         <div className={`flex ${center ? "justify-center md:justify-end" : ""}`}>
           <Link
             to={link}
-            className={`clip-cut text-sm font-bold flex items-center gap-2 bg-[#F5F6F8] px-6 py-3 text-[#1A1A2E] hover:bg-[#1A1A2E] hover:text-white hover:gap-3 transition-all group`}
+            className={`clip-cut text-sm font-bold flex items-center gap-2 bg-[#F5F6F8] px-6 py-3 text-[#222538] hover:bg-[#222538] hover:text-white hover:gap-3 transition-all group`}
           >
             {linkLabel || "View all"}
             <ArrowRight size={15} className="group-hover:translate-x-0.5 transition" />
@@ -253,7 +252,7 @@ export function Stars({ rating, reviews, size = 12 }) {
           <Star key={s} size={size} className={s <= Math.round(rating) ? "fill-[#FFBB00] text-[#FFBB00]" : "fill-[#E5E7EB] text-[#E5E7EB]"} />
         ))}
       </span>
-      <b className="text-[#1A1A2E]">{rating}</b>
+      <b className="text-[#222538]">{rating}</b>
       {reviews != null && <span className="text-[#9CA3AF]">({reviews})</span>}
     </p>
   );
@@ -290,7 +289,7 @@ export function AnimatedCounter({ target, suffix = "", duration = 1900, classNam
   }, [target, duration]);
 
   return (
-    <span ref={ref} className={`font-display font-bold text-[34px] sm:text-[40px] text-[#1A1A2E] tabular-nums ${className}`}>
+    <span ref={ref} className={`font-display font-bold text-[34px] sm:text-[40px] text-[#222538] tabular-nums ${className}`}>
       {count}
       {suffix}
     </span>
@@ -313,10 +312,10 @@ export function ScrollRow({ children, className = "" }) {
         {children}
       </div>
       <div className="mt-5 flex gap-2 justify-end">
-        <button onClick={() => by(-1)} aria-label="previous" className="w-11 h-11 grid place-items-center rounded-full border border-[#E5E7EB] text-[#1A1A2E] bg-white hover:bg-[#1A1A2E] hover:text-white hover:border-[#1A1A2E] transition">
+        <button onClick={() => by(-1)} aria-label="previous" className="w-11 h-11 grid place-items-center rounded-full border border-[#E5E7EB] text-[#222538] bg-white hover:bg-[#222538] hover:text-white hover:border-[#222538] transition">
           <ChevronLeft size={18} />
         </button>
-        <button onClick={() => by(1)} aria-label="next" className="w-11 h-11 grid place-items-center rounded-full border border-[#E5E7EB] text-[#1A1A2E] bg-white hover:bg-[#0B2F5C] hover:text-white hover:border-[#0B2F5C] transition">
+        <button onClick={() => by(1)} aria-label="next" className="w-11 h-11 grid place-items-center rounded-full border border-[#E5E7EB] text-[#222538] bg-white hover:bg-[#134E8D] hover:text-white hover:border-[#134E8D] transition">
           <ChevronRight size={18} />
         </button>
       </div>
@@ -339,8 +338,7 @@ function CardShell({ p, index = 0, actions = false }) {
       whileInView="whileInView"
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, ease: EASE, delay: (index % 4) * 0.06 }}
-      className="group relative bg-white border border-[#E5E7EB] hover:border-[#0B2F5C]/40 hover:shadow-card-hover hover:-translate-y-1 transition-all duration-400 flex flex-col"
-      style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 20px 100%, 0 calc(100% - 20px))" }}
+      className="group relative bg-white border border-[#E5E7EB] hover:border-[#134E8D]/40 rounded-xl overflow-hidden hover:shadow-card-hover hover:-translate-y-1 transition-all duration-400 flex flex-col"
     >
       <Link to={`/product/${p.sku}`} className="relative block aspect-[4/3] overflow-hidden bg-[#F4F6F9]" aria-label={p.name}>
         <SafeImg
@@ -350,11 +348,11 @@ function CardShell({ p, index = 0, actions = false }) {
           className="w-full h-full object-cover group-hover:scale-107 transition-transform duration-700 ease-out"
           wrapClass="w-full h-full"
         />
-        <span className="absolute inset-0 bg-gradient-to-t from-[#0B2F5C]/85 via-[#0B2F5C]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none" />
+        <span className="absolute inset-0 bg-gradient-to-t from-[#134E8D]/85 via-[#134E8D]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none" />
         {/* Hover slide-up bar (home rail signature) */}
         <span className="absolute inset-x-0 bottom-0 z-10 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out bg-white px-4 py-3 flex items-center justify-between gap-2">
-          <span className="text-[12px] font-black uppercase tracking-wider text-[#0B2F5C]">View details</span>
-          <span className="grid place-items-center w-8 h-8 bg-[#0B2F5C] text-white shrink-0" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
+          <span className="text-[12px] font-black uppercase tracking-wider text-[#134E8D]">View details</span>
+          <span className="grid place-items-center w-8 h-8 rounded-lg bg-[#134E8D] text-white shrink-0">
             <ArrowRight size={15} />
           </span>
         </span>
@@ -366,16 +364,16 @@ function CardShell({ p, index = 0, actions = false }) {
         </p>
         <Link
           to={`/product/${p.sku}`}
-          className="font-display font-bold text-[15px] leading-snug text-[#1A1A2E] mt-1 line-clamp-2 min-h-[42px] group-hover:text-[#0B2F5C] transition"
+          className="font-display font-bold text-[15px] leading-snug text-[#222538] mt-1 line-clamp-2 min-h-[42px] group-hover:text-[#134E8D] transition"
         >
           {p.name}
         </Link>
         <div className="mt-2 pt-3 border-t border-[#F1F2F4] flex items-center justify-between gap-2">
           <span>
             {p.price == null ? (
-              <span className="font-display font-bold text-[17px] text-[#0B2F5C]">Enquire</span>
+              <span className="font-display font-bold text-[17px] text-[#134E8D]">Enquire</span>
             ) : (
-              <span className="font-display font-bold text-[19px] text-[#1A1A2E]">${p.price.toFixed(2)}</span>
+              <span className="font-display font-bold text-[19px] text-[#222538]">${p.price.toFixed(2)}</span>
             )}
             {p.oldPrice && p.price != null && (
               <span className="block text-[12px] line-through text-[#9CA3AF]">${p.oldPrice.toFixed(2)}</span>
@@ -388,16 +386,14 @@ function CardShell({ p, index = 0, actions = false }) {
           <div className="mt-3 grid grid-cols-2 gap-2">
             <button
               onClick={() => add(p.sku)}
-              className="flex items-center justify-center gap-1.5 bg-[#0B2F5C] text-white px-4 py-2.5 text-[13px] font-bold hover:bg-[#1A1A2E] active:scale-[0.98] transition-all"
-              style={{ clipPath: "polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))" }}
+              className="flex items-center justify-center gap-1.5 bg-[#134E8D] text-white px-4 py-2.5 text-[13px] font-bold rounded-lg hover:bg-[#222538] active:scale-[0.98] transition-all"
             >
               <ShoppingCart size={14} />
               Add
             </button>
             <button
               onClick={() => toggleCompare(p.sku)}
-              className={`py-2.5 text-[13px] font-bold border transition ${inCompare ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#1A1A2E] hover:text-[#1A1A2E]"}`}
-              style={{ clipPath: "polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))" }}
+              className={`py-2.5 text-[13px] font-bold border rounded-lg transition ${inCompare ? "bg-[#222538] text-white border-[#222538]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#222538] hover:text-[#222538]"}`}
             >
               {inCompare ? "Added ✓" : "Compare"}
             </button>
@@ -435,7 +431,7 @@ export function Countdown({ end }) {
   const s = Math.floor((t % 60000) / 1000);
   const cell = (v, l) => (
     <div className="text-center">
-      <div className="w-14 h-14 rounded-xl bg-[#1A1A2E] text-white grid place-items-center font-display font-black text-xl tabular-nums">
+      <div className="w-14 h-14 rounded-xl bg-[#222538] text-white grid place-items-center font-display font-black text-xl tabular-nums">
         {String(v).padStart(2, "0")}
       </div>
       <p className="text-[10px] font-bold text-[#9CA3AF] mt-1.5 tracking-widest uppercase">{l}</p>

@@ -28,24 +28,246 @@ function ScrollManager() {
 function NewsBox() {
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
+
   return (
-    <div className="px-6 sm:px-10 pt-10 flex flex-wrap items-center gap-6 justify-between">
-      <div className="flex items-center gap-4">
-        <span className="grid place-items-center w-12 h-12 rounded-xl bg-[#0B2F5C] text-white shrink-0"><Mail size={22} /></span>
-        <div>
-          <p className="font-display font-bold text-xl text-white">Get fleet pricing and new arrivals</p>
-          <p className="text-white/80 text-[13px] mt-0.5">Join the trade list. No spam, unsubscribe anytime.</p>
+    <div className="relative overflow-hidden bg-gradient-to-r from-[#134E8D] via-[#1D2B4E] to-[#134E8D] text-white px-6 sm:px-12 py-10">
+      {/* Background overlay graphic */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.08),transparent_70%)] pointer-events-none" />
+      <div className="absolute -right-10 -bottom-10 w-80 h-80 rounded-full bg-white/5 blur-2xl pointer-events-none" />
+
+      <div className="relative z-10 mx-auto max-w-7xl flex flex-col lg:flex-row items-center justify-between gap-8">
+        <div className="text-center lg:text-left">
+          <div className="inline-flex items-center gap-2 mb-2.5">
+            <span className="w-6 h-[3px] bg-[#9AC1EE] rounded-full inline-block" />
+            <span className="text-[12px] font-black uppercase tracking-[0.2em] text-[#9AC1EE]">Our Newsletter</span>
+          </div>
+          <h3 className="font-display font-black text-2xl sm:text-3xl lg:text-[34px] leading-tight text-white">
+            Get Regular Update Please <br className="hidden sm:inline" />
+            Subscribe Newsletter
+          </h3>
+        </div>
+
+        <div className="w-full lg:w-auto flex-1 max-w-xl">
+          {done ? (
+            <div className="bg-white/15 border border-white/30 rounded-xl px-6 py-4 text-white text-center font-bold text-sm">
+              ✓ Thank you! You are now subscribed to regular updates.
+            </div>
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (email.trim()) setDone(true);
+              }}
+              className="flex items-center bg-white rounded-xl p-1.5 shadow-2xl w-full"
+            >
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter Your Email"
+                className="flex-1 px-4 py-3 text-sm text-[#222538] placeholder-[#9CA3AF] bg-transparent outline-none min-w-0 font-medium"
+              />
+              <button
+                type="submit"
+                className="bg-[#134E8D] hover:bg-[#0E3B6C] text-white font-bold text-sm px-6 sm:px-8 py-3.5 rounded-lg flex items-center gap-2 transition shrink-0 shadow-md"
+              >
+                <span>Subscribe</span>
+                <Send size={14} className="-rotate-12" />
+              </button>
+            </form>
+          )}
         </div>
       </div>
-      {done ? (
-        <p className="rounded-xl bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-sm font-semibold px-5 py-3.5">Thanks. You are on the trade list.</p>
-      ) : (
-        <form onSubmit={(e) => { e.preventDefault(); if (email.trim()) setDone(true); }} className="flex flex-col sm:flex-row gap-2 flex-1 min-w-[200px] w-full sm:w-auto sm:max-w-md">
-          <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Work email" className="flex-1 rounded-xl px-4 py-3.5 bg-white/10 border border-white/15 text-white placeholder:text-white/40 outline-none focus:border-[#8FB4E0] transition text-sm min-w-0" />
-          <button className="clip-cut bg-[#0B2F5C] text-white px-6 py-3.5 text-sm font-bold hover:bg-white hover:text-[#0B2F5C] transition whitespace-nowrap">Subscribe</button>
-        </form>
-      )}
     </div>
+  );
+}
+
+const GALLERY_IMAGES = [
+  { url: "/images/products/TL-20-2450-2400.jpg", title: "Hydraulic Tail Lift 2000kg", to: "/shop?cat=Tail%20Lifts" },
+  { url: "/images/products/PU-12V-22KW.jpg", title: "12V 2.2kW Power Unit", to: "/shop?cat=Tail%20Lifts" },
+  { url: "/images/products/GL-25126.jpg", title: "Steel Tool Box & Latches", to: "/shop?cat=Tool%20Boxes" },
+  { url: "/images/products/GL-11113.jpg", title: "Rear Door Locking Gear", to: "/shop?cat=Trailer%20Parts" },
+  { url: "/images/products/GL-13112.jpg", title: "Heavy Duty Door Hinges", to: "/shop?cat=Trailer%20Parts" },
+  { url: "/images/products/GL-19120.jpg", title: "Spring Bolt Hardware", to: "/shop?cat=Accessories" }
+];
+
+function Footer() {
+  return (
+    <footer className="bg-[#181C2E] text-white">
+      {/* Top Newsletter Bar */}
+      <NewsBox />
+
+      {/* Main Footer Content */}
+      <div className="mx-auto max-w-7xl px-6 sm:px-10 pt-12 pb-14">
+        {/* Brand & Social Bar */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-8 border-b border-white/10">
+          <div className="max-w-xl">
+            <LogoFull light />
+            <p className="mt-3 text-[#9CA3AF] text-[13.5px] leading-relaxed">
+              Australian owned truck hardware & heavy vehicle parts: tail lifts, toolboxes, trailer hardware and ADR-compliant spares. Engineered for heavy haulage and fleet reliability across Australia.
+            </p>
+          </div>
+
+          {/* Social Icons */}
+          <div className="flex items-center gap-3">
+            {[
+              { name: "Facebook", href: "#", icon: "f" },
+              { name: "Twitter", href: "#", icon: "𝕏" },
+              { name: "LinkedIn", href: "#", icon: "in" },
+              { name: "YouTube", href: "#", icon: "▶" },
+              { name: "Instagram", href: "#", icon: "📷" }
+            ].map((s) => (
+              <a
+                key={s.name}
+                href={s.href}
+                aria-label={s.name}
+                className="w-10 h-10 rounded-full bg-[#134E8D] text-white flex items-center justify-center font-bold text-sm hover:bg-white hover:text-[#134E8D] transition shadow-md hover:scale-105"
+              >
+                {s.icon}
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {/* 4-Column Grid */}
+        <div className="pt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          {/* Column 1: Useful Links */}
+          <div>
+            <h4 className="font-display font-bold text-[17px] text-white tracking-wide">Useful Links</h4>
+            <div className="flex items-center gap-1.5 mt-2 mb-5">
+              <span className="w-3 h-[3px] bg-[#134E8D] rounded-full" />
+              <span className="w-7 h-[3px] bg-[#3B82F6] rounded-full" />
+            </div>
+            <ul className="space-y-3 text-[14px]">
+              {[
+                { label: "Home", to: "/" },
+                { label: "About Us", to: "/about" },
+                { label: "Fleet & Trade", to: "/trade" },
+                { label: "All Products", to: "/shop" },
+                { label: "Fitting Guides", to: "/resources" },
+                { label: "Contact Us", to: "/contact" }
+              ].map((item) => (
+                <li key={item.label}>
+                  <Link
+                    to={item.to}
+                    className="group inline-flex items-center gap-2 text-[#9CA3AF] hover:text-white transition"
+                  >
+                    <span className="text-[#3B82F6] font-bold group-hover:translate-x-1 transition-transform">»</span>
+                    <span>{item.label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 2: Popular Categories */}
+          <div>
+            <h4 className="font-display font-bold text-[17px] text-white tracking-wide">Popular Categories</h4>
+            <div className="flex items-center gap-1.5 mt-2 mb-5">
+              <span className="w-3 h-[3px] bg-[#134E8D] rounded-full" />
+              <span className="w-7 h-[3px] bg-[#3B82F6] rounded-full" />
+            </div>
+            <ul className="space-y-3 text-[14px]">
+              {[
+                { label: "Hydraulic Tail Lifts", to: "/shop?cat=Tail%20Lifts" },
+                { label: "Truck Tool Boxes", to: "/shop?cat=Tool%20Boxes" },
+                { label: "Trailer Hardware", to: "/shop?cat=Trailer%20Parts" },
+                { label: "Replacement Parts", to: "/shop?cat=Replacement%20Parts" },
+                { label: "Cargo & Accessories", to: "/shop?cat=Accessories" },
+                { label: "Locks & Fasteners", to: "/shop?cat=Trailer%20Parts" }
+              ].map((item) => (
+                <li key={item.label}>
+                  <Link
+                    to={item.to}
+                    className="group inline-flex items-center gap-2 text-[#9CA3AF] hover:text-white transition"
+                  >
+                    <span className="text-[#3B82F6] font-bold group-hover:translate-x-1 transition-transform">»</span>
+                    <span>{item.label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 3: Contact Info */}
+          <div>
+            <h4 className="font-display font-bold text-[17px] text-white tracking-wide">Contact Info</h4>
+            <div className="flex items-center gap-1.5 mt-2 mb-5">
+              <span className="w-3 h-[3px] bg-[#134E8D] rounded-full" />
+              <span className="w-7 h-[3px] bg-[#3B82F6] rounded-full" />
+            </div>
+            <div className="space-y-4 text-[13.5px]">
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-full bg-[#134E8D] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                  <Phone size={15} />
+                </div>
+                <div>
+                  <p className="text-white font-bold text-[14px]">1300 0 AUREX</p>
+                  <p className="text-[#9CA3AF] text-xs mt-0.5">+61 3 9000 0000</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-full bg-[#134E8D] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                  <Mail size={15} />
+                </div>
+                <div>
+                  <a href="mailto:sales@aurextruckparts.com.au" className="text-slate-300 hover:text-white transition break-all">
+                    sales@aurextruckparts.com.au
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-full bg-[#134E8D] text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                  <MapPin size={15} />
+                </div>
+                <div>
+                  <p className="text-slate-300 leading-snug">
+                    41 Halley Court, Campbellfield VIC 3061, Melbourne
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Column 4: Parts Gallery */}
+          <div>
+            <h4 className="font-display font-bold text-[17px] text-white tracking-wide">Parts Gallery</h4>
+            <div className="flex items-center gap-1.5 mt-2 mb-5">
+              <span className="w-3 h-[3px] bg-[#134E8D] rounded-full" />
+              <span className="w-7 h-[3px] bg-[#3B82F6] rounded-full" />
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {GALLERY_IMAGES.map((img, idx) => (
+                <Link
+                  key={idx}
+                  to={img.to}
+                  title={img.title}
+                  className="group relative aspect-square overflow-hidden rounded-lg bg-white p-1 border border-white/20 hover:border-[#3B82F6] transition shadow-sm block"
+                >
+                  <img
+                    src={img.url}
+                    alt={img.title}
+                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-[#134E8D]/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-1 text-center">
+                    <span className="text-white text-[10px] font-bold leading-tight line-clamp-2">{img.title}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Copyright Bar */}
+      <div className="bg-[#134E8D] py-4 px-6 text-center text-[13px] text-white/95 font-medium border-t border-white/10">
+        <p>&copy; Copyright 2026 Aurex Truck Parts AU. All Rights Reserved.</p>
+      </div>
+    </footer>
   );
 }
 
@@ -83,7 +305,7 @@ export default function Layout({ children }) {
   }, [mobile, drawer]);
 
   return (
-    <div className="min-h-screen bg-white text-[#1A1A2E] antialiased overflow-x-hidden flex flex-col" style={{ fontFamily: "Inter" }}>
+    <div className="min-h-screen bg-white text-[#222538] antialiased overflow-x-clip flex flex-col" style={{ fontFamily: "Inter" }}>
       <ScrollProgress />
       <ScrollManager />
 
@@ -101,88 +323,9 @@ export default function Layout({ children }) {
         {children}
       </motion.main>
 
-      {/* Footer: floating modular card (square corners, bottom-left cut) */}
-      <div className="bg-[#EAF2FA] print:hidden px-3 sm:px-5 pb-8 pt-4 [filter:drop-shadow(0_30px_45px_rgba(11,47,92,0.22))]">
-        <footer className="mx-auto max-w-7xl bg-[#1A1A2E] text-white overflow-hidden" style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 34px 100%, 0 calc(100% - 34px))" }}>
-          <NewsBox />
-          <div aria-hidden className="mx-6 sm:mx-10 mt-10 border-t border-white/10" />
-          <div className="px-6 sm:px-10 pt-10 grid sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr_1.2fr] gap-10 text-sm lg:divide-x lg:divide-white/10">
-          <div className="lg:pr-8">
-            <LogoFull light />
-            <p className="text-white/75 text-[13px] mt-4 leading-relaxed">
-              Australian owned truck hardware: tail lifts, tool boxes, trailer parts and accessories. Honest advice plus fast freight to every state.
-            </p>
-            <div className="mt-4 space-y-2 text-[12px] text-white/70">
-              <p className="flex items-center gap-2"><MapPin size={13} className="text-[#8FB4E0]" /> 41 Halley Court, Campbellfield VIC 3061</p>
-              <p className="flex items-center gap-2"><Phone size={13} className="text-[#8FB4E0]" /> 03 9000 0000</p>
-              <p className="flex items-center gap-2"><Mail size={13} className="text-[#8FB4E0]" /> sales@aurextruckparts.com.au</p>
-            </div>
-            <div className="mt-5 flex gap-2">
-              {[["Instagram", "IG"], ["Facebook", "FB"], ["LinkedIn", "IN"]].map(([label, short]) => (
-                <a key={label} href="/contact" aria-label={label} className="grid place-items-center w-9 h-9 border border-white/20 text-white/70 text-[11px] font-black hover:bg-white hover:text-[#0B2F5C] hover:border-white transition" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
-                  {short}
-                </a>
-              ))}
-            </div>
-          </div>
-          <div>
-            <p className="font-bold text-[12px] tracking-widest text-white/45 uppercase">Shop</p>
-            <div className="mt-4 grid gap-2.5 text-white/75">
-              <Link to="/shop" className="hover:text-white hover:translate-x-1 transition-all w-fit">All parts</Link>
-              <Link to="/shop?cat=Tail%20Lifts" className="hover:text-white hover:translate-x-1 transition-all w-fit">Tail Lifts</Link>
-              <Link to="/shop?cat=Tool%20Boxes" className="hover:text-white hover:translate-x-1 transition-all w-fit">Tool Boxes</Link>
-              <Link to="/shop?cat=Trailer%20Parts" className="hover:text-white hover:translate-x-1 transition-all w-fit">Trailer Parts</Link>
-              <Link to="/shop?cat=Accessories" className="hover:text-white hover:translate-x-1 transition-all w-fit">Accessories</Link>
-              <Link to="/shop?cat=Replacement%20Parts" className="hover:text-white hover:translate-x-1 transition-all w-fit">Replacement Parts</Link>
-              <Link to="/shop?cat=Tools%20and%20Others" className="hover:text-white hover:translate-x-1 transition-all w-fit">Tools and Others</Link>
-              <Link to="/brands" className="hover:text-white hover:translate-x-1 transition-all w-fit">Brands</Link>
-              <Link to="/deals" className="hover:text-white hover:translate-x-1 transition-all w-fit">Deals</Link>
-            </div>
-          </div>
-          <div>
-            <p className="font-bold text-[12px] tracking-widest text-white/45 uppercase">Support</p>
-            <div className="mt-4 grid gap-2.5 text-white/75">
-              <Link to="/resources" className="hover:text-white hover:translate-x-1 transition-all w-fit">Resources</Link>
-              <Link to="/compliance" className="hover:text-white hover:translate-x-1 transition-all w-fit">ADR Compliance</Link>
-              <Link to="/track" className="hover:text-white hover:translate-x-1 transition-all w-fit">Track order</Link>
-              <Link to="/quote" className="hover:text-white hover:translate-x-1 transition-all w-fit">Quote cart</Link>
-              <Link to="/checkout" className="hover:text-white hover:translate-x-1 transition-all w-fit">Checkout</Link>
-              <Link to="/contact" className="hover:text-white hover:translate-x-1 transition-all w-fit">Contact</Link>
-            </div>
-          </div>
-          <div>
-            <p className="font-bold text-[12px] tracking-widest text-white/45 uppercase">Company</p>
-            <div className="mt-4 grid gap-2.5 text-white/75">
-              <Link to="/about" className="hover:text-white hover:translate-x-1 transition-all w-fit">About us</Link>
-              <Link to="/partners" className="hover:text-white hover:translate-x-1 transition-all w-fit">Our Partners</Link>
-              <Link to="/catalogue" className="hover:text-white hover:translate-x-1 transition-all w-fit">Catalogue</Link>
-              <Link to="/locations" className="hover:text-white hover:translate-x-1 transition-all w-fit">Locations</Link>
-              <Link to="/trade" className="hover:text-white hover:translate-x-1 transition-all w-fit">Trade accounts</Link>
-              <Link to="/policies/shipping" className="hover:text-white hover:translate-x-1 transition-all w-fit">Shipping</Link>
-              <Link to="/policies/returns" className="hover:text-white hover:translate-x-1 transition-all w-fit">Returns</Link>
-              <Link to="/policies/warranty" className="hover:text-white hover:translate-x-1 transition-all w-fit">Warranty</Link>
-            </div>
-          </div>
-          <div className="bg-white/[0.04] border border-white/10 p-6 h-fit" style={{ clipPath: "polygon(0 0,100% 0,100% 100%,14px 100%,0 calc(100% - 14px))" }}>
-            <p className="font-display font-bold text-[16px]">Fleet Desk</p>
-            <p className="mt-1 text-white/75 text-[13px]">Mon to Fri, 8am to 5pm AEST</p>
-            <p className="text-white/75 text-[13px] mt-1">Priority quotes for trade and fleet accounts.</p>
-            <Link
-              to="/contact"
-              className="clip-cut mt-4 inline-flex items-center gap-1.5 bg-[#0B2F5C] text-white px-5 py-2.5 font-bold hover:bg-white hover:text-[#0B2F5C] text-[13px] transition"
-            >
-              Get a quote <ArrowRight size={14} />
-            </Link>
-          </div>
-        </div>
-        <div aria-hidden className="mx-6 sm:mx-10 mt-10 border-t border-white/10" />
-        <div className="px-6 sm:px-10 relative">
-          <p className="py-4 text-[12px] text-white/50 flex flex-wrap justify-between gap-2">
-            <span>&copy; 2026 Aurex Truck Parts Australia. All rights reserved.</span>
-            <span>Visa, Mastercard, Afterpay, Bank transfer · Category imagery via Wikimedia Commons contributors (CC BY-SA)</span>
-          </p>
-        </div>
-        </footer>
+      {/* Footer component */}
+      <div className="print:hidden">
+        <Footer />
       </div>
 
       {/* Back to top */}
@@ -193,7 +336,7 @@ export default function Layout({ children }) {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.7 }}
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="fixed bottom-6 right-6 z-[60] w-12 h-12 grid place-items-center bg-[#1A1A2E] text-white shadow-elevated hover:bg-[#0B2F5C] transition" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}
+            className="fixed bottom-6 right-6 z-[60] w-12 h-12 grid place-items-center bg-[#222538] text-white shadow-elevated hover:bg-[#134E8D] transition rounded-full"
             aria-label="back to top"
           >
             <ArrowUp size={20} />
@@ -218,86 +361,86 @@ export default function Layout({ children }) {
             >
               <FocusTrap active={drawer} className="flex-1 flex flex-col min-h-0">
                 <div className="p-5 flex items-center justify-between border-b border-[#E5E7EB]">
-                <p className="font-bold text-lg text-[#1A1A2E] flex items-center gap-2"><ShoppingCart size={18} className="text-[#0B2F5C]" /> Cart ({count})</p>
-                <button onClick={() => setDrawer(false)} className="p-2 rounded-lg border border-[#E5E7EB] text-[#6B7280]" aria-label="close">
-                  <X size={18} />
-                </button>
-              </div>
-              <div className="flex-1 overflow-auto p-5 space-y-3">
-                {hasValidVehicle && cart.length > 0 && (
-                  <div className="flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 px-3.5 py-3">
-                    <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
-                    <p className="text-[12.5px] font-semibold text-emerald-800 leading-snug">
-                      Fit checked for your <b>{rigLabel}</b> — every line in this cart suits your rig.
-                    </p>
-                  </div>
-                )}
-                {cart.length === 0 && (
-                  <div className="text-center py-16">
-                    <ShoppingCart size={40} className="mx-auto text-[#E5E7EB]" />
-                    <p className="text-[#9CA3AF] text-sm mt-3">Cart is empty. Add parts from Shop.</p>
-                    <Link to="/shop" onClick={() => setDrawer(false)} className="clip-cut mt-4 inline-block bg-[#0B2F5C] text-white px-6 py-2.5 text-sm font-bold">Browse shop</Link>
-                  </div>
-                )}
-                {cart.map((i) => (
-                  <div key={i.sku} className="bg-[#F7F8FA] border border-[#E5E7EB] rounded-xl p-3 flex gap-3">
-                    <img src={i.image} alt="" className="w-16 h-16 rounded-lg object-cover bg-white shrink-0" onError={(e) => { e.currentTarget.style.visibility = "hidden"; }} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-semibold text-[#9CA3AF]">{i.sku}</p>
-                      <p className="font-semibold text-[13px] leading-snug text-[#1A1A2E] line-clamp-2">{i.name}</p>
-                      <div className="mt-2 flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            onClick={() => setCart((c) => c.map((x) => (x.sku === i.sku ? { ...x, qty: Math.max(1, x.qty - 1) } : x)))}
-                            className="w-7 h-7 grid place-items-center rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:border-[#0B2F5C] transition"
-                          >
-                            <Minus size={13} />
-                          </button>
-                          <span className="font-bold text-sm w-6 text-center text-[#1A1A2E]">{i.qty}</span>
-                          <button
-                            onClick={() => setCart((c) => c.map((x) => (x.sku === i.sku ? { ...x, qty: x.qty + 1 } : x)))}
-                            className="w-7 h-7 grid place-items-center rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:border-[#0B2F5C] transition"
-                          >
-                            <Plus size={13} />
-                          </button>
+                  <p className="font-bold text-lg text-[#222538] flex items-center gap-2"><ShoppingCart size={18} className="text-[#134E8D]" /> Cart ({count})</p>
+                  <button onClick={() => setDrawer(false)} className="p-2 rounded-lg border border-[#E5E7EB] text-[#6B7280]" aria-label="close">
+                    <X size={18} />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-auto p-5 space-y-3">
+                  {hasValidVehicle && cart.length > 0 && (
+                    <div className="flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 px-3.5 py-3">
+                      <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                      <p className="text-[12.5px] font-semibold text-emerald-800 leading-snug">
+                        Fit checked for your <b>{rigLabel}</b> — every line in this cart suits your rig.
+                      </p>
+                    </div>
+                  )}
+                  {cart.length === 0 && (
+                    <div className="text-center py-16">
+                      <ShoppingCart size={40} className="mx-auto text-[#E5E7EB]" />
+                      <p className="text-[#9CA3AF] text-sm mt-3">Cart is empty. Add parts from Shop.</p>
+                      <Link to="/shop" onClick={() => setDrawer(false)} className="rounded-xl mt-4 inline-block bg-[#134E8D] text-white px-6 py-2.5 text-sm font-bold">Browse shop</Link>
+                    </div>
+                  )}
+                  {cart.map((i) => (
+                    <div key={i.sku} className="bg-[#F7F8FA] border border-[#E5E7EB] rounded-xl p-3 flex gap-3">
+                      <img src={i.image} alt="" className="w-16 h-16 rounded-lg object-cover bg-white shrink-0" onError={(e) => { e.currentTarget.style.visibility = "hidden"; }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[11px] font-semibold text-[#9CA3AF]">{i.sku}</p>
+                        <p className="font-semibold text-[13px] leading-snug text-[#222538] line-clamp-2">{i.name}</p>
+                        <div className="mt-2 flex items-center justify-between">
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              onClick={() => setCart((c) => c.map((x) => (x.sku === i.sku ? { ...x, qty: Math.max(1, x.qty - 1) } : x)))}
+                              className="w-7 h-7 grid place-items-center rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:border-[#134E8D] transition"
+                            >
+                              <Minus size={13} />
+                            </button>
+                            <span className="font-bold text-sm w-6 text-center text-[#222538]">{i.qty}</span>
+                            <button
+                              onClick={() => setCart((c) => c.map((x) => (x.sku === i.sku ? { ...x, qty: x.qty + 1 } : x)))}
+                              className="w-7 h-7 grid place-items-center rounded-lg border border-[#E5E7EB] text-[#6B7280] hover:border-[#134E8D] transition"
+                            >
+                              <Plus size={13} />
+                            </button>
+                          </div>
+                          <p className="font-bold text-[#222538] text-sm">${((i.price || 0) * i.qty).toFixed(2)}</p>
                         </div>
-                        <p className="font-bold text-[#1A1A2E] text-sm">${((i.price || 0) * i.qty).toFixed(2)}</p>
                       </div>
                     </div>
+                  ))}
+                </div>
+                <div className="p-5 border-t border-[#E5E7EB]">
+                  <div className="flex justify-between font-bold text-lg text-[#222538]">
+                    <span>Subtotal</span>
+                    <span className="text-[#134E8D]">${total.toFixed(2)}</span>
                   </div>
-                ))}
-              </div>
-              <div className="p-5 border-t border-[#E5E7EB]">
-                <div className="flex justify-between font-bold text-lg text-[#1A1A2E]">
-                  <span>Subtotal</span>
-                  <span className="text-[#0B2F5C]">${total.toFixed(2)}</span>
-                </div>
-                <p className="mt-1 text-[12px] text-[#9CA3AF]">Free freight over ${freeOver}. Login saves order history.</p>
-                <div className="mt-2.5">
-                  <div className="h-2 rounded-full bg-[#F3F4F6] overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-[#0B2F5C] to-[#FFBB00] transition-all" style={{ width: `${Math.min(100, (total / freeOver) * 100)}%` }} />
+                  <p className="mt-1 text-[12px] text-[#9CA3AF]">Free freight over ${freeOver}. Login saves order history.</p>
+                  <div className="mt-2.5">
+                    <div className="h-2 rounded-full bg-[#F3F4F6] overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-[#134E8D] to-[#FFBB00] transition-all" style={{ width: `${Math.min(100, (total / freeOver) * 100)}%` }} />
+                    </div>
+                    <p className="mt-1.5 text-[12px] font-semibold text-[#6B7280]">{total >= freeOver ? "Free freight unlocked." : `$${(freeOver - total).toFixed(2)} away from free freight.`}</p>
                   </div>
-                  <p className="mt-1.5 text-[12px] font-semibold text-[#6B7280]">{total >= freeOver ? "Free freight unlocked." : `$${(freeOver - total).toFixed(2)} away from free freight.`}</p>
+                  <div className="mt-3 grid grid-cols-3 gap-2">
+                    <Link
+                      to="/quote"
+                      onClick={() => setDrawer(false)}
+                      className="rounded-xl py-3 text-sm font-bold border-2 border-[#E5E7EB] text-center text-[#222538] hover:border-[#134E8D] transition"
+                    >
+                      Quote
+                    </Link>
+                    <Link
+                      to="/checkout"
+                      onClick={() => setDrawer(false)}
+                      className="rounded-xl col-span-2 py-3 text-sm font-bold bg-[#134E8D] text-white text-center flex items-center justify-center gap-2 hover:bg-[#222538] transition"
+                    >
+                      <Send size={14} /> Checkout
+                    </Link>
+                  </div>
                 </div>
-                <div className="mt-3 grid grid-cols-3 gap-2">
-                  <Link
-                    to="/quote"
-                    onClick={() => setDrawer(false)}
-                    className="clip-cut-sm py-3 text-sm font-bold border-2 border-[#E5E7EB] text-center text-[#1A1A2E] hover:border-[#0B2F5C] transition"
-                  >
-                    Quote
-                  </Link>
-                  <Link
-                    to="/checkout"
-                    onClick={() => setDrawer(false)}
-                    className="clip-cut-sm col-span-2 py-3 text-sm font-bold bg-[#0B2F5C] text-white text-center flex items-center justify-center gap-2 hover:bg-[#1A1A2E] transition"
-                  >
-                    <Send size={14} /> Checkout
-                  </Link>
-                </div>
-              </div>
-            </FocusTrap>
-          </motion.aside>
+              </FocusTrap>
+            </motion.aside>
           </div>
         )}
       </AnimatePresence>

@@ -21,7 +21,7 @@ export default function BrandFilter({ brands, selected, onChange, compact = fals
     <div>
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center justify-between w-full text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase hover:text-[#1A1A2E] transition"
+        className="flex items-center justify-between w-full text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase hover:text-[#222538] transition"
       >
         <span>Brand</span>
         {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -36,12 +36,12 @@ export default function BrandFilter({ brands, selected, onChange, compact = fals
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search brands..."
-                className="w-full bg-[#F5F6F8] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#0B2F5C] transition"
+                className="w-full bg-[#F5F6F8] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#134E8D] transition"
               />
               {searchTerm && (
                 <button
                   onClick={handleClearSearch}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#1A1A2E]"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] hover:text-[#222538]"
                 >
                   <X size={14} />
                 </button>
@@ -56,8 +56,8 @@ export default function BrandFilter({ brands, selected, onChange, compact = fals
                 onClick={() => handleBrandClick(brand)}
                 className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold border transition ${
                   selected === brand
-                    ? "bg-[#0B2F5C] text-white border-[#0B2F5C]"
-                    : "border-[#E5E7EB] text-[#6B7280] hover:border-[#0B2F5C] hover:text-[#0B2F5C]"
+                    ? "bg-[#134E8D] text-white border-[#134E8D]"
+                    : "border-[#E5E7EB] text-[#6B7280] hover:border-[#134E8D] hover:text-[#134E8D]"
                 }`}
               >
                 {brand}

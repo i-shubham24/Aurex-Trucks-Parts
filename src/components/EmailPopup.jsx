@@ -42,8 +42,7 @@ export default function EmailPopup() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 12 }}
             transition={{ duration: 0.45, ease: EASE }}
-            className="relative w-full max-w-3xl grid sm:grid-cols-2 overflow-hidden bg-[#12121B] shadow-elevated"
-            style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 24px 100%, 0 calc(100% - 24px))" }}
+            className="relative w-full max-w-3xl grid sm:grid-cols-2 overflow-hidden bg-[#12121B] shadow-elevated rounded-2xl"
           >
             <button onClick={close} className="absolute top-3 right-3 z-10 w-9 h-9 grid place-items-center rounded-full bg-black/40 text-white hover:bg-black/70 transition" aria-label="close">
               <X size={17} />
@@ -58,7 +57,7 @@ export default function EmailPopup() {
 
             {/* Copy side */}
             <div className="relative p-7 sm:p-9">
-              <p className="text-[11px] font-black tracking-[0.25em] text-[#2F5E93] uppercase">Join the trade list</p>
+              <p className="text-[11px] font-black tracking-[0.25em] text-[#3873B3] uppercase">Join the trade list</p>
               <h2 className="font-display font-black text-white text-[30px] sm:text-[36px] leading-[0.98] mt-2">
                 GET FLEET<br />DEALS FIRST
               </h2>
@@ -79,9 +78,9 @@ export default function EmailPopup() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Your work email"
-                      className="w-full bg-white/[0.06] border-2 border-white/12 rounded-md px-4 py-3.5 text-sm text-white placeholder:text-white/40 outline-none focus:border-[#2F5E93] transition"
+                      className="w-full bg-white/[0.06] border-2 border-white/12 rounded-lg px-4 py-3.5 text-sm text-white placeholder:text-white/40 outline-none focus:border-[#3873B3] transition"
                     />
-                    <button className="w-full bg-[#0B2F5C] hover:bg-white hover:text-[#0B2F5C] text-white py-3.5 text-sm font-black uppercase tracking-wide flex items-center justify-center gap-2 transition" style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 12px 100%, 0 calc(100% - 12px))" }}>
+                    <button className="w-full bg-[#134E8D] hover:bg-white hover:text-[#134E8D] text-white py-3.5 text-sm font-black uppercase tracking-wide flex items-center justify-center gap-2 transition rounded-xl">
                       Sign me up <ArrowRight size={16} />
                     </button>
                   </form>

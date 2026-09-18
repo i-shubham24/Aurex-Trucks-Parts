@@ -12,7 +12,7 @@ export default function StockFilter({ inStockOnly = false, onChange, compact = f
     <div>
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center justify-between w-full text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase hover:text-[#1A1A2E] transition"
+        className="flex items-center justify-between w-full text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase hover:text-[#222538] transition"
       >
         <span>Availability</span>
         {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}

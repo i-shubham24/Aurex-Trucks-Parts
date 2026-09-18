@@ -8,7 +8,7 @@ export function PartnersPage() {
 
   return (
     <div className="bg-[#F9FAFB] min-h-screen pb-20">
-      <div className="bg-[#1A1A2E] text-white py-16">
+      <div className="bg-[#222538] text-white py-16">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="font-display font-bold text-4xl md:text-5xl">Our Partners</h1>
           <p className="text-[#9CA3AF] mt-4 max-w-2xl mx-auto text-lg">
@@ -20,9 +20,9 @@ export function PartnersPage() {
       <div className="max-w-6xl mx-auto px-4 -mt-8">
         <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
           {partners.map((p, idx) => (
-            <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-[#E5E7EB] flex flex-col justify-between hover:border-[#0B2F5C] transition group cursor-default">
+            <div key={idx} className="bg-white p-6 rounded-2xl shadow-sm border border-[#E5E7EB] flex flex-col justify-between hover:border-[#134E8D] transition group cursor-default">
               <div>
-                <h3 className="font-display font-black text-2xl text-[#1A1A2E] group-hover:text-[#0B2F5C] transition">{p.name}</h3>
+                <h3 className="font-display font-black text-2xl text-[#222538] group-hover:text-[#134E8D] transition">{p.name}</h3>
                 <span className="inline-block bg-[#F3F4F6] text-[#4B5563] text-xs font-bold px-2 py-1 rounded mt-2 uppercase tracking-wide">
                   {p.type}
                 </span>

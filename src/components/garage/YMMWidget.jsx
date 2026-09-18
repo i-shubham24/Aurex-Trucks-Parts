@@ -4,7 +4,6 @@ import { ChevronDown, Truck, X, Check, Wrench } from "lucide-react";
 import { useGarage } from "./GarageContext.jsx";
 import { TRUCK_MAKES, TRUCK_YEARS } from "../../data/fitment.js";
 
-const CUT = { clipPath: "polygon(0 0, 100% 0, 100% 100%, 10px 100%, 0 calc(100% - 10px))" };
 const EASE = [0.16, 1, 0.3, 1];
 
 function Field({ label, value, onChange, options, placeholder, disabled, dark }) {
@@ -19,32 +18,32 @@ function Field({ label, value, onChange, options, placeholder, disabled, dark })
 
   return (
     <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }} className={disabled ? "opacity-40 pointer-events-none" : ""}>
-      <span className={`block text-[10px] font-black tracking-[0.22em] uppercase mb-1.5 ${dark ? "text-[#8FB4E0]" : "text-[#0B2F5C]"}`}>{label}</span>
+      <span className={`block text-[10px] font-black tracking-[0.22em] uppercase mb-1.5 ${dark ? "text-[#9AC1EE]" : "text-[#134E8D]"}`}>{label}</span>
           <div className="relative" ref={ref}>
             {open && <span className="fixed inset-0 z-[60]" onClick={() => setOpen(false)} />}
             <button
               type="button"
               disabled={disabled}
               onClick={() => setOpen((o) => !o)}
-              className={`relative z-[61] clip-cut-sm w-full flex items-center justify-between gap-2 px-3.5 py-3.5 text-base sm:text-sm font-bold outline-none transition border-2 ${
-                dark ? "bg-[#1A1A2E] border-white/15 hover:border-[#8FB4E0]" : "bg-white border-[#C9D6E6] hover:border-[#0B2F5C]"
-              } ${value ? (dark ? "text-white" : "text-[#1A1A2E]") : (dark ? "text-white/70" : "text-[#6B7280]")}`}
+              className={`relative z-[61] rounded-lg w-full flex items-center justify-between gap-2 px-3.5 py-3.5 text-base sm:text-sm font-bold outline-none transition border-2 ${
+                dark ? "bg-[#222538] border-white/15 hover:border-[#9AC1EE]" : "bg-white border-[#C9D6E6] hover:border-[#134E8D]"
+              } ${value ? (dark ? "text-white" : "text-[#222538]") : (dark ? "text-white/70" : "text-[#6B7280]")}`}
             >
               <span className="truncate">{value || placeholder}</span>
-              <ChevronDown size={15} className={`shrink-0 transition ${open ? "rotate-180" : ""} ${dark ? "text-white/70" : "text-[#0B2F5C]"}`} />
+              <ChevronDown size={15} className={`shrink-0 transition ${open ? "rotate-180" : ""} ${dark ? "text-white/70" : "text-[#134E8D]"}`} />
             </button>
             <AnimatePresence>
               {open && (
                 <motion.ul
                   initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.16 }}
-                  className={`absolute -left-2 -right-2 z-[80] mt-1.5 max-h-[40vh] sm:max-h-56 overflow-y-auto overflow-x-hidden shadow-elevated ${dark ? "bg-[#1A1A2E] border-2 border-[#8FB4E0]/50" : "bg-white border-2 border-[#0B2F5C]"}`}
+                  className={`absolute -left-2 -right-2 z-[80] mt-1.5 max-h-[40vh] sm:max-h-56 overflow-y-auto overflow-x-hidden shadow-elevated rounded-xl ${dark ? "bg-[#222538] border-2 border-[#9AC1EE]/50" : "bg-white border-2 border-[#134E8D]"}`}
                 >
                   {options.map((o) => (
                     <li key={o}>
                       <button
                         type="button"
                         onClick={() => { onChange(o); setOpen(false); }}
-                        className={`w-full text-left px-4 py-3.5 sm:py-2.5 text-base sm:text-sm font-semibold transition ${o === value ? "bg-[#0B2F5C] text-white" : (dark ? "text-white hover:bg-white/10" : "text-[#1A1A2E] hover:bg-[#E8EEF5]")}`}
+                        className={`w-full text-left px-4 py-3.5 sm:py-2.5 text-base sm:text-sm font-semibold transition ${o === value ? "bg-[#134E8D] text-white" : (dark ? "text-white hover:bg-white/10" : "text-[#222538] hover:bg-[#EDF3FA]")}`}
                       >
                         {o}
                       </button>
@@ -87,9 +86,9 @@ function Console({ dark = true, stacked = false, onDone }) {
           const on = i <= step;
           return (
             <div key={s} className="flex items-center gap-2 flex-1">
-              <span className={`grid place-items-center w-6 h-6 text-[11px] font-black shrink-0 transition ${on ? "bg-[#0B2F5C] text-white" : dark ? "bg-white/10 text-white/40" : "bg-[#E8EEF5] text-[#9CA3AF]"}`}>{i + 1}</span>
-              <span className={`text-[12px] font-bold ${on ? (dark ? "text-white" : "text-[#0B2F5C]") : (dark ? "text-white/40" : "text-[#9CA3AF]")}`}>{s}</span>
-              {i < 2 && <span className={`flex-1 h-0.5 rounded-full ${i < step ? "bg-[#0B2F5C]" : dark ? "bg-white/10" : "bg-[#E5E7EB]"}`} />}
+              <span className={`grid place-items-center w-6 h-6 rounded-full text-[11px] font-black shrink-0 transition ${on ? "bg-[#134E8D] text-white" : dark ? "bg-white/10 text-white/40" : "bg-[#EDF3FA] text-[#9CA3AF]"}`}>{i + 1}</span>
+              <span className={`text-[12px] font-bold ${on ? (dark ? "text-white" : "text-[#134E8D]") : (dark ? "text-white/40" : "text-[#9CA3AF]")}`}>{s}</span>
+              {i < 2 && <span className={`flex-1 h-0.5 rounded-full ${i < step ? "bg-[#134E8D]" : dark ? "bg-white/10" : "bg-[#E5E7EB]"}`} />}
             </div>
           );
         })}
@@ -109,8 +108,7 @@ function Console({ dark = true, stacked = false, onDone }) {
         variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
         onClick={commit}
         disabled={!ready}
-        style={CUT}
-        className="mt-3 w-full bg-[#0B2F5C] text-white py-3.5 text-sm font-black tracking-wide uppercase flex items-center justify-center gap-2 hover:bg-[#16467E] active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed transition shadow-primary"
+        className="mt-3 w-full bg-[#134E8D] text-white py-3.5 text-sm font-black tracking-wide uppercase flex items-center justify-center gap-2 rounded-xl hover:bg-[#16467E] active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed transition shadow-primary"
       >
         <Check size={16} /> Lock in my rig
       </motion.button>
@@ -134,20 +132,20 @@ export default function YMMWidget({ variant = "hero" }) {
   // ===== Hero console: always open, light readable card =====
   if (variant === "hero") {
     return (
-      <div className="relative bg-white border-2 border-[#0B2F5C]/15 shadow-elevated">
+      <div className="relative bg-white border-2 border-[#134E8D]/15 shadow-elevated rounded-2xl">
         <div className="p-5 sm:p-7">
           <div className="flex items-center gap-3 flex-wrap">
-            <span className="grid place-items-center w-11 h-11 bg-[#0B2F5C] text-white shrink-0" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
+            <span className="grid place-items-center w-11 h-11 bg-[#134E8D] text-white shrink-0 rounded-xl">
               <Truck size={20} />
             </span>
             <div className="min-w-0 flex-1 basis-36">
-              <p className="text-[#1A1A2E] font-display font-bold text-[17px] leading-none">Find parts that fit</p>
+              <p className="text-[#222538] font-display font-bold text-[17px] leading-none">Find parts that fit</p>
               <p className="text-[#6B7280] text-[12px] mt-1">
                 {hasValidVehicle ? `Filtering for ${selectedVehicle.year || "any"} ${selectedVehicle.make} ${selectedVehicle.model}` : "Set your truck once, we filter everything."}
               </p>
             </div>
             {hasValidVehicle && (
-              <button onClick={clearSelectedVehicle} className="ml-auto text-[#9CA3AF] hover:text-[#0B2F5C] text-[11px] font-bold uppercase tracking-widest flex items-center gap-1 shrink-0">
+              <button onClick={clearSelectedVehicle} className="ml-auto text-[#9CA3AF] hover:text-[#134E8D] text-[11px] font-bold uppercase tracking-widest flex items-center gap-1 shrink-0">
                 <X size={13} /> Clear
               </button>
             )}
@@ -164,14 +162,13 @@ export default function YMMWidget({ variant = "hero" }) {
       {hasValidVehicle ? (
         <button
           onClick={() => setOpen((o) => !o)}
-          className="flex items-center gap-2.5 bg-[#1A1A2E] text-white pl-2.5 pr-3.5 py-2 hover:bg-[#0B2F5C] transition group border border-white/15"
-          style={{ clipPath: "polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))" }}
+          className="flex items-center gap-2.5 bg-[#222538] text-white pl-2.5 pr-3.5 py-2 hover:bg-[#134E8D] transition group border border-white/15 rounded-xl"
         >
-          <span className="grid place-items-center w-7 h-7 bg-[#0B2F5C] group-hover:bg-white group-hover:text-[#0B2F5C] text-white transition" style={{ clipPath: "polygon(0 0,100% 0,100% 65%,65% 100%,0 100%)" }}>
+          <span className="grid place-items-center w-7 h-7 bg-[#134E8D] group-hover:bg-white group-hover:text-[#134E8D] text-white transition rounded-lg">
             <Truck size={14} />
           </span>
           <span className="text-left leading-none">
-            <span className="block text-[9px] font-black tracking-[0.2em] text-[#8FB4E0] uppercase">Your rig</span>
+            <span className="block text-[9px] font-black tracking-[0.2em] text-[#9AC1EE] uppercase">Your rig</span>
             <span className="block text-[13px] font-bold mt-1 text-white">{selectedVehicle.make} {selectedVehicle.model}</span>
           </span>
           <ChevronDown size={15} className="text-white/70 group-hover:text-white transition" />
@@ -179,8 +176,7 @@ export default function YMMWidget({ variant = "hero" }) {
       ) : (
         <button
           onClick={() => setOpen((o) => !o)}
-          style={CUT}
-          className="flex items-center gap-2 bg-[#0B2F5C] text-white px-3.5 py-2.5 text-[13px] font-black uppercase tracking-wide hover:bg-[#1A1A2E] transition"
+          className="flex items-center gap-2 bg-[#134E8D] text-white px-3.5 py-2.5 text-[13px] font-black uppercase tracking-wide hover:bg-[#222538] transition rounded-xl"
         >
           <Wrench size={15} /> Add your truck
         </button>
@@ -193,10 +189,10 @@ export default function YMMWidget({ variant = "hero" }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.22, ease: EASE }}
-            className="absolute right-0 top-full mt-2 w-[400px] max-w-[calc(100vw-2rem)] bg-[#12121B] border-2 border-[#8FB4E0]/50 p-5 shadow-elevated z-[65]"
+            className="absolute right-0 top-full mt-2 w-[400px] max-w-[calc(100vw-2rem)] bg-[#12121B] border-2 border-[#9AC1EE]/50 p-5 shadow-elevated z-[65] rounded-2xl"
           >
             <p className="text-white font-display font-bold text-[15px] mb-1 flex items-center gap-2">
-              <Truck size={16} className="text-[#8FB4E0]" /> Select your truck
+              <Truck size={16} className="text-[#9AC1EE]" /> Select your truck
             </p>
             <p className="text-white/60 text-[12px] mb-4">Make, model, year. We filter every part to fit.</p>
             <Console dark stacked onDone={() => setOpen(false)} />

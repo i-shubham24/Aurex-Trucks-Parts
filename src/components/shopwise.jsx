@@ -41,7 +41,7 @@ export function EnquiryModal() {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/60" onClick={close} />
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
             <div className="flex items-center gap-3">
-              <div className="flex-1"><p className="text-[11px] font-bold text-[#0B2F5C]">PRODUCT ENQUIRY, {p.sku}</p><p className="font-bold text-[15px] text-[#1A1A2E] leading-snug mt-0.5">{p.name}</p>
+              <div className="flex-1"><p className="text-[11px] font-bold text-[#134E8D]">PRODUCT ENQUIRY, {p.sku}</p><p className="font-bold text-[15px] text-[#222538] leading-snug mt-0.5">{p.name}</p>
               {rigLabel && <p className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2.5 py-1"><Check size={11} /> For your {rigLabel}</p>}</div>
               <button onClick={close} className="p-2 border border-[#E5E7EB] rounded-lg"><X size={15} /></button>
             </div>
@@ -54,7 +54,7 @@ export function EnquiryModal() {
                     <input required value={f.phone} onChange={set("phone")} placeholder="Phone" className="rounded-xl px-4 py-3 text-sm bg-[#F7F8FA] border border-[#E5E7EB] outline-none" />
                   </div>
                   <textarea required value={f.message} onChange={set("message")} rows={3} placeholder="Question about fitment, stock or bulk price..." className="rounded-xl px-4 py-3 text-sm bg-[#F7F8FA] border border-[#E5E7EB] outline-none" />
-                  <button className="bg-[#0B2F5C] text-white rounded-xl py-3.5 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#1A1A2E] transition"><Send size={14} /> Send enquiry</button>
+                  <button className="bg-[#134E8D] text-white rounded-xl py-3.5 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#222538] transition"><Send size={14} /> Send enquiry</button>
                 </form>
               )}
           </motion.div>
@@ -79,13 +79,13 @@ export function CompareTray() {
     { label: "Price", render: (p) => (
       <span className="inline-flex flex-wrap items-center gap-2">
         {p.price == null
-          ? <span className="font-display font-bold text-[17px] text-[#0B2F5C]">Enquire</span>
-          : <span className="font-display font-bold text-[19px] text-[#1A1A2E]">${p.price.toFixed(2)}</span>}
+          ? <span className="font-display font-bold text-[17px] text-[#134E8D]">Enquire</span>
+          : <span className="font-display font-bold text-[19px] text-[#222538]">${p.price.toFixed(2)}</span>}
         {bestSku === p.sku && <span className="text-[10px] font-black uppercase tracking-wider bg-[#10B981] text-white px-2 py-0.5">Best price</span>}
       </span>
     ) },
     { label: "Was", render: (p) => (p.oldPrice ? <span className="line-through text-[#9CA3AF]">${p.oldPrice.toFixed(2)}</span> : <span className="text-[#C7CDD6]">—</span>) },
-    { label: "Brand", render: (p) => <span className="font-bold text-[#1A1A2E]">{p.brand || "—"}</span> },
+    { label: "Brand", render: (p) => <span className="font-bold text-[#222538]">{p.brand || "—"}</span> },
     { label: "Rating", render: (p) => (
       <span className="inline-flex items-center gap-1.5">
         <span className="flex gap-0.5">
@@ -93,13 +93,13 @@ export function CompareTray() {
             <Star key={s} size={12} className={s <= Math.round(p.rating || 0) ? "fill-[#E8A90C] text-[#E8A90C]" : "fill-[#E5E7EB] text-[#E5E7EB]"} />
           ))}
         </span>
-        <b className="text-[#1A1A2E] text-[13px]">{p.rating}</b>
+        <b className="text-[#222538] text-[13px]">{p.rating}</b>
         <span className="text-[#9CA3AF] text-[12px]">({p.reviews})</span>
-        {topRated === p.sku && items.length > 1 && <span className="text-[10px] font-black uppercase tracking-wider bg-[#E8EEF5] text-[#0B2F5C] px-2 py-0.5">Top rated</span>}
+        {topRated === p.sku && items.length > 1 && <span className="text-[10px] font-black uppercase tracking-wider bg-[#EDF3FA] text-[#134E8D] px-2 py-0.5">Top rated</span>}
       </span>
     ) },
     { label: "Stock", render: (p) => (
-      <span className={`inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider px-2.5 py-1 ${String(p.stock).includes("In stock") ? "bg-[#1A1A2E] text-white" : "bg-[#F3F4F6] text-[#6B7280]"}`}>
+      <span className={`inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider px-2.5 py-1 ${String(p.stock).includes("In stock") ? "bg-[#222538] text-white" : "bg-[#F3F4F6] text-[#6B7280]"}`}>
         <span className={`w-1.5 h-1.5 rounded-full ${String(p.stock).includes("In stock") ? "bg-[#10B981]" : "bg-[#9CA3AF]"}`} />
         {p.stock}
       </span>
@@ -113,33 +113,32 @@ export function CompareTray() {
 
   return (
     <>
-      <div className="fixed bottom-20 sm:bottom-4 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-2 max-w-[calc(100vw-2rem)] bg-[#1A1A2E] text-white rounded-full pl-2 pr-2 py-2 shadow-2xl border border-white/10">
+      <div className="fixed bottom-20 sm:bottom-4 left-1/2 -translate-x-1/2 z-[60] flex items-center gap-2 max-w-[calc(100vw-2rem)] bg-[#222538] text-white rounded-full pl-2 pr-2 py-2 shadow-2xl border border-white/10">
         <span className="flex -space-x-2 pl-2">{items.map((p) => <span key={p.sku} className="w-8 h-8 rounded-full bg-white/10 border border-white/20 grid place-items-center text-[10px] font-black">{p.sku.slice(0, 2)}</span>)}</span>
         <span className="text-[13px] font-bold px-1">Compare ({items.length}/3)</span>
-        <button onClick={() => setOpen(true)} className="bg-[#0B2F5C] rounded-full px-5 py-2 text-[13px] font-bold hover:bg-[#2F5E93] transition">Compare</button>
+        <button onClick={() => setOpen(true)} className="bg-[#134E8D] rounded-full px-5 py-2 text-[13px] font-bold hover:bg-[#3873B3] transition">Compare</button>
         <button onClick={() => items.forEach((p) => toggleCompare(p.sku))} className="p-2 text-white/50 hover:text-white" aria-label="Clear compare"><X size={15} /></button>
       </div>
       <AnimatePresence>
         {open && (
           <div className="fixed inset-0 z-[80] grid place-items-center p-3 sm:p-6">
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-[#1A1A2E]/70 backdrop-blur-[2px]" onClick={() => setOpen(false)} />
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-[#222538]/70 backdrop-blur-[2px]" onClick={() => setOpen(false)} />
             <motion.div
               initial={{ opacity: 0, y: 28, scale: 0.98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 16, scale: 0.98 }}
               transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-full max-w-5xl bg-white shadow-2xl max-h-[88vh] flex flex-col overflow-hidden"
-              style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 24px 100%, 0 calc(100% - 24px))" }}
+              className="relative w-full max-w-5xl bg-white shadow-2xl max-h-[88vh] flex flex-col overflow-hidden rounded-2xl"
             >
               {/* Header */}
-              <div className="bg-[#1A1A2E] text-white px-5 sm:px-7 py-5 flex items-start gap-4 shrink-0">
-                <span className="grid place-items-center w-11 h-11 bg-[#0B2F5C] shrink-0" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
+              <div className="bg-[#222538] text-white px-5 sm:px-7 py-5 flex items-start gap-4 shrink-0">
+                <span className="grid place-items-center w-11 h-11 bg-[#134E8D] shrink-0 rounded-xl">
                   <GitCompareArrows size={19} />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-[11px] font-black tracking-[0.22em] text-[#8FB4E0] uppercase">Side by side · {items.length} of 3</p>
+                  <p className="text-[11px] font-black tracking-[0.22em] text-[#9AC1EE] uppercase">Side by side · {items.length} of 3</p>
                   <p className="font-display font-bold text-[22px] sm:text-[26px] leading-tight">Compare the difference</p>
                   <p className="text-white/60 text-[13px] mt-0.5">Price, rating, stock and fitment — pick the right line for your truck.</p>
                 </div>
-                <button onClick={() => setOpen(false)} className="ml-auto p-2 border border-white/20 hover:bg-white hover:text-[#1A1A2E] transition shrink-0" aria-label="Close compare"><X size={16} /></button>
+                <button onClick={() => setOpen(false)} className="ml-auto p-2 border border-white/20 hover:bg-white hover:text-[#222538] transition shrink-0 rounded-lg" aria-label="Close compare"><X size={16} /></button>
               </div>
 
               {/* Body */}
@@ -157,7 +156,7 @@ export function CompareTray() {
                       </button>
                       <div className="p-3">
                         <p className="text-[10px] font-black tracking-[0.16em] text-[#9CA3AF] uppercase">{p.brand} · {p.sku}</p>
-                        <Link to={`/product/${p.sku}`} onClick={() => setOpen(false)} className="block font-display font-bold text-[13.5px] leading-snug mt-0.5 text-[#1A1A2E] hover:text-[#0B2F5C] line-clamp-2 min-h-[38px]">{p.name}</Link>
+                        <Link to={`/product/${p.sku}`} onClick={() => setOpen(false)} className="block font-display font-bold text-[13.5px] leading-snug mt-0.5 text-[#222538] hover:text-[#134E8D] line-clamp-2 min-h-[38px]">{p.name}</Link>
                       </div>
                     </div>
                   ))}
@@ -168,18 +167,18 @@ export function CompareTray() {
                   {rows.map((r, ri) => (
                     <div key={r.label} className={`grid gap-3 items-center px-3 sm:px-4 py-3 ${ri % 2 ? "bg-[#F7F8FA]" : "bg-white"}`} style={{ gridTemplateColumns: cols }}>
                       <p className="text-[11px] font-black tracking-[0.14em] text-[#9CA3AF] uppercase">{r.label}</p>
-                      {items.map((p) => <div key={p.sku} className="text-[13.5px] font-medium text-[#1A1A2E] min-w-0">{r.render(p)}</div>)}
+                      {items.map((p) => <div key={p.sku} className="text-[13.5px] font-medium text-[#222538] min-w-0">{r.render(p)}</div>)}
                     </div>
                   ))}
                   {/* CTA row */}
-                  <div className="grid gap-3 items-center px-3 sm:px-4 py-4 bg-[#1A1A2E]" style={{ gridTemplateColumns: cols }}>
+                  <div className="grid gap-3 items-center px-3 sm:px-4 py-4 bg-[#222538]" style={{ gridTemplateColumns: cols }}>
                     <p className="text-[11px] font-black tracking-[0.14em] text-white/50 uppercase">Next step</p>
                     {items.map((p) => (
                       <div key={p.sku} className="flex flex-wrap items-center gap-2">
                         {p.price == null ? (
-                          <button onClick={() => { setOpen(false); setEnquirySku(p.sku); }} className="bg-white text-[#1A1A2E] px-4 py-2.5 text-[12px] font-black hover:bg-[#8FB4E0] transition">Enquire</button>
+                          <button onClick={() => { setOpen(false); setEnquirySku(p.sku); }} className="bg-white text-[#222538] px-4 py-2.5 text-[12px] font-black hover:bg-[#9AC1EE] transition">Enquire</button>
                         ) : (
-                          <button onClick={() => add(p.sku)} className="inline-flex items-center gap-1.5 bg-[#0B2F5C] border border-white/20 text-white px-4 py-2.5 text-[12px] font-black hover:bg-white hover:text-[#1A1A2E] transition">
+                          <button onClick={() => add(p.sku)} className="inline-flex items-center gap-1.5 bg-[#134E8D] border border-white/20 text-white px-4 py-2.5 text-[12px] font-black hover:bg-white hover:text-[#222538] transition">
                             <ShoppingCart size={13} /> Add to cart
                           </button>
                         )}
@@ -208,12 +207,12 @@ export function RecentlyViewed({ current }) {
   if (items.length === 0) return null;
   return (
     <div className="mt-10">
-      <p className="font-display font-bold text-[22px] text-[#1A1A2E] flex items-center gap-2"><Clock size={19} className="text-[#0B2F5C]" /> Recently viewed</p>
+      <p className="font-display font-bold text-[22px] text-[#222538] flex items-center gap-2"><Clock size={19} className="text-[#134E8D]" /> Recently viewed</p>
       <div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-4">
         {items.map((p) => (
-          <Link key={p.sku} to={`/product/${p.sku}`} className="bg-white border border-[#E5E7EB] rounded-2xl p-3 flex gap-3 hover:border-[#0B2F5C]/40 transition">
+          <Link key={p.sku} to={`/product/${p.sku}`} className="bg-white border border-[#E5E7EB] rounded-2xl p-3 flex gap-3 hover:border-[#134E8D]/40 transition">
             <img src={p.image} alt="" className="w-16 h-16 rounded-xl object-cover shrink-0" loading="lazy" />
-            <span><b className="block text-[13px] leading-snug text-[#1A1A2E] line-clamp-2">{p.name}</b><span className="text-[13px] font-extrabold">{p.price == null ? "Enquire" : `$${p.price.toFixed(2)}`}</span></span>
+            <span><b className="block text-[13px] leading-snug text-[#222538] line-clamp-2">{p.name}</b><span className="text-[13px] font-extrabold">{p.price == null ? "Enquire" : `$${p.price.toFixed(2)}`}</span></span>
           </Link>
         ))}
       </div>

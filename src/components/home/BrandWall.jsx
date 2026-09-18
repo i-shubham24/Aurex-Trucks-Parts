@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 // Distinct typographic lockups so the wall reads as logos, not a text list.
 // These are stylised wordmarks, not reproductions of any registered logo.
 const BRANDS = [
-  { name: "BEAUWAY", ff: "var(--font-display)", w: 900, ls: "0.02em", color: "#0B2F5C" },
-  { name: "GANLAND", ff: "var(--font-display)", w: 900, ls: "0.02em", color: "#1A1A2E" },
-  { name: "CAIYUAN", ff: "var(--font-display)", w: 800, ls: "0.04em", color: "#2F5E93" },
-  { name: "AUREX", ff: "var(--font-display)", w: 900, it: true, ls: "-0.02em", color: "#0B2F5C" },
+  { name: "BEAUWAY", ff: "var(--font-display)", w: 900, ls: "0.02em", color: "#134E8D" },
+  { name: "GANLAND", ff: "var(--font-display)", w: 900, ls: "0.02em", color: "#222538" },
+  { name: "CAIYUAN", ff: "var(--font-display)", w: 800, ls: "0.04em", color: "#3873B3" },
+  { name: "AUREX", ff: "var(--font-display)", w: 900, it: true, ls: "-0.02em", color: "#134E8D" },
 ];
 
 function Mark({ b }) {

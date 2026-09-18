@@ -25,7 +25,7 @@ export default function MegaMenu() {
               onMouseEnter={() => setMega(true)}
               onClick={() => nav(h)}
               className={`px-4 py-3.5 border-b-2 flex items-center gap-1 transition ${
-                mega || pathname === h ? "border-[#0B2F5C] text-[#0B2F5C]" : "border-transparent text-[#6B7280] hover:text-[#1A1A2E]"
+                mega || pathname === h ? "border-[#134E8D] text-[#134E8D]" : "border-transparent text-[#6B7280] hover:text-[#222538]"
               }`}
             >
               {t} <ChevronDown size={14} className={`transition ${mega ? "rotate-180" : ""}`} />
@@ -37,7 +37,7 @@ export default function MegaMenu() {
               onMouseEnter={() => setMega(false)}
               className={({ isActive }) =>
                 `px-4 py-3.5 border-b-2 transition ${
-                  isActive ? "border-[#0B2F5C] text-[#0B2F5C]" : "border-transparent text-[#6B7280] hover:text-[#1A1A2E]"
+                  isActive ? "border-[#134E8D] text-[#134E8D]" : "border-transparent text-[#6B7280] hover:text-[#222538]"
                 }`
               }
             >
@@ -67,13 +67,13 @@ export default function MegaMenu() {
                     key={c.name}
                     to={`/shop?cat=${encodeURIComponent(c.name)}`}
                     onClick={() => setMega(false)}
-                    className="group flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-[#E8EEF5] transition"
+                    className="group flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-[#EDF3FA] transition"
                   >
-                    <span className="grid place-items-center w-9 h-9 rounded-lg bg-[#F5F6F8] text-[#0B2F5C] group-hover:bg-[#0B2F5C] group-hover:text-white transition shrink-0">
+                    <span className="grid place-items-center w-9 h-9 rounded-lg bg-[#F5F6F8] text-[#134E8D] group-hover:bg-[#134E8D] group-hover:text-white transition shrink-0">
                       <c.icon size={17} />
                     </span>
                     <span className="min-w-0">
-                      <span className="block text-[13px] font-semibold text-[#1A1A2E] truncate">{c.name}</span>
+                      <span className="block text-[13px] font-semibold text-[#222538] truncate">{c.name}</span>
                       <span className="block text-[11px] text-[#9CA3AF]">{c.count} lines</span>
                     </span>
                   </Link>
@@ -83,12 +83,12 @@ export default function MegaMenu() {
                 to="/deals"
                 onClick={() => setMega(false)}
                 className="relative rounded-xl overflow-hidden group grid place-items-center p-6 text-white"
-                style={{ background: "linear-gradient(135deg,#0B2F5C,#7a1500)" }}
+                style={{ background: "linear-gradient(135deg,#134E8D,#7a1500)" }}
               >
                 <div className="relative text-center">
                   <p className="text-[11px] font-black tracking-[0.2em] text-white/70">THIS WEEK</p>
                   <p className="font-display font-bold text-2xl mt-1 leading-tight">Fleet deals up to 30% off</p>
-                  <span className="mt-4 inline-flex items-center gap-1.5 bg-white text-[#1A1A2E] rounded-lg px-4 py-2 text-[13px] font-bold group-hover:gap-2.5 transition-all">
+                  <span className="mt-4 inline-flex items-center gap-1.5 bg-white text-[#222538] rounded-lg px-4 py-2 text-[13px] font-bold group-hover:gap-2.5 transition-all">
                     See deals <ArrowRight size={14} />
                   </span>
                 </div>

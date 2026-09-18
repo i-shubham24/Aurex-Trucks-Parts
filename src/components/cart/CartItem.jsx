@@ -50,7 +50,7 @@ export default function CartItem({ item, onRemove }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
-            <Link to={`/product/${item.sku}`} className="font-semibold text-sm text-[#1A1A2E] hover:text-[#0B2F5C] transition line-clamp-2">
+            <Link to={`/product/${item.sku}`} className="font-semibold text-sm text-[#222538] hover:text-[#134E8D] transition line-clamp-2">
               {product.name}
             </Link>
             <p className="text-xs text-[#9CA3AF] mt-1">{product.sku}</p>
@@ -73,7 +73,7 @@ export default function CartItem({ item, onRemove }) {
             >
               <Minus size={14} />
             </button>
-            <span className="w-8 text-center font-display font-bold text-sm text-[#1A1A2E]">{item.qty}</span>
+            <span className="w-8 text-center font-display font-bold text-sm text-[#222538]">{item.qty}</span>
             <button
               onClick={handleIncrement}
               className="w-8 h-8 grid place-items-center rounded-r-lg hover:bg-[#F5F6F8] transition text-[#6B7280]"
@@ -84,7 +84,7 @@ export default function CartItem({ item, onRemove }) {
           </div>
 
           <div className="text-right">
-            <p className="font-display font-bold text-[#1A1A2E]">${itemTotal.toFixed(2)}</p>
+            <p className="font-display font-bold text-[#222538]">${itemTotal.toFixed(2)}</p>
             {product.oldPrice && (
               <p className="text-xs text-[#9CA3AF] line-through">${(product.oldPrice * item.qty).toFixed(2)}</p>
             )}

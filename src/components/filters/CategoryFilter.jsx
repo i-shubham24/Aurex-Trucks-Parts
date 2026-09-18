@@ -12,7 +12,7 @@ export default function CategoryFilter({ categories, selected, onChange, compact
     <div>
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center justify-between w-full text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase hover:text-[#1A1A2E] transition"
+        className="flex items-center justify-between w-full text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase hover:text-[#222538] transition"
       >
         <span>System</span>
         {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -26,7 +26,7 @@ export default function CategoryFilter({ categories, selected, onChange, compact
               onClick={() => handleCategoryClick(categoryName)}
               className={`flex justify-between items-center text-left rounded-xl px-3.5 py-2.5 text-[13px] font-semibold transition ${
                 selected === categoryName
-                  ? "bg-[#0B2F5C] text-white"
+                  ? "bg-[#134E8D] text-white"
                   : "hover:bg-[#F7F8FA] text-[#6B7280]"
               }`}
             >

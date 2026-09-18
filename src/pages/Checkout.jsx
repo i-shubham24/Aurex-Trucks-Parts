@@ -81,9 +81,9 @@ export function CheckoutPage() {
 
   if (cart.length === 0) return (
     <div className="mx-auto max-w-xl px-4 py-14 text-center">
-      <h1 className="font-display font-bold text-3xl text-[#1A1A2E]">Cart is empty</h1>
+      <h1 className="font-display font-bold text-3xl text-[#222538]">Cart is empty</h1>
       <p className="text-[#6B7280] text-sm mt-2">Add parts before checkout.</p>
-      <Link to="/shop" className="mt-5 inline-block bg-[#0B2F5C] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition">Back to shop</Link>
+      <Link to="/shop" className="mt-5 inline-block bg-[#134E8D] text-white rounded-lg px-7 py-3.5 text-sm font-bold hover:bg-[#222538] transition">Back to shop</Link>
     </div>
   );
 
@@ -91,9 +91,9 @@ export function CheckoutPage() {
     <div>
       <div className="mx-auto max-w-7xl px-4 py-8">
         <p className="text-[12px] font-semibold text-[#9CA3AF]">
-          Cart <span className="mx-1.5">/</span> <span className="text-[#1A1A2E]">Checkout</span> <span className="mx-1.5">/</span> Done
+          Cart <span className="mx-1.5">/</span> <span className="text-[#222538]">Checkout</span> <span className="mx-1.5">/</span> Done
         </p>
-        <h1 className="font-display font-bold tracking-[-0.02em] text-[32px] sm:text-[44px] mt-2 text-[#1A1A2E]">Checkout ({count})</h1>
+        <h1 className="font-display font-bold tracking-[-0.02em] text-[32px] sm:text-[44px] mt-2 text-[#222538]">Checkout ({count})</h1>
         {hasValidVehicle && (
           <div className="mt-4 flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 px-4 py-3 max-w-2xl">
             <CheckCircle2 size={17} className="text-emerald-600 shrink-0" />
@@ -107,56 +107,56 @@ export function CheckoutPage() {
           <div className="space-y-5">
             {/* Contact + Delivery */}
             <section className="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
-              <p className="font-display font-bold text-lg flex items-center gap-2 text-[#1A1A2E]">
-                <span className="grid place-items-center w-7 h-7 rounded-full bg-[#0B2F5C] text-white text-[13px] font-black">1</span>
+              <p className="font-display font-bold text-lg flex items-center gap-2 text-[#222538]">
+                <span className="grid place-items-center w-7 h-7 rounded-full bg-[#134E8D] text-white text-[13px] font-black">1</span>
                 Contact plus delivery
               </p>
               <div className="mt-4 grid sm:grid-cols-2 gap-3">
                 <div>
-                  <input value={form.name} onChange={setF("name")} placeholder="Full name" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.name ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
+                  <input value={form.name} onChange={setF("name")} placeholder="Full name" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#222538] transition ${errors.name ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#134E8D]'}`} />
                   {errors.name && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.name}</p>}
                 </div>
                 <div>
-                  <input value={form.phone} onChange={setF("phone")} placeholder="Phone (e.g. 0412345678)" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.phone ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
+                  <input value={form.phone} onChange={setF("phone")} placeholder="Phone (e.g. 0412345678)" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#222538] transition ${errors.phone ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#134E8D]'}`} />
                   {errors.phone && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.phone}</p>}
                 </div>
                 <div className="sm:col-span-2">
-                  <input value={form.email} onChange={setF("email")} type="email" placeholder="Email for receipt plus tracking" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.email ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
+                  <input value={form.email} onChange={setF("email")} type="email" placeholder="Email for receipt plus tracking" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#222538] transition ${errors.email ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#134E8D]'}`} />
                   {errors.email && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.email}</p>}
                 </div>
                 <div className="sm:col-span-2">
-                  <input value={form.address} onChange={setF("address")} placeholder="Street address" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.address ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
+                  <input value={form.address} onChange={setF("address")} placeholder="Street address" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#222538] transition ${errors.address ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#134E8D]'}`} />
                   {errors.address && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.address}</p>}
                 </div>
                 <div>
-                  <input value={form.suburb} onChange={setF("suburb")} placeholder="Suburb" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.suburb ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
+                  <input value={form.suburb} onChange={setF("suburb")} placeholder="Suburb" className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#222538] transition ${errors.suburb ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#134E8D]'}`} />
                   {errors.suburb && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.suburb}</p>}
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <select value={form.state} onChange={setF("state")} className="rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E]">
+                  <select value={form.state} onChange={setF("state")} className="rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#222538]">
                     {["VIC", "NSW", "QLD", "SA", "WA", "TAS", "NT", "ACT"].map((s) => <option key={s}>{s}</option>)}
                   </select>
                   <div>
-                    <input value={form.postcode} onChange={setF("postcode")} placeholder="Postcode" maxLength={4} className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#1A1A2E] transition ${errors.postcode ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
+                    <input value={form.postcode} onChange={setF("postcode")} placeholder="Postcode" maxLength={4} className={`w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border outline-none text-sm text-[#222538] transition ${errors.postcode ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#134E8D]'}`} />
                   </div>
                 </div>
-                <input value={form.notes} onChange={setF("notes")} placeholder="Delivery notes or VIN, optional" className="sm:col-span-2 rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#0B2F5C] transition" />
+                <input value={form.notes} onChange={setF("notes")} placeholder="Delivery notes or VIN, optional" className="sm:col-span-2 rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#222538] focus:border-[#134E8D] transition" />
               </div>
-              {!user && <p className="mt-3 text-[13px] text-[#6B7280]">Checking out as guest. <Link to="/login" className="text-[#0B2F5C] font-bold">Log in</Link> or <Link to="/signup" className="text-[#0B2F5C] font-bold">create an account</Link> to save history.</p>}
+              {!user && <p className="mt-3 text-[13px] text-[#6B7280]">Checking out as guest. <Link to="/login" className="text-[#134E8D] font-bold">Log in</Link> or <Link to="/signup" className="text-[#134E8D] font-bold">create an account</Link> to save history.</p>}
             </section>
 
             {/* Shipping */}
             <section className="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
-              <p className="font-display font-bold text-lg flex items-center gap-2 text-[#1A1A2E]">
-                <span className="grid place-items-center w-7 h-7 rounded-full bg-[#0B2F5C] text-white text-[13px] font-black">2</span>
+              <p className="font-display font-bold text-lg flex items-center gap-2 text-[#222538]">
+                <span className="grid place-items-center w-7 h-7 rounded-full bg-[#134E8D] text-white text-[13px] font-black">2</span>
                 Shipping
               </p>
               <div className="mt-4 grid sm:grid-cols-3 gap-2.5">
                 {SHIPPING.map((s) => (
-                  <button key={s.id} type="button" onClick={() => setShip(s.id)} className={`text-left rounded-xl border p-4 transition ${ship === s.id ? "border-[#0B2F5C] bg-[#E8EEF5]" : "border-[#E5E7EB] hover:border-[#0B2F5C]/50"}`}>
-                    <p className="font-semibold text-sm flex items-center gap-1.5 text-[#1A1A2E]"><Truck size={15} className="text-[#0B2F5C]" />{s.label}</p>
+                  <button key={s.id} type="button" onClick={() => setShip(s.id)} className={`text-left rounded-xl border p-4 transition ${ship === s.id ? "border-[#134E8D] bg-[#EDF3FA]" : "border-[#E5E7EB] hover:border-[#134E8D]/50"}`}>
+                    <p className="font-semibold text-sm flex items-center gap-1.5 text-[#222538]"><Truck size={15} className="text-[#134E8D]" />{s.label}</p>
                     <p className="text-[12px] text-[#9CA3AF] mt-1">{s.eta}</p>
-                    <p className="text-[13px] font-bold mt-1.5 text-[#1A1A2E]">{s.fee(total) === 0 ? "Free" : `$${s.fee(total).toFixed(2)}`}</p>
+                    <p className="text-[13px] font-bold mt-1.5 text-[#222538]">{s.fee(total) === 0 ? "Free" : `$${s.fee(total).toFixed(2)}`}</p>
                   </button>
                 ))}
               </div>
@@ -164,13 +164,13 @@ export function CheckoutPage() {
 
             {/* Payment */}
             <section className="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
-              <p className="font-display font-bold text-lg flex items-center gap-2 text-[#1A1A2E]">
-                <span className="grid place-items-center w-7 h-7 rounded-full bg-[#0B2F5C] text-white text-[13px] font-black">3</span>
+              <p className="font-display font-bold text-lg flex items-center gap-2 text-[#222538]">
+                <span className="grid place-items-center w-7 h-7 rounded-full bg-[#134E8D] text-white text-[13px] font-black">3</span>
                 Payment
               </p>
               <div className="mt-4 grid sm:grid-cols-2 gap-2.5">
                 {PAYMENTS.map((m) => (
-                  <button key={m} type="button" onClick={() => setPay(m)} className={`rounded-xl border p-4 text-left text-sm font-semibold transition flex items-center gap-2 ${pay === m ? "border-[#0B2F5C] bg-[#E8EEF5] text-[#1A1A2E]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#0B2F5C]/50"}`}>
+                  <button key={m} type="button" onClick={() => setPay(m)} className={`rounded-xl border p-4 text-left text-sm font-semibold transition flex items-center gap-2 ${pay === m ? "border-[#134E8D] bg-[#EDF3FA] text-[#222538]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#134E8D]/50"}`}>
                     <CreditCard size={15} className="text-[#9CA3AF]" />{m}
                   </button>
                 ))}
@@ -183,17 +183,17 @@ export function CheckoutPage() {
                       <p className="text-[11px] font-bold tracking-widest text-[#9CA3AF] uppercase flex items-center gap-1.5"><Lock size={12}/> Secure Payment</p>
                       
                       <div className="relative">
-                        <input value={card.number} onChange={handleCardNumber} onPaste={(e) => e.preventDefault()} placeholder="Card number" className={`w-full rounded-lg px-4 py-3 bg-white border outline-none text-sm font-mono text-[#1A1A2E] transition ${errors.card ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
+                        <input value={card.number} onChange={handleCardNumber} onPaste={(e) => e.preventDefault()} placeholder="Card number" className={`w-full rounded-lg px-4 py-3 bg-white border outline-none text-sm font-mono text-[#222538] transition ${errors.card ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#134E8D]'}`} />
                         {errors.card && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.card}</p>}
                       </div>
                       
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <input value={card.expiry} onChange={handleCardExpiry} onPaste={(e) => e.preventDefault()} placeholder="MM/YY" className={`w-full rounded-lg px-4 py-3 bg-white border outline-none text-sm font-mono text-[#1A1A2E] transition ${errors.expiry ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
+                          <input value={card.expiry} onChange={handleCardExpiry} onPaste={(e) => e.preventDefault()} placeholder="MM/YY" className={`w-full rounded-lg px-4 py-3 bg-white border outline-none text-sm font-mono text-[#222538] transition ${errors.expiry ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#134E8D]'}`} />
                           {errors.expiry && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.expiry}</p>}
                         </div>
                         <div>
-                          <input value={card.cvv} onChange={handleCardCvv} onPaste={(e) => e.preventDefault()} type="password" placeholder="CVV" maxLength={4} className={`w-full rounded-lg px-4 py-3 bg-white border outline-none text-sm font-mono text-[#1A1A2E] transition ${errors.cvv ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#0B2F5C]'}`} />
+                          <input value={card.cvv} onChange={handleCardCvv} onPaste={(e) => e.preventDefault()} type="password" placeholder="CVV" maxLength={4} className={`w-full rounded-lg px-4 py-3 bg-white border outline-none text-sm font-mono text-[#222538] transition ${errors.cvv ? 'border-red-500' : 'border-[#E5E7EB] focus:border-[#134E8D]'}`} />
                           {errors.cvv && <p className="text-red-500 text-[11px] mt-1 ml-1">{errors.cvv}</p>}
                         </div>
                       </div>
@@ -212,23 +212,23 @@ export function CheckoutPage() {
 
           {/* Order Summary */}
           <aside className="rounded-2xl bg-white border border-[#E5E7EB] p-7 lg:sticky lg:top-28 shadow-sm">
-            <p className="font-display font-bold text-xl text-[#1A1A2E]">Order summary</p>
+            <p className="font-display font-bold text-xl text-[#222538]">Order summary</p>
             <div className="mt-4 space-y-3 max-h-[280px] overflow-auto pr-1">
               {cart.map((i) => (
                 <div key={i.sku} className="flex gap-3 text-[13px]">
-                  <span className="font-bold bg-[#1A1A2E] text-white rounded-lg w-8 h-8 grid place-items-center shrink-0">{i.qty}</span>
+                  <span className="font-bold bg-[#222538] text-white rounded-lg w-8 h-8 grid place-items-center shrink-0">{i.qty}</span>
                   <span className="flex-1">
-                    <b className="block leading-snug text-[#1A1A2E]">{i.name}</b>
+                    <b className="block leading-snug text-[#222538]">{i.name}</b>
                     <span className="text-[#9CA3AF]">{i.sku}</span>
                   </span>
-                  <b className="text-[#1A1A2E]">${(i.price * i.qty).toFixed(2)}</b>
+                  <b className="text-[#222538]">${(i.price * i.qty).toFixed(2)}</b>
                 </div>
               ))}
             </div>
             <div className="mt-4 pt-4 border-t border-[#E5E7EB] space-y-1.5 text-sm font-semibold">
-              <p className="flex justify-between"><span className="text-[#6B7280]">Subtotal</span><span className="text-[#1A1A2E]">${total.toFixed(2)}</span></p>
-              <p className="flex justify-between"><span className="text-[#6B7280]">Shipping ({shipOpt.label})</span><span className="text-[#1A1A2E]">{fee === 0 ? "Free" : `$${fee.toFixed(2)}`}</span></p>
-              <p className="flex justify-between font-display font-bold text-xl pt-2 text-[#1A1A2E]"><span>Total</span><span>${grand.toFixed(2)}</span></p>
+              <p className="flex justify-between"><span className="text-[#6B7280]">Subtotal</span><span className="text-[#222538]">${total.toFixed(2)}</span></p>
+              <p className="flex justify-between"><span className="text-[#6B7280]">Shipping ({shipOpt.label})</span><span className="text-[#222538]">{fee === 0 ? "Free" : `$${fee.toFixed(2)}`}</span></p>
+              <p className="flex justify-between font-display font-bold text-xl pt-2 text-[#222538]"><span>Total</span><span>${grand.toFixed(2)}</span></p>
             </div>
             <button onClick={() => {
               if (!validate()) {
@@ -238,7 +238,7 @@ export function CheckoutPage() {
               const order = placeOrder({ items: cart, subtotal: total, shipping: shipOpt.label, shippingFee: fee, payment: pay, total: grand, address: form });
               setCart([]);
               nav(`/order-success/${order.id}`);
-            }} className="mt-5 w-full bg-[#0B2F5C] text-white rounded-xl py-4 text-sm font-bold hover:bg-[#1A1A2E] transition flex items-center justify-center gap-2">
+            }} className="mt-5 w-full bg-[#134E8D] text-white rounded-xl py-4 text-sm font-bold hover:bg-[#222538] transition flex items-center justify-center gap-2">
               <Lock size={15} /> Pay ${grand.toFixed(2)}, Place order
             </button>
           </aside>
@@ -259,15 +259,15 @@ export function OrderSuccessPage() {
         <motion.div initial={{ scale: 0.85, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="mx-auto w-20 h-20 rounded-full bg-[#10B981] grid place-items-center">
           <CheckCircle2 size={40} className="text-white" />
         </motion.div>
-        <h1 className="font-display font-bold text-4xl mt-6 text-[#1A1A2E]">Order locked in</h1>
-        <p className="text-[#6B7280] text-sm mt-2">Order <b className="text-[#1A1A2E]">{id}</b> is packed in Campbellfield VIC.</p>
+        <h1 className="font-display font-bold text-4xl mt-6 text-[#222538]">Order locked in</h1>
+        <p className="text-[#6B7280] text-sm mt-2">Order <b className="text-[#222538]">{id}</b> is packed in Campbellfield VIC.</p>
         
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link to={`/track?order=${id || ""}`} className="bg-[#0B2F5C] text-white rounded-xl px-7 py-3.5 text-sm font-bold hover:bg-[#1A1A2E] transition">Track this order</Link>
-          <button onClick={() => window.print()} className="rounded-xl px-7 py-3.5 text-sm font-bold border border-[#E5E7EB] text-[#1A1A2E] flex items-center gap-2 hover:border-[#0B2F5C] transition bg-white">
+          <Link to={`/track?order=${id || ""}`} className="bg-[#134E8D] text-white rounded-xl px-7 py-3.5 text-sm font-bold hover:bg-[#222538] transition">Track this order</Link>
+          <button onClick={() => window.print()} className="rounded-xl px-7 py-3.5 text-sm font-bold border border-[#E5E7EB] text-[#222538] flex items-center gap-2 hover:border-[#134E8D] transition bg-white">
             <Printer size={16} /> Print Tax Invoice
           </button>
-          <Link to="/shop" className="rounded-xl px-7 py-3.5 text-sm font-bold border border-[#E5E7EB] text-[#1A1A2E] flex items-center gap-2 hover:border-[#0B2F5C] transition bg-white">
+          <Link to="/shop" className="rounded-xl px-7 py-3.5 text-sm font-bold border border-[#E5E7EB] text-[#222538] flex items-center gap-2 hover:border-[#134E8D] transition bg-white">
             Keep shopping <ArrowRight size={15} />
           </Link>
         </div>
@@ -277,12 +277,12 @@ export function OrderSuccessPage() {
         <div className="mt-12 p-8 bg-white border border-[#E5E7EB] rounded-2xl shadow-sm print:shadow-none print:border-none print:mt-0 print:p-0">
           <div className="flex justify-between items-start border-b border-[#E5E7EB] pb-6">
             <div>
-              <p className="font-display font-black text-2xl text-[#1A1A2E]">TAX INVOICE</p>
+              <p className="font-display font-black text-2xl text-[#222538]">TAX INVOICE</p>
               <p className="text-[#6B7280] text-sm mt-1">Aurex Truck Parts Australia Pty Ltd</p>
               <p className="text-[#6B7280] text-sm">ABN: 12 345 678 901</p>
             </div>
             <div className="text-right">
-              <p className="font-bold text-[#1A1A2E]">Order # {id}</p>
+              <p className="font-bold text-[#222538]">Order # {id}</p>
               <p className="text-[#6B7280] text-sm mt-1">{new Date().toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
             </div>
           </div>
@@ -290,14 +290,14 @@ export function OrderSuccessPage() {
           <div className="py-6 grid sm:grid-cols-2 gap-8 border-b border-[#E5E7EB]">
             <div>
               <p className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-widest mb-2">Billed To</p>
-              <p className="font-semibold text-[#1A1A2E]">{order.address.firstName} {order.address.lastName}</p>
+              <p className="font-semibold text-[#222538]">{order.address.firstName} {order.address.lastName}</p>
               <p className="text-[#6B7280] text-sm mt-1">{order.address.company}</p>
               <p className="text-[#6B7280] text-sm">{order.address.address}</p>
               <p className="text-[#6B7280] text-sm">{order.address.suburb} {order.address.state} {order.address.postcode}</p>
             </div>
             <div>
               <p className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-widest mb-2">Payment</p>
-              <p className="font-semibold text-[#1A1A2E]">{order.payment}</p>
+              <p className="font-semibold text-[#222538]">{order.payment}</p>
               <p className="text-[#6B7280] text-sm mt-1">Paid in full</p>
             </div>
           </div>
@@ -315,7 +315,7 @@ export function OrderSuccessPage() {
                 {order.items.map((i, idx) => (
                   <tr key={idx}>
                     <td className="py-4">
-                      <p className="font-semibold text-[#1A1A2E]">{i.name}</p>
+                      <p className="font-semibold text-[#222538]">{i.name}</p>
                       <p className="text-[11px] text-[#6B7280] mt-0.5">SKU: {i.sku}</p>
                     </td>
                     <td className="py-4 text-right font-medium">{i.qty}</td>
@@ -329,19 +329,19 @@ export function OrderSuccessPage() {
           <div className="pt-6 border-t border-[#E5E7EB] flex flex-col items-end gap-2 text-sm">
             <div className="flex justify-between w-64 text-[#6B7280]">
               <span>Subtotal</span>
-              <span className="text-[#1A1A2E] font-medium">${order.subtotal.toFixed(2)}</span>
+              <span className="text-[#222538] font-medium">${order.subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between w-64 text-[#6B7280]">
               <span>Shipping ({order.shipping})</span>
-              <span className="text-[#1A1A2E] font-medium">${order.shippingFee.toFixed(2)}</span>
+              <span className="text-[#222538] font-medium">${order.shippingFee.toFixed(2)}</span>
             </div>
             <div className="flex justify-between w-64 text-[#6B7280]">
               <span>GST Included (10%)</span>
-              <span className="text-[#1A1A2E] font-medium">${(order.total / 11).toFixed(2)}</span>
+              <span className="text-[#222538] font-medium">${(order.total / 11).toFixed(2)}</span>
             </div>
-            <div className="flex justify-between w-64 font-display font-bold text-xl text-[#1A1A2E] pt-3 border-t border-[#E5E7EB] mt-1">
+            <div className="flex justify-between w-64 font-display font-bold text-xl text-[#222538] pt-3 border-t border-[#E5E7EB] mt-1">
               <span>Total paid</span>
-              <span className="text-[#0B2F5C]">${order.total.toFixed(2)}</span>
+              <span className="text-[#134E8D]">${order.total.toFixed(2)}</span>
             </div>
           </div>
         </div>

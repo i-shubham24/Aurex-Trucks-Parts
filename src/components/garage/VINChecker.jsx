@@ -59,7 +59,7 @@ export default function VINChecker({ onValidation, compact = false }) {
           onKeyDown={(e) => e.key === "Enter" && handleCheck()}
           placeholder="VIN (17 chars)"
           maxLength={17}
-          className="flex-1 bg-[#F5F6F8] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#0B2F5C] transition uppercase"
+          className="flex-1 bg-[#F5F6F8] border border-[#E5E7EB] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#134E8D] transition uppercase"
         />
         {vin && (
           <button onClick={handleClear} className="p-2 rounded-lg hover:bg-[#E5E7EB] transition">
@@ -69,7 +69,7 @@ export default function VINChecker({ onValidation, compact = false }) {
         <button 
           onClick={handleCheck}
           disabled={vin.length < 6}
-          className="bg-[#0B2F5C] text-white rounded-lg px-4 py-2 text-sm font-bold hover:bg-[#1A1A2E] disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="bg-[#134E8D] text-white rounded-lg px-4 py-2 text-sm font-bold hover:bg-[#222538] disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           Check
         </button>
@@ -80,7 +80,7 @@ export default function VINChecker({ onValidation, compact = false }) {
   return (
     <div className="rounded-xl border border-[#E5E7EB] bg-[#F7F8FA] p-4">
       <p className="text-[12px] font-bold tracking-widest text-[#9CA3AF] flex items-center gap-1.5 uppercase">
-        <ScanLine size={14} className="text-[#0B2F5C]" /> Check Fitment by VIN
+        <ScanLine size={14} className="text-[#134E8D]" /> Check Fitment by VIN
       </p>
       <div className="mt-2.5 flex gap-2">
         <input 
@@ -89,12 +89,12 @@ export default function VINChecker({ onValidation, compact = false }) {
           onKeyDown={(e) => e.key === "Enter" && handleCheck()}
           placeholder="Enter VIN, 17 characters"
           maxLength={17}
-          className="flex-1 rounded-lg px-4 py-3 bg-white border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#0B2F5C] transition uppercase"
+          className="flex-1 rounded-lg px-4 py-3 bg-white border border-[#E5E7EB] outline-none text-sm text-[#222538] focus:border-[#134E8D] transition uppercase"
         />
         <button 
           onClick={handleCheck}
           disabled={vin.length < 6}
-          className="bg-[#0B2F5C] text-white rounded-lg px-5 py-3 text-sm font-bold hover:bg-[#1A1A2E] disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="bg-[#134E8D] text-white rounded-lg px-5 py-3 text-sm font-bold hover:bg-[#222538] disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           Check
         </button>

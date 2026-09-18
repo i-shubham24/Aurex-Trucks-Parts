@@ -89,7 +89,7 @@ export default function Shop() {
   return (
     <div>
       {/* Category hero, changes with the selected system */}
-      <section className="relative bg-[#1A1A2E] text-white">
+      <section className="relative bg-[#222538] text-white">
         <div className="absolute inset-0 overflow-hidden">
           <AnimatePresence mode="wait">
             <motion.div key={activeCat?.name || "all"} initial={{ opacity: 0, scale: 1.06 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }} className="absolute inset-0">
@@ -97,15 +97,15 @@ export default function Shop() {
             </motion.div>
           </AnimatePresence>
           <div className="absolute inset-0 grid-scrim opacity-30" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#1A1A2E]/85 via-[#1A1A2E]/60 to-transparent" />
-          <motion.div aria-hidden animate={{ x: [0, 36, 0], y: [0, -20, 0], opacity: [0.12, 0.22, 0.12] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }} className="absolute -right-24 -top-12 w-[420px] h-[420px] rounded-full bg-[#0B2F5C]/15 blur-[130px]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#222538]/85 via-[#222538]/60 to-transparent" />
+          <motion.div aria-hidden animate={{ x: [0, 36, 0], y: [0, -20, 0], opacity: [0.12, 0.22, 0.12] }} transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }} className="absolute -right-24 -top-12 w-[420px] h-[420px] rounded-full bg-[#134E8D]/15 blur-[130px]" />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-4 pt-8 pb-9 min-h-[380px] flex flex-col justify-center">
           <p className="text-[12px] font-semibold text-white/50">
-            <Link to="/" className="hover:text-[#2F5E93] transition">Home</Link>
+            <Link to="/" className="hover:text-[#3873B3] transition">Home</Link>
             <span className="mx-1.5">/</span>
-            <Link to="/shop" className="hover:text-[#2F5E93] transition">Shop</Link>
+            <Link to="/shop" className="hover:text-[#3873B3] transition">Shop</Link>
             {activeCat && <><span className="mx-1.5">/</span><span className="text-white/80">{activeCat.name}</span></>}
           </p>
           <div className="mt-4 flex flex-wrap items-start justify-between gap-6">
@@ -115,7 +115,7 @@ export default function Shop() {
                 initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 className="min-w-0 max-w-2xl"
               >
-                <p className="text-[12px] font-black tracking-[0.22em] text-[#2F5E93] uppercase mb-2">{activeCat ? "System" : "Full catalogue"}</p>
+                <p className="text-[12px] font-black tracking-[0.22em] text-[#3873B3] uppercase mb-2">{activeCat ? "System" : "Full catalogue"}</p>
                 <h1 className="font-display font-bold tracking-[-0.02em] text-[36px] sm:text-[54px] leading-[0.92]">
                   {activeCat ? <CategoryTitle name={activeCat.name} /> : <>Shop truck <span className="text-[#C7CDD6]">parts.</span></>}
                 </h1>
@@ -130,9 +130,9 @@ export default function Shop() {
                   </div>
                 )}
                 <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-[13px] font-semibold text-white/70">
-                  <span className="flex items-center gap-1.5"><ShieldCheck size={15} className="text-[#2F5E93]" /> ADR compliant range</span>
-                  <span className="flex items-center gap-1.5"><Truck size={15} className="text-[#2F5E93]" /> Same day dispatch from VIC</span>
-                  <span className="flex items-center gap-1.5"><RotateCcw size={15} className="text-[#2F5E93]" /> Free returns on fit errors</span>
+                  <span className="flex items-center gap-1.5"><ShieldCheck size={15} className="text-[#3873B3]" /> ADR compliant range</span>
+                  <span className="flex items-center gap-1.5"><Truck size={15} className="text-[#3873B3]" /> Same day dispatch from VIC</span>
+                  <span className="flex items-center gap-1.5"><RotateCcw size={15} className="text-[#3873B3]" /> Free returns on fit errors</span>
                 </div>
               </motion.div>
             </AnimatePresence>
@@ -164,20 +164,18 @@ export default function Shop() {
       </section>
 
       {/* Fitment banner */}
-      <div className="mx-auto max-w-7xl px-4 pt-6">
-        <FitmentBanner fitCount={fitCount} onlyFits={onlyFits} setOnlyFits={setOnlyFits} />
-      </div>
+      <FitmentBanner fitCount={fitCount} onlyFits={onlyFits} setOnlyFits={setOnlyFits} />
 
       {/* Filters + Grid */}
       <div className="mx-auto max-w-7xl px-4 py-8 grid lg:grid-cols-[260px_1fr] gap-6 items-start">
         <aside className="bg-white border border-[#E5E7EB] p-5 lg:sticky lg:top-28 shadow-sm">
           <div className="flex items-center justify-between">
-            <p className="font-display font-bold text-lg text-[#1A1A2E]">Filters</p>
+            <p className="font-display font-bold text-lg text-[#222538]">Filters</p>
             <span className="flex items-center gap-3">
-              <button onClick={clearAll} className="text-[12px] font-semibold text-[#9CA3AF] hover:text-[#0B2F5C] transition">
+              <button onClick={clearAll} className="text-[12px] font-semibold text-[#9CA3AF] hover:text-[#134E8D] transition">
                 Clear all
               </button>
-              <button onClick={() => setFiltersOpen(!filtersOpen)} className="lg:hidden text-[12px] font-bold text-[#0B2F5C]">
+              <button onClick={() => setFiltersOpen(!filtersOpen)} className="lg:hidden text-[12px] font-bold text-[#134E8D]">
                 {filtersOpen ? "Hide ▲" : "Show ▼"}
               </button>
             </span>
@@ -192,7 +190,7 @@ export default function Shop() {
                 onClick={() => setCat(t)}
                 className={`clip-cut-sm flex justify-between items-center text-left px-3.5 py-2.5 text-[13px] font-semibold transition ${
                   cat === t
-                    ? "bg-[#0B2F5C] text-white"
+                    ? "bg-[#134E8D] text-white"
                     : "hover:bg-[#F7F8FA] text-[#6B7280]"
                 }`}
               >
@@ -210,8 +208,8 @@ export default function Shop() {
                 onClick={() => setBrand(b)}
                 className={`clip-cut-sm px-3 py-1.5 text-[12px] font-semibold border transition ${
                   brand === b
-                    ? "bg-[#0B2F5C] text-white border-[#0B2F5C]"
-                    : "border-[#E5E7EB] text-[#6B7280] hover:border-[#0B2F5C] hover:text-[#0B2F5C]"
+                    ? "bg-[#134E8D] text-white border-[#134E8D]"
+                    : "border-[#E5E7EB] text-[#6B7280] hover:border-[#134E8D] hover:text-[#134E8D]"
                 }`}
               >
                 {b}
@@ -228,21 +226,21 @@ export default function Shop() {
             max={6000}
             value={maxPrice}
             onChange={(e) => setMaxPrice(Number(e.target.value))}
-            className="mt-2 w-full accent-[#1A1A2E]"
+            className="mt-2 w-full accent-[#222538]"
           />
 
           <button
             onClick={() => setInStock(!inStock)}
             className={`clip-cut mt-4 w-full px-4 py-3 text-[13px] font-bold border-2 transition ${
               inStock
-                ? "bg-[#1A1A2E] text-white border-[#1A1A2E]"
-                : "border-[#E5E7EB] text-[#6B7280] hover:border-[#1A1A2E]"
+                ? "bg-[#222538] text-white border-[#222538]"
+                : "border-[#E5E7EB] text-[#6B7280] hover:border-[#222538]"
             }`}
           >
             {inStock ? "In stock VIC: ON" : "In stock VIC: OFF"}
           </button>
 
-          <div className="mt-5 rounded-xl bg-gradient-to-br from-[#0B2F5C] to-[#071E3C] text-white p-4">
+          <div className="mt-5 rounded-xl bg-gradient-to-br from-[#134E8D] to-[#0C2B52] text-white p-4">
             <p className="font-bold">Fleet top up?</p>
             <p className="text-[12px] font-medium mt-1 text-white/80">5 plus units unlocks extra pricing in the quote cart.</p>
           </div>
@@ -257,9 +255,9 @@ export default function Shop() {
           </motion.div>
           {list.length === 0 && (
             <div className="mt-6 rounded-2xl border border-dashed border-[#E5E7EB] p-12 text-center">
-              <p className="font-display font-bold text-2xl text-[#1A1A2E]">No matches at these filters</p>
+              <p className="font-display font-bold text-2xl text-[#222538]">No matches at these filters</p>
               <p className="text-[#6B7280] text-sm mt-2">Try a shorter term like hinge, lock or track, or clear filters.</p>
-              <button onClick={clearAll} className="clip-cut mt-5 bg-[#0B2F5C] text-white px-6 py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">
+              <button onClick={clearAll} className="clip-cut mt-5 bg-[#134E8D] text-white px-6 py-3 text-sm font-bold hover:bg-[#222538] transition">
                 Clear all filters
               </button>
             </div>

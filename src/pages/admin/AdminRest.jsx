@@ -148,7 +148,7 @@ export function AdminSettings() {
         <label className="grid gap-1.5 sm:col-span-2"><span className="text-[11px] font-black tracking-widest text-white/35">ANNOUNCEMENT BAR</span><input value={settings.announcement} onChange={set("announcement")} className="rounded-xl px-4 py-3 bg-black/40 border border-white/10 outline-none focus:border-[#5B93D1]/50 transition" /></label>
       </div>
       <div className="mt-6 flex items-center gap-3">
-        <button onClick={handleSave} className={`rounded-xl px-8 py-3.5 text-sm font-bold transition flex items-center gap-2 ${saved ? 'bg-[#10B981] text-white' : 'bg-[#5B93D1] text-white hover:bg-[#8FB4E0]'}`}>
+        <button onClick={handleSave} className={`rounded-xl px-8 py-3.5 text-sm font-bold transition flex items-center gap-2 ${saved ? 'bg-[#10B981] text-white' : 'bg-[#5B93D1] text-white hover:bg-[#9AC1EE]'}`}>
           {saved ? "Settings Saved!" : "Save Settings"}
         </button>
         <button onClick={() => { if (confirm("Reset settings and content to defaults?")) resetSite(); }} className="rounded-xl border border-white/15 px-6 py-3.5 text-sm font-bold text-white/60 hover:text-white hover:bg-white/5 transition">Reset to defaults</button>
