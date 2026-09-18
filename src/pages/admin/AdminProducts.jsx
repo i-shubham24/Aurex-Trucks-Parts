@@ -75,7 +75,7 @@ export default function AdminProducts() {
     <div>
       <div className="flex flex-wrap items-center gap-3">
         <div><h1 className="font-display font-bold text-3xl">Products ({products.length})</h1><p className="text-white/50 text-sm mt-1">Pickers over typing. Edits go live on the storefront instantly.</p></div>
-        <div className="ml-auto flex gap-2"><button onClick={() => { if (confirm("Reset catalogue to seed data?")) resetCatalog(); }} className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-bold">Reset</button><button onClick={openNew} className="rounded-full bg-[#ff4d00] px-5 py-2.5 text-sm font-black flex items-center gap-1.5"><Plus size={15} /> Add product</button></div>
+        <div className="ml-auto flex gap-2"><button onClick={() => { if (confirm("Reset catalogue to seed data?")) resetCatalog(); }} className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-bold">Reset</button><button onClick={openNew} className="rounded-full bg-[#5B93D1] px-5 py-2.5 text-sm font-black flex items-center gap-1.5"><Plus size={15} /> Add product</button></div>
       </div>
 
       <div className="mt-5 flex flex-wrap gap-2">
@@ -83,7 +83,7 @@ export default function AdminProducts() {
         <select value={cat} onChange={(e) => setCat(e.target.value)} className="rounded-full bg-white/5 border border-white/10 px-4 py-2.5 text-sm font-bold outline-none">{["All", ...liveCategories.map((c) => c.name)].map((c) => <option key={c} className="text-black">{c}</option>)}</select>
       </div>
 
-      <div className="mt-4 rounded-[22px] border border-white/10 bg-[#0d1218] overflow-hidden">
+      <div className="mt-4 rounded-[22px] border border-white/10 bg-[#0C1622] overflow-hidden">
         <div className="overflow-x-auto"><table className="sticky-col w-full text-sm min-w-[860px]">
           <thead><tr className="text-left text-[11px] text-white/35">{["", "SKU", "PRODUCT", "CAT", "PRICE", "STOCK", "ACTIONS"].map((h) => <th key={h} className="px-4 py-3 font-black tracking-widest">{h}</th>)}</tr></thead>
           <tbody>{list.map((p) => (
@@ -105,7 +105,7 @@ export default function AdminProducts() {
         {modal && (
           <div className="fixed inset-0 z-[80] grid place-items-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/75" onClick={() => setModal(null)} />
-            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="relative w-full max-w-3xl rounded-[24px] border border-white/10 bg-[#0d1218] p-6 max-h-[90vh] overflow-auto">
+            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="relative w-full max-w-3xl rounded-[24px] border border-white/10 bg-[#0C1622] p-6 max-h-[90vh] overflow-auto">
               <div className="flex items-center gap-4">
                 <div>{previewImg ? <img src={previewImg} alt="preview" className="w-20 h-20 rounded-2xl object-cover border border-white/10" /> : <span className="grid place-items-center w-20 h-20 rounded-2xl bg-white/5 text-white/25"><ImageIcon size={26} /></span>}</div>
                 <div><p className="font-display font-bold text-2xl">{modal === "new" ? "Add product" : `Edit ${form.sku}`}</p><p className="text-[13px] text-white/45">Live preview on the left. Image picker below.</p></div>
@@ -133,7 +133,7 @@ export default function AdminProducts() {
                   <input value={form.useCustom && !Object.values(IMG_OVERRIDES).includes(form.image) ? form.image : ""} onChange={(e) => setForm({ ...form, image: e.target.value, useCustom: true })} placeholder="https://..." className="rounded-xl px-4 py-3 bg-black/40 border border-white/10 outline-none" />
                 </label>
                 <label className="sm:col-span-2 flex items-center gap-2.5 text-sm font-semibold cursor-pointer">
-                  <input type="checkbox" checked={form.useCustom} onChange={(e) => setForm({ ...form, useCustom: e.target.checked })} className="w-4 h-4 accent-[#ff4d00]" /> Use custom URL instead of library photo
+                  <input type="checkbox" checked={form.useCustom} onChange={(e) => setForm({ ...form, useCustom: e.target.checked })} className="w-4 h-4 accent-[#5B93D1]" /> Use custom URL instead of library photo
                   {form.useCustom && form.image === "" && <button type="button" onClick={() => setForm({ ...form, useCustom: false })} className="text-[12px] underline text-white/50">back to library</button>}
                 </label>
               </div>
@@ -177,7 +177,7 @@ export default function AdminProducts() {
                 </label>
                 <div className="grid gap-1">
                   <label className="flex items-center gap-2.5 text-sm font-semibold cursor-pointer pt-6">
-                    <input type="checkbox" checked={form.onSale} onChange={(e) => setForm({ ...form, onSale: e.target.checked })} className="w-4 h-4 accent-[#ff4d00]" /> On sale (shows was price plus Deals entry)
+                    <input type="checkbox" checked={form.onSale} onChange={(e) => setForm({ ...form, onSale: e.target.checked })} className="w-4 h-4 accent-[#5B93D1]" /> On sale (shows was price plus Deals entry)
                   </label>
                 </div>
                 {form.onSale && (
@@ -190,7 +190,7 @@ export default function AdminProducts() {
               <p className={`${lab} mt-5 mb-1.5`}>SPECS (COMMA SEPARATED)</p>
               <input value={form.specs} onChange={(e) => setForm({ ...form, specs: e.target.value })} placeholder="27mm steel, 200L plus 200R" className={`${inp}`} />
               {err && <p className="mt-3 text-[13px] text-red-400 font-semibold">{err}</p>}
-              <button onClick={save} className="mt-4 w-full bg-[#ff4d00] rounded-2xl py-3.5 text-sm font-black hover:bg-white hover:text-black transition">{modal === "new" ? "Add to catalogue" : "Save changes"}</button>
+              <button onClick={save} className="mt-4 w-full bg-[#5B93D1] rounded-2xl py-3.5 text-sm font-black hover:bg-white hover:text-black transition">{modal === "new" ? "Add to catalogue" : "Save changes"}</button>
             </motion.div>
           </div>
         )}

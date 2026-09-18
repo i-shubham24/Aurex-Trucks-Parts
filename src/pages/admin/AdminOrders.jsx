@@ -32,7 +32,7 @@ export default function AdminOrders() {
         <select value={status} onChange={(e) => setStatus(e.target.value)} className="rounded-full bg-white/5 border border-white/10 px-4 py-2.5 text-sm font-bold outline-none">{["All", ...STATUSES].map((s) => <option key={s} className="text-black">{s}</option>)}</select>
       </div>
 
-      <div className="mt-4 rounded-[22px] border border-white/10 bg-[#0d1218] overflow-hidden">
+      <div className="mt-4 rounded-[22px] border border-white/10 bg-[#0C1622] overflow-hidden">
         <div className="overflow-x-auto"><table className="sticky-col w-full text-sm min-w-[760px]">
           <thead><tr className="text-left text-[11px] text-white/35">{["ORDER", "CUSTOMER", "ITEMS", "TOTAL", "PAYMENT", "STATUS"].map((h) => <th key={h} className="px-4 py-3 font-black tracking-widest">{h}</th>)}</tr></thead>
           <tbody>{list.map((o) => (
@@ -53,7 +53,7 @@ export default function AdminOrders() {
         {sel && (
           <div className="fixed inset-0 z-[80] grid place-items-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/75" onClick={() => setSel(null)} />
-            <motion.div initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="relative w-full max-w-2xl rounded-[24px] border border-white/10 bg-[#0d1218] p-6 max-h-[85vh] overflow-auto">
+            <motion.div initial={{ opacity: 0, y: 26 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="relative w-full max-w-2xl rounded-[24px] border border-white/10 bg-[#0C1622] p-6 max-h-[85vh] overflow-auto">
               <div className="flex items-center"><p className="font-display font-bold text-2xl">{sel.id}</p><button onClick={() => setSel(null)} className="ml-auto p-2 border border-white/10 rounded-lg"><X size={16} /></button></div>
               <p className="text-[13px] text-white/45 mt-1">{sel.email}, {new Date(sel.placedAt).toLocaleString()}, {sel.shipping}</p>
               <div className="mt-4 space-y-2">{sel.items.map((i) => <div key={i.sku} className="flex gap-3 text-sm bg-white/[0.03] border border-white/[0.07] rounded-xl p-3"><span className="font-black">{i.qty}x</span><span className="flex-1">{i.name}<span className="block text-[11px] text-white/35">{i.sku}</span></span><b>{i.price == null ? "Enquire" : `$${(i.price * i.qty).toFixed(2)}`}</b></div>)}</div>

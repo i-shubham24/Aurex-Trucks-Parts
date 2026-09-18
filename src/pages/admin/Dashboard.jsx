@@ -65,13 +65,13 @@ export default function Dashboard() {
         </div>
         <div className="flex items-center gap-3 relative">
           <div className="relative">
-            <button onClick={() => setShowDatePicker(!showDatePicker)} className="hidden sm:flex items-center gap-2 bg-[#0d1218] border border-white/10 hover:border-white/20 rounded-xl px-4 py-2.5 text-sm text-white/80 transition">
+            <button onClick={() => setShowDatePicker(!showDatePicker)} className="hidden sm:flex items-center gap-2 bg-[#0C1622] border border-white/10 hover:border-white/20 rounded-xl px-4 py-2.5 text-sm text-white/80 transition">
               <Calendar size={15} className="text-white/40" />
               <span>{dateRange}</span>
               <ChevronDown size={14} className="text-white/40 ml-1" />
             </button>
             {showDatePicker && (
-              <div className="absolute top-full right-0 mt-2 w-48 bg-[#161f2a] border border-white/10 rounded-xl shadow-2xl p-1 z-50">
+              <div className="absolute top-full right-0 mt-2 w-48 bg-[#12202F] border border-white/10 rounded-xl shadow-2xl p-1 z-50">
                 {["Today", "Last 7 Days", "Last 30 Days", "Year to Date"].map(range => (
                   <button key={range} onClick={() => { setDateRange(range); setShowDatePicker(false); }} className="w-full text-left px-3 py-2 text-sm text-white/80 hover:bg-white/10 rounded-lg transition">
                     {range}
@@ -81,11 +81,11 @@ export default function Dashboard() {
             )}
           </div>
           
-          <button onClick={downloadCSV} className="bg-[#0d1218] border border-white/10 rounded-xl p-2.5 text-white/70 hover:text-white hover:bg-white/10 transition" title="Export Orders CSV">
+          <button onClick={downloadCSV} className="bg-[#0C1622] border border-white/10 rounded-xl p-2.5 text-white/70 hover:text-white hover:bg-white/10 transition" title="Export Orders CSV">
             <Download size={16} />
           </button>
           
-          <button onClick={handleRefresh} className="bg-[#ff4d00] rounded-xl p-2.5 text-white hover:bg-[#ff8c00] transition shadow-[0_0_15px_rgba(255,77,0,0.3)]" title="Refresh">
+          <button onClick={handleRefresh} className="bg-[#5B93D1] rounded-xl p-2.5 text-white hover:bg-[#8FB4E0] transition shadow-[0_0_15px_rgba(255,77,0,0.3)]" title="Refresh">
             <RefreshCw size={16} className={isRefreshing ? "animate-spin" : ""} />
           </button>
         </div>
@@ -93,13 +93,13 @@ export default function Dashboard() {
 
       <div className="mt-8 grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {cards.map((c, i) => (
-          <motion.div key={c.title} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="rounded-2xl border border-white/10 bg-[#0d1218] p-5 relative overflow-hidden group">
+          <motion.div key={c.title} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }} className="rounded-2xl border border-white/10 bg-[#0C1622] p-5 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-5">
               <span className={`flex items-center gap-1 text-[12px] font-bold ${c.positive ? 'text-[#10B981]' : 'text-red-400'}`}>
                 {c.positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />} {c.trend}
               </span>
             </div>
-            <span className="grid place-items-center w-11 h-11 rounded-xl bg-white/5 text-white/60 group-hover:bg-[#ff4d00]/15 group-hover:text-[#ff4d00] transition">
+            <span className="grid place-items-center w-11 h-11 rounded-xl bg-white/5 text-white/60 group-hover:bg-[#5B93D1]/15 group-hover:text-[#5B93D1] transition">
               <c.icon size={20} />
             </span>
             <p className="text-[13px] font-bold text-white/50 mt-4">{c.title}</p>
@@ -110,7 +110,7 @@ export default function Dashboard() {
       </div>
 
       <div className="mt-6 grid xl:grid-cols-2 gap-4">
-        <div className="rounded-2xl border border-white/10 bg-[#0d1218] p-6">
+        <div className="rounded-2xl border border-white/10 bg-[#0C1622] p-6">
           <div className="flex items-center justify-between mb-5">
             <p className="font-display font-bold text-lg flex items-center gap-2 text-white">
               <TrendingUp size={18} className="text-[#10B981]" /> Top Performing Products
@@ -128,7 +128,7 @@ export default function Dashboard() {
                   <p className="text-[12px] text-white/40 font-mono mt-0.5">{p.sku}</p>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="font-bold text-white">${p.price.toFixed(2)}</p>
+                  <p className="font-bold text-white">{p.price == null ? "POA" : `$${p.price.toFixed(2)}`}</p>
                   <p className="text-[11px] text-white/40 mt-0.5">{p.reviews} reviews</p>
                 </div>
               </div>
@@ -136,7 +136,7 @@ export default function Dashboard() {
           </div>
         </div>
         
-        <div className="rounded-2xl border border-white/10 bg-[#0d1218] p-6">
+        <div className="rounded-2xl border border-white/10 bg-[#0C1622] p-6">
           <div className="flex items-center justify-between mb-5">
             <p className="font-display font-bold text-lg flex items-center gap-2 text-white">
               <AlertTriangle size={18} className="text-amber-400" /> Action Required
@@ -154,14 +154,14 @@ export default function Dashboard() {
               <div className="flex items-center gap-3 text-sm p-2 hover:bg-white/5 rounded-xl transition mt-2">
                 <span className="text-[10px] font-black uppercase tracking-wider bg-blue-400/10 text-blue-400 rounded-md px-2 py-1 border border-blue-400/20 w-24 text-center shrink-0">Enquiries</span>
                 <span className="flex-1 text-white/80">{enquiries.filter((e) => e.status === "New").length} new trade quote requests pending</span>
-                <Link to="/admin/quotes" className="text-[12px] font-bold text-white bg-[#ff4d00] hover:bg-[#ff8c00] px-3 py-1.5 rounded-lg transition shrink-0">Review</Link>
+                <Link to="/admin/quotes" className="text-[12px] font-bold text-white bg-[#5B93D1] hover:bg-[#8FB4E0] px-3 py-1.5 rounded-lg transition shrink-0">Review</Link>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-white/10 bg-[#0d1218] overflow-hidden">
+      <div className="mt-6 rounded-2xl border border-white/10 bg-[#0C1622] overflow-hidden">
         <div className="p-6 border-b border-white/10 flex items-center justify-between">
           <p className="font-display font-bold text-lg text-white">Latest Orders</p>
           <Link to="/admin/orders" className="text-[12px] font-bold text-white/40 hover:text-white transition">View all orders</Link>

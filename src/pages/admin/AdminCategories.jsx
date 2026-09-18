@@ -30,14 +30,14 @@ export default function AdminCategories() {
     <div>
       <div className="flex flex-wrap items-center gap-3">
         <div><h1 className="font-display font-bold text-3xl">Categories ({categories.length})</h1><p className="text-white/50 text-sm mt-1">Name, description, icon, image and sub groups. Live across Home, Shop and nav instantly.</p></div>
-        <div className="ml-auto flex gap-2"><button onClick={() => { if (confirm("Reset categories to seed data?")) resetCategories(); }} className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-bold">Reset</button><button onClick={openNew} className="rounded-full bg-[#ff4d00] px-5 py-2.5 text-sm font-black flex items-center gap-1.5"><Plus size={15} /> Add category</button></div>
+        <div className="ml-auto flex gap-2"><button onClick={() => { if (confirm("Reset categories to seed data?")) resetCategories(); }} className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-bold">Reset</button><button onClick={openNew} className="rounded-full bg-[#5B93D1] px-5 py-2.5 text-sm font-black flex items-center gap-1.5"><Plus size={15} /> Add category</button></div>
       </div>
 
       <div className="mt-5 grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
         {liveCategories.map((c) => {
           const Icon = c.icon;
           return (
-            <div key={c.name} className="rounded-[22px] border border-white/10 bg-[#0d1218] overflow-hidden">
+            <div key={c.name} className="rounded-[22px] border border-white/10 bg-[#0C1622] overflow-hidden">
               {c.image ? <img src={c.image} alt="" className="h-28 w-full object-cover" loading="lazy" /> : <div className="h-16 bg-white/[0.03]" />}
               <div className="p-5">
                 <div className="flex items-center gap-3"><span className="grid place-items-center w-11 h-11 rounded-xl bg-white/5 border border-white/10"><Icon size={20} /></span><div><p className="font-display font-bold text-lg">{c.name}</p><p className="text-[11px] text-white/35 font-bold">{c.count} lines</p></div></div>
@@ -54,7 +54,7 @@ export default function AdminCategories() {
         {modal && (
           <div className="fixed inset-0 z-[80] grid place-items-center p-4">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-black/75" onClick={() => setModal(false)} />
-            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="relative w-full max-w-xl rounded-[24px] border border-white/10 bg-[#0d1218] p-6 max-h-[88vh] overflow-auto">
+            <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="relative w-full max-w-xl rounded-[24px] border border-white/10 bg-[#0C1622] p-6 max-h-[88vh] overflow-auto">
               <div className="flex items-center"><p className="font-display font-bold text-2xl">{editing ? `Edit ${editing}` : "Add category"}</p><button onClick={() => setModal(false)} className="ml-auto p-2 border border-white/10 rounded-lg"><X size={16} /></button></div>
               <div className="mt-4 grid gap-3 text-sm">
                 {!editing && <label className="grid gap-1.5"><span className={lab}>NAME (UNIQUE)</span><input value={form.name} onChange={set("name")} placeholder="e.g. Air Conditioning" className={inp} /></label>}
@@ -70,7 +70,7 @@ export default function AdminCategories() {
                 <label className="grid gap-1.5"><span className={lab}>SUB GROUPS (COMMA SEPARATED)</span><input value={form.subs} onChange={set("subs")} placeholder="Compressors, Condensers, Regas kits" className={inp} /></label>
               </div>
               {err && <p className="mt-3 text-[13px] text-red-400 font-semibold">{err}</p>}
-              <button onClick={save} className="mt-4 w-full bg-[#ff4d00] rounded-2xl py-3.5 text-sm font-black hover:bg-white hover:text-black transition">{editing ? "Save changes" : "Add category"}</button>
+              <button onClick={save} className="mt-4 w-full bg-[#5B93D1] rounded-2xl py-3.5 text-sm font-black hover:bg-white hover:text-black transition">{editing ? "Save changes" : "Add category"}</button>
             </motion.div>
           </div>
         )}
