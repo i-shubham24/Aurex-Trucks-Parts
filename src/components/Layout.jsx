@@ -38,7 +38,6 @@ function NewsBox() {
       <div className="relative z-10 mx-auto max-w-7xl flex flex-col lg:flex-row items-center justify-between gap-8">
         <div className="text-center lg:text-left">
           <div className="inline-flex items-center gap-2 mb-2.5">
-            <span className="w-6 h-[3px] bg-[#9AC1EE] rounded-full inline-block" />
             <span className="text-[12px] font-black uppercase tracking-[0.2em] text-[#9AC1EE]">Our Newsletter</span>
           </div>
           <h3 className="font-display font-black text-2xl sm:text-3xl lg:text-[34px] leading-tight text-white">
