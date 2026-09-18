@@ -5,21 +5,22 @@ import { ChevronRight, ChevronLeft, ArrowRight, ShieldCheck, Truck, Flame } from
 import { PRODUCTS, HERO } from "../../data/catalog.js";
 
 const WORDS = ["QUALITY", "EXPERTISE", "SPEED", "TRUST"];
-const IMAGES = [HERO.primary, HERO.secondary, HERO.dark];
 const EASE = [0.16, 1, 0.3, 1];
 
 export default function HeroFeature() {
   const [i, setI] = useState(0);
-  const [img, setImg] = useState(0);
   const [open, setOpen] = useState(true);
   const { scrollY } = useScroll();
   const yImg = useTransform(scrollY, [0, 600], [0, 70]);
   const bestSellers = useMemo(() => [...PRODUCTS].sort((a, b) => (b.reviews || 0) - (a.reviews || 0)).slice(0, 6), []);
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    setReduced(!!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches);
+  }, []);
 
   useEffect(() => {
     const t = setInterval(() => setI((n) => (n + 1) % WORDS.length), 2200);
-    const ti = setInterval(() => setImg((n) => (n + 1) % IMAGES.length), 5000);
-    return () => { clearInterval(t); clearInterval(ti); };
+    return () => clearInterval(t);
   }, []);
 
   return (
@@ -69,22 +70,21 @@ export default function HeroFeature() {
             </motion.aside>
           </div>
 
-          {/* Animated word hero */}
+          {/* Animated word hero over background video */}
           <div className="relative overflow-hidden min-h-[460px] lg:min-h-[540px] flex-1 flex">
-            <motion.div style={{ y: yImg }} className="absolute inset-0 -top-16 -bottom-16">
-              <AnimatePresence>
-                <motion.img
-                  key={img}
-                  src={IMAGES[img]}
-                  alt=""
-                  initial={{ opacity: 0, scale: 1.12 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 1.4, ease: "easeInOut" }}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </AnimatePresence>
-            </motion.div>
+          {/* Background video */}
+          <motion.div style={{ y: yImg }} className="absolute inset-0 -top-16 -bottom-16">
+            <video
+              src="/hero-video.mp4"
+              autoPlay={!reduced}
+              muted
+              loop
+              playsInline
+              preload="auto"
+              poster={HERO.primary}
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </motion.div>
             <div className="absolute inset-0 bg-gradient-to-r from-[#1A1A2E]/90 via-[#1A1A2E]/65 to-[#0B2F5C]/20" />
             <div className="absolute inset-0 grid-scrim opacity-35" />
             <div className="absolute -right-16 top-1/3 w-[420px] h-[420px] rounded-full bg-[#0B2F5C]/20 blur-[120px]" />
