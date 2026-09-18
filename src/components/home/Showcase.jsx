@@ -67,7 +67,7 @@ export function RangeBento() {
 const TRUST = [
   { n: "01", t: "Fitment, checked twice", d: "Left and right gear, latch and stainless variants matched to your body before anything ships. The wrong side never leaves the dock.", stat: "L/R split", statSub: "on every door gear", img: "/images/products/GL-11113.jpg", link: "/shop?cat=Trailer%20Parts" },
   { n: "02", t: "VIC stock, moving daily", d: "Ticketed lines sit in Campbellfield and freight Australia wide in 1 to 2 days. Built-to-order lifts get a straight answer, fast.", stat: "1\u20132 days", statSub: "dispatch, priced lines", img: "/images/products/GL-25126.jpg", link: "/shop?cat=Tool%20Boxes" },
-  { n: "03", t: "Priced under the competitor", d: "Every ticketed line is checked against Sunrise and set $10 to $15 lower. Same hardware family, smaller invoice.", stat: "$10\u201315", statSub: "under Sunrise tickets", img: "/images/ACCESSORIES-CAT.jpg", link: "/deals" },
+  { n: "03", t: "Bulk quotes, one invoice", d: "Door-gear sets, multi-trailer refreshes and blanket orders quoted in a single pass. One invoice, one freight run, zero paperwork sprawl.", stat: "1 order", statSub: "the whole job, one invoice", img: "/images/products/GL-19113H1.jpg", link: "/quote" },
   { n: "04", t: "A desk that picks up", d: "VIN matching, measuring help and bulk quotes from people who know door hardware. Replies within 4 business hours.", stat: "4hr", statSub: "quote response", img: "/images/TRAILER-PARTS-CAT.jpg", link: "/contact" },
 ];
 
