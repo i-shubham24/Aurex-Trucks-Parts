@@ -281,7 +281,7 @@ export function ResourcesPage() {
                 <div className="absolute inset-x-0 bottom-0 p-5 text-white">
                   <p className="font-display font-bold text-[19px] leading-tight">{a.title}</p>
                   <p className="text-[13px] text-white/70 mt-1.5 line-clamp-2">{a.desc || "Read the full workshop guide and fitment tips."}</p>
-                  <span className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-black text-[#2F5E93] group-hover:gap-2.5 transition-all">Read guide <ArrowRight size={14} /></span>
+                  <span className="mt-3 inline-flex items-center gap-1.5 text-[13px] font-black text-[#8FB4E0] group-hover:gap-2.5 transition-all">Read guide <ArrowRight size={14} /></span>
                 </div>
               </button>
             </motion.div>
@@ -436,7 +436,7 @@ export function ContactPage() {
             <div className="relative overflow-hidden bg-[#1A1A2E] text-white px-7 py-6">
               <div className="absolute inset-0 grid-scrim opacity-40" />
               <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-[#0B2F5C]/25 blur-[70px]" />
-              <p className="relative text-[11px] font-black tracking-[0.2em] text-[#2F5E93] uppercase">Send an enquiry</p>
+              <p className="relative text-[11px] font-black tracking-[0.2em] text-[#8FB4E0] uppercase">Send an enquiry</p>
               <p className="relative font-display font-bold text-xl mt-1">Tell us what you need</p>
             </div>
             <div className="p-7 grid gap-3.5">

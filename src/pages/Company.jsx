@@ -10,9 +10,9 @@ function PageHero({ crumb, title, accent, sub }) {
       <div className="absolute inset-0 grid-scrim opacity-40" />
       <div className="absolute -right-20 top-0 w-[420px] h-[420px] rounded-full bg-[#0B2F5C]/15 blur-[110px]" />
       <div className="relative mx-auto max-w-7xl px-4 py-12">
-        <p className="text-[12px] font-semibold text-white/40">Home <span className="mx-1">/</span> {crumb}</p>
-        <h1 className="font-display font-bold tracking-[-0.02em] text-[36px] sm:text-[52px] leading-[0.98] mt-2">{title} <span className="text-[#2F5E93]">{accent}</span></h1>
-        {sub && <p className="text-white/55 text-[15px] mt-3 max-w-xl">{sub}</p>}
+        <p className="text-[12px] font-semibold text-white/60">Home <span className="mx-1">/</span> {crumb}</p>
+        <h1 className="font-display font-bold tracking-[-0.02em] text-[36px] sm:text-[52px] leading-[0.98] mt-2">{title} <span className="text-[#8FB4E0]">{accent}</span></h1>
+        {sub && <p className="text-white/80 text-[15px] mt-3 max-w-xl">{sub}</p>}
       </div>
     </div>
   );
@@ -154,17 +154,17 @@ export function LocationsPage() {
             <h3 className="font-display font-bold text-2xl mb-8 flex items-center gap-3"><Truck className="text-[#0B2F5C]" /> National Freight Times</h3>
             <div className="grid sm:grid-cols-3 gap-8 sm:gap-4 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
               <div className="pt-4 sm:pt-0 sm:px-6 first:pl-0">
-                <p className="text-[#2F5E93] font-black text-3xl font-display">1 Day</p>
+                <p className="text-[#8FB4E0] font-black text-3xl font-display">1 Day</p>
                 <p className="font-bold text-lg mt-1">VIC Metro</p>
-                <p className="text-white/60 text-sm mt-2">Overnight freight on stock lines ordered by 2pm.</p>
+                <p className="text-white/80 text-sm mt-2">Overnight freight on stock lines ordered by 2pm.</p>
               </div>
               <div className="pt-4 sm:pt-0 sm:px-6">
-                <p className="text-[#2F5E93] font-black text-3xl font-display">1-2 Days</p>
+                <p className="text-[#8FB4E0] font-black text-3xl font-display">1-2 Days</p>
                 <p className="font-bold text-lg mt-1">Sydney, Brisbane, Adelaide</p>
                 <p className="text-white/60 text-sm mt-2">South East Queensland routes run daily from Campbellfield.</p>
               </div>
               <div className="pt-4 sm:pt-0 sm:px-6">
-                <p className="text-[#2F5E93] font-black text-3xl font-display">2-5 Days</p>
+                <p className="text-[#8FB4E0] font-black text-3xl font-display">2-5 Days</p>
                 <p className="font-bold text-lg mt-1">Perth & Regional</p>
                 <p className="text-white/60 text-sm mt-2">WA freight runs with tracking at every leg. Consolidate cartons free.</p>
               </div>
@@ -196,7 +196,7 @@ export function TradePage() {
               </tbody>
             </table>
           </div>
-          <div className="mt-4 rounded-2xl bg-[#1A1A2E] text-white p-6 flex items-center gap-4"><FileText size={26} className="text-[#2F5E93] shrink-0" /><p className="text-sm text-white/70">Volume breaks apply automatically over 5 units on service lines. Talk to the desk for blanket orders.</p></div>
+          <div className="mt-4 rounded-2xl bg-[#1A1A2E] text-white p-6 flex items-center gap-4"><FileText size={26} className="text-[#8FB4E0] shrink-0" /><p className="text-sm text-white/80">Volume breaks apply automatically over 5 units on service lines. Talk to the desk for blanket orders.</p></div>
         </div>
         <form onSubmit={(e) => { e.preventDefault(); const id = addQuote({ email: f.email, items: [], total: 0, name: f.name, company: f.company, abn: f.abn, kind: "trade-application", volume: f.volume }); setSent(id); }} className="rounded-2xl bg-white border border-[#E5E7EB] p-6 sm:p-7 grid gap-3 shadow-sm">
           <p className="font-display font-bold text-xl text-[#1A1A2E]">Apply for a trade account</p>

@@ -13,7 +13,7 @@ export default function FitmentBanner({ fitCount, onlyFits, setOnlyFits }) {
     return (
       <div className="relative bg-[#12121B] text-white p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4 border-l-4 border-[#0B2F5C]">
         <div className="flex items-center gap-3 flex-1">
-          <span className="grid place-items-center w-10 h-10 bg-white/5 border border-white/10 text-[#2F5E93] shrink-0" style={NOTCH}>
+          <span className="grid place-items-center w-10 h-10 bg-white/5 border border-white/10 text-[#8FB4E0] shrink-0" style={NOTCH}>
             <Truck size={18} />
           </span>
           <div>

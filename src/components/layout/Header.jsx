@@ -54,8 +54,8 @@ export default function Header({ onOpenMobile }) {
       <div className="bg-[#1A1A2E] text-white">
         <div className="mx-auto max-w-7xl px-4 h-9 flex items-center justify-between text-[12px] font-semibold">
           <div className="flex items-center gap-5 text-white/80">
-            <a href={`mailto:${settings.email}`} className="flex items-center gap-1.5 hover:text-white transition"><Mail size={13} className="text-[#2F5E93]" /> <span className="hidden sm:inline">{settings.email}</span></a>
-            <a href={`tel:${settings.phone}`} className="flex items-center gap-1.5 hover:text-white transition"><Phone size={13} className="text-[#2F5E93]" /> {settings.phone}</a>
+            <a href={`mailto:${settings.email}`} className="flex items-center gap-1.5 hover:text-white transition"><Mail size={13} className="text-[#8FB4E0]" /> <span className="hidden sm:inline">{settings.email}</span></a>
+            <a href={`tel:${settings.phone}`} className="flex items-center gap-1.5 hover:text-white transition"><Phone size={13} className="text-[#8FB4E0]" /> {settings.phone}</a>
           </div>
           <div className="flex items-center gap-3 text-white/80">
             <span className="hidden md:inline">Australian owned. ADR compliant. Freight Australia wide.</span>
@@ -190,7 +190,7 @@ export default function Header({ onOpenMobile }) {
                   <Link to="/deals" onClick={() => setMega(false)} className="relative overflow-hidden group grid place-items-center p-6 text-white" style={{ background: "linear-gradient(135deg,#1A1A2E,#3a1c0c)" }}>
                     <div className="absolute inset-0 grid-scrim opacity-40" />
                     <div className="relative text-center">
-                      <p className="text-[11px] font-black tracking-[0.2em] text-[#2F5E93]">THIS WEEK</p>
+                      <p className="text-[11px] font-black tracking-[0.2em] text-[#8FB4E0]">THIS WEEK</p>
                       <p className="font-display font-bold text-2xl mt-1 leading-tight">Fleet deals up to 30% off</p>
                       <span className="mt-4 inline-flex items-center gap-1.5 bg-[#0B2F5C] text-white rounded-lg px-4 py-2 text-[13px] font-bold group-hover:gap-2.5 transition-all">See deals <ArrowRight size={14} /></span>
                     </div>

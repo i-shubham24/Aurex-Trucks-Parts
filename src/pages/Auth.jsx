@@ -59,7 +59,7 @@ function AuthShell({ title, sub, children, footer }) {
               [ShieldCheck, "ADR compliant range with OEM cross references"],
             ].map(([Icon, txt]) => (
               <div key={txt} className="flex items-center gap-3">
-                <span className="grid place-items-center w-10 h-10 rounded-xl bg-white/10 border border-white/15 text-[#2F5E93] shrink-0">
+                <span className="grid place-items-center w-10 h-10 rounded-xl bg-white/10 border border-white/15 text-[#8FB4E0] shrink-0">
                   <Icon size={18} />
                 </span>
                 <span className="text-white/80 text-[14px] font-medium">{txt}</span>

@@ -440,9 +440,8 @@ export function ProductCard({ p, index = 0 }) {
 
 
 
-/* Compact rail card: mirrors the category tile exactly (image, overlapping
-   notch badge, title below). On hover a blue tone rises from below with the
-   product name plus a View details action. */
+/* Rail card: calm white card with bottom-left cut. Hover washes the image
+   blue and slides up a full-width View details bar. */
 export function ProductRailCard({ p, index = 0 }) {
   return (
     <motion.article
@@ -451,42 +450,48 @@ export function ProductRailCard({ p, index = 0 }) {
       whileInView="whileInView"
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, ease: EASE, delay: (index % 4) * 0.06 }}
-      className="group flex flex-col items-center text-center"
+      className="group relative bg-white border border-[#E5E7EB] hover:border-[#0B2F5C]/40 hover:shadow-card-hover hover:-translate-y-1 transition-all duration-400 flex flex-col"
+      style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 20px 100%, 0 calc(100% - 20px))" }}
     >
-      <div className="relative w-full aspect-[4/3] group-hover:-translate-y-1.5 transition-transform duration-500">
-        <div className="clip-cut-lg w-full h-full overflow-hidden bg-[#F1F2F4]">
-          <SafeImg
-            src={p.image}
-            alt={p.name}
-            label={p.sku}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-            wrapClass="w-full h-full"
-          />
-          <span className="absolute inset-0 bg-gradient-to-t from-[#0B2F5C]/55 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-          <span className="clip-cut-lg absolute inset-0 border-[3px] border-[#0B2F5C] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-        </div>
-        <span className="clip-notch absolute -bottom-2 left-1/2 -translate-x-1/2 grid place-items-center w-10 h-10 bg-[#0B2F5C] text-white shadow-primary group-hover:scale-110 group-hover:rotate-6 transition duration-300">
-          <ShoppingCart size={16} />
-        </span>
-        <span className="absolute top-3 right-3 grid place-items-center w-8 h-8 rounded-full bg-white/95 text-[#0B2F5C] opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-300">
-          <Eye size={15} />
-        </span>
-        {/* Hover reveal: name rises from below with action */}
-        <Link
-          to={`/product/${p.sku}`}
-          className="absolute inset-x-3 bottom-8 z-10 translate-y-[130%] group-hover:translate-y-0 transition-transform duration-400 ease-out bg-[#0B2F5C]/95 backdrop-blur px-3.5 py-3 text-left block"
-          style={{ clipPath: "polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))" }}
-        >
-          <span className="block font-display font-bold text-white text-[13px] leading-snug line-clamp-2">{p.name}</span>
-          <span className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wide text-white/90">
-            View details <ArrowRight size={12} />
+      <Link to={`/product/${p.sku}`} className="relative block aspect-[4/3] overflow-hidden bg-[#F4F6F9]" aria-label={p.name}>
+        <SafeImg
+          src={p.image}
+          alt={p.name}
+          label={p.sku}
+          className="w-full h-full object-cover group-hover:scale-107 transition-transform duration-700 ease-out"
+          wrapClass="w-full h-full"
+        />
+        {p.badge && (
+          <span className="absolute top-3 left-3 z-10 bg-[#1A1A2E]/90 backdrop-blur text-white text-[10px] font-black tracking-wider uppercase px-2.5 py-1">
+            {p.badge}
           </span>
-        </Link>
+        )}
+        <span className="absolute inset-0 bg-gradient-to-t from-[#0B2F5C]/85 via-[#0B2F5C]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none" />
+        <span className="absolute inset-x-0 bottom-0 z-10 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out bg-white px-4 py-3 flex items-center justify-between gap-2">
+          <span className="text-[12px] font-black uppercase tracking-wider text-[#0B2F5C]">View details</span>
+          <span className="grid place-items-center w-8 h-8 bg-[#0B2F5C] text-white shrink-0" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
+            <ArrowRight size={15} />
+          </span>
+        </span>
+      </Link>
+      <div className="p-4 flex flex-col flex-1">
+        <p className="text-[10px] font-black tracking-[0.16em] text-[#9CA3AF] uppercase truncate">
+          {p.brand ? `${p.brand} · ` : ""}{p.sku}
+        </p>
+        <p className="font-display font-bold text-[15px] leading-snug text-[#1A1A2E] mt-1 line-clamp-2 min-h-[42px] group-hover:text-[#0B2F5C] transition">{p.name}</p>
+        <div className="mt-2 pt-3 border-t border-[#F1F2F4] flex items-center justify-between gap-2">
+          {p.price == null ? (
+            <span className="font-display font-bold text-[17px] text-[#0B2F5C]">Enquire</span>
+          ) : (
+            <span className="font-display font-bold text-[19px] text-[#1A1A2E]">${p.price.toFixed(2)}</span>
+          )}
+          <span className="flex items-center gap-0.5">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} size={12} className={i < Math.round(p.rating || 5) ? "fill-[#E8A90C] text-[#E8A90C]" : "fill-[#E5E7EB] text-[#E5E7EB]"} />
+            ))}
+          </span>
+        </div>
       </div>
-      <p className="mt-5 text-[15px] font-bold text-[#1A1A2E] leading-snug line-clamp-2 min-h-[42px] group-hover:text-[#0B2F5C] transition px-1">{p.name}</p>
-      <p className="text-[12px] text-[#9CA3AF] mt-1">
-        {p.brand ? `${p.brand} · ` : ""}{p.price == null ? <span className="text-[#0B2F5C] font-bold">Enquire</span> : <span className="text-[#1A1A2E] font-bold">${p.price.toFixed(2)}</span>} · <Link to={`/product/${p.sku}`} className="text-[#0B2F5C] font-semibold">View details</Link>
-      </p>
     </motion.article>
   );
 }

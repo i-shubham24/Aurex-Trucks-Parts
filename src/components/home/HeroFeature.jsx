@@ -85,7 +85,7 @@ export default function HeroFeature() {
               className="absolute inset-0 w-full h-full object-cover"
             />
           </motion.div>
-            <div className="absolute inset-0 bg-gradient-to-r from-[#1A1A2E]/90 via-[#1A1A2E]/65 to-[#0B2F5C]/20" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#1A1A2E]/85 via-[#1A1A2E]/60 to-transparent" />
             <div className="absolute inset-0 grid-scrim opacity-35" />
             <div className="absolute -right-16 top-1/3 w-[420px] h-[420px] rounded-full bg-[#0B2F5C]/20 blur-[120px]" />
 
@@ -105,7 +105,7 @@ export default function HeroFeature() {
                     animate={{ y: "0%", opacity: 1 }}
                     exit={{ y: "-110%", opacity: 0 }}
                     transition={{ duration: 0.5, ease: EASE }}
-                    className="block font-display font-black text-[46px] sm:text-[70px] lg:text-[82px] leading-none tracking-[-0.03em] text-gradient"
+                    className="block font-display font-black text-[46px] sm:text-[70px] lg:text-[82px] leading-none tracking-[-0.03em] text-gradient-hero"
                   >
                     {WORDS[i]}
                   </motion.span>

@@ -75,6 +75,14 @@ body {
   color: transparent;
 }
 
+/* Hero word gradient: white into sky blue, readable on dark video */
+.text-gradient-hero {
+  background: linear-gradient(100deg, #FFFFFF 0%, #CFE2F5 55%, #7FA8D6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 /* Tasteful hover sheen that sweeps across a card */
 .shine { position: relative; overflow: hidden; }
 .shine::after {

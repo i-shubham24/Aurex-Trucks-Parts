@@ -19,7 +19,7 @@ function Field({ label, value, onChange, options, placeholder, disabled, dark })
 
   return (
     <motion.div variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }} className={disabled ? "opacity-40 pointer-events-none" : ""}>
-      <span className="block text-[10px] font-black tracking-[0.22em] uppercase mb-1.5 text-[#2F5E93]">{label}</span>
+      <span className={`block text-[10px] font-black tracking-[0.22em] uppercase mb-1.5 ${dark ? "text-[#8FB4E0]" : "text-[#0B2F5C]"}`}>{label}</span>
       <div className="relative" ref={ref}>
         <button
           type="button"
@@ -171,7 +171,7 @@ export default function YMMWidget({ variant = "hero" }) {
             <Truck size={13} />
           </span>
           <span className="text-left leading-none">
-            <span className="block text-[8px] font-black tracking-[0.2em] text-[#2F5E93] uppercase">Your rig</span>
+            <span className="block text-[8px] font-black tracking-[0.2em] text-[#8FB4E0] uppercase">Your rig</span>
             <span className="block text-[12px] font-bold mt-0.5">{selectedVehicle.make} {selectedVehicle.model}</span>
           </span>
           <ChevronDown size={14} className="text-white/40 group-hover:text-white transition" />
@@ -194,10 +194,10 @@ export default function YMMWidget({ variant = "hero" }) {
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.22, ease: EASE }}
             style={CUT}
-            className="absolute right-0 top-full mt-2 w-[340px] max-w-[calc(100vw-2rem)] bg-[#12121B] border-t-2 border-[#2F5E93] p-4 shadow-elevated z-[65]"
+            className="absolute right-0 top-full mt-2 w-[340px] max-w-[calc(100vw-2rem)] bg-[#12121B] border-t-2 border-[#8FB4E0] p-4 shadow-elevated z-[65]"
           >
             <p className="text-white font-display font-bold text-sm mb-3 flex items-center gap-2">
-              <Truck size={15} className="text-[#2F5E93]" /> Select your truck
+              <Truck size={15} className="text-[#8FB4E0]" /> Select your truck
             </p>
             <Console dark onDone={() => setOpen(false)} />
           </motion.div>
