@@ -13,7 +13,7 @@ function BentoCell({ to, img, label, sub, count, tall = false, badges = [] }) {
     <motion.div variants={staggerChild} className={tall ? "sm:row-span-2" : ""}>
       <Link
         to={to}
-        className={`group relative block overflow-hidden bg-[#222538] rounded-2xl border border-[#E5E7EB] hover:border-[#134E8D] transition shadow-card hover:shadow-card-hover ${tall ? "h-72 sm:h-full sm:min-h-[540px]" : "h-64 sm:h-72"}`}
+        className={`group relative block overflow-hidden bg-[#181C2E] rounded-2xl border border-white/10 hover:border-[#134E8D]/80 transition-all duration-300 shadow-sm hover:shadow-xl ${tall ? "h-72 sm:h-full sm:min-h-[540px]" : "h-64 sm:h-72"}`}
       >
         <SafeImg
           src={img}
@@ -22,33 +22,33 @@ function BentoCell({ to, img, label, sub, count, tall = false, badges = [] }) {
           className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700"
           wrapClass="absolute inset-0 w-full h-full"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0d1526]/95 via-[#0d1526]/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0E1A]/95 via-[#0A0E1A]/40 to-transparent" />
         
         {/* Top badge */}
         <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-          <span className="bg-[#134E8D] text-white text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded">
+          <span className="bg-[#134E8D] text-white text-[10px] font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg border border-white/20 shadow-xs">
             {sub}
           </span>
-          <span className="text-[11px] font-bold text-white/90 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded">
+          <span className="text-[11px] font-mono font-bold text-white/90 bg-black/50 backdrop-blur-sm px-2.5 py-0.5 rounded-lg border border-white/10">
             {count}
           </span>
         </div>
 
         <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 flex items-end justify-between gap-3">
           <div>
-            <p className="font-display font-black text-white text-[22px] sm:text-[26px] leading-tight">{label}</p>
+            <p className="font-display font-black text-white text-[22px] sm:text-[26px] leading-tight tracking-tight">{label}</p>
             {badges.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2.5">
                 {badges.map((b) => (
-                  <span key={b} className="text-[10px] font-semibold text-white/80 bg-white/10 px-2 py-0.5 rounded">
+                  <span key={b} className="text-[10px] font-mono font-semibold text-white/90 bg-white/10 backdrop-blur-sm px-2 py-0.5 rounded-lg border border-white/15">
                     {b}
                   </span>
                 ))}
               </div>
             )}
           </div>
-          <span className="grid place-items-center w-10 h-10 shrink-0 rounded-full bg-white text-[#134E8D] opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300 shadow-md">
-            <ArrowUpRight size={18} />
+          <span className="grid place-items-center w-9 h-9 shrink-0 rounded-xl bg-white text-[#134E8D] group-hover:bg-[#134E8D] group-hover:text-white group-hover:scale-105 transition-all duration-200 shadow-md">
+            <ArrowUpRight size={17} />
           </span>
         </div>
       </Link>

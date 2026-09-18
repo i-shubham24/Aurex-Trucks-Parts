@@ -99,11 +99,10 @@ export default function Home() {
                 <button
                   key={t}
                   onClick={() => setTab(t)}
-                  className={`px-4 py-2.5 text-[13px] font-bold rounded-xl border transition ${
-                    tab === t
+                  className={`px-4 py-2.5 text-[13px] font-bold rounded-xl border transition ${tab === t
                       ? "bg-[#134E8D] text-white border-[#134E8D] shadow-sm"
                       : "bg-[#F7F8FA] border-[#E5E7EB] text-[#6B7280] hover:border-[#134E8D] hover:text-[#134E8D]"
-                  }`}
+                    }`}
                 >
                   {t}
                 </button>

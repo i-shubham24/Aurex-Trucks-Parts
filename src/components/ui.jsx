@@ -13,7 +13,7 @@ export function FocusTrap({ children, active, className }) {
     const focusableElements = ref.current.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
     const first = focusableElements[0];
     const last = focusableElements[focusableElements.length - 1];
-    
+
     const handleTab = (e) => {
       if (e.key !== "Tab") return;
       if (e.shiftKey) {
@@ -28,7 +28,7 @@ export function FocusTrap({ children, active, className }) {
         }
       }
     };
-    
+
     document.addEventListener("keydown", handleTab);
     first?.focus();
     return () => document.removeEventListener("keydown", handleTab);
@@ -95,9 +95,8 @@ export function Dropdown({ value, options, onChange, align = "left", className =
                   type="button"
                   tabIndex={-1}
                   onClick={() => { onChange(o); setOpen(false); }}
-                  className={`w-full text-left px-4 py-3.5 sm:py-2.5 text-base sm:text-sm font-semibold transition ${
-                    o === value ? "bg-[#134E8D] text-white" : "text-[#222538] hover:bg-[#EDF3FA]"
-                  } ${focusedIndex === i ? "bg-[#EDF3FA] text-[#222538] outline-none" : ""}`}
+                  className={`w-full text-left px-4 py-3.5 sm:py-2.5 text-base sm:text-sm font-semibold transition ${o === value ? "bg-[#134E8D] text-white" : "text-[#222538] hover:bg-[#EDF3FA]"
+                    } ${focusedIndex === i ? "bg-[#EDF3FA] text-[#222538] outline-none" : ""}`}
                 >
                   {o}
                 </button>
@@ -214,7 +213,7 @@ export function SectionHead({ kicker, title, sub, link, linkLabel, center }) {
   return (
     <Reveal className={center ? "grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-end gap-6 mb-10" : "flex flex-wrap items-end justify-between gap-5 mb-8"}>
       {center && <div className="hidden md:block"></div>}
-      
+
       <div className={`max-w-2xl ${center ? "text-center mx-auto" : ""}`}>
         {kicker && (
           <p className={`text-[12px] font-black tracking-[0.22em] text-[#134E8D] uppercase mb-2 flex items-center gap-2 ${center ? "justify-center" : ""}`}>
@@ -338,45 +337,45 @@ function CardShell({ p, index = 0, actions = false }) {
       whileInView="whileInView"
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, ease: EASE, delay: (index % 4) * 0.06 }}
-      className="group relative bg-white border border-[#E5E7EB] hover:border-[#134E8D]/40 rounded-xl overflow-hidden hover:shadow-card-hover hover:-translate-y-1 transition-all duration-400 flex flex-col"
+      className="group relative bg-white border border-[#E2E8F0] hover:border-[#134E8D]/80 rounded-2xl overflow-hidden hover:shadow-[0_12px_28px_rgba(15,23,42,0.08)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col shadow-xs"
     >
-      <Link to={`/product/${p.sku}`} className="relative block aspect-[4/3] overflow-hidden bg-[#F4F6F9]" aria-label={p.name}>
+      <Link to={`/product/${p.sku}`} className="relative block aspect-[4/3] overflow-hidden bg-[#F8FAFC] border-b border-[#E2E8F0]" aria-label={p.name}>
         <SafeImg
           src={p.image}
           alt={p.name}
           label={p.sku}
-          className="w-full h-full object-cover group-hover:scale-107 transition-transform duration-700 ease-out"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           wrapClass="w-full h-full"
         />
-        <span className="absolute inset-0 bg-gradient-to-t from-[#134E8D]/85 via-[#134E8D]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none" />
+        <span className="absolute inset-0 bg-gradient-to-t from-[#0C345F]/85 via-[#134E8D]/15 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
         {/* Hover slide-up bar (home rail signature) */}
-        <span className="absolute inset-x-0 bottom-0 z-10 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out bg-white px-4 py-3 flex items-center justify-between gap-2">
-          <span className="text-[12px] font-black uppercase tracking-wider text-[#134E8D]">View details</span>
-          <span className="grid place-items-center w-8 h-8 rounded-lg bg-[#134E8D] text-white shrink-0">
-            <ArrowRight size={15} />
+        <span className="absolute inset-x-0 bottom-0 z-10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out bg-[#0F3C6D] text-white px-4 py-2.5 flex items-center justify-between gap-2 shadow-md border-t border-white/15">
+          <span className="text-[12px] font-black uppercase tracking-wider text-white">View details</span>
+          <span className="grid place-items-center w-7 h-7 rounded-lg bg-white/20 text-white shrink-0">
+            <ArrowRight size={14} />
           </span>
         </span>
       </Link>
 
       <div className="p-4 flex flex-col flex-1">
-        <p className="text-[10px] font-black tracking-[0.16em] text-[#9CA3AF] uppercase truncate">
+        <p className="text-[11px] font-mono font-bold tracking-wider text-[#64748B] uppercase truncate">
           {p.brand ? `${p.brand} · ` : ""}{p.sku}
         </p>
         <Link
           to={`/product/${p.sku}`}
-          className="font-display font-bold text-[15px] leading-snug text-[#222538] mt-1 line-clamp-2 min-h-[42px] group-hover:text-[#134E8D] transition"
+          className="font-display font-bold text-[15px] leading-snug text-[#0F172A] mt-1 line-clamp-2 min-h-[42px] group-hover:text-[#134E8D] transition"
         >
           {p.name}
         </Link>
-        <div className="mt-2 pt-3 border-t border-[#F1F2F4] flex items-center justify-between gap-2">
+        <div className="mt-2 pt-3 border-t border-[#F1F5F9] flex items-center justify-between gap-2">
           <span>
             {p.price == null ? (
               <span className="font-display font-bold text-[17px] text-[#134E8D]">Enquire</span>
             ) : (
-              <span className="font-display font-bold text-[19px] text-[#222538]">${p.price.toFixed(2)}</span>
+              <span className="font-display font-black text-[19px] text-[#0F172A] tracking-tight">${p.price.toFixed(2)}</span>
             )}
             {p.oldPrice && p.price != null && (
-              <span className="block text-[12px] line-through text-[#9CA3AF]">${p.oldPrice.toFixed(2)}</span>
+              <span className="block text-[12px] line-through text-[#94A3B8] font-medium">${p.oldPrice.toFixed(2)}</span>
             )}
           </span>
           <Stars rating={p.rating} reviews={p.reviews} size={12} />
@@ -386,16 +385,19 @@ function CardShell({ p, index = 0, actions = false }) {
           <div className="mt-3 grid grid-cols-2 gap-2">
             <button
               onClick={() => add(p.sku)}
-              className="flex items-center justify-center gap-1.5 bg-[#134E8D] text-white px-4 py-2.5 text-[13px] font-bold rounded-lg hover:bg-[#222538] active:scale-[0.98] transition-all"
+              className="flex items-center justify-center gap-1.5 bg-[#134E8D] hover:bg-[#0C345F] text-white px-4 py-2.5 text-[13px] font-bold rounded-xl shadow-xs border border-[#0C345F] active:scale-[0.98] transition-all"
             >
               <ShoppingCart size={14} />
               Add
             </button>
             <button
               onClick={() => toggleCompare(p.sku)}
-              className={`py-2.5 text-[13px] font-bold border rounded-lg transition ${inCompare ? "bg-[#222538] text-white border-[#222538]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#222538] hover:text-[#222538]"}`}
+              className={`flex items-center justify-center gap-1 px-3 py-2.5 text-[12px] font-bold rounded-xl border transition-all ${inCompare
+                  ? "bg-[#134E8D] text-white border-[#134E8D]"
+                  : "bg-white border-[#E2E8F0] text-[#0F172A] hover:bg-[#F8FAFC] hover:border-[#134E8D]"
+                }`}
             >
-              {inCompare ? "Added ✓" : "Compare"}
+              {inCompare ? "Compared" : "Compare"}
             </button>
           </div>
         )}

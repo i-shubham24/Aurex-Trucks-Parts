@@ -257,16 +257,6 @@ export default function ProductDetail() {
                   </div>
                 </div>
               )}
-              {!hasValidVehicle && (
-                <div className="bg-[#F7F8FA] border border-[#E5E7EB] border-l-4 border-l-[#134E8D] p-4 rounded-xl flex flex-wrap items-center gap-3">
-                  <Truck size={20} className="text-[#134E8D] shrink-0" />
-                  <div className="flex-1 min-w-[180px]">
-                    <p className="font-bold text-[#222538] text-[15px]">Add your truck to confirm fit</p>
-                    <p className="text-[#6B7280] text-[13px]">We check OEM {p.oem} against your make before dispatch.</p>
-                  </div>
-                  <YMMWidget variant="pill" />
-                </div>
-              )}
             </div>
 
             {/* Qty + CTA */}

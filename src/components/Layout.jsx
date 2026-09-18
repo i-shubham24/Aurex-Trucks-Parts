@@ -30,25 +30,26 @@ function NewsBox() {
   const [done, setDone] = useState(false);
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-r from-[#134E8D] via-[#1D2B4E] to-[#134E8D] text-white px-6 sm:px-12 py-10">
-      {/* Background overlay graphic */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.08),transparent_70%)] pointer-events-none" />
-      <div className="absolute -right-10 -bottom-10 w-80 h-80 rounded-full bg-white/5 blur-2xl pointer-events-none" />
+    <div className="relative overflow-hidden bg-gradient-to-r from-[#0C345F] via-[#14233F] to-[#0C345F] text-white px-6 sm:px-12 py-10 border-y border-white/10 shadow-2xl">
+      {/* Background metallic reflection overlay */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.12),transparent_70%)] pointer-events-none" />
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none" />
+      <div className="absolute -right-10 -bottom-10 w-80 h-80 rounded-full bg-[#134E8D]/20 blur-3xl pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-7xl flex flex-col lg:flex-row items-center justify-between gap-8">
         <div className="text-center lg:text-left">
           <div className="inline-flex items-center gap-2 mb-2.5">
-            <span className="text-[12px] font-black uppercase tracking-[0.2em] text-[#9AC1EE]">Our Newsletter</span>
+            <span className="text-[12px] font-black uppercase tracking-[0.2em] text-[#9AC1EE] bg-white/10 px-3 py-1 rounded-full border border-white/15">Our Newsletter</span>
           </div>
-          <h3 className="font-display font-black text-2xl sm:text-3xl lg:text-[34px] leading-tight text-white">
-            Get Regular Update Please <br className="hidden sm:inline" />
+          <h3 className="font-display font-black text-2xl sm:text-3xl lg:text-[34px] leading-tight text-white drop-shadow-sm">
+            Get Regular Updates & Fleet Pricing <br className="hidden sm:inline" />
             Subscribe Newsletter
           </h3>
         </div>
 
         <div className="w-full lg:w-auto flex-1 max-w-xl">
           {done ? (
-            <div className="bg-white/15 border border-white/30 rounded-xl px-6 py-4 text-white text-center font-bold text-sm">
+            <div className="bg-emerald-500/20 border border-emerald-400/40 rounded-xl px-6 py-4 text-emerald-200 text-center font-bold text-sm backdrop-blur-sm">
               ✓ Thank you! You are now subscribed to regular updates.
             </div>
           ) : (
@@ -57,22 +58,22 @@ function NewsBox() {
                 e.preventDefault();
                 if (email.trim()) setDone(true);
               }}
-              className="flex items-center bg-white rounded-xl p-1.5 shadow-2xl w-full"
+              className="flex items-center bg-white/95 backdrop-blur-md rounded-xl p-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.35)] w-full border border-white"
             >
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter Your Email"
-                className="flex-1 px-4 py-3 text-sm text-[#222538] placeholder-[#9CA3AF] bg-transparent outline-none min-w-0 font-medium"
+                placeholder="Enter Your Email Address"
+                className="flex-1 px-4 py-3 text-sm text-[#191C2B] placeholder-[#8E98A8] bg-transparent outline-none min-w-0 font-medium"
               />
               <button
                 type="submit"
-                className="bg-[#134E8D] hover:bg-[#0E3B6C] text-white font-bold text-sm px-6 sm:px-8 py-3.5 rounded-lg flex items-center gap-2 transition shrink-0 shadow-md"
+                className="bg-gradient-to-r from-[#0C345F] to-[#134E8D] hover:from-[#134E8D] hover:to-[#1D6BB8] text-white font-bold text-sm px-6 sm:px-8 py-3.5 rounded-lg flex items-center gap-2 transition-all shrink-0 shadow-md border-t border-white/20 active:scale-95 group"
               >
                 <span>Subscribe</span>
-                <Send size={14} className="-rotate-12" />
+                <Send size={14} className="-rotate-12 group-hover:translate-x-0.5 transition-transform" />
               </button>
             </form>
           )}
@@ -93,7 +94,7 @@ const GALLERY_IMAGES = [
 
 function Footer() {
   return (
-    <footer className="bg-[#181C2E] text-white">
+    <footer className="bg-gradient-to-b from-[#171A29] via-[#11131F] to-[#0A0C14] text-white border-t border-slate-700/50">
       {/* Top Newsletter Bar */}
       <NewsBox />
 
@@ -304,7 +305,7 @@ export default function Layout({ children }) {
   }, [mobile, drawer]);
 
   return (
-    <div className="min-h-screen bg-white text-[#222538] antialiased overflow-x-clip flex flex-col" style={{ fontFamily: "Inter" }}>
+    <div className="min-h-screen bg-[#F0F4F8] text-[#191C2B] antialiased overflow-x-clip flex flex-col" style={{ fontFamily: "Inter" }}>
       <ScrollProgress />
       <ScrollManager />
 
