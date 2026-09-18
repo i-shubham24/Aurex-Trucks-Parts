@@ -141,11 +141,11 @@ function Footer() {
             <ul className="space-y-3 text-[14px]">
               {[
                 { label: "Home", to: "/" },
-                { label: "About Us", to: "/about" },
+                { label: "About", to: "/about" },
                 { label: "Fleet & Trade", to: "/trade" },
                 { label: "All Products", to: "/shop" },
                 { label: "Fitting Guides", to: "/resources" },
-                { label: "Contact Us", to: "/contact" }
+                { label: "Contact", to: "/contact" }
               ].map((item) => (
                 <li key={item.label}>
                   <Link

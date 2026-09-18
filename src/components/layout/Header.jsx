@@ -74,10 +74,10 @@ export default function Header({ onOpenMobile }) {
 
   const navLinks = [
     { label: "HOME", to: "/" },
-    { label: "ABOUT US", to: "/about" },
+    { label: "ABOUT", to: "/about" },
     { label: "SHOP", to: "/shop" },
     { label: "CATEGORIES", to: "/catalogue", isMega: true },
-    { label: "CONTACT US", to: "/contact" }
+    { label: "CONTACT", to: "/contact" }
   ];
 
   const isLinkActive = (to) => {
@@ -86,41 +86,45 @@ export default function Header({ onOpenMobile }) {
     return false;
   };
 
+  const isProductDetail = pathname.startsWith("/product");
+
   return (
     <header className="relative z-50 bg-[#222538] text-white">
       {/* Top Utility Info Bar (scrolls away naturally) */}
-      <div className="border-b border-white/10 bg-[#1D2030]/90">
-        <div className="mx-auto max-w-[1560px] px-4 sm:px-8 h-9 flex items-center justify-between text-[12px] font-medium text-white/80">
-          <div className="flex items-center gap-6">
-            <a
-              href={`tel:${settings.phone || "1300 0 AUREX"}`}
-              className="flex items-center gap-1.5 hover:text-white transition font-semibold text-white/90"
-            >
-              <Phone size={13} className="text-[#9AC1EE]" />
-              <span>Call Us {settings.phone || "1300 0 AUREX"}</span>
-            </a>
-            <a
-              href={`mailto:${settings.email || "sales@aurextruckparts.com.au"}`}
-              className="hidden sm:flex items-center gap-1.5 hover:text-white transition text-white/70"
-            >
-              <Mail size={13} className="text-[#9AC1EE]" />
-              <span>{settings.email || "sales@aurextruckparts.com.au"}</span>
-            </a>
-          </div>
+      {!isProductDetail && (
+        <div className="border-b border-white/10 bg-[#1D2030]/90">
+          <div className="mx-auto max-w-[1560px] px-4 sm:px-8 h-9 flex items-center justify-between text-[12px] font-medium text-white/80">
+            <div className="flex items-center gap-6">
+              <a
+                href={`tel:${settings.phone || "1300 0 AUREX"}`}
+                className="flex items-center gap-1.5 hover:text-white transition font-semibold text-white/90"
+              >
+                <Phone size={13} className="text-[#9AC1EE]" />
+                <span>Call Us {settings.phone || "1300 0 AUREX"}</span>
+              </a>
+              <a
+                href={`mailto:${settings.email || "sales@aurextruckparts.com.au"}`}
+                className="hidden sm:flex items-center gap-1.5 hover:text-white transition text-white/70"
+              >
+                <Mail size={13} className="text-[#9AC1EE]" />
+                <span>{settings.email || "sales@aurextruckparts.com.au"}</span>
+              </a>
+            </div>
 
-          <div className="flex items-center gap-4">
-            <span className="hidden md:inline text-[11px] text-[#9AC1EE] font-bold tracking-wide">
-              🚚 Melbourne Warehouse Direct · ADR Compliant
-            </span>
-            <div className="flex items-center gap-3 pl-3 border-l border-white/15 text-white/70">
-              <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook"><Social d={FB} /></a>
-              <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><Social d={IG} /></a>
-              <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="Twitter"><Social d={TW} /></a>
-              <a href="https://linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn"><Social d={LI} /></a>
+            <div className="flex items-center gap-4">
+              <span className="hidden md:inline text-[11px] text-[#9AC1EE] font-bold tracking-wide">
+                🚚 Melbourne Warehouse Direct · ADR Compliant
+              </span>
+              <div className="flex items-center gap-3 pl-3 border-l border-white/15 text-white/70">
+                <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook"><Social d={FB} /></a>
+                <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><Social d={IG} /></a>
+                <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="Twitter"><Social d={TW} /></a>
+                <a href="https://linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn"><Social d={LI} /></a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Main Floating Slanted Navigation Bar (Sticky Floating Element) */}
       <div className="sticky top-2 sm:top-3 z-50 mx-auto max-w-[1560px] px-3 sm:px-6 py-2.5 sm:py-3 transition-all duration-300">
