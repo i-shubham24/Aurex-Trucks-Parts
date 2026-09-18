@@ -44,13 +44,13 @@ function AuthShell({ title, sub, children, footer }) {
         <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A2E] via-[#1A1A2E]/70 to-[#1A1A2E]/40" />
         <div className="absolute -right-24 top-1/3 w-96 h-96 rounded-full bg-[#0B2F5C]/20 blur-[120px]" />
 
-        <Link to="/" className="relative w-fit">
-          <LogoFull mono size={58} />
+        <Link to="/" className="relative w-fit bg-white px-6 py-4 inline-block" style={{ clipPath: "polygon(0 0,100% 0,100% 100%,16px 100%,0 calc(100% - 16px))" }}>
+          <LogoFull size={52} />
         </Link>
 
         <div className="relative">
           <h2 className="font-display font-bold text-[40px] leading-[1.05] tracking-[-0.02em] max-w-md">
-            The parts desk that <span className="text-gradient">moves as fast</span> as your fleet.
+            The parts desk that <span className="text-[#8FB4E0]">moves as fast</span> as your fleet.
           </h2>
           <div className="mt-8 space-y-4 max-w-sm">
             {[
@@ -59,21 +59,21 @@ function AuthShell({ title, sub, children, footer }) {
               [ShieldCheck, "ADR compliant range with OEM cross references"],
             ].map(([Icon, txt]) => (
               <div key={txt} className="flex items-center gap-3">
-                <span className="grid place-items-center w-10 h-10 rounded-xl bg-white/10 border border-white/15 text-[#8FB4E0] shrink-0">
+                <span className="grid place-items-center w-10 h-10 bg-white/10 border border-white/15 text-[#8FB4E0] shrink-0" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
                   <Icon size={18} />
                 </span>
-                <span className="text-white/80 text-[14px] font-medium">{txt}</span>
+                <span className="text-white/85 text-[14px] font-medium">{txt}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="relative rounded-2xl bg-white/5 border border-white/10 backdrop-blur p-5 max-w-md">
+        <div className="relative bg-white/5 border border-white/10 backdrop-blur p-5 max-w-md" style={{ clipPath: "polygon(0 0,100% 0,100% 100%,20px 100%,0 calc(100% - 20px))" }}>
           <div className="flex gap-0.5">
-            {[...Array(t.rating)].map((_, i) => <Star key={i} size={14} className="fill-[#FFBB00] text-[#FFBB00]" />)}
+            {[...Array(t.rating)].map((_, i) => <Star key={i} size={14} className="fill-[#E8A90C] text-[#E8A90C]" />)}
           </div>
-          <p className="text-white/85 text-[14px] mt-2.5 leading-relaxed">{t.quote}</p>
-          <p className="text-white/50 text-[12px] mt-3 font-semibold">{t.name}, {t.role}</p>
+          <p className="text-white/90 text-[14px] mt-2.5 leading-relaxed">{t.quote}</p>
+          <p className="text-white/60 text-[12px] mt-3 font-semibold">{t.name}, {t.role}</p>
         </div>
       </div>
 
@@ -111,7 +111,7 @@ function AuthShell({ title, sub, children, footer }) {
   );
 }
 
-const inputClass = "w-full rounded-xl px-4 py-3.5 bg-[#F7F8FA] border border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#0B2F5C] focus:bg-white transition";
+const inputClass = "w-full px-4 py-3.5 bg-[#F7F8FA] border-2 border-[#E5E7EB] outline-none text-sm text-[#1A1A2E] focus:border-[#0B2F5C] focus:bg-white transition";
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -164,7 +164,7 @@ export function LoginPage() {
           <PasswordField value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Your password" inputClass={inputClass} />
         </label>
         {err && <p className="text-[13px] text-red-500 font-semibold">{err}</p>}
-        <button className="mt-2 bg-[#0B2F5C] text-white rounded-xl py-4 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#1A1A2E] active:scale-[0.99] transition shadow-primary">
+        <button className="mt-2 bg-[#0B2F5C] text-white py-4 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#1A1A2E] active:scale-[0.99] transition shadow-primary clip-cut">
           <LogIn size={16} /> Log in
         </button>
       </form>
@@ -229,7 +229,7 @@ export function SignupPage() {
         <input value={f.company} onChange={set("company")} placeholder="Company or fleet, optional" className={inputClass} />
         <PasswordField value={f.password} onChange={set("password")} placeholder="Create password" inputClass={inputClass} />
         {err && <p className="text-[13px] text-red-500 font-semibold">{err}</p>}
-        <button className="mt-2 bg-[#1A1A2E] text-white rounded-xl py-4 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#0B2F5C] active:scale-[0.99] transition">
+        <button className="mt-2 bg-[#1A1A2E] text-white py-4 text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#0B2F5C] active:scale-[0.99] transition clip-cut">
           <UserPlus size={16} /> Create account
         </button>
       </form>
@@ -269,7 +269,7 @@ export function AccountPage() {
         <p className="text-[#6B7280] text-sm mt-1">{user.email}</p>
         <p className="text-[#9CA3AF] text-[13px] mt-1">{user.company || "Independent buyer"} {user.phone ? ", " + user.phone : ""}</p>
         <button onClick={() => { logout(); nav("/"); }} className="mt-5 w-full rounded-xl border border-[#E5E7EB] py-3 text-sm font-bold text-[#6B7280] hover:border-red-400 hover:text-red-500 transition">Log out</button>
-        <Link to="/shop" className="mt-2 block text-center rounded-xl bg-[#0B2F5C] text-white py-3 text-sm font-bold hover:bg-[#1A1A2E] transition">Continue shopping</Link>
+        <Link to="/shop" className="mt-2 block text-center bg-[#0B2F5C] text-white py-3 text-sm font-bold hover:bg-[#1A1A2E] transition clip-cut-sm">Continue shopping</Link>
       </div>
       <div>
         <h1 className="font-display font-bold text-3xl text-[#1A1A2E]">Order history ({myOrders.length})</h1>

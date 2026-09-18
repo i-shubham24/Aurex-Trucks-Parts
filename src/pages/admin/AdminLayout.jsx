@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { LayoutDashboard, ShoppingCart, Boxes, LayoutGrid, Users, FileText, Tag, PenLine, Settings, LogOut, Menu, X, Eye, EyeOff, Search, Bell, ChevronDown, ChevronRight, Loader2, AlertTriangle } from "lucide-react";
 import { useAuth } from "../../store/auth.jsx";
-import logoWhite from "../../assets/aurex-logo-white.png";
+import logoBlue from "../../assets/aurex-logo-blue.png";
 
 const MENU_GROUPS = [
   {
@@ -89,33 +89,33 @@ export default function AdminLayout() {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-[#06080b] flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="min-h-screen bg-[#060B13] flex items-center justify-center p-4 relative overflow-hidden">
         <div className="absolute inset-0 grid-scrim opacity-20" />
         <div className="absolute inset-0 bg-gradient-to-tr from-[#0B2F5C]/10 to-transparent" />
-        <div className="absolute -left-1/4 -top-1/4 w-[150%] h-[150%] blur-3xl opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#ff4d00]/20 via-[#06080b]/0 to-transparent pointer-events-none" />
+        <div className="absolute -left-1/4 -top-1/4 w-[150%] h-[150%] blur-3xl opacity-20 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#5B93D1]/20 via-[#060B13]/0 to-transparent pointer-events-none" />
         
         <div className="w-full max-w-[420px] relative z-10">
           <div className="flex justify-center mb-8">
-            <img src={logoWhite} alt="Aurex" className="h-8 object-contain" />
+            <span className="bg-white px-3 py-2 inline-block"><img src={logoBlue} alt="Aurex" className="h-8 object-contain" /></span>
           </div>
           
           <form onSubmit={handleLogin} className="rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-xl p-8 sm:p-10 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#ff4d00] to-[#ff8c00]" />
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#5B93D1] to-[#8FB4E0]" />
             
-            <p className="text-[11px] font-black tracking-[0.2em] text-[#ff4d00] uppercase mb-2">Secure Gateway</p>
+            <p className="text-[11px] font-black tracking-[0.2em] text-[#5B93D1] uppercase mb-2">Secure Gateway</p>
             <h1 className="font-display font-bold text-3xl text-white">Staff Login</h1>
             <p className="text-white/40 text-[13px] mt-2 mb-8 leading-relaxed">Access the Aurex Truck Parts administrative portal to manage orders and catalogue.</p>
             
             <div className="space-y-4">
               <div>
                 <label className="block text-[11px] font-bold text-white/50 uppercase tracking-wider mb-1.5 ml-1">Email</label>
-                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@aurex.com.au" className="w-full rounded-xl px-4 py-3.5 bg-black/40 border border-white/10 outline-none text-sm text-white focus:border-[#ff4d00]/50 transition" />
+                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@aurex.com.au" className="w-full rounded-xl px-4 py-3.5 bg-black/40 border border-white/10 outline-none text-sm text-white focus:border-[#5B93D1]/50 transition" />
               </div>
               
               <div>
                 <label className="block text-[11px] font-bold text-white/50 uppercase tracking-wider mb-1.5 ml-1">Password</label>
                 <span className="relative block">
-                  <input value={password} onChange={(e) => setPassword(e.target.value)} type={showPw ? "text" : "password"} placeholder="••••••••" className="w-full rounded-xl px-4 py-3.5 pr-11 bg-black/40 border border-white/10 outline-none text-sm text-white focus:border-[#ff4d00]/50 transition" />
+                  <input value={password} onChange={(e) => setPassword(e.target.value)} type={showPw ? "text" : "password"} placeholder="••••••••" className="w-full rounded-xl px-4 py-3.5 pr-11 bg-black/40 border border-white/10 outline-none text-sm text-white focus:border-[#5B93D1]/50 transition" />
                   <button type="button" onClick={() => setShowPw(!showPw)} aria-label={showPw ? "Hide password" : "Show password"} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition">
                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -125,7 +125,7 @@ export default function AdminLayout() {
 
             {err && <p className="mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-[13px] text-red-400 font-semibold">{err}</p>}
             
-            <button disabled={loading} className="mt-8 w-full bg-[#ff4d00] rounded-xl py-3.5 text-[14px] font-bold text-white hover:bg-[#ff8c00] transition flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+            <button disabled={loading} className="mt-8 w-full bg-[#5B93D1] rounded-xl py-3.5 text-[14px] font-bold text-white hover:bg-[#8FB4E0] transition flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
               {loading ? <><Loader2 size={18} className="animate-spin" /> Authenticating...</> : "Sign into portal"}
             </button>
             
@@ -137,12 +137,12 @@ export default function AdminLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-[#06080b] text-white flex">
-      <aside className={`fixed lg:static z-50 h-screen w-[260px] shrink-0 bg-[#0d1218] border-r border-white/10 flex flex-col transition-transform ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+    <div className="min-h-screen bg-[#060B13] text-white flex">
+      <aside className={`fixed lg:static z-50 h-screen w-[260px] shrink-0 bg-[#0C1622] border-r border-white/10 flex flex-col transition-transform ${open ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
         <div className="p-5 flex items-center justify-between border-b border-white/10">
           <Link to="/admin" className="flex items-center gap-3">
-            <img src={logoWhite} alt="Aurex" className="h-5 object-contain" />
-            <span className="text-[10px] font-black tracking-widest text-[#ff4d00] uppercase mt-1 border-l border-white/20 pl-3">Admin</span>
+            <span className="bg-white px-2 py-1 inline-block"><img src={logoBlue} alt="Aurex" className="h-5 object-contain" /></span>
+            <span className="text-[10px] font-black tracking-widest text-[#5B93D1] uppercase mt-1 border-l border-white/20 pl-3">Admin</span>
           </Link>
           <button onClick={() => setOpen(false)} className="lg:hidden p-2 text-white/50 hover:text-white"><X size={18} /></button>
         </div>
@@ -153,7 +153,7 @@ export default function AdminLayout() {
               <p className="text-[11px] font-black tracking-widest text-white/30 uppercase mb-2 px-3">{group.title}</p>
               <div className="grid gap-1">
                 {group.items.map(([t, h, Icon]) => (
-                  <NavLink key={t} to={h} end={h === "/admin"} onClick={() => setOpen(false)} className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-2.5 transition ${isActive ? "bg-[#ff4d00]/10 text-[#ff4d00]" : "text-white/60 hover:bg-white/5 hover:text-white"}`}>
+                  <NavLink key={t} to={h} end={h === "/admin"} onClick={() => setOpen(false)} className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-2.5 transition ${isActive ? "bg-[#5B93D1]/10 text-[#5B93D1]" : "text-white/60 hover:bg-white/5 hover:text-white"}`}>
                     <Icon size={17} />{t}
                   </NavLink>
                 ))}
@@ -164,7 +164,7 @@ export default function AdminLayout() {
       </aside>
 
       <div className="flex-1 min-w-0 flex flex-col h-screen relative">
-        <header className="shrink-0 z-40 bg-[#0d1218] border-b border-white/10 px-4 sm:px-6 py-4 flex items-center gap-4">
+        <header className="shrink-0 z-40 bg-[#0C1622] border-b border-white/10 px-4 sm:px-6 py-4 flex items-center gap-4">
           <button onClick={() => setOpen(true)} className="lg:hidden p-2 -ml-2 text-white/60 hover:text-white"><Menu size={20} /></button>
           
           <div className="flex-1 flex items-center gap-4">
@@ -180,14 +180,14 @@ export default function AdminLayout() {
             <div ref={notifRef} className="relative">
               <button onClick={() => setShowNotif(!showNotif)} className={`relative p-2 rounded-lg transition ${showNotif ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white'}`}>
                 <Bell size={20} />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#ff4d00] rounded-full ring-2 ring-[#0d1218]" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#5B93D1] rounded-full ring-2 ring-[#0C1622]" />
               </button>
               
               {showNotif && (
-                <div className="absolute top-full right-0 mt-2 w-80 bg-[#161f2a] border border-white/10 rounded-2xl shadow-2xl p-4 z-50">
+                <div className="absolute top-full right-0 mt-2 w-80 bg-[#12202F] border border-white/10 rounded-2xl shadow-2xl p-4 z-50">
                   <div className="flex items-center justify-between mb-3 border-b border-white/10 pb-3">
                     <p className="font-bold text-sm">Notifications</p>
-                    <button className="text-[11px] text-[#ff4d00] font-bold">Mark all read</button>
+                    <button className="text-[11px] text-[#5B93D1] font-bold">Mark all read</button>
                   </div>
                   <div className="space-y-3">
                     <div className="flex gap-3">
@@ -213,18 +213,18 @@ export default function AdminLayout() {
             
             <div ref={profileRef} className="relative">
               <div onClick={() => setShowProfile(!showProfile)} className="flex items-center gap-3 cursor-pointer group p-1.5 rounded-xl hover:bg-white/5 transition">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#ff4d00] to-[#ff8c00] flex items-center justify-center font-bold shadow-inner">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#5B93D1] to-[#8FB4E0] flex items-center justify-center font-bold shadow-inner">
                   {user.name.charAt(0)}
                 </div>
                 <div className="hidden md:block text-left">
-                  <p className="text-[13px] font-bold leading-tight group-hover:text-[#ff4d00] transition">{user.name}</p>
+                  <p className="text-[13px] font-bold leading-tight group-hover:text-[#5B93D1] transition">{user.name}</p>
                   <p className="text-[11px] text-white/50">{user.role}</p>
                 </div>
                 <ChevronDown size={14} className={`text-white/40 group-hover:text-white transition ${showProfile ? 'rotate-180' : ''}`} />
               </div>
               
               {showProfile && (
-                <div className="absolute top-full right-0 mt-2 w-56 bg-[#161f2a] border border-white/10 rounded-2xl shadow-2xl p-2 z-50">
+                <div className="absolute top-full right-0 mt-2 w-56 bg-[#12202F] border border-white/10 rounded-2xl shadow-2xl p-2 z-50">
                   <div className="px-3 py-2 border-b border-white/10 mb-1">
                     <p className="text-sm font-bold text-white">{user.name}</p>
                     <p className="text-[12px] text-white/50 truncate">{user.email}</p>
@@ -240,7 +240,7 @@ export default function AdminLayout() {
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-4 sm:p-7 bg-[#06080b]">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-7 bg-[#060B13]">
           <div className="max-w-[1200px] mx-auto">
             <Outlet />
           </div>
@@ -281,7 +281,7 @@ function CommandPalette() {
   return (
     <div className="fixed inset-0 z-[100] flex items-start justify-center pt-[10vh] sm:pt-[20vh] px-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)} />
-      <div className="relative w-full max-w-2xl bg-[#161f2a] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+      <div className="relative w-full max-w-2xl bg-[#12202F] border border-white/10 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
         <div className="flex items-center px-4 py-4 border-b border-white/10">
           <Search size={20} className="text-white/40 mr-3 shrink-0" />
           <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Type a command or search..." className="flex-1 bg-transparent outline-none text-white text-lg placeholder:text-white/30" />
@@ -293,13 +293,13 @@ function CommandPalette() {
             results.length > 0 ? (
               <div className="space-y-1">
                 {results.map((r, i) => (
-                  <button key={i} onClick={() => { nav(r.url); setOpen(false); setQ(""); }} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[#ff4d00]/10 hover:text-[#ff4d00] transition text-left group">
-                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-[#ff4d00]/20"><r.icon size={16} /></div>
+                  <button key={i} onClick={() => { nav(r.url); setOpen(false); setQ(""); }} className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[#5B93D1]/10 hover:text-[#5B93D1] transition text-left group">
+                    <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0 group-hover:bg-[#5B93D1]/20"><r.icon size={16} /></div>
                     <div className="flex-1 truncate">
                       <p className="font-bold text-[14px] text-white">{r.title}</p>
                       <p className="text-[11px] text-white/40 uppercase tracking-wider font-black">{r.type}</p>
                     </div>
-                    <ChevronRight size={16} className="text-white/20 group-hover:text-[#ff4d00]" />
+                    <ChevronRight size={16} className="text-white/20 group-hover:text-[#5B93D1]" />
                   </button>
                 ))}
               </div>
