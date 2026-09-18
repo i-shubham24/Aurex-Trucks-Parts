@@ -37,7 +37,7 @@ function Field({ label, value, onChange, options, placeholder, disabled, dark })
               {open && (
                 <motion.ul
                   initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.16 }}
-                  className={`absolute left-0 right-0 z-[80] mt-1.5 max-h-[40vh] sm:max-h-52 overflow-auto shadow-elevated ${dark ? "bg-[#1A1A2E] border-2 border-[#8FB4E0]/50" : "bg-white border-2 border-[#0B2F5C]"}`}
+                  className={`absolute -left-2 -right-2 z-[80] mt-1.5 max-h-[40vh] sm:max-h-56 overflow-y-auto overflow-x-hidden shadow-elevated ${dark ? "bg-[#1A1A2E] border-2 border-[#8FB4E0]/50" : "bg-white border-2 border-[#0B2F5C]"}`}
                 >
                   {options.map((o) => (
                     <li key={o}>
@@ -59,7 +59,7 @@ function Field({ label, value, onChange, options, placeholder, disabled, dark })
 }
 
 // The console: three progressive selects plus confirm. Shared by the hero and the header pill.
-function Console({ dark = true, onDone }) {
+function Console({ dark = true, stacked = false, onDone }) {
   const { selectedVehicle, addVehicle, updateVehicle } = useGarage();
   const [make, setMake] = useState(selectedVehicle?.make || "");
   const [model, setModel] = useState(selectedVehicle?.model || "");
@@ -94,7 +94,7 @@ function Console({ dark = true, onDone }) {
           );
         })}
       </div>
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className={`grid gap-3 ${stacked ? "" : "sm:grid-cols-3"}`}>
         <Field label="Make" value={make} dark={dark} placeholder="Select make"
           options={Object.keys(TRUCK_MAKES)}
           onChange={(v) => { setMake(v); setModel(""); }} />
@@ -134,8 +134,7 @@ export default function YMMWidget({ variant = "hero" }) {
   // ===== Hero console: always open, light readable card =====
   if (variant === "hero") {
     return (
-      <div className="relative bg-white border-2 border-[#0B2F5C]/15 shadow-elevated overflow-hidden clip-cut-lg">
-        <span className="absolute top-0 left-8 right-8 h-1.5 rounded-full bg-gradient-to-r from-[#0B2F5C] via-[#5B93D1] to-[#B9D6F2]" />
+      <div className="relative bg-white border-2 border-[#0B2F5C]/15 shadow-elevated">
         <div className="p-5 sm:p-7">
           <div className="flex items-center gap-3">
             <span className="grid place-items-center w-11 h-11 bg-[#0B2F5C] text-white shrink-0" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
@@ -194,12 +193,13 @@ export default function YMMWidget({ variant = "hero" }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.22, ease: EASE }}
-            className="absolute right-0 top-full mt-2 w-[340px] max-w-[calc(100vw-2rem)] bg-[#12121B] border-2 border-[#8FB4E0]/50 p-4 shadow-elevated z-[65]"
+            className="absolute right-0 top-full mt-2 w-[400px] max-w-[calc(100vw-2rem)] bg-[#12121B] border-2 border-[#8FB4E0]/50 p-5 shadow-elevated z-[65]"
           >
-            <p className="text-white font-display font-bold text-sm mb-3 flex items-center gap-2">
-              <Truck size={15} className="text-[#8FB4E0]" /> Select your truck
+            <p className="text-white font-display font-bold text-[15px] mb-1 flex items-center gap-2">
+              <Truck size={16} className="text-[#8FB4E0]" /> Select your truck
             </p>
-            <Console dark onDone={() => setOpen(false)} />
+            <p className="text-white/60 text-[12px] mb-4">Make, model, year. We filter every part to fit.</p>
+            <Console dark stacked onDone={() => setOpen(false)} />
           </motion.div>
         )}
       </AnimatePresence>
