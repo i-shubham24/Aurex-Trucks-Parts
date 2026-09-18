@@ -6,7 +6,7 @@ const KEY = "aurex_orders";
 const STATUSES = ["Packed in Campbellfield VIC", "Courier booked", "In transit", "Delivered", "Cancelled"];
 const load = () => { try { const v = localStorage.getItem(KEY); const a = v ? JSON.parse(v) : []; return Array.isArray(a) ? a : []; } catch { return []; } };
 const seed = () => [
-  { id: "AUX-4101", email: "mark@lavertonfleet.com.au", items: [{ sku: "GL-11113", name: "27mm Steel Door Locking Gear 200L+200R", price: null, qty: 4 }, { sku: "GL-13112", name: "Steel Hinges", price: 10, qty: 8 }], subtotal: 80, shipping: "Standard road", shippingFee: 24, payment: "Card", total: 104, status: "In transit", placedAt: new Date(Date.now() - 86400000 * 2).toISOString(), address: { name: "Mark D.", suburb: "Laverton", state: "VIC", postcode: "3028" } },
+  { id: "AUX-4101", email: "mark@lavertonfleet.com.au", items: [{ sku: "GL-11113", name: "27mm Steel Door Locking Gear 200L+200R", price: 85, qty: 4 }, { sku: "GL-13112", name: "Steel Hinges", price: 10, qty: 8 }], subtotal: 420, shipping: "Standard road", shippingFee: 24, payment: "Card", total: 444, status: "In transit", placedAt: new Date(Date.now() - 86400000 * 2).toISOString(), address: { name: "Mark D.", suburb: "Laverton", state: "VIC", postcode: "3028" } },
   { id: "AUX-4102", email: "sarah@brisbanehaul.com.au", items: [{ sku: "GL-25126", name: "Steel Tool Box 1200x450x400", price: 293, qty: 1 }], subtotal: 293, shipping: "Express priority", shippingFee: 39, payment: "Afterpay", total: 332, status: "Courier booked", placedAt: new Date(Date.now() - 86400000 * 1).toISOString(), address: { name: "Sarah K.", suburb: "Brisbane", state: "QLD", postcode: "4000" } },
 ];
 

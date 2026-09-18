@@ -14,7 +14,7 @@ export function useSearchFilters() {
     brand: searchParams.get("brand") || "All brands",
     priceRange: [
       Number(searchParams.get("minPrice")) || 0,
-      Number(searchParams.get("maxPrice")) || 1600
+      Number(searchParams.get("maxPrice")) || 6000
     ],
     inStockOnly: searchParams.get("inStock") === "true",
     query: searchParams.get("q") || ""
@@ -27,7 +27,7 @@ export function useSearchFilters() {
     if (filters.category !== "All") params.set("cat", filters.category);
     if (filters.brand !== "All brands") params.set("brand", filters.brand);
     if (filters.priceRange[0] > 0) params.set("minPrice", filters.priceRange[0]);
-    if (filters.priceRange[1] < 1600) params.set("maxPrice", filters.priceRange[1]);
+    if (filters.priceRange[1] < 6000) params.set("maxPrice", filters.priceRange[1]);
     if (filters.inStockOnly) params.set("inStock", "true");
     if (filters.query) params.set("q", filters.query);
 
@@ -67,7 +67,7 @@ export function useSearchFilters() {
     setFilters({
       category: "All",
       brand: "All brands",
-      priceRange: [0, 1600],
+      priceRange: [0, 6000],
       inStockOnly: false,
       query: ""
     });
@@ -78,7 +78,7 @@ export function useSearchFilters() {
     return filters.category !== "All" ||
            filters.brand !== "All brands" ||
            filters.priceRange[0] > 0 ||
-           filters.priceRange[1] < 1600 ||
+           filters.priceRange[1] < 6000 ||
            filters.inStockOnly ||
            filters.query !== "";
   }, [filters]);
@@ -88,7 +88,7 @@ export function useSearchFilters() {
     let count = 0;
     if (filters.category !== "All") count++;
     if (filters.brand !== "All brands") count++;
-    if (filters.priceRange[0] > 0 || filters.priceRange[1] < 1600) count++;
+    if (filters.priceRange[0] > 0 || filters.priceRange[1] < 6000) count++;
     if (filters.inStockOnly) count++;
     if (filters.query) count++;
     return count;

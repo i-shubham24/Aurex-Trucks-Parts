@@ -66,6 +66,7 @@ export default function AdminProducts() {
     };
     delete payload.onSale; delete payload.preset; delete payload.useCustom;
     if (!payload.name.trim()) { setErr("Name is required."); return; }
+    if (payload.price == null || !(payload.price > 0)) { setErr("Price (AUD) is required — every line sells at a set price."); return; }
     if (modal === "new") { const r = addProduct(payload); if (!r.ok) { setErr(r.msg); return; } }
     else updateProduct(form.sku, payload);
     setModal(null);

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
-export default function PriceFilter({ range = [0, 1600], onChange, min = 0, max = 1600, compact = false }) {
+export default function PriceFilter({ range = [0, 6000], onChange, min = 0, max = 6000, compact = false }) {
   const [expanded, setExpanded] = useState(true);
   const [localRange, setLocalRange] = useState(range);
 

@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useScroll, useSpring, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Star, ShoppingCart, Eye, ArrowRight, ChevronLeft, ChevronRight, ChevronDown, Check, TriangleAlert } from "lucide-react";
+import { Star, ShoppingCart, ArrowRight, ChevronLeft, ChevronRight, ChevronDown, Check, TriangleAlert } from "lucide-react";
 import { useShop } from "../store/shop.jsx";
-import { useGarage } from "./garage/GarageContext.jsx";
 import { fitLabel } from "../data/fitment.js";
 
 // Styled dropdown that replaces raw select boxes. Angular house shape.
@@ -325,124 +324,14 @@ export function ScrollRow({ children, className = "" }) {
   );
 }
 
-export function ProductCard({ p, index = 0 }) {
-  const { add, toggleCompare, compare, setEnquirySku } = useShop();
-  const { fitStatus, selectedVehicle } = useGarage();
-  const fit = fitStatus(p);
+/* Unified catalogue card — single clean design shared by home rails, shop
+   grids, brand walls and related rows (navy/silver rail language).
+   `actions` toggles the shop footer (Add to cart + Compare). Buying
+   details live on the product page via the View details bar. */
+function CardShell({ p, index = 0, actions = false }) {
+  const { add, toggleCompare, compare } = useShop();
   const inCompare = compare.includes(p.sku);
-  const discount = p.oldPrice ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : null;
-  const inStock = p.stock.includes("In stock");
 
-  return (
-    <motion.article
-      variants={staggerChild}
-      initial="initial"
-      whileInView="whileInView"
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.55, ease: EASE, delay: (index % 4) * 0.06 }}
-      className="group relative bg-white rounded-2xl border border-[#E5E7EB] overflow-hidden hover:border-[#0B2F5C]/30 hover:shadow-card-hover hover:-translate-y-1.5 transition-all duration-500 flex flex-col"
-    >
-      <div className="relative aspect-[16/10] overflow-hidden bg-[#F1F2F4] shine">
-        <Link to={`/product/${p.sku}`} className="block w-full h-full">
-          <SafeImg
-            src={p.image}
-            alt={p.name}
-            label={p.sku}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-            wrapClass="w-full h-full"
-          />
-        </Link>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition pointer-events-none" />
-
-        {discount ? (
-          <span className="clip-cut-sm absolute bottom-4 left-4 z-10 bg-[#0B2F5C] text-white text-[11px] font-black px-2.5 py-1 shadow-primary">
-            -{discount}%
-          </span>
-        ) : p.badge ? (
-          <span className="clip-cut-sm absolute bottom-4 left-4 z-10 bg-[#1A1A2E] text-white text-[11px] font-black px-2.5 py-1">
-            {p.badge}
-          </span>
-        ) : null}
-
-        {fit !== "unknown" && (
-          <span className="absolute top-3 right-3 z-10">
-            <FitChip status={fit} vehicle={selectedVehicle} />
-          </span>
-        )}
-
-        <span
-          className={`clip-cut-sm absolute top-3 left-3 z-10 text-[11px] font-bold px-2.5 py-1 backdrop-blur ${
-            inStock ? "bg-[#1A1A2E]/90 text-white" : "bg-white/90 text-[#6B7280] border border-[#E5E7EB]"
-          }`}
-        >
-          {p.stock}
-        </span>
-
-        <Link
-          to={`/product/${p.sku}`}
-          className="absolute bottom-3 right-3 z-10 w-9 h-9 grid place-items-center rounded-full bg-white/95 border border-[#E5E7EB] text-[#1A1A2E] translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 hover:bg-[#1A1A2E] hover:text-white transition-all shadow-sm"
-          aria-label="quick view"
-        >
-          <Eye size={15} />
-        </Link>
-      </div>
-
-      <div className="p-4 flex flex-col flex-1">
-        <p className="text-[11px] font-semibold tracking-wide text-[#9CA3AF] uppercase">
-          {p.brand ? p.brand + ", " : ""}
-          {p.cat}
-        </p>
-        <Link
-          to={`/product/${p.sku}`}
-          className="font-display font-semibold text-[14px] leading-snug mt-1 text-[#1A1A2E] hover:text-[#0B2F5C] transition line-clamp-2 min-h-[40px]"
-        >
-          {p.name}
-        </Link>
-        <div className="mt-2">
-          <Stars rating={p.rating} reviews={p.reviews} />
-        </div>
-        <div className="mt-auto pt-3 flex items-center justify-between gap-3 border-t border-[#F3F4F6]">
-          <p>
-            {p.price == null ? (
-              <span className="font-display font-bold text-[16px] text-[#0B2F5C]">Enquire for price</span>
-            ) : (
-              <span className="font-display font-bold text-[18px] text-[#1A1A2E]">${p.price.toFixed(2)}</span>
-            )}
-            {p.oldPrice && (
-              <span className="block text-[12px] line-through text-[#9CA3AF]">${p.oldPrice.toFixed(2)}</span>
-            )}
-          </p>
-          {p.price == null ? (
-            <button
-              onClick={() => setEnquirySku(p.sku)}
-              className="clip-cut flex items-center gap-1.5 bg-[#1A1A2E] text-white px-4 py-2.5 text-[13px] font-bold hover:bg-[#0B2F5C] active:scale-95 transition-all"
-            >
-              Enquire
-            </button>
-          ) : (
-          <button
-            onClick={() => add(p.sku)}
-            className="clip-cut flex items-center gap-1.5 bg-[#0B2F5C] text-white px-4 py-2.5 text-[13px] font-bold hover:bg-[#1A1A2E] hover:gap-2.5 active:scale-95 transition-all"
-          >
-            <ShoppingCart size={14} />
-            Add
-          </button>
-          )}
-        </div>
-        <div className="mt-2.5 flex gap-2">
-          <button onClick={() => toggleCompare(p.sku)} className={`clip-cut-sm flex-1 py-2 text-[12px] font-bold border transition ${inCompare ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#1A1A2E] hover:text-[#1A1A2E]"}`}>{inCompare ? "Added to compare" : "Compare"}</button>
-          <button onClick={() => setEnquirySku(p.sku)} className="clip-cut-sm flex-1 py-2 text-[12px] font-bold border border-[#E5E7EB] text-[#6B7280] hover:border-[#0B2F5C] hover:text-[#0B2F5C] transition">Enquire on SKU</button>
-        </div>
-      </div>
-    </motion.article>
-  );
-}
-
-
-
-/* Rail card: calm white card with bottom-left cut. Hover washes the image
-   blue and slides up a full-width View details bar. */
-export function ProductRailCard({ p, index = 0 }) {
   return (
     <motion.article
       variants={staggerChild}
@@ -461,12 +350,8 @@ export function ProductRailCard({ p, index = 0 }) {
           className="w-full h-full object-cover group-hover:scale-107 transition-transform duration-700 ease-out"
           wrapClass="w-full h-full"
         />
-        {p.badge && (
-          <span className="absolute top-3 left-3 z-10 bg-[#1A1A2E]/90 backdrop-blur text-white text-[10px] font-black tracking-wider uppercase px-2.5 py-1">
-            {p.badge}
-          </span>
-        )}
         <span className="absolute inset-0 bg-gradient-to-t from-[#0B2F5C]/85 via-[#0B2F5C]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none" />
+        {/* Hover slide-up bar (home rail signature) */}
         <span className="absolute inset-x-0 bottom-0 z-10 translate-y-full group-hover:translate-y-0 transition-transform duration-400 ease-out bg-white px-4 py-3 flex items-center justify-between gap-2">
           <span className="text-[12px] font-black uppercase tracking-wider text-[#0B2F5C]">View details</span>
           <span className="grid place-items-center w-8 h-8 bg-[#0B2F5C] text-white shrink-0" style={{ clipPath: "polygon(0 0,100% 0,100% 70%,70% 100%,0 100%)" }}>
@@ -474,26 +359,65 @@ export function ProductRailCard({ p, index = 0 }) {
           </span>
         </span>
       </Link>
+
       <div className="p-4 flex flex-col flex-1">
         <p className="text-[10px] font-black tracking-[0.16em] text-[#9CA3AF] uppercase truncate">
           {p.brand ? `${p.brand} · ` : ""}{p.sku}
         </p>
-        <p className="font-display font-bold text-[15px] leading-snug text-[#1A1A2E] mt-1 line-clamp-2 min-h-[42px] group-hover:text-[#0B2F5C] transition">{p.name}</p>
+        <Link
+          to={`/product/${p.sku}`}
+          className="font-display font-bold text-[15px] leading-snug text-[#1A1A2E] mt-1 line-clamp-2 min-h-[42px] group-hover:text-[#0B2F5C] transition"
+        >
+          {p.name}
+        </Link>
         <div className="mt-2 pt-3 border-t border-[#F1F2F4] flex items-center justify-between gap-2">
-          {p.price == null ? (
-            <span className="font-display font-bold text-[17px] text-[#0B2F5C]">Enquire</span>
-          ) : (
-            <span className="font-display font-bold text-[19px] text-[#1A1A2E]">${p.price.toFixed(2)}</span>
-          )}
-          <span className="flex items-center gap-0.5">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} size={12} className={i < Math.round(p.rating || 5) ? "fill-[#E8A90C] text-[#E8A90C]" : "fill-[#E5E7EB] text-[#E5E7EB]"} />
-            ))}
+          <span>
+            {p.price == null ? (
+              <span className="font-display font-bold text-[17px] text-[#0B2F5C]">Enquire</span>
+            ) : (
+              <span className="font-display font-bold text-[19px] text-[#1A1A2E]">${p.price.toFixed(2)}</span>
+            )}
+            {p.oldPrice && p.price != null && (
+              <span className="block text-[12px] line-through text-[#9CA3AF]">${p.oldPrice.toFixed(2)}</span>
+            )}
           </span>
+          <Stars rating={p.rating} reviews={p.reviews} size={12} />
         </div>
+
+        {actions && (
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <button
+              onClick={() => add(p.sku)}
+              className="flex items-center justify-center gap-1.5 bg-[#0B2F5C] text-white px-4 py-2.5 text-[13px] font-bold hover:bg-[#1A1A2E] active:scale-[0.98] transition-all"
+              style={{ clipPath: "polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))" }}
+            >
+              <ShoppingCart size={14} />
+              Add
+            </button>
+            <button
+              onClick={() => toggleCompare(p.sku)}
+              className={`py-2.5 text-[13px] font-bold border transition ${inCompare ? "bg-[#1A1A2E] text-white border-[#1A1A2E]" : "border-[#E5E7EB] text-[#6B7280] hover:border-[#1A1A2E] hover:text-[#1A1A2E]"}`}
+              style={{ clipPath: "polygon(0 0,100% 0,100% 100%,10px 100%,0 calc(100% - 10px))" }}
+            >
+              {inCompare ? "Added ✓" : "Compare"}
+            </button>
+          </div>
+        )}
       </div>
     </motion.article>
   );
+}
+
+export function ProductCard({ p, index = 0 }) {
+  return <CardShell p={p} index={index} actions />;
+}
+
+
+
+/* Rail card: same shell as the catalogue card, without the shop action
+   footer — used for home rails and quiet placements. */
+export function ProductRailCard({ p, index = 0 }) {
+  return <CardShell p={p} index={index} actions={false} />;
 }
 
 

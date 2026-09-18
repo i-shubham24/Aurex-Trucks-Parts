@@ -31,7 +31,7 @@ export default function Shop() {
   const [cat, setCat] = useState(catParam);
   const [brand, setBrand] = useState("All brands");
   const [sort, setSort] = useState("Popular");
-  const [maxPrice, setMaxPrice] = useState(1600);
+  const [maxPrice, setMaxPrice] = useState(6000);
   const [inStock, setInStock] = useState(false);
   const [onlyFits, setOnlyFits] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -83,7 +83,7 @@ export default function Shop() {
     return l;
   }, [base, hasValidVehicle, onlyFits, fitStatus, sort]);
 
-  const clearAll = () => { setCat("All"); setBrand("All brands"); setQuery(""); setMaxPrice(1600); setInStock(false); setOnlyFits(false); };
+  const clearAll = () => { setCat("All"); setBrand("All brands"); setQuery(""); setMaxPrice(6000); setInStock(false); setOnlyFits(false); };
   const activeCat = cat !== "All" ? CATEGORIES.find((c) => c.name === cat) : null;
 
   return (
@@ -225,7 +225,7 @@ export default function Shop() {
           <input
             type="range"
             min={50}
-            max={1600}
+            max={6000}
             value={maxPrice}
             onChange={(e) => setMaxPrice(Number(e.target.value))}
             className="mt-2 w-full accent-[#1A1A2E]"

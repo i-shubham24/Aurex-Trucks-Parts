@@ -53,8 +53,6 @@ function ensureAdmin() {
     localStorage.setItem("aurex_users", JSON.stringify(users));
   } catch { /* noop */ }
 }
-  } catch { /* noop */ }
-}
 
 export default function AdminLayout() {
   const { user, login, logout } = useAuth();

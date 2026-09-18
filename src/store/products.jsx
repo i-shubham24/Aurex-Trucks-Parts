@@ -2,13 +2,13 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { PRODUCTS as SEED } from "../data/catalog.js";
 import { deriveFitment } from "../data/fitment.js";
 
-const KEY = "aurex_products_v4";
+const KEY = "aurex_products_v5";
 const Ctx = createContext(null);
 
 // Older saved catalogues predate the fitment field, so backfill it from the product text.
 const withFitment = (p) => (p.fitment ? p : { ...p, fitment: deriveFitment(p) });
 
-const DKEY = "aurex_products_deleted_v4";
+const DKEY = "aurex_products_deleted_v5";
 const readDeleted = () => { try { const a = JSON.parse(localStorage.getItem(DKEY) || "[]"); return new Set(Array.isArray(a) ? a : []); } catch { return new Set(); } };
 
 const load = () => {

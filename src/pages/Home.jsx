@@ -65,12 +65,12 @@ export default function Home() {
 
       <RangeBento />
 
-      {/* Garage filter band */}
-      <section className="mx-auto max-w-7xl px-4 py-14">
-        <div className="relative overflow-hidden rounded-[28px] bg-[#EAF2FA] border border-[#D7E4F2]">
-          <div className="absolute -right-24 -top-24 w-[380px] h-[380px] rounded-full bg-[#8FB4E0]/25 blur-[110px]" />
-          <div className="absolute -left-24 -bottom-24 w-[380px] h-[380px] rounded-full bg-[#0B2F5C]/10 blur-[110px]" />
-          <div className="relative grid lg:grid-cols-2 gap-6 items-stretch p-6 sm:p-10">
+      {/* Garage filter band — full-width squared section */}
+      <section className="relative overflow-hidden bg-[#EAF2FA] border-y border-[#D7E4F2] py-14">
+        <div className="absolute -right-24 -top-24 w-[380px] h-[380px] rounded-full bg-[#8FB4E0]/25 blur-[110px]" />
+        <div className="absolute -left-24 -bottom-24 w-[380px] h-[380px] rounded-full bg-[#0B2F5C]/10 blur-[110px]" />
+        <div className="relative mx-auto max-w-7xl px-4">
+          <div className="grid lg:grid-cols-2 gap-6 items-stretch">
             <div className="relative overflow-hidden bg-[#1A1A2E] text-white p-7 sm:p-10 flex flex-col justify-center clip-cut-lg">
               <div className="absolute inset-0 grid-scrim opacity-20" />
               <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-[#0B2F5C]/40 blur-[90px]" />

@@ -27,7 +27,7 @@ export default function FilterSidebar({
   const handleClearAll = () => {
     onCategoryChange("All");
     onBrandChange("All brands");
-    onPriceChange([0, 1600]);
+    onPriceChange([0, 6000]);
     onStockChange(false);
     if (onClearAll) onClearAll();
   };
@@ -35,7 +35,7 @@ export default function FilterSidebar({
   const hasActiveFilters = selectedCategory !== "All" || 
                           selectedBrand !== "All brands" || 
                           selectedPriceRange[0] > 0 || 
-                          selectedPriceRange[1] < 1600 || 
+                          selectedPriceRange[1] < 6000 || 
                           inStockOnly;
 
   if (compact) {
