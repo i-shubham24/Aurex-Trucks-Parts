@@ -36,8 +36,24 @@ export function AuthProvider({ children }) {
     // NOTE: demo-only auth, credentials live in this browser's localStorage.
     // Production must move to a real backend with hashed passwords and sessions.
     // The admin account is seeded by AdminLayout (ensureAdmin), not here.
-    const f = users.find((u) => u.email === clean && u.password === password);
-    if (!f) return { ok: false, msg: "Email or password did not match. Try again or create an account." };
+    let f = users.find((u) => u.email === clean && u.password === password);
+    if (!f) {
+      // In-memory list can be stale (e.g. admin seeded after provider mount),
+      // so fall back to a fresh localStorage read before giving up.
+      try {
+        const raw = localStorage.getItem(USERS_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        if (Array.isArray(arr)) {
+          const hit = arr.find((u) => u.email === clean && u.password === password);
+          if (hit) {
+            setUsers(arr);
+            setSession(clean);
+            return { ok: true };
+          }
+        }
+      } catch { /* noop */ }
+      return { ok: false, msg: "Email or password did not match. Try again or create an account." };
+    }
     setSession(clean);
     return { ok: true };
   };

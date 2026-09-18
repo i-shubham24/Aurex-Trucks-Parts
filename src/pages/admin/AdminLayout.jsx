@@ -43,10 +43,16 @@ function ensureAdmin() {
   try {
     const raw = localStorage.getItem("aurex_users");
     const users = raw ? JSON.parse(raw) : [];
-    if (!users.some((u) => u.email === ADMIN_EMAIL)) {
+    const i = users.findIndex((u) => u.email === ADMIN_EMAIL);
+    if (i === -1) {
       users.push({ name: "Store Admin", email: ADMIN_EMAIL, password: ADMIN_PASS, phone: "03 9000 0000", company: "Aurex HQ", createdAt: new Date().toISOString(), role: "admin" });
-      localStorage.setItem("aurex_users", JSON.stringify(users));
+    } else {
+      // Normalise legacy seeds so the documented credential always works.
+      users[i] = { ...users[i], password: ADMIN_PASS, role: "admin" };
     }
+    localStorage.setItem("aurex_users", JSON.stringify(users));
+  } catch { /* noop */ }
+}
   } catch { /* noop */ }
 }
 
