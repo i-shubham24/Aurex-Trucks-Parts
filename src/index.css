@@ -1,0 +1,107 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #0b3d91;
+  --color-primary-dark: #082c6b;
+  --color-gold: #ffb800;
+  --color-gold-dark: #e09c00;
+  --color-navy: #0b3d91;
+  --color-navy-dark: #082c6b;
+  --color-ink: #111111;
+  --color-coal: #1a1a1a;
+  --color-steel: #4b5563;
+  --color-faint: #6b7280;
+  --color-line: #e5e7eb;
+  --color-line-dark: #d1d5db;
+  --color-mist: #f8f9fa;
+  --color-pale: #f1f3f5;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+button, a, summary, select, input[type="checkbox"], label { cursor: pointer; }
+input[type="text"], input[type="email"], input[type="password"], input[type="number"], input:not([type]), textarea { cursor: text; }
+body {
+  font-family: var(--font-sans);
+  background: #ffffff;
+  color: #111111;
+  font-size: 14px;
+  line-height: 20px;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+::selection { background: #0b3d91; color: #ffffff; }
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* Nav link underline slide */
+.u-slide { position: relative; }
+.u-slide::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -4px;
+  height: 3px; width: 100%;
+  background: #ffb800;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 220ms ease;
+}
+.u-slide:hover::after, .u-slide.active::after { transform: scaleX(1); }
+
+/* Button fill slide (fills logo-navy on hover) */
+.btn-fill { position: relative; overflow: hidden; isolation: isolate; }
+.btn-fill::before {
+  content: "";
+  position: absolute; inset: 0; z-index: -1;
+  background: #0b3d91;
+  transform: translateY(101%);
+  transition: transform 240ms ease;
+}
+.btn-fill:hover::before { transform: translateY(0); }
+.btn-fill-gold::before { background: #ffb800; }
+.btn-fill-gold:hover { color: #111111 !important; }
+.btn-fill-navy { position: relative; overflow: hidden; isolation: isolate; }
+.btn-fill-navy::before {
+  content: "";
+  position: absolute; inset: 0; z-index: -1;
+  background: #0b3d91;
+  transform: translateY(101%);
+  transition: transform 240ms ease;
+}
+.btn-fill-navy:hover::before { transform: translateY(0); }
+.btn-fill-navy:hover { color: #ffffff !important; }
+
+/* Card image zoom + red bottom rule reveal */
+.card-zoom img { transition: transform 320ms ease; }
+.card-zoom:hover img { transform: scale(1.06); }
+.card-rule { position: relative; }
+.card-rule::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: -1px;
+  height: 3px; width: 100%;
+  background: #0b3d91;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 260ms ease;
+}
+.card-rule:hover::after { transform: scaleX(1); }
+
+/* Hero slide crossfade */
+.hero-slide { transition: opacity 600ms ease; }
+
+/* Makes marquee ticker */
+.marquee-track { width: max-content; animation: marquee 32s linear infinite; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+.text-outline { -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.9); color: transparent; }
+.marquee a:hover > span:first-child { color: #ffb800; -webkit-text-stroke-color: #ffb800; }
+
+/* Hide scrollbar on touch-drag carousels (keeps native swipe) */
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; }
+  .marquee-track { animation: none !important; }
+  html { scroll-behavior: auto; }
+}
