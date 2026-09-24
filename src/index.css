@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #0b3d91;
-  --color-primary-dark: #082c6b;
+  --color-primary: #002049;
+  --color-primary-dark: #001633;
   --color-gold: #ffb800;
   --color-gold-dark: #e09c00;
-  --color-navy: #0b3d91;
-  --color-navy-dark: #082c6b;
+  --color-navy: #002049;
+  --color-navy-dark: #001633;
   --color-ink: #111111;
   --color-coal: #1a1a1a;
   --color-steel: #4b5563;
@@ -30,7 +30,7 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
 }
-::selection { background: #0b3d91; color: #ffffff; }
+::selection { background: #002049; color: #ffffff; }
 .tabular { font-variant-numeric: tabular-nums; }
 
 /* Nav link underline slide */
@@ -52,7 +52,7 @@ body {
 .btn-fill::before {
   content: "";
   position: absolute; inset: 0; z-index: -1;
-  background: #0b3d91;
+  background: #002049;
   transform: translateY(101%);
   transition: transform 240ms ease;
 }
@@ -63,7 +63,7 @@ body {
 .btn-fill-navy::before {
   content: "";
   position: absolute; inset: 0; z-index: -1;
-  background: #0b3d91;
+  background: #002049;
   transform: translateY(101%);
   transition: transform 240ms ease;
 }
@@ -79,7 +79,7 @@ body {
   position: absolute;
   left: 0; bottom: -1px;
   height: 3px; width: 100%;
-  background: #0b3d91;
+  background: #002049;
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 260ms ease;
@@ -94,7 +94,12 @@ body {
 .marquee:hover .marquee-track { animation-play-state: paused; }
 @keyframes marquee { to { transform: translateX(-50%); } }
 .text-outline { -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.9); color: transparent; }
+.text-outline-navy { -webkit-text-stroke: 1.5px #002049; color: transparent; }
 .marquee a:hover > span:first-child { color: #ffb800; -webkit-text-stroke-color: #ffb800; }
+
+/* Popup entrance */
+.popup-in { animation: popupin 320ms cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes popupin { from { opacity: 0; transform: scale(0.96) translateY(16px); } to { opacity: 1; transform: none; } }
 
 /* Hide scrollbar on touch-drag carousels (keeps native swipe) */
 .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
@@ -102,6 +107,6 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0.01ms !important; }
-  .marquee-track { animation: none !important; }
+  .marquee-track, .popup-in { animation: none !important; }
   html { scroll-behavior: auto; }
 }

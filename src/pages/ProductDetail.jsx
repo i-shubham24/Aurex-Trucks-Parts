@@ -1,14 +1,17 @@
 import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
 import { CheckCircle2, Minus, Phone, Plus, ShieldCheck, Truck } from "lucide-react";
-import { PRODUCTS, formatAUD } from "../data/products";
-import { COMPANY } from "../data/company";
+import { formatAUD } from "../data/products";
+import { useCatalog } from "../store/catalog";
+import { useCompany } from "../store/site";
 import { imgFor } from "../data/images";
 import { useCart } from "../store/cart";
 import ProductCard from "../components/ProductCard";
 
 export default function ProductDetail() {
   const { sku } = useParams();
+  const { products: PRODUCTS } = useCatalog();
+  const COMPANY = useCompany();
   const p = PRODUCTS.find((x) => x.sku === sku);
   const { add, compare, toggleCompare } = useCart();
   const [qty, setQty] = useState(1);
@@ -74,7 +77,7 @@ export default function ProductDetail() {
       <div className="mt-8 overflow-hidden rounded-md border border-line">
         <div className="flex border-b border-line bg-mist">
           {["specs", "fitment", "freight"].map((t) => (
-            <button key={t} onClick={() => setTab(t)} className={`px-5 py-3 text-sm font-bold capitalize transition-colors ${tab === t ? "bg-white text-navy shadow-[inset_0_2px_0_#0b3d91]" : "text-steel hover:text-ink"}`}>{t === "specs" ? "Specifications" : t === "fitment" ? "Fitment" : "Freight & Returns"}</button>
+            <button key={t} onClick={() => setTab(t)} className={`px-5 py-3 text-sm font-bold capitalize transition-colors ${tab === t ? "bg-white text-navy shadow-[inset_0_2px_0_#002049]" : "text-steel hover:text-ink"}`}>{t === "specs" ? "Specifications" : t === "fitment" ? "Fitment" : "Freight & Returns"}</button>
           ))}
         </div>
         <div className="bg-white p-5">
@@ -92,7 +95,7 @@ export default function ProductDetail() {
         <p className="text-sm">Fitted this part? Leave a review after delivery and help the next workshop. <span className="text-gray-300">Reviews appear after moderation.</span></p>
       </div>
       <h2 className="mb-4 mt-10 text-2xl font-extrabold tracking-tight">You May Also Need</h2>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 lg:gap-4">{related.map((r) => <ProductCard key={r.sku} p={r} />)}</div>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 lg:gap-4">{related.map((r) => <ProductCard key={r.sku} p={r} badges={false} />)}</div>
     </main>
   );
 }

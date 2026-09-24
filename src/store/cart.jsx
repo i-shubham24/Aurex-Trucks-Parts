@@ -17,12 +17,13 @@ export function CartProvider({ children }) {
   };
   const setQty = (sku, qty) => setLines((prev) => qty <= 0 ? prev.filter((l) => l.sku !== sku) : prev.map((l) => (l.sku === sku ? { ...l, qty: Math.min(99, qty) } : l)));
   const remove = (sku) => setLines((prev) => prev.filter((l) => l.sku !== sku));
+  const clear = () => setLines([]);
   const toggleCompare = (sku) => setCompare((c) => (c.includes(sku) ? c.filter((x) => x !== sku) : [...c, sku].slice(-3)));
   const clearCompare = () => setCompare([]);
   const total = useMemo(() => lines.reduce((s, l) => s + l.price * l.qty, 0), [lines]);
   const count = useMemo(() => lines.reduce((s, l) => s + l.qty, 0), [lines]);
 
-  return <CartCtx.Provider value={{ lines, add, setQty, remove, total, count, open, setOpen, compare, toggleCompare, clearCompare }}>{children}</CartCtx.Provider>;
+  return <CartCtx.Provider value={{ lines, add, setQty, remove, clear, total, count, open, setOpen, compare, toggleCompare, clearCompare }}>{children}</CartCtx.Provider>;
 }
 
 export const useCart = () => useContext(CartCtx);

@@ -17,11 +17,11 @@ export const NEWS = [
 ];
 
 export const TESTIMONIALS = [
-  { name: "Rudi Santoso", role: "Fleet Manager, Melbourne Transport", quote: "Aurex matched our body hardware in one call and had it on the dock next morning. Zero downtime on our linehaul fleet.", rating: 5, sku: "GL-25126" },
-  { name: "Sneha Kulkarni", role: "Production Lead, Cutwell Bodies", quote: "Door locking gear and keeper sets match our CAD specs flawlessly. No guessing left or right configurations.", rating: 5, sku: "GL-11113" },
-  { name: "Vikram Nair", role: "Maintenance Lead, AusTrans Logistics", quote: "30-day billing, bulk fleet rates, and ADR compliance certificates provided on every consignment without asking.", rating: 5, sku: "GL-19113H1" },
-  { name: "Maria Anggraini", role: "Workshop Owner, Geelong Heavy Repairs", quote: "Direct fit replacement powerpacks and hydraulic cylinders arrived within 24 hours. Saved our breakdown crew a full day.", rating: 5, sku: "A20-01S-06" },
-  { name: "Aarav Sharma", role: "Quality Head, Aeroworks Transport", quote: "Toolbox latches, locks, and cam seals all in one invoice. Ordered Friday, fitted and certified Monday morning.", rating: 5, sku: "GL-25126" },
+  { name: "Rudi Santoso", role: "Fleet Manager, Melbourne Transport", quote: "Aurex matched our body hardware in one call and had it on the dock next morning. Zero downtime on our linehaul fleet.", rating: 5, sku: "GL-25126", img: "https://randomuser.me/api/portraits/men/32.jpg" },
+  { name: "Sneha Kulkarni", role: "Production Lead, Cutwell Bodies", quote: "Door locking gear and keeper sets match our CAD specs flawlessly. No guessing left or right configurations.", rating: 5, sku: "GL-11113", img: "https://randomuser.me/api/portraits/women/44.jpg" },
+  { name: "Vikram Nair", role: "Maintenance Lead, AusTrans Logistics", quote: "30-day billing, bulk fleet rates, and ADR compliance certificates provided on every consignment without asking.", rating: 5, sku: "GL-19113H1", img: "https://randomuser.me/api/portraits/men/54.jpg" },
+  { name: "Maria Anggraini", role: "Workshop Owner, Geelong Heavy Repairs", quote: "Direct fit replacement powerpacks and hydraulic cylinders arrived within 24 hours. Saved our breakdown crew a full day.", rating: 5, sku: "A20-01S-06", img: "https://randomuser.me/api/portraits/women/68.jpg" },
+  { name: "Aarav Sharma", role: "Quality Head, Aeroworks Transport", quote: "Toolbox latches, locks, and cam seals all in one invoice. Ordered Friday, fitted and certified Monday morning.", rating: 5, sku: "GL-25126", img: "https://randomuser.me/api/portraits/men/75.jpg" },
 ];
 
 export const BRANDS = ["BEAUWAY", "GANLAND", "CAIYUAN", "AUREX"];

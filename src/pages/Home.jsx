@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, ClipboardCheck, Headset, Phone, Truck } from "lucide-react";
-import { CATEGORIES, PRODUCTS, formatAUD } from "../data/products";
-import { COMPANY, FAQS } from "../data/company";
+import { ArrowRight, BadgeCheck, ClipboardCheck, Headset, Phone, Truck } from "lucide-react";
+import { formatAUD } from "../data/products";
+import { useCatalog } from "../store/catalog";
+import { FAQS } from "../data/company";
+import { useCompany } from "../store/site";
 import { NEWS, TESTIMONIALS } from "../data/content";
 import { CAT_IMG, imgFor } from "../data/images";
 import { useCart } from "../store/cart";
@@ -48,7 +50,7 @@ function Hero() {
         </div>
         <div className="relative min-h-[260px] md:min-h-[380px]" key={`i-${i}`}>
           <div className="hero-slide absolute inset-y-4 right-6 left-16 rounded-full bg-gold/50 blur-[1px] md:left-24" />
-          <img src={s.img} alt="" className="hero-slide absolute inset-0 h-full w-full rounded-r-lg object-cover [clip-path:polygon(12%_0,100%_0,100%_100%,0_100%)]" />
+          <img src={s.img} alt={s.title} className="hero-slide absolute inset-0 h-full w-full rounded-r-lg object-cover [clip-path:polygon(12%_0,100%_0,100%_100%,0_100%)]" />
         </div>
       </div>
     </section>
@@ -56,12 +58,14 @@ function Hero() {
 }
 
 function Tiles() {
+  const { categories } = useCatalog();
+  const prices = { "tail-lifts": "From $3,850", "trailer-parts": "Priced on enquiry", "accessories": "From $4.50" };
   return (
     <section id="categories" className="mx-auto grid max-w-7xl scroll-mt-24 gap-4 px-4 pt-6 md:grid-cols-3">
-      {[{ c: CATEGORIES[0], price: "From $3,850", img: CAT_IMG["tail-lifts"] }, { c: CATEGORIES[1], price: "Priced on enquiry", img: CAT_IMG["trailer-parts"] }, { c: CATEGORIES[2], price: "From $4.50", img: CAT_IMG["accessories"] }].map(({ c, price, img }) => (
+      {categories.slice(0, 3).map((c) => (
         <Link key={c.slug} to={`/shop/${c.slug}`} className="card-zoom group grid grid-cols-2 items-center overflow-hidden rounded-md border border-line bg-mist transition-colors hover:border-gold">
-          <span className="p-4 md:p-5"><span className="block text-xl font-extrabold leading-tight md:text-2xl">{c.name}</span><span className="tabular mt-1.5 block text-sm font-extrabold text-primary">{price}</span><span className="mt-2.5 inline-block bg-mist px-3 py-1.5 text-xs font-bold transition-colors group-hover:bg-gold">{c.count} lines →</span></span>
-          <span className="block h-full min-h-[110px] overflow-hidden bg-mist"><img src={img} alt={c.name} loading="lazy" className="h-full w-full object-cover" /></span>
+          <span className="p-4 md:p-5"><span className="block text-xl font-extrabold leading-tight md:text-2xl">{c.name}</span><span className="tabular mt-1.5 block text-sm font-extrabold text-primary">{prices[c.slug] || `${c.count} lines`}</span><span className="mt-2.5 inline-block bg-mist px-3 py-1.5 text-xs font-bold transition-colors group-hover:bg-gold">{c.count} lines →</span></span>
+          <span className="block h-full min-h-[110px] overflow-hidden bg-mist">{CAT_IMG[c.slug] && <img src={CAT_IMG[c.slug]} alt={c.name} loading="lazy" className="h-full w-full object-cover" />}</span>
         </Link>
       ))}
     </section>
@@ -76,9 +80,10 @@ const TABS = [
 
 function Arrivals() {
   const [tab, setTab] = useState("best");
-  const best = ["TL-20-2450-2400", "TL-15-2450-2400", "GL-25126", "GL-15616", "PU-12V-22KW", "TL-20-2450-2200", "A20-01S-06", "GL-16513", "GL-19120", "GL-23116"].map((s) => PRODUCTS.find((p) => p.sku === s)).filter(Boolean);
-  const lifts = PRODUCTS.filter((p) => p.category === "tail-lifts").slice(0, 5);
-  const accs = PRODUCTS.filter((p) => p.category === "accessories").slice(0, 10);
+  const { products } = useCatalog();
+  const best = ["TL-20-2450-2400", "TL-15-2450-2400", "GL-25126", "GL-15616", "PU-12V-22KW", "TL-20-2450-2200", "A20-01S-06", "GL-16513", "GL-19120", "GL-23116"].map((s) => products.find((p) => p.sku === s)).filter(Boolean);
+  const lifts = products.filter((p) => p.category === "tail-lifts").slice(0, 5);
+  const accs = products.filter((p) => p.category === "accessories").slice(0, 10);
   const items = tab === "best" ? best : tab === "tail-lifts" ? lifts : accs;
   return (
     <section id="bestsellers" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-10">
@@ -90,7 +95,7 @@ function Arrivals() {
           ))}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">{items.map((p) => <ProductCard key={p.sku} p={p} bare joined />)}</div>
+      <div className="grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">{items.map((p) => <ProductCard key={p.sku} p={p} bare joined badges={false} />)}</div>
     </section>
   );
 }
@@ -121,8 +126,9 @@ function SubTiles() {
 
 function FeatureRow() {
   const { add } = useCart();
-  const f = PRODUCTS.find((p) => p.sku === "GL-25126");
-  const rest = ["GL-15616", "GL-23116", "GL-ASJ04", "GL-19120", "GL-19117"].map((s) => PRODUCTS.find((p) => p.sku === s)).filter(Boolean);
+  const { products } = useCatalog();
+  const f = products.find((p) => p.sku === "GL-25126");
+  const rest = ["GL-15616", "GL-23116", "GL-ASJ04", "GL-19120", "GL-19117"].map((s) => products.find((p) => p.sku === s)).filter(Boolean);
   if (!f) return null;
   return (
     <section id="cat-accessories" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-10">
@@ -135,7 +141,7 @@ function FeatureRow() {
           <p className="tabular mt-1.5 text-xl font-extrabold text-primary">{formatAUD(f.price)}</p>
           <button onClick={() => add(f)} className="mt-2.5 w-full rounded bg-gold py-2 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white">Add to Cart</button>
         </div>
-        <div className="grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5 md:col-span-2">{rest.map((p) => <ProductCard key={p.sku} p={p} joined />)}</div>
+        <div className="grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5 md:col-span-2">{rest.map((p) => <ProductCard key={p.sku} p={p} joined badges={false} />)}</div>
       </div>
       <span id="cat-tail-lifts" className="scroll-mt-24" />
     </section>
@@ -144,18 +150,19 @@ function FeatureRow() {
 
 function LiftsBand() {
   const ref = useRef(null);
-  const items = PRODUCTS.filter((p) => p.category === "tail-lifts");
+  const { products } = useCatalog();
+  const items = products.filter((p) => p.category === "tail-lifts");
   return (
     <section className="mt-10 bg-ink py-10 text-white">
       <div className="mx-auto max-w-7xl px-4">
         <div className="mb-4 flex items-end justify-between gap-4">
-          <div><p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">Tail lifts</p><h2 className="mt-1 text-xl font-extrabold tracking-tight md:text-[22px]">Sized for Aussie Bodies</h2></div>
+          <div><p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-gold"><span className="inline-block h-4 w-1.5 bg-gold" />Tail lifts</p><h2 className="mt-1.5 text-xl font-extrabold tracking-tight text-white md:text-[22px]">Sized for Aussie Bodies</h2></div>
           <div className="flex shrink-0 gap-2">
-            <button aria-label="Previous" onClick={() => ref.current?.scrollBy({ left: -480, behavior: "smooth" })} className="grid h-9 w-9 place-items-center rounded-full border border-gray-600 transition-colors hover:border-gold hover:text-gold">←</button>
+            <button aria-label="Previous" onClick={() => ref.current?.scrollBy({ left: -480, behavior: "smooth" })} className="grid h-9 w-9 place-items-center rounded-full border border-gray-600 text-white transition-colors hover:border-gold hover:text-gold">←</button>
             <button aria-label="Next" onClick={() => ref.current?.scrollBy({ left: 480, behavior: "smooth" })} className="grid h-9 w-9 place-items-center rounded-full bg-gold font-bold text-ink transition-colors hover:bg-white">→</button>
           </div>
         </div>
-        <div ref={ref} className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto pb-1">{items.map((p) => <div key={p.sku} className="w-[270px] shrink-0 snap-start md:w-[300px]"><ProductCard key={p.sku} p={p} bare /></div>)}</div>
+        <div ref={ref} className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto pb-1">{items.map((p) => <div key={p.sku} className="w-[270px] shrink-0 snap-start md:w-[300px]"><ProductCard key={p.sku} p={p} bare badges={false} /></div>)}</div>
       </div>
     </section>
   );
@@ -163,7 +170,9 @@ function LiftsBand() {
 
 function TrailerBlock() {
   const [all, setAll] = useState(false);
-  const parts = PRODUCTS.filter((p) => p.category === "trailer-parts");
+  const { products } = useCatalog();
+  const COMPANY = useCompany();
+  const parts = products.filter((p) => p.category === "trailer-parts");
   const shown = all ? parts : parts.slice(0, 10);
   return (
     <section id="cat-trailer-parts" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-10">
@@ -174,12 +183,13 @@ function TrailerBlock() {
         </div>
         <button onClick={() => setAll(!all)} className="btn-fill border border-ink px-5 py-2.5 text-sm font-bold transition-colors hover:text-white">{all ? "Show Less" : `View All ${parts.length} Trailer Parts →`}</button>
       </div>
-      <div className="grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">{shown.map((p) => <ProductCard key={p.sku} p={p} joined />)}</div>
+      <div className="grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">{shown.map((p) => <ProductCard key={p.sku} p={p} joined badges={false} />)}</div>
     </section>
   );
 }
 
 function CounterBand() {
+  const COMPANY = useCompany();
   return (
     <section className="mt-10 bg-mist">
       <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 py-8 md:grid-cols-2">
@@ -204,6 +214,7 @@ function CounterBand() {
 const TAG_LINKS = { "Tail Lifts": "/shop/tail-lifts", "Trailer Parts": "/shop/trailer-parts", "Accessories": "/shop/accessories", "Tool Boxes": "/shop/accessories" };
 
 function Blog() {
+  const COMPANY = useCompany();
   const posts = NEWS.slice(0, 4);
   const [lead, ...rest] = posts;
   return (
@@ -216,7 +227,7 @@ function Blog() {
         <span className="font-mono text-[11px] font-bold text-faint">N01 — N{String(posts.length).padStart(2, "0")}</span>
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
-        <Link to={TAG_LINKS[lead.tag] || "/shop"} className="card-zoom group grid border-2 border-ink bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(11,61,145,0.18)]">
+        <Link to={TAG_LINKS[lead.tag] || "/shop"} className="card-zoom group grid border-2 border-ink bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(0,32,73,0.18)]">
           <span className="relative block overflow-hidden bg-mist">
             <img src={lead.img} alt={lead.title} loading="lazy" className="aspect-[16/9] w-full object-cover" />
             <span className="absolute left-3 top-3 bg-gold px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-ink">{lead.tag}</span>
@@ -231,7 +242,7 @@ function Blog() {
         </Link>
         <div className="grid content-start gap-4">
           {rest.map((n, k) => (
-            <Link key={n.title} to={TAG_LINKS[n.tag] || "/shop"} className="card-zoom group grid grid-cols-[140px_minmax(0,1fr)] border-2 border-ink bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(11,61,145,0.18)] sm:grid-cols-[200px_minmax(0,1fr)]">
+            <Link key={n.title} to={TAG_LINKS[n.tag] || "/shop"} className="card-zoom group grid grid-cols-[140px_minmax(0,1fr)] border-2 border-ink bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(0,32,73,0.18)] sm:grid-cols-[200px_minmax(0,1fr)]">
               <span className="relative block min-h-full overflow-hidden bg-mist">
                 <img src={n.img} alt={n.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
               </span>
@@ -244,9 +255,9 @@ function Blog() {
               </span>
             </Link>
           ))}
-          <a href={COMPANY.phoneHref} className="flex items-center justify-between gap-3 bg-ink px-5 py-4 text-white transition-colors hover:bg-navy">
-            <span className="text-[15px] font-extrabold">After something older? Ask the counter.</span>
-            <span className="shrink-0 font-mono text-[11px] font-bold text-gold">{COMPANY.phone}</span>
+          <a href={COMPANY.phoneHref} className="flex items-center justify-between gap-3 rounded-md border border-gold bg-gold/15 px-5 py-4 transition-colors hover:bg-gold/25">
+            <span className="text-[15px] font-extrabold text-ink">After something older? Ask the counter.</span>
+            <span className="tabular shrink-0 font-mono text-[11px] font-bold text-navy">{COMPANY.phone}</span>
           </a>
         </div>
       </div>
@@ -254,31 +265,38 @@ function Blog() {
   );
 }
 
-function Makes() {
+function MakesMarquee() {
   const makes = ["VOLVO", "SCANIA", "HINO", "ISUZU", "KENWORTH", "MACK", "IVECO", "DAF", "FUSO", "UD TRUCKS", "MAN", "MERCEDES-BENZ"];
   const row = [...makes, ...makes];
   return (
-    <section className="mt-12 overflow-hidden bg-ink py-8 text-white">
+    <>
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4">
-        <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-gold">Truck makes we fit</p>
+        <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.24em] text-gold"><span className="inline-block h-4 w-1.5 bg-gold" />Truck makes we fit</p>
         <Link to="/shop" className="text-[13px] font-bold text-gray-300 transition-colors hover:text-gold">Shop all parts →</Link>
       </div>
       <div className="marquee mt-5 overflow-hidden">
         <div className="marquee-track flex items-center">
           {row.map((m, k) => (
-            <Link key={`${m}-${k}`} to="/shop" className="flex shrink-0 items-center" aria-hidden={k >= makes.length}>
-              <span className={`whitespace-nowrap px-6 text-3xl font-extrabold tracking-[0.08em] transition-colors md:text-4xl ${k % 2 ? "text-outline" : ""}`}>{m}</span>
-              <span className="h-2.5 w-2.5 shrink-0 bg-gold" />
-            </Link>
+            k < makes.length ? (
+              <Link key={`${m}-${k}`} to="/shop" className="flex shrink-0 items-center">
+                <span className={`whitespace-nowrap px-6 text-3xl font-extrabold tracking-[0.08em] transition-colors md:text-4xl ${k % 2 ? "text-outline" : "text-white"}`}>{m}</span>
+                <span className="h-2.5 w-2.5 shrink-0 bg-gold" />
+              </Link>
+            ) : (
+              <span key={`${m}-${k}`} aria-hidden="true" className="flex shrink-0 items-center">
+                <span className={`whitespace-nowrap px-6 text-3xl font-extrabold tracking-[0.08em] md:text-4xl ${k % 2 ? "text-outline" : "text-white"}`}>{m}</span>
+                <span className="h-2.5 w-2.5 shrink-0 bg-gold" />
+              </span>
+            )
           ))}
         </div>
       </div>
-      <p className="mx-auto mt-5 max-w-7xl px-4 font-mono text-[11px] uppercase tracking-[0.14em] text-gray-400">One catalogue — every badge. VIN-matched before dispatch.</p>
-    </section>
+    </>
   );
 }
 
 function Trust() {
+  const COMPANY = useCompany();
   const items = [
     [Truck, "Daily Freight Australia Wide", "Order by 2pm. Free road freight over $500."],
     [ClipboardCheck, "Quotes in 4 Business Hours", "Send VIN or photos for an exact price."],
@@ -312,21 +330,26 @@ function Reviews() {
   const r = items[i];
   const initials = r.name.split(" ").map((w) => w[0]).slice(0, 2).join("");
   return (
-    <section id="reviews" className="scroll-mt-24 bg-ink py-12 text-white">
-      <div className="mx-auto max-w-4xl px-4 text-center" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
-        <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-gold">Reviews</p>
-        <h2 className="mt-1 text-2xl font-extrabold tracking-tight md:text-[28px]">Trusted at Counters Across the Country</h2>
+    <section id="reviews" className="mt-12 scroll-mt-24 overflow-hidden bg-ink pb-12 pt-10 text-white">
+      <MakesMarquee />
+      <div className="mx-auto mt-8 max-w-7xl border-t border-white/10" />
+      <div className="mx-auto max-w-4xl px-4 pt-8 text-center" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+        <p className="flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-[0.24em] text-gold"><span className="inline-block h-4 w-1.5 bg-gold" />Reviews</p>
+        <h2 className="mt-1.5 text-2xl font-extrabold tracking-tight text-white md:text-[28px]">Trusted at Counters Across the Country</h2>
         <div key={i} className="mt-6">
           <p className="font-serif text-6xl leading-none text-gold">“</p>
-          <blockquote className="-mt-4 text-xl font-medium leading-8 md:text-2xl md:leading-10">{r.quote}</blockquote>
+          <blockquote className="-mt-4 text-xl font-medium leading-8 text-white md:text-2xl md:leading-10">{r.quote}</blockquote>
           <div className="mt-5 flex items-center justify-center gap-1 text-gold">{"★★★★★"}</div>
           <p className="mt-3 flex items-center justify-center gap-2.5">
-            <span className="grid h-10 w-10 place-items-center rounded-full bg-gold text-sm font-extrabold text-ink">{initials}</span>
-            <span className="text-left"><span className="block text-sm font-bold">{r.name}</span><span className="block text-xs text-gray-400">{r.role}</span></span>
+            <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full bg-gold text-sm font-extrabold text-ink ring-2 ring-gold/60">
+              {initials}
+              {r.img && <img src={r.img} alt={r.name} loading="lazy" onError={(e) => e.currentTarget.remove()} className="absolute inset-0 h-full w-full object-cover" />}
+            </span>
+            <span className="text-left"><span className="block text-sm font-bold text-white">{r.name}</span><span className="block text-xs text-gray-400">{r.role}</span></span>
           </p>
         </div>
         <div className="mt-7 flex items-center justify-center gap-4">
-          <button onClick={() => setI((i + items.length - 1) % items.length)} aria-label="Previous review" className="grid h-9 w-9 place-items-center rounded-full border border-gray-600 transition-colors hover:border-gold hover:text-gold">←</button>
+          <button onClick={() => setI((i + items.length - 1) % items.length)} aria-label="Previous review" className="grid h-9 w-9 place-items-center rounded-full border border-gray-600 text-white transition-colors hover:border-gold hover:text-gold">←</button>
           <div className="flex gap-1.5">
             {items.map((x, k) => <button key={x.name} onClick={() => setI(k)} aria-label={`Review ${k + 1}`} className={`h-2 rounded-full transition-all ${k === i ? "w-7 bg-gold" : "w-2 bg-gray-600 hover:bg-gray-400"}`} />)}
           </div>
@@ -339,10 +362,11 @@ function Reviews() {
 
 function Faq() {
   const [open, setOpen] = useState(0);
+  const COMPANY = useCompany();
   return (
     <section id="faq" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-12">
       <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
-        <div className="lg:sticky lg:top-24 lg:self-start">
+        <div className="lg:sticky lg:top-44 lg:self-start">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">FAQ</p>
           <h2 className="mt-1 text-2xl font-extrabold tracking-tight md:text-[28px]">Straight Answers</h2>
           <p className="mt-2 text-sm leading-6 text-steel">The questions we hear at the counter every week. Anything else, call and ask.</p>
@@ -382,7 +406,6 @@ export default function Home() {
       <CounterBand />
       <Blog />
       <Trust />
-      <Makes />
       <Reviews />
       <Faq />
     </main>

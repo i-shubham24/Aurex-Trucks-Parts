@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { GitCompareArrows, Phone, ShoppingCart, Star } from "lucide-react";
 import { formatAUD } from "../data/products";
-import { COMPANY } from "../data/company";
+import { useCompany } from "../store/site";
 import { imgFor } from "../data/images";
 import { useCart } from "../store/cart";
 
@@ -43,14 +43,15 @@ function CompareBtn({ p }) {
   );
 }
 
-export default function ProductCard({ p, joined }) {
+export default function ProductCard({ p, joined, badges = true }) {
   const { add } = useCart();
+  const COMPANY = useCompany();
   const enquiry = p.price === null;
   return (
-    <div className={`card-zoom group flex h-full flex-col bg-white transition-all duration-200 hover:-translate-y-1 hover:border-navy hover:shadow-[0_14px_30px_rgba(11,61,145,0.18)] ${joined ? "" : "rounded-md border border-line"}`}>
+    <div className={`card-zoom group flex h-full flex-col bg-white transition-all duration-200 hover:-translate-y-1 hover:border-navy hover:shadow-[0_14px_30px_rgba(0,32,73,0.18)] ${joined ? "" : "rounded-md border border-line"}`}>
       <Link to={`/product/${p.sku}`} className={`relative block aspect-[4/3] overflow-hidden bg-mist ${joined ? "" : "rounded-t-[5px]"}`}>
         <PartVisual p={p} />
-        <span className="absolute left-2 top-2"><StatusBadge p={p} /></span>
+        {badges && <span className="absolute left-2 top-2"><StatusBadge p={p} /></span>}
         {/* hover quick-action bar: slim solid strip that slides up from below */}
         {!enquiry ? (
           <span className="absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-between gap-2 bg-navy px-3 py-1.5 transition-transform duration-200 group-hover:translate-y-0 group-focus-within:translate-y-0">

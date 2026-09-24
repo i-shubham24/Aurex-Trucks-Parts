@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
-import { COMPANY } from "../data/company";
+import { useCompany } from "../store/site";
 
 export default function Footer() {
+  const COMPANY = useCompany();
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
   return (
@@ -21,7 +22,7 @@ export default function Footer() {
         <div>
           <p className="text-sm font-bold">Subscribe Newsletter To Get Updated</p>
           <form className="mt-3 flex" onSubmit={(e) => { e.preventDefault(); setDone(true); }}>
-            <input value={email} onChange={(e) => setEmail(e.target.value)} required type="email" placeholder="Enter your email address" className="h-10 w-full rounded-l-md border border-line-dark px-3 text-sm outline-none placeholder:text-faint focus:border-gold" />
+            <input value={email} onChange={(e) => setEmail(e.target.value)} required type="email" maxLength={120} placeholder="Enter your email address" className="h-10 w-full rounded-l-md border border-line-dark px-3 text-sm outline-none placeholder:text-faint focus:border-gold" />
             <button className="h-10 shrink-0 rounded-r-md bg-gold px-4 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white">Subscribe</button>
           </form>
           {done ? <p className="mt-2 text-[13px] font-semibold">Thanks. You are subscribed.</p> : <p className="mt-2 text-xs text-faint">We never share your email with third parties.</p>}

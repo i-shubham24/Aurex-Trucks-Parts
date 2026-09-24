@@ -1,23 +1,28 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
-import { CATEGORIES, PRODUCTS } from "../data/products";
-import { COMPANY } from "../data/company";
+import { useCatalog } from "../store/catalog";
+import { useCompany } from "../store/site";
 import ProductCard from "../components/ProductCard";
 
-const SLUGS = ["tail-lifts", "trailer-parts", "accessories"];
-
 export default function Shop({ preset }) {
+  const { products: PRODUCTS, categories: CATEGORIES } = useCatalog();
+  const COMPANY = useCompany();
   const { slug: paramSlug } = useParams();
   const [params] = useSearchParams();
   const slug = preset || paramSlug || null;
   const cat = slug ? CATEGORIES.find((c) => c.slug === slug) : null;
+  const urlQ = params.get("q") || "";
 
-  const subs = useMemo(() => [...new Set(PRODUCTS.filter((p) => !slug || p.category === slug).map((p) => p.sub))], [slug]);
-  const [q, setQ] = useState(params.get("q") || "");
+  const subs = useMemo(() => [...new Set(PRODUCTS.filter((p) => !slug || p.category === slug).map((p) => p.sub))], [slug, PRODUCTS]);
+  const [q, setQ] = useState(urlQ);
   const [sub, setSub] = useState("All");
   const [avail, setAvail] = useState("All");
   const [sort, setSort] = useState("featured");
+
+  /* Keep the filter box in sync when arriving via header search (?q=) while already on /shop. */
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { setQ(urlQ); setSub("All"); }, [urlQ, slug]);
 
   const items = useMemo(() => {
     const query = (params.get("q") || q).toLowerCase().trim();
@@ -80,6 +85,7 @@ export default function Shop({ preset }) {
 
 export function CategoryByParam() {
   const { slug } = useParams();
-  if (SLUGS.includes(slug)) return <Shop key={slug} preset={slug} />;
+  const { categories } = useCatalog();
+  if (categories.some((c) => c.slug === slug)) return <Shop key={slug} preset={slug} />;
   return <main className="mx-auto max-w-7xl px-4 py-16"><p>Shelf not found. <Link to="/shop" className="font-bold text-navy underline">Shop all</Link></p></main>;
 }

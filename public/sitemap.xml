@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://aurextruckparts.com.au/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://aurextruckparts.com.au/shop</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://aurextruckparts.com.au/shop/tail-lifts</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://aurextruckparts.com.au/shop/trailer-parts</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://aurextruckparts.com.au/shop/accessories</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://aurextruckparts.com.au/about</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://aurextruckparts.com.au/contact</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://aurextruckparts.com.au/track</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://aurextruckparts.com.au/policies</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://aurextruckparts.com.au/login</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://aurextruckparts.com.au/signup</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+</urlset>

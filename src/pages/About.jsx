@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, BadgeCheck, ClipboardCheck, Phone, Truck } from "lucide-react";
-import { COMPANY } from "../data/company";
+import { useCompany } from "../store/site";
 
 const WEB = (n) => `/images/web/${n}.jpg`;
 
 export default function About() {
+  const COMPANY = useCompany();
   return (
     <main>
       <section className="mx-auto max-w-7xl px-4 pt-6">
@@ -28,7 +29,7 @@ export default function About() {
 
       <section className="mt-10 bg-ink py-8 text-white">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 md:grid-cols-4">
-          {[["36", "Approved lines"], ["3", "Categories"], [" VIC", "Counter stock"], ["4hr", "Quote turnaround"]].map(([n, l]) => (
+          {[["36", "Approved lines"], ["3", "Categories"], ["1", "VIC counter"], ["4hr", "Quote turnaround"]].map(([n, l]) => (
             <div key={l} className="border-l-2 border-gold pl-4">
               <p className="tabular text-3xl font-extrabold md:text-4xl">{n}</p>
               <p className="mt-1 text-[13px] text-gray-300">{l}</p>
@@ -69,15 +70,15 @@ export default function About() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 pt-10">
-        <div className="grid gap-4 rounded-md bg-ink p-6 text-white md:grid-cols-2 md:p-8">
+        <div className="grid items-center gap-5 rounded-md bg-ink p-6 text-white md:grid-cols-2 md:p-8">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">Visit the counter</p>
-            <p className="mt-2 text-xl font-extrabold">{COMPANY.address}</p>
+            <p className="mt-2 text-xl font-extrabold md:text-2xl">{COMPANY.address}</p>
             <p className="mt-1 text-sm text-gray-300">{COMPANY.hours}</p>
           </div>
-          <div className="flex flex-col justify-center gap-3 sm:flex-row md:justify-end">
-            <a href={COMPANY.phoneHref} className="rounded bg-gold px-6 py-3 text-center text-sm font-bold text-ink transition-colors hover:bg-white">Call {COMPANY.phone}</a>
-            <Link to="/contact" className="rounded border border-gray-500 px-6 py-3 text-center text-sm font-bold text-white transition-colors hover:border-gold hover:text-gold">Send an Enquiry</Link>
+          <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center md:justify-end">
+            <a href={COMPANY.phoneHref} className="inline-flex h-[52px] items-center justify-center rounded bg-gold px-6 text-sm font-bold text-ink transition-colors hover:bg-white">Call {COMPANY.phone}</a>
+            <Link to="/contact" className="inline-flex h-[52px] items-center justify-center rounded border border-gray-500 px-6 text-sm font-bold text-white transition-colors hover:border-gold hover:text-gold">Send an Enquiry</Link>
           </div>
         </div>
       </section>

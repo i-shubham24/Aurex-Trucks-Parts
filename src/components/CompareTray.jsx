@@ -1,15 +1,17 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { GitCompareArrows, ShoppingCart, Star, Trash2, X } from "lucide-react";
-import { PRODUCTS, formatAUD } from "../data/products";
-import { COMPANY } from "../data/company";
+import { formatAUD } from "../data/products";
+import { useCompany } from "../store/site";
 import { imgFor } from "../data/images";
 import { useCart } from "../store/cart";
+import { useCatalog } from "../store/catalog";
 
 export default function CompareTray() {
   const { compare, toggleCompare, clearCompare, add } = useCart();
+  const COMPANY = useCompany();
+  const { products: PRODUCTS } = useCatalog();
   const [open, setOpen] = useState(false);
-  const items = useMemo(() => compare.map((s) => PRODUCTS.find((p) => p.sku === s)).filter(Boolean), [compare]);
+  const items = useMemo(() => compare.map((s) => PRODUCTS.find((p) => p.sku === s)).filter(Boolean), [compare, PRODUCTS]);
   if (items.length === 0) return null;
 
   const priced = items.filter((p) => p.price != null);
