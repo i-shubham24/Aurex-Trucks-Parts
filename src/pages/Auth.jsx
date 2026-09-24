@@ -119,6 +119,11 @@ export function AuthCard({ mode: initial = "login" }) {
 
   return (
     <div className="p-4 sm:p-5">
+      <div className="mb-3 flex items-center gap-2.5 lg:hidden">
+        <img src="/logo.png" alt="Aurex Truck Parts" className="h-9 w-auto" />
+        <span className="h-7 w-px bg-line" aria-hidden="true" />
+        <p className="text-[10px] font-bold uppercase leading-[1.5] tracking-[0.2em] text-navy">Trade<br />accounts</p>
+      </div>
       <div className="flex items-center justify-between gap-3">
         <div className="inline-flex rounded-full bg-mist p-1">
           <button type="button" onClick={() => switchTab("login")} className={`rounded-full px-4 py-1 text-[13px] font-extrabold transition ${tab === "login" ? "bg-ink text-white shadow" : "text-steel hover:text-ink"}`}>Login</button>
@@ -222,11 +227,9 @@ function BrandPanel() {
       <img src="/images/web/hero-roadtrain.jpg" alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-40" />
       <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent" />
       <div className="relative flex items-center gap-3">
-        <span className="grid h-10 w-10 place-items-center rounded-full bg-gold font-mono text-xs font-extrabold text-ink">AT</span>
-        <div>
-          <p className="text-sm font-extrabold leading-none">Aurex Truck Parts</p>
-          <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.2em] text-gold">Trade accounts</p>
-        </div>
+        <img src="/logo.png" alt="Aurex Truck Parts" className="h-14 w-auto shrink-0 brightness-0 invert" />
+        <span className="h-10 w-px shrink-0 bg-white/15" aria-hidden="true" />
+        <p className="text-[11px] font-bold uppercase leading-[1.5] tracking-[0.2em] text-gold">Trade<br />accounts</p>
       </div>
       <div className="relative">
         <p className="max-w-xs text-[26px] font-extrabold leading-[1.1] tracking-tight">Counter pricing, unlocked for your fleet.</p>
