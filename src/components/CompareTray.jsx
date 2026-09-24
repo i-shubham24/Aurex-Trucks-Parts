@@ -45,7 +45,7 @@ export default function CompareTray() {
     <>
       <div className="fixed bottom-4 left-1/2 z-[60] flex max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-2 rounded-full border border-white/10 bg-ink py-2 pl-2 pr-2 text-white shadow-2xl">
         <span className="flex -space-x-2 pl-2">{items.map((p) => <span key={p.sku} className="grid h-8 w-8 place-items-center rounded-full border border-white/20 bg-white/10 text-[10px] font-black">{p.sku.slice(0, 2)}</span>)}</span>
-        <span className="px-1 text-[13px] font-bold">Compare ({items.length}/3)</span>
+        <span className="hidden px-1 text-[13px] font-bold min-[420px]:inline">Compare ({items.length}/3)</span>
         <button onClick={() => setOpen(true)} className="rounded-full bg-gold px-5 py-2 text-[13px] font-bold text-ink transition-colors hover:bg-white">Compare</button>
         <button onClick={clearCompare} className="p-2 text-white/50 hover:text-white" aria-label="Clear compare"><X size={15} /></button>
       </div>

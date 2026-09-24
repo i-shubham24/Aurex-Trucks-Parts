@@ -73,8 +73,8 @@ export default function Header() {
       )}
       {/* ── Main header bar (yellow) — logo / search / contact / account / cart ── */}
       <div id="top" className="bg-gold text-ink">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-3">
-          <Link to="/" className="shrink-0 rounded bg-white px-2 py-1"><img src="/logo.jpeg" alt="Aurex Truck Parts" className="h-10 w-auto" /></Link>
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-2">
+          <Link to="/" className="shrink-0"><img src="/logo.png" alt="Aurex Truck Parts" className="h-16 w-auto" /></Link>
           <div className="hidden min-w-0 flex-1 md:flex md:justify-end"><div className="w-full max-w-md"><SearchBox /></div></div>
           <a href={COMPANY.phoneHref} className="group hidden shrink-0 items-center gap-2 xl:flex">
             <Phone size={26} className="text-primary transition-colors group-hover:text-navy" />
@@ -82,9 +82,8 @@ export default function Header() {
           </a>
           <div className="ml-auto flex shrink-0 items-center gap-2.5">
             {user ? (
-              <Link to="/profile" aria-label="Profile" title={user.name} className="flex h-11 items-center gap-2 rounded-md bg-ink px-4 text-white transition-colors hover:bg-navy">
-                <span className="text-lg font-extrabold leading-none text-gold">{(user.name || "A")[0].toUpperCase()}</span>
-                <span className="hidden max-w-24 truncate text-sm font-extrabold sm:block">{(user.name || "Trader").split(" ")[0]}</span>
+              <Link to="/profile" aria-label="Profile" title={user.name} className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-ink text-lg font-extrabold leading-none text-gold transition-colors hover:bg-navy">
+                {(user.name || "A")[0].toUpperCase()}
               </Link>
             ) : (
               <Link to="/login" aria-label="Account" className="grid h-11 w-11 place-items-center rounded-md border border-ink/30 text-ink transition-colors hover:border-navy hover:text-navy"><User size={20} /></Link>

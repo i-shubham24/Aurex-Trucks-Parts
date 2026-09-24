@@ -94,7 +94,6 @@ body {
 .marquee:hover .marquee-track { animation-play-state: paused; }
 @keyframes marquee { to { transform: translateX(-50%); } }
 .text-outline { -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.9); color: transparent; }
-.text-outline-navy { -webkit-text-stroke: 1.5px #002049; color: transparent; }
 .marquee a:hover > span:first-child { color: #ffb800; -webkit-text-stroke-color: #ffb800; }
 
 /* Popup entrance */

@@ -50,7 +50,14 @@ export function SiteProvider({ children }) {
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
-export const useSite = () => useContext(Ctx);
+export const useSite = () => {
+  const ctx = useContext(Ctx);
+  if (!ctx && import.meta.env?.DEV) console.error("[site] useSite rendered without SiteProvider.");
+  return ctx ?? {
+    settings: DEFAULT_SETTINGS, setSettings: () => {}, promos: [], setPromos: () => {},
+    enquiries: [], addEnquiry: () => null, setEnquiryStatus: () => {}, resetSite: () => {},
+  };
+};
 export { DEFAULT_SETTINGS };
 
 /* Live company card: admin settings merged over seed defaults. */

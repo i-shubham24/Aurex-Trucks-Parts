@@ -69,4 +69,13 @@ export function CatalogProvider({ children }) {
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
-export const useCatalog = () => useContext(Ctx);
+export const useCatalog = () => {
+  const ctx = useContext(Ctx);
+  if (!ctx && import.meta.env?.DEV) console.error("[catalog] useCatalog rendered without CatalogProvider.");
+  return ctx ?? {
+    products: SEED_PRODUCTS, categories: SEED_CATS,
+    addProduct: () => ({ ok: false, msg: "Catalogue unavailable. Reload and try again." }),
+    updateProduct: () => {}, deleteProduct: () => {}, resetCatalog: () => {},
+    updateCategory: () => {}, addCategory: () => ({ ok: false }), deleteCategory: () => {}, resetCategories: () => {},
+  };
+};

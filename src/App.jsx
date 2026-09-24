@@ -7,6 +7,7 @@ import { CatalogProvider } from "./store/catalog";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import PageMeta from "./components/PageMeta";
+import ErrorBoundary from "./components/ErrorBoundary";
 import CartDrawer from "./components/CartDrawer";
 import CompareTray from "./components/CompareTray";
 import PromoPopup from "./components/PromoPopup";
@@ -122,7 +123,9 @@ export default function App() {
     <CatalogProvider>
     <CartProvider>
       <BrowserRouter>
-        <Shell />
+        <ErrorBoundary>
+          <Shell />
+        </ErrorBoundary>
       </BrowserRouter>
     </CartProvider>
     </CatalogProvider>

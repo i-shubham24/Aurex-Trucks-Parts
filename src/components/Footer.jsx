@@ -11,7 +11,7 @@ export default function Footer() {
     <footer className="mt-12 bg-white">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 text-sm md:grid-cols-3">
         <div>
-          <img src="/logo.jpeg" alt="Aurex Truck Parts" className="h-12 w-auto" />
+          <img src="/logo.jpeg" alt="Aurex Truck Parts" className="h-20 w-auto" />
           <p className="mt-3 max-w-xs text-[13px] leading-5 text-steel">VIN matched catalogue for Aussie fleets. Tail lifts, trailer parts and accessories, stocked in Campbellfield and freighted Australia wide.</p>
           <a href={COMPANY.phoneHref} className="mt-3 flex items-center gap-2 text-[15px] font-extrabold transition-colors hover:text-navy"><Phone size={18} className="text-gold" />{COMPANY.phone}</a>
           <div className="mt-3 flex gap-2">

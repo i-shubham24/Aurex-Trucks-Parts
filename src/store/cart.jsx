@@ -26,4 +26,14 @@ export function CartProvider({ children }) {
   return <CartCtx.Provider value={{ lines, add, setQty, remove, clear, total, count, open, setOpen, compare, toggleCompare, clearCompare }}>{children}</CartCtx.Provider>;
 }
 
-export const useCart = () => useContext(CartCtx);
+const cartFallback = {
+  lines: [], total: 0, count: 0, open: false, compare: [],
+  add: () => {}, setQty: () => {}, remove: () => {}, clear: () => {},
+  setOpen: () => {}, toggleCompare: () => {}, clearCompare: () => {},
+};
+
+export const useCart = () => {
+  const ctx = useContext(CartCtx);
+  if (!ctx && import.meta.env?.DEV) console.error("[cart] useCart rendered without CartProvider.");
+  return ctx ?? cartFallback;
+};

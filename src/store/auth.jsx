@@ -10,6 +10,8 @@ const ADMIN_PASS = "Admin123!";
 
 const read = (k, fb) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } };
 const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode */ } };
+const TEMP_SESSION_KEY = "aurex_session_temp";
+const readTemp = () => { try { const v = sessionStorage.getItem(TEMP_SESSION_KEY); return v ? JSON.parse(v) : null; } catch { return null; } };
 
 function ensureAdmin() {
   const users = read(USERS_KEY, []);
@@ -23,11 +25,23 @@ function ensureAdmin() {
 
 export function AuthProvider({ children }) {
   const [users, setUsers] = useState(() => ensureAdmin());
-  const [session, setSession] = useState(() => read(SESSION_KEY, null));
+  const [session, setSession] = useState(() => read(SESSION_KEY, null) ?? readTemp());
+  const [persist, setPersist] = useState(() => read(SESSION_KEY, null) != null);
   const [orders, setOrders] = useState(() => read(ORDERS_KEY, []));
 
   useEffect(() => write(USERS_KEY, users), [users]);
-  useEffect(() => write(SESSION_KEY, session), [session]);
+  /* Remember-me ON → localStorage (survives restarts). OFF → sessionStorage (this tab only). */
+  useEffect(() => {
+    try {
+      if (persist) {
+        localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+        sessionStorage.removeItem(TEMP_SESSION_KEY);
+      } else {
+        sessionStorage.setItem(TEMP_SESSION_KEY, JSON.stringify(session));
+        localStorage.removeItem(SESSION_KEY);
+      }
+    } catch { /* private mode */ }
+  }, [session, persist]);
   useEffect(() => write(ORDERS_KEY, orders), [orders]);
 
   const user = useMemo(() => {
@@ -41,11 +55,12 @@ export function AuthProvider({ children }) {
     if (users.some((u) => u.email === cleanEmail)) return { ok: false, msg: "An account with this email already exists. Please log in." };
     const nu = { name: String(name || "").trim(), email: cleanEmail, password, phone: phone || "", company: company || "", createdAt: new Date().toISOString(), role: "customer" };
     setUsers((u) => [...u, nu]);
+    setPersist(true);
     setSession(cleanEmail);
     return { ok: true };
   };
 
-  const login = ({ email, password }) => {
+  const login = ({ email, password, remember = true }) => {
     const cleanEmail = String(email || "").trim().toLowerCase().slice(0, 120);
     /* Brute-force throttle: 5 failed attempts locks the address for 60 seconds. */
     try {
@@ -86,6 +101,7 @@ export function AuthProvider({ children }) {
           const hit = arr.find((u) => u.email === cleanEmail && u.password === password);
           if (hit) {
             setUsers(arr);
+            setPersist(remember !== false);
             setSession(cleanEmail);
             pass();
             return { ok: true };
@@ -95,12 +111,19 @@ export function AuthProvider({ children }) {
       fail();
       return { ok: false, msg: "Email or password did not match. Try again or create an account." };
     }
+    setPersist(remember !== false);
     setSession(cleanEmail);
     pass();
     return { ok: true };
   };
 
-  const logout = () => setSession(null);
+  const logout = () => {
+    setSession(null);
+    try {
+      localStorage.removeItem(SESSION_KEY);
+      sessionStorage.removeItem(TEMP_SESSION_KEY);
+    } catch { /* private mode */ }
+  };
 
   const placeOrder = (order) => {
     const id = "AUX-" + Math.floor(1000 + Math.random() * 9000);
@@ -114,4 +137,19 @@ export function AuthProvider({ children }) {
   return <AuthCtx.Provider value={{ user, session, users, setUsers, signup, login, logout, orders, setOrders, myOrders, placeOrder }}>{children}</AuthCtx.Provider>;
 }
 
-export const useAuth = () => useContext(AuthCtx);
+/* Safe default: no component may crash if it ever renders outside the
+   provider (e.g. a stale dev-HMR module identity). Real tree always
+   provides a value, so this path only triggers a console warning. */
+const authFallback = {
+  user: null, session: null, users: [], orders: [], myOrders: [],
+  setUsers: () => {}, setOrders: () => {}, logout: () => {},
+  signup: () => ({ ok: false, msg: "Accounts are unavailable right now. Reload and try again." }),
+  login: () => ({ ok: false, msg: "Login is unavailable right now. Reload and try again." }),
+  placeOrder: () => ({ id: "AUX-0000" }),
+};
+
+export const useAuth = () => {
+  const ctx = useContext(AuthCtx);
+  if (!ctx && import.meta.env?.DEV) console.error("[auth] useAuth rendered without AuthProvider.");
+  return ctx ?? authFallback;
+};

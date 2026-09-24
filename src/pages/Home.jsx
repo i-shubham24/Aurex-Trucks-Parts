@@ -50,7 +50,7 @@ function Hero() {
         </div>
         <div className="relative min-h-[260px] md:min-h-[380px]" key={`i-${i}`}>
           <div className="hero-slide absolute inset-y-4 right-6 left-16 rounded-full bg-gold/50 blur-[1px] md:left-24" />
-          <img src={s.img} alt={s.title} className="hero-slide absolute inset-0 h-full w-full rounded-r-lg object-cover [clip-path:polygon(12%_0,100%_0,100%_100%,0_100%)]" />
+          <img src={s.img} alt={s.title} fetchPriority="high" className="hero-slide absolute inset-0 h-full w-full rounded-r-lg object-cover [clip-path:polygon(12%_0,100%_0,100%_100%,0_100%)]" />
         </div>
       </div>
     </section>

@@ -89,7 +89,7 @@ export function AuthCard({ mode: initial = "login" }) {
     if (tab === "signup") {
       r = signup({ name, email, password: pass, phone: phone.trim(), company: company.trim() });
     } else {
-      r = login({ email, password: pass });
+      r = login({ email, password: pass, remember });
     }
     if (!r.ok) {
       setErr(r.msg);
