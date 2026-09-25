@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Check, Gift, X } from "lucide-react";
 import { useSite } from "../store/site";
+import useLockBody from "../utils/useLockBody";
 
 const KEY = "aurex_popup_seen_v2";
 
@@ -10,6 +11,7 @@ export default function PromoPopup() {
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
+  useLockBody(show);
 
   useEffect(() => {
     let seen = false;

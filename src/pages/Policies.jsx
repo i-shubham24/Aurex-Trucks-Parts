@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { formatAUD } from "../data/products";
+import { useSite } from "../store/site";
 
 const TABS = [
   { id: "shipping", label: "Shipping", title: "Shipping policy", body: [
     ["Dispatch", "Order by 2pm AEST for same day dispatch from Campbellfield VIC."],
     ["Timeframes", "VIC metro 1 day. Sydney, Brisbane and Adelaide 1 to 2 days. Perth and regional 2 to 5 days."],
-    ["Free freight", "Standard road freight is free over $500. Express and bulky goods quoted at checkout."],
+    ["Free freight", "Standard road freight is free over FREE_OVER. Express and bulky goods quoted at checkout."],
     ["Pickup", "Click and Collect is free. Ready in 4 hours in business hours. Bring your order number plus ID."],
   ] },
   { id: "returns", label: "Returns", title: "Returns policy", body: [
@@ -33,6 +35,8 @@ const TABS = [
 
 export default function Policies({ initial = "shipping" }) {
   const [tab, setTab] = useState(TABS.some((t) => t.id === initial) ? initial : "shipping");
+  const { settings } = useSite();
+  const freeOver = formatAUD(settings.freeFreightOver || 500);
   const active = TABS.find((t) => t.id === tab);
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
@@ -49,7 +53,7 @@ export default function Policies({ initial = "shipping" }) {
           {active.body.map(([h, d]) => (
             <div key={h} className="grid gap-1 px-5 py-4 sm:grid-cols-[180px_minmax(0,1fr)]">
               <p className="text-sm font-bold">{h}</p>
-              <p className="text-sm leading-6 text-steel">{d}</p>
+              <p className="text-sm leading-6 text-steel">{d.split("FREE_OVER").join(freeOver)}</p>
             </div>
           ))}
         </div>

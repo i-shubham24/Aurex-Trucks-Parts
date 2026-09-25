@@ -74,7 +74,7 @@ export default function Header() {
       {/* ── Main header bar (yellow) — logo / search / contact / account / cart ── */}
       <div id="top" className="bg-gold text-ink">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-2">
-          <Link to="/" className="shrink-0"><img src="/logo.png" alt="Aurex Truck Parts" className="h-16 w-auto" /></Link>
+          <Link to="/" className="shrink-0"><img src="/logo.png" alt="Aurex Truck Parts" className="h-12 w-auto md:h-16" /></Link>
           <div className="hidden min-w-0 flex-1 md:flex md:justify-end"><div className="w-full max-w-md"><SearchBox /></div></div>
           <a href={COMPANY.phoneHref} className="group hidden shrink-0 items-center gap-2 xl:flex">
             <Phone size={26} className="text-primary transition-colors group-hover:text-navy" />
@@ -88,9 +88,9 @@ export default function Header() {
             ) : (
               <Link to="/login" aria-label="Account" className="grid h-11 w-11 place-items-center rounded-md border border-ink/30 text-ink transition-colors hover:border-navy hover:text-navy"><User size={20} /></Link>
             )}
-            <button onClick={() => setOpen(true)} aria-label="Open cart" className="flex h-11 items-center gap-2 whitespace-nowrap rounded bg-ink px-6 text-sm font-extrabold text-white transition-colors hover:bg-navy">
-              <span className="relative"><ShoppingCart size={19} />{count > 0 && <span className="absolute -right-2 -top-2 grid h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-[11px] font-bold text-ink">{count}</span>}</span>
-              Cart {formatAUD(total)}
+            <button onClick={() => setOpen(true)} aria-label="Open cart" title={count > 0 ? `${count} items` : "Cart is empty"} className="flex h-11 shrink-0 items-center gap-1.5 rounded-md bg-ink px-2.5 text-white transition-colors hover:bg-navy">
+              <span className="relative shrink-0"><ShoppingCart size={19} />{count > 0 && <span className="absolute -right-2 -top-2 grid h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-[11px] font-bold text-ink">{count}</span>}</span>
+              <span className="tabular max-w-[72px] truncate text-sm font-extrabold">{formatAUD(total)}</span>
             </button>
             <button className="grid h-11 w-11 place-items-center rounded-md text-ink hover:bg-ink/10 md:hidden" onClick={() => setMenu(!menu)} aria-label="Menu">{menu ? <X size={24} /> : <Menu size={24} />}</button>
           </div>

@@ -58,7 +58,7 @@ export default function Footer() {
       </div>
       <div className="bg-gold text-ink">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-3 text-xs font-medium sm:flex-row">
-          <p>Copyright © 2026 Aurex Truck Parts Australia. All Rights Reserved.</p>
+          <p>Copyright © 2026 {COMPANY.name}. All Rights Reserved.</p>
           <p>Visa . Mastercard . PayPal . Afterpay . Bank Transfer</p>
         </div>
       </div>

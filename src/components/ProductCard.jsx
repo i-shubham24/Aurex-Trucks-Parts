@@ -88,8 +88,22 @@ export default function ProductCard({ p, joined, badges = true }) {
         <Link to={`/product/${p.sku}`}><h3 className="mt-1 line-clamp-2 min-h-11 text-[15px] font-extrabold leading-snug text-ink transition-colors group-hover:text-navy hover:text-navy">{p.name}</h3></Link>
         <p className="mt-1 truncate text-[12.5px] text-steel">{p.fit}</p>
         <Stars rating={p.rating || 4.6} reviews={p.reviews || 12} />
-        <div className="mt-2 flex items-end justify-between gap-2">
-          <CompareBtn p={p} />
+        <div className="mt-2 flex items-center justify-between gap-2">
+          {/* Desktop: compare lives here (quick-add is in the hover bar).
+              Phones/tablets: hover can't fire, so this spot becomes a one-tap
+              round add-to-cart (or call) button instead. */}
+          <span className="hidden shrink-0 lg:block"><CompareBtn p={p} /></span>
+          {enquiry ? (
+            <a href={COMPANY.phoneHref} aria-label={`Call to enquire about ${p.name}`}
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gold text-ink transition-colors hover:bg-navy hover:text-white lg:hidden">
+              <Phone size={15} />
+            </a>
+          ) : (
+            <button onClick={() => add(p)} aria-label={`Add ${p.name} to cart`}
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gold text-ink transition-colors hover:bg-navy hover:text-white active:scale-95 lg:hidden">
+              <ShoppingCart size={15} />
+            </button>
+          )}
           {enquiry
             ? <span className="text-[15px] font-extrabold text-primary">Enquire on Call</span>
             : <span className="tabular text-[22px] font-extrabold text-primary">{formatAUD(p.price)}</span>}

@@ -5,12 +5,14 @@ import { useCompany } from "../store/site";
 import { imgFor } from "../data/images";
 import { useCart } from "../store/cart";
 import { useCatalog } from "../store/catalog";
+import useLockBody from "../utils/useLockBody";
 
 export default function CompareTray() {
   const { compare, toggleCompare, clearCompare, add } = useCart();
   const COMPANY = useCompany();
   const { products: PRODUCTS } = useCatalog();
   const [open, setOpen] = useState(false);
+  useLockBody(open);
   const items = useMemo(() => compare.map((s) => PRODUCTS.find((p) => p.sku === s)).filter(Boolean), [compare, PRODUCTS]);
   if (items.length === 0) return null;
 
@@ -62,12 +64,15 @@ export default function CompareTray() {
               </div>
               <button onClick={() => setOpen(false)} className="ml-auto shrink-0 rounded border border-white/20 p-2 transition-colors hover:bg-white hover:text-ink" aria-label="Close compare"><X size={16} /></button>
             </div>
-            <div className="overflow-auto p-5 sm:p-7">
+            <div className="overflow-auto overscroll-contain p-4 sm:p-7">
+              {/* One shared min-width on phones: cards + spec rows scroll together,
+                  so columns never desync and every product stays reachable. */}
+              <div className={items.length > 1 ? "min-w-[500px] sm:min-w-0" : ""}>
               <div className="grid gap-3" style={{ gridTemplateColumns: cols }}>
                 <div />
                 {items.map((p) => (
                   <div key={p.sku} className="relative overflow-hidden rounded-md border border-line bg-white">
-                    <span className="block aspect-[16/9] overflow-hidden bg-mist">{imgFor(p.sku) && <img src={imgFor(p.sku)} alt="" className="h-full w-full object-cover" />}</span>
+                    <span className="block aspect-[16/9] overflow-hidden bg-mist">{imgFor(p.sku) && <img src={imgFor(p.sku)} alt={p.name} className="h-full w-full object-cover" />}</span>
                     <button onClick={() => toggleCompare(p.sku)} className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-white text-faint shadow transition-colors hover:text-primary" aria-label={`Remove ${p.sku}`}><Trash2 size={13} /></button>
                     <div className="p-3">
                       <p className="font-mono text-[10px] uppercase tracking-wide text-faint">{p.sub} . {p.sku}</p>
@@ -94,6 +99,7 @@ export default function CompareTray() {
                     </div>
                   ))}
                 </div>
+              </div>
               </div>
             </div>
           </div>

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { CheckCircle2, Minus, Phone, Plus, ShieldCheck, Truck } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { useCatalog } from "../store/catalog";
-import { useCompany } from "../store/site";
+import { useCompany, useSite } from "../store/site";
 import { imgFor } from "../data/images";
 import { useCart } from "../store/cart";
 import ProductCard from "../components/ProductCard";
@@ -12,6 +12,8 @@ export default function ProductDetail() {
   const { sku } = useParams();
   const { products: PRODUCTS } = useCatalog();
   const COMPANY = useCompany();
+  const { settings } = useSite();
+  const freeOver = formatAUD(settings.freeFreightOver || 500);
   const p = PRODUCTS.find((x) => x.sku === sku);
   const { add, compare, toggleCompare } = useCart();
   const [qty, setQty] = useState(1);
@@ -87,7 +89,7 @@ export default function ProductDetail() {
             </table>
           )}
           {tab === "fitment" && <p className="max-w-3xl text-sm leading-6 text-steel">Designed for Australian fleet conditions, this {p.category.replace("-", " ")} line suits {p.fit.charAt(0).toLowerCase() + p.fit.slice(1)}. Check measurements against your old part, or send our VIC desk your VIN and we confirm before dispatch on <a className="font-bold text-navy underline" href={COMPANY.phoneHref}>{COMPANY.phone}</a>.</p>}
-          {tab === "freight" && <p className="max-w-3xl text-sm leading-6 text-steel">Order by 2pm for same day dispatch ex Campbellfield. Free road freight over $500. Unused parts in original packaging can be returned within 30 days, see our <Link className="font-bold text-navy underline" to="/policies">returns policy</Link>.</p>}
+          {tab === "freight" && <p className="max-w-3xl text-sm leading-6 text-steel">Order by 2pm for same day dispatch ex Campbellfield. Free road freight over {freeOver}. Unused parts in original packaging can be returned within 30 days, see our <Link className="font-bold text-navy underline" to="/policies">returns policy</Link>.</p>}
         </div>
       </div>
       <div className="mt-8 flex items-center gap-2 rounded-md bg-ink p-4 text-white">

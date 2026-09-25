@@ -56,7 +56,7 @@ export default function Marketing() {
             {err && <p className="text-[13px] font-semibold text-red-600">{err}</p>}
             <button className="rounded bg-gold py-2.5 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white">Add Promo</button>
           </form>
-          <p className="mt-3 border-t border-line pt-3 text-xs leading-5 text-steel">The active code with the highest percent feeds the homepage welcome popup automatically.</p>
+          <p className="mt-3 border-t border-line pt-3 text-xs leading-5 text-steel">Active codes apply at checkout. The highest-percent active code also feeds the homepage welcome popup.</p>
         </div>
       </div>
     </div>

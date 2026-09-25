@@ -4,7 +4,7 @@ import { ArrowRight, BadgeCheck, ClipboardCheck, Headset, Phone, Truck } from "l
 import { formatAUD } from "../data/products";
 import { useCatalog } from "../store/catalog";
 import { FAQS } from "../data/company";
-import { useCompany } from "../store/site";
+import { useCompany, useSite } from "../store/site";
 import { NEWS, TESTIMONIALS } from "../data/content";
 import { CAT_IMG, imgFor } from "../data/images";
 import { useCart } from "../store/cart";
@@ -43,7 +43,7 @@ function Hero() {
           <p className="inline-flex items-center gap-2.5 bg-ink px-3 py-2 text-[11px] font-bold uppercase tracking-[0.22em] text-white"><span className="inline-block h-4 w-1.5 bg-gold" />{s.eyebrow}</p>
           <h1 className="mt-3 text-4xl font-extrabold leading-[1.05] tracking-tight md:text-[56px]">{s.title}</h1>
           <p className="mt-3 max-w-sm text-[15px] leading-6 text-steel">{s.sub}</p>
-          <div className="mt-6 flex flex-wrap gap-3"><Link to={s.href} className="bg-gold px-7 py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white">Shop Now</Link><a href="#bestsellers" className="border border-ink px-7 py-3 text-sm font-bold transition-colors hover:bg-ink hover:text-white">Best Sellers</a></div>
+          <div className="mt-6 flex gap-2.5 sm:gap-3"><Link to={s.href} className="flex-1 whitespace-nowrap bg-gold px-4 py-3 text-center text-[13px] font-bold text-ink transition-colors hover:bg-navy hover:text-white sm:flex-none sm:px-7 sm:text-sm">Shop Now</Link><a href="#bestsellers" className="flex-1 whitespace-nowrap border border-ink px-4 py-3 text-center text-[13px] font-bold transition-colors hover:bg-ink hover:text-white sm:flex-none sm:px-7 sm:text-sm">Best Sellers</a></div>
           <div className="mt-7 flex gap-1.5">
             {SLIDES.map((x, k) => <button key={x.img} onClick={() => setI(k)} aria-label={`Slide ${k + 1}`} className={`h-2 rounded-full transition-all ${k === i ? "w-7 bg-gold" : "w-2 bg-line-dark hover:bg-faint"}`} />)}
           </div>
@@ -95,7 +95,7 @@ function Arrivals() {
           ))}
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">{items.map((p) => <ProductCard key={p.sku} p={p} bare joined badges={false} />)}</div>
+      <div className="cap-6 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">{items.map((p) => <ProductCard key={p.sku} p={p} bare joined badges={false} />)}</div>
     </section>
   );
 }
@@ -183,7 +183,7 @@ function TrailerBlock() {
         </div>
         <button onClick={() => setAll(!all)} className="btn-fill border border-ink px-5 py-2.5 text-sm font-bold transition-colors hover:text-white">{all ? "Show Less" : `View All ${parts.length} Trailer Parts →`}</button>
       </div>
-      <div className="grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">{shown.map((p) => <ProductCard key={p.sku} p={p} joined badges={false} />)}</div>
+      <div className="cap-6 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">{shown.map((p) => <ProductCard key={p.sku} p={p} joined badges={false} />)}</div>
     </section>
   );
 }
@@ -297,8 +297,9 @@ function MakesMarquee() {
 
 function Trust() {
   const COMPANY = useCompany();
+  const { settings } = useSite();
   const items = [
-    [Truck, "Daily Freight Australia Wide", "Order by 2pm. Free road freight over $500."],
+    [Truck, "Daily Freight Australia Wide", `Order by 2pm. Free road freight over ${formatAUD(settings.freeFreightOver || 500)}.`],
     [ClipboardCheck, "Quotes in 4 Business Hours", "Send VIN or photos for an exact price."],
     [BadgeCheck, "VIN Matched Catalogue", "Every line crossed to make, model and OEM."],
     [Headset, "Talk to a Specialist", `${COMPANY.phone}. Real advice, no scripts.`],
@@ -363,6 +364,8 @@ function Reviews() {
 function Faq() {
   const [open, setOpen] = useState(0);
   const COMPANY = useCompany();
+  const { settings } = useSite();
+  const freeOver = formatAUD(settings.freeFreightOver || 500);
   return (
     <section id="faq" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-12">
       <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
@@ -384,7 +387,7 @@ function Faq() {
                   <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-lg font-bold leading-none transition-all duration-200 ${isOpen ? "rotate-45 bg-primary text-white" : "bg-mist text-ink"}`}>+</span>
                 </button>
                 <div className={`grid transition-all duration-300 ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
-                  <div className="overflow-hidden"><p className="px-5 pb-5 pl-[52px] text-sm leading-6 text-steel">{f.a}</p></div>
+                  <div className="overflow-hidden"><p className="px-5 pb-5 pl-[52px] text-sm leading-6 text-steel">{f.a.split("$500").join(freeOver)}</p></div>
                 </div>
               </div>
             );
