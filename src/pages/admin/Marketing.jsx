@@ -15,7 +15,7 @@ export default function Marketing() {
     if (!c) { setErr("Code is required."); return; }
     if (promos.some((p) => p.code === c)) { setErr("That code already exists."); return; }
     const n = Number(pct);
-    if (!(n > 0 && n <= 90)) { setErr("Percent must be 1–90."); return; }
+    if (!(n > 0 && n <= 90)) { setErr("Percent must be 1 to 90."); return; }
     setPromos((l) => [...l, { code: c, label: "Custom", pct: n, active: true }]);
     setCode("");
     setPct("");

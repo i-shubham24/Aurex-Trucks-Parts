@@ -52,7 +52,7 @@ export default function PromoPopup() {
             <div className="py-6 text-center">
               <p className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-green-100 text-green-700"><Check size={26} /></p>
               <h3 className="mt-4 text-2xl font-extrabold">You are on the list</h3>
-              <p className="mt-2 text-[15px] text-steel">Watch your inbox. Your code is ready — show it at checkout or mention it on the phone.</p>
+              <p className="mt-2 text-[15px] text-steel">Watch your inbox. Your code is ready. Show it at checkout or mention it on the phone.</p>
               <p className="mx-auto mt-4 w-fit border-2 border-dashed border-gold bg-gold/15 px-8 py-2.5 font-mono text-2xl font-extrabold tracking-[0.2em]">{active.code}</p>
             </div>
           ) : (

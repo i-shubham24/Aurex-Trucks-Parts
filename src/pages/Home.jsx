@@ -226,7 +226,7 @@ function Blog() {
           <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-faint">From the counter</p>
           <h2 className="mt-1 text-2xl font-extrabold tracking-tight md:text-[28px]">Stock Notes & Workshop News</h2>
         </div>
-        <span className="font-mono text-[11px] font-bold text-faint">N01 — N{String(posts.length).padStart(2, "0")}</span>
+        <span className="font-mono text-[11px] font-bold text-faint">N01 / N{String(posts.length).padStart(2, "0")}</span>
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <Link to={articleHref(lead)} className="card-zoom group grid border-2 border-ink bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(0,32,73,0.18)]">

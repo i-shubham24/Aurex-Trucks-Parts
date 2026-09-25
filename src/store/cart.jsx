@@ -7,13 +7,14 @@ export function CartProvider({ children }) {
   const [open, setOpen] = useState(false);
   const [compare, setCompare] = useState([]);
 
+  /* Silent add: updates lines + header badge only. Nothing opens;
+     the shopper opens the cart when ready via the header button. */
   const add = (product, qty = 1) => {
     setLines((prev) => {
       const found = prev.find((l) => l.sku === product.sku);
       if (found) return prev.map((l) => (l.sku === product.sku ? { ...l, qty: Math.min(99, l.qty + qty) } : l));
       return [...prev, { sku: product.sku, name: product.name, price: product.price, qty }];
     });
-    setOpen(true);
   };
   const setQty = (sku, qty) => setLines((prev) => qty <= 0 ? prev.filter((l) => l.sku !== sku) : prev.map((l) => (l.sku === sku ? { ...l, qty: Math.min(99, qty) } : l)));
   const remove = (sku) => setLines((prev) => prev.filter((l) => l.sku !== sku));

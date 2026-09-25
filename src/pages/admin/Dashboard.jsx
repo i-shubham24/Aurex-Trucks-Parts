@@ -65,13 +65,13 @@ export default function Dashboard() {
           {attention.length === 0 && freshEnquiries.length === 0 && <p className="p-4 text-sm text-steel">Nothing waiting. All lines live, no new enquiries.</p>}
           {attention.map((p) => (
             <div key={p.sku} className="flex items-center justify-between gap-3 border-b border-line px-4 py-2.5 last:border-b-0">
-              <span className="truncate text-[13px]"><span className="font-bold">{p.sku}</span> <span className="text-steel">built to order — check lead time</span></span>
+              <span className="truncate text-[13px]"><span className="font-bold">{p.sku}</span> <span className="text-steel">built to order, check lead time</span></span>
               <Link to="/admin/products" className="shrink-0 text-[13px] font-bold text-navy underline">Restock →</Link>
             </div>
           ))}
           {freshEnquiries.map((e) => (
             <div key={e.id} className="flex items-center justify-between gap-3 border-b border-line px-4 py-2.5 last:border-b-0">
-              <span className="truncate text-[13px]"><span className="font-bold">{e.id}</span> <span className="text-steel">{e.name} — {e.topic}</span></span>
+              <span className="truncate text-[13px]"><span className="font-bold">{e.id}</span> <span className="text-steel">{e.name} · {e.topic}</span></span>
               <Link to="/admin/enquiries" className="shrink-0 text-[13px] font-bold text-navy underline">Review →</Link>
             </div>
           ))}

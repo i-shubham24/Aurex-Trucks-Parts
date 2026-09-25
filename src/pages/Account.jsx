@@ -53,7 +53,7 @@ function InlineTrack({ order }) {
               <span className={`block text-[13px] font-extrabold ${k <= idx && !cancelled ? "text-ink" : "text-faint"}`}>{s}</span>
               {k === 0 && <span className="block text-[12px] text-faint">{new Date(order.placedAt).toLocaleString("en-AU")}</span>}
               {k === idx && !cancelled && (
-                <span className="mt-0.5 block text-[12px] font-semibold text-green-700">Packed in Campbellfield VIC — courier updates appear here.</span>
+                <span className="mt-0.5 block text-[12px] font-semibold text-green-700">Packed in Campbellfield VIC. Courier updates appear here.</span>
               )}
             </span>
           </li>
@@ -168,7 +168,7 @@ export default function Orders() {
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-faint">Purchase history</p>
               <h1 className="mt-1 text-3xl font-extrabold tracking-tight">My Orders</h1>
-              <p className="mt-1 text-[13px] text-steel">Every order carries an inline <span className="font-bold text-ink">Track</span> button — no need to leave this list.</p>
+              <p className="mt-1 text-[13px] text-steel">Every order carries an inline <span className="font-bold text-ink">Track</span> button. No need to leave this list.</p>
             </div>
             <OrdersToolbar q={q} setQ={setQ} status={status} setStatus={setStatus} count={orders.length} />
             <div className="flex flex-wrap gap-2 text-[13px] font-bold">

@@ -18,11 +18,15 @@ export default function CartDrawer() {
   const startX = useRef(0);
   const live = useRef(false);
 
-  const close = () => {
-    /* Drop the history entry we pushed on open, so one back-press never feels dead. */
-    try { if (window.history.state && window.history.state.cart) window.history.back(); } catch { /* noop */ }
+  const dismiss = () => {
     setDrag(0);
     setOpen(false);
+  };
+  const close = () => {
+    /* Drop the history entry we pushed on open, so one back-press never feels dead.
+       (Checkout navigates away, so it dismisses without touching history.) */
+    try { if (window.history.state && window.history.state.cart) window.history.back(); } catch { /* noop */ }
+    dismiss();
   };
 
   /* Browser back button / OS back gesture closes the slider instead of leaving the page. */
@@ -98,7 +102,7 @@ export default function CartDrawer() {
           <p className="mt-0.5 text-[11px] text-faint">Freight calculated at checkout.</p>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <button onClick={close} className="rounded border border-ink py-2.5 text-sm font-bold transition-colors hover:bg-mist">Continue shopping</button>
-            <Link to="/checkout" onClick={close} className="rounded bg-gold py-2.5 text-center text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white">Checkout</Link>
+            <Link to="/checkout" onClick={dismiss} className="rounded bg-gold py-2.5 text-center text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white">Checkout</Link>
           </div>
         </div>
       </aside>

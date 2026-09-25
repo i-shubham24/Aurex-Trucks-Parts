@@ -34,7 +34,7 @@ export default function PageMeta() {
       const p = products.find((x) => x.sku === decodeURIComponent(pm[1]));
       if (p) {
         title = `${p.name} (${p.sku}) | ${BASE}`;
-        desc = `${p.name} — ${p.fit || "VIN-matched"}. ${p.price == null ? "Priced on enquiry" : "Live VIC stock"} at Aurex Truck Parts Campbellfield.`;
+        desc = `${p.name}, ${p.fit || "VIN-matched"}. ${p.price == null ? "Priced on enquiry" : "Live VIC stock"} at Aurex Truck Parts Campbellfield.`;
       } else {
         title = "Part Detail | " + BASE;
         desc = "Specifications, fitment, freight and trade pricing for this Aurex line.";

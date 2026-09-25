@@ -154,7 +154,7 @@ export default function Checkout() {
             </div>
             {pay === "Card" && (
               <div className="mt-3 grid gap-2.5 rounded-md bg-mist p-4">
-                <p className="text-xs font-bold text-steel">Demo card form — do not enter real card details. You will not be charged.</p>
+                <p className="text-xs font-bold text-steel">Demo card form. Do not enter real card details. You will not be charged.</p>
                 <input value={card.number} onChange={(e) => setNum(e.target.value)} onPaste={(e) => e.preventDefault()} inputMode="numeric" placeholder="Card number" className={input(fieldErrs.card)} />
                 <div className="grid grid-cols-2 gap-2.5">
                   <input value={card.expiry} onChange={(e) => setExp(e.target.value)} onPaste={(e) => e.preventDefault()} inputMode="numeric" placeholder="MM/YY" className={input(fieldErrs.card)} />

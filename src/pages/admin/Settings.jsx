@@ -62,7 +62,7 @@ export default function Settings() {
           {err && <p className="text-sm font-semibold text-red-600">{err}</p>}
         </div>
       </form>
-      <p className="mt-2 font-mono text-[11px] text-faint">FREIGHT FEES FEED CHECKOUT INSTANTLY. CONTACT FIELDS APPLY AFTER A RELOAD — HEADER, FOOTER AND CONTACT READ THEM LIVE.</p>
+      <p className="mt-2 font-mono text-[11px] text-faint">FREIGHT FEES FEED CHECKOUT INSTANTLY. CONTACT FIELDS APPLY AFTER A RELOAD: HEADER, FOOTER AND CONTACT READ THEM LIVE.</p>
     </div>
   );
 }

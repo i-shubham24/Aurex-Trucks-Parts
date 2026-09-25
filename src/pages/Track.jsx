@@ -24,7 +24,7 @@ function Timeline({ order }) {
           <span className="pb-5">
             <span className={`block text-[15px] font-extrabold ${k <= idx && !cancelled ? "text-ink" : "text-faint"}`}>{s}</span>
             {k === 0 && <span className="block text-[13px] text-faint">{new Date(order.placedAt).toLocaleString("en-AU")}</span>}
-            {k === idx && !cancelled && k > 0 && <span className="block text-[13px] font-semibold text-green-700">Latest update — with courier network.</span>}
+            {k === idx && !cancelled && k > 0 && <span className="block text-[13px] font-semibold text-green-700">Latest update from the courier network.</span>}
           </span>
         </li>
       ))}
@@ -57,7 +57,7 @@ export default function Track() {
         <p className="text-[12px] text-faint"><Link to="/" className="hover:text-navy hover:underline">Home</Link> / <span className="font-semibold text-ink">Track Order</span></p>
         <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.22em] text-faint">Live courier status</p>
         <h1 className="mt-1 text-3xl font-extrabold tracking-tight md:text-4xl">Track your order</h1>
-        <p className="mt-1 text-sm text-steel">Enter the order ID from your receipt — e.g. AUX-4821 or AX-483920.</p>
+        <p className="mt-1 text-sm text-steel">Enter the order ID from your receipt, e.g. AUX-4821 or AX-483920.</p>
 
         <form onSubmit={lookup} className="mt-4 flex items-stretch rounded-xl border border-line bg-white p-1.5 shadow-sm focus-within:border-gold">
           <span className="grid w-11 shrink-0 place-items-center"><PackageSearch size={18} className="text-faint" /></span>
@@ -116,7 +116,7 @@ export default function Track() {
 
         {!order && !miss && (
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
-            <Link to="/orders" className="rounded-xl border border-line bg-white p-4 text-sm font-extrabold transition hover:border-navy hover:text-navy">My Orders — inline tracking per order →</Link>
+            <Link to="/orders" className="rounded-xl border border-line bg-white p-4 text-sm font-extrabold transition hover:border-navy hover:text-navy">My Orders: inline tracking per order →</Link>
             <Link to="/contact" className="rounded-xl border border-line bg-white p-4 text-sm font-extrabold transition hover:border-navy hover:text-navy">Missing a parcel? Contact counter →</Link>
           </div>
         )}

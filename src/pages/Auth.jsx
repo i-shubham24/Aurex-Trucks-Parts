@@ -136,7 +136,7 @@ export function AuthCard({ mode: initial = "login" }) {
         {tab === "login" ? "Welcome back, driver." : "Create your trade account."}
       </h2>
       <p className="mt-0.5 text-[13px] text-steel">
-        {tab === "login" ? "Log in for faster checkout, order tracking and trade pricing." : "Counter pricing, 30-day fleet terms and saved vehicles — free to join."}
+        {tab === "login" ? "Log in for faster checkout, order tracking and trade pricing." : "Counter pricing, 30-day fleet terms and saved vehicles. Free to join."}
       </p>
 
       <form onSubmit={submit} className="mt-3 grid gap-2.5">

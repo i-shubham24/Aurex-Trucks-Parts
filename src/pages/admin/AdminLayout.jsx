@@ -102,7 +102,7 @@ function StaffLogin() {
             {err && <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-[13px] font-semibold text-red-300">{err}</p>}
             <button className="rounded-lg bg-gold py-3 text-sm font-extrabold text-ink transition hover:bg-white">Unlock console →</button>
           </form>
-          <p className="mt-4 text-center text-[12px] text-gray-500">Separate staff URL — never linked from the public shop header, footer or account screens.</p>
+          <p className="mt-4 text-center text-[12px] text-gray-500">Separate staff URL. It is never linked from the public shop header, footer or account screens.</p>
         </div>
       </div>
     </main>
