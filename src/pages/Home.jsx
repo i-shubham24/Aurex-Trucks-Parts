@@ -213,6 +213,8 @@ function CounterBand() {
 
 const TAG_LINKS = { "Tail Lifts": "/shop/tail-lifts", "Trailer Parts": "/shop/trailer-parts", "Accessories": "/shop/accessories", "Tool Boxes": "/shop/accessories" };
 
+const articleHref = (n) => (n.slug ? `/news/${n.slug}` : TAG_LINKS[n.tag] || "/shop");
+
 function Blog() {
   const COMPANY = useCompany();
   const posts = NEWS.slice(0, 4);
@@ -227,7 +229,7 @@ function Blog() {
         <span className="font-mono text-[11px] font-bold text-faint">N01 — N{String(posts.length).padStart(2, "0")}</span>
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
-        <Link to={TAG_LINKS[lead.tag] || "/shop"} className="card-zoom group grid border-2 border-ink bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(0,32,73,0.18)]">
+        <Link to={articleHref(lead)} className="card-zoom group grid border-2 border-ink bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(0,32,73,0.18)]">
           <span className="relative block overflow-hidden bg-mist">
             <img src={lead.img} alt={lead.title} loading="lazy" className="aspect-[16/9] w-full object-cover" />
             <span className="absolute left-3 top-3 bg-gold px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-ink">{lead.tag}</span>
@@ -242,7 +244,7 @@ function Blog() {
         </Link>
         <div className="grid content-start gap-4">
           {rest.map((n, k) => (
-            <Link key={n.title} to={TAG_LINKS[n.tag] || "/shop"} className="card-zoom group grid grid-cols-[140px_minmax(0,1fr)] border-2 border-ink bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(0,32,73,0.18)] sm:grid-cols-[200px_minmax(0,1fr)]">
+            <Link key={n.title} to={articleHref(n)} className="card-zoom group grid grid-cols-[140px_minmax(0,1fr)] border-2 border-ink bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(0,32,73,0.18)] sm:grid-cols-[200px_minmax(0,1fr)]">
               <span className="relative block min-h-full overflow-hidden bg-mist">
                 <img src={n.img} alt={n.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
               </span>

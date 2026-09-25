@@ -17,6 +17,7 @@ import Contact from "./pages/Contact";
 import Shop, { CategoryByParam } from "./pages/Shop";
 import Policies from "./pages/Policies";
 import ProductDetail from "./pages/ProductDetail";
+import Article from "./pages/Article";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
 import Orders, { ProfileBody } from "./pages/Account";
@@ -104,6 +105,7 @@ function Shell() {
         <Route path="/shop/:slug" element={<CategoryByParam />} />
         <Route path="/policies" element={<Policies />} />
         <Route path="/product/:sku" element={<ProductDetail />} />
+        <Route path="/news/:slug" element={<Article />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/order-success/:id" element={<OrderSuccess />} />
         <Route path="/orders" element={<Orders />} />

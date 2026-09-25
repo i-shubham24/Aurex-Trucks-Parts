@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Clock, Mail, MapPin, Phone, Send } from "lucide-react";
 import { useCompany } from "../store/site";
 import { useSite } from "../store/site";
+import ThemeSelect from "../components/ThemeSelect";
 
 export default function Contact() {
   const { addEnquiry } = useSite();
@@ -70,9 +71,7 @@ export default function Contact() {
           </div>
           <label className="mt-3 block"><span className="mb-1 block text-xs font-bold">Email *</span><input required type="email" value={form.email} onChange={set("email")} placeholder="you@company.com.au" maxLength={120} className={input(errs.email)} />{err("email")}</label>
           <label className="mt-3 block"><span className="mb-1 block text-xs font-bold">Topic</span>
-            <select value={form.topic} onChange={set("topic")} className={input}>
-              <option>Tail Lifts</option><option>Trailer Parts</option><option>Accessories</option><option>Trade Account</option><option>Something else</option>
-            </select>
+            <ThemeSelect value={form.topic} onChange={(v) => setForm({ ...form, topic: v })} options={["Tail Lifts", "Trailer Parts", "Accessories", "Trade Account", "Something else"]} label="Topic" />
           </label>
           <label className="mt-3 block"><span className="mb-1 block text-xs font-bold">What do you need? *</span><textarea required value={form.msg} onChange={set("msg")} rows={5} maxLength={2000} placeholder="Body type, SKU, sizes, VIN if critical" className={`w-full rounded-md border bg-white px-3 py-2.5 text-sm outline-none placeholder:text-faint focus:border-gold ${errs.msg ? "border-red-500" : "border-line-dark"}`} />{err("msg")}</label>
           <button className="mt-4 flex items-center gap-2 rounded bg-gold px-6 py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white"><Send size={15} /> Send Enquiry</button>

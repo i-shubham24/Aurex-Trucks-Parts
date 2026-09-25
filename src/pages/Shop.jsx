@@ -4,6 +4,7 @@ import { Search } from "lucide-react";
 import { useCatalog } from "../store/catalog";
 import { useCompany } from "../store/site";
 import ProductCard from "../components/ProductCard";
+import ThemeSelect from "../components/ThemeSelect";
 
 export default function Shop({ preset }) {
   const { products: PRODUCTS, categories: CATEGORIES } = useCatalog();
@@ -38,7 +39,17 @@ export default function Shop({ preset }) {
 
   if (slug && !cat) return <main className="mx-auto max-w-7xl px-4 py-16"><p>Shelf not found. <Link to="/shop" className="font-bold text-navy underline">Shop all</Link></p></main>;
 
-  const sel = "h-11 w-full rounded-md border border-line-dark bg-white px-2.5 text-[13px] font-semibold outline-none focus:border-gold sm:w-auto";
+  const AVAIL_OPTS = [
+    { value: "All", label: "All availability" },
+    { value: "stock", label: "In stock VIC" },
+    { value: "order", label: "Built to order" },
+    { value: "enquiry", label: "Enquiry only" },
+  ];
+  const SORT_OPTS = [
+    { value: "featured", label: "Featured" },
+    { value: "low", label: "Price low to high" },
+    { value: "high", label: "Price high to low" },
+  ];
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">
@@ -59,22 +70,10 @@ export default function Shop({ preset }) {
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Filter by SKU or keyword" className="w-full bg-transparent text-[13px] outline-none" />
         </span>
         <span className="grid grid-cols-2 gap-2 sm:contents">
-          <select value={sub} onChange={(e) => setSub(e.target.value)} className={sel} aria-label="Type">
-            <option>All</option>
-            {subs.map((s) => <option key={s}>{s}</option>)}
-          </select>
-          <select value={avail} onChange={(e) => setAvail(e.target.value)} className={sel} aria-label="Availability">
-            <option value="All">All availability</option>
-            <option value="stock">In stock VIC</option>
-            <option value="order">Built to order</option>
-            <option value="enquiry">Enquiry only</option>
-          </select>
+          <ThemeSelect value={sub} onChange={setSub} options={["All", ...subs]} label="Type" mega />
+          <ThemeSelect value={avail} onChange={setAvail} options={AVAIL_OPTS} label="Availability" />
         </span>
-        <select value={sort} onChange={(e) => setSort(e.target.value)} className={sel} aria-label="Sort">
-          <option value="featured">Featured</option>
-          <option value="low">Price low to high</option>
-          <option value="high">Price high to low</option>
-        </select>
+        <ThemeSelect value={sort} onChange={setSort} options={SORT_OPTS} label="Sort" align="right" />
         <span className="text-right font-mono text-[11px] text-faint sm:ml-auto sm:text-left">{items.length} LINES</span>
       </div>
 

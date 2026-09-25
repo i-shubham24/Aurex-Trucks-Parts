@@ -32,33 +32,6 @@ function StatusPill({ order }) {
   );
 }
 
-function ProgressBar({ order }) {
-  const { steps, idx, cancelled } = orderStatus(order);
-  return (
-    <div className="mt-3">
-      <div className="flex items-center">
-        {steps.map((s, k) => (
-          <div key={s} className="flex flex-1 items-center last:flex-none">
-            <div className="flex flex-col items-center">
-              <span className={`grid h-7 w-7 place-items-center rounded-full text-[12px] font-extrabold ring-2 ${
-                cancelled ? "bg-mist text-faint ring-line" :
-                k < idx ? "bg-navy text-white ring-navy" :
-                k === idx ? "bg-gold text-ink ring-gold" : "bg-mist text-faint ring-line"
-              }`}>
-                {k < idx && !cancelled ? <Check size={14} /> : k + 1}
-              </span>
-              <span className={`mt-1 hidden text-[10px] font-bold uppercase tracking-wide sm:block ${k <= idx && !cancelled ? "text-ink" : "text-faint"}`}>{s}</span>
-            </div>
-            {k < steps.length - 1 && (
-              <span className={`mx-1 mb-0 h-0.5 flex-1 rounded-full sm:mb-5 ${k < idx && !cancelled ? "bg-navy" : "bg-line"}`} />
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function InlineTrack({ order }) {
   const { steps, idx, cancelled } = orderStatus(order);
   return (
@@ -98,8 +71,8 @@ function InlineTrack({ order }) {
   );
 }
 
-function OrderCard({ order, onReorder, defaultOpen = false }) {
-  const [open, setOpen] = useState(defaultOpen);
+function OrderCard({ order, onReorder }) {
+  const [open, setOpen] = useState(false);
   const lines = order.items || order.lines || [];
   const qty = lines.reduce((s, l) => s + (l.qty || 0), 0);
   const shown = open ? lines : lines.slice(0, 3);
@@ -115,7 +88,6 @@ function OrderCard({ order, onReorder, defaultOpen = false }) {
           <StatusPill order={order} />
           <span className="text-[12px] font-bold text-faint">{qty} items{order.payment ? ` · ${order.payment}` : ""}</span>
         </div>
-        <ProgressBar order={order} />
         <ul className="mt-3 divide-y divide-line rounded-xl border border-line">
           {shown.map((l) => (
             <li key={l.sku} className="flex items-center gap-3 px-3 py-2.5">
@@ -213,7 +185,7 @@ export default function Orders() {
                 <Link to="/shop" className="mt-5 inline-block rounded-lg bg-gold px-6 py-2.5 text-sm font-extrabold text-ink transition hover:bg-ink hover:text-white">Shop All Products</Link>
               </div>
             ) : (
-              <div className="grid items-start gap-4 xl:grid-cols-2">{orders.map((o, i) => <OrderCard key={o.id} order={o} onReorder={reorder} defaultOpen={i === 0 && orders.length <= 3} />)}</div>
+              <div className="grid items-start gap-4 xl:grid-cols-2">{orders.map((o) => <OrderCard key={o.id} order={o} onReorder={reorder} />)}</div>
             )}
           </div>
         </div>

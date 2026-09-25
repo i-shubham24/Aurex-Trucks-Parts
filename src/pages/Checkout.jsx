@@ -7,6 +7,7 @@ import { useCompany } from "../store/site";
 import { useCart } from "../store/cart";
 import { useAuth } from "../store/auth";
 import { useSite } from "../store/site";
+import ThemeSelect from "../components/ThemeSelect";
 
 const STATES = ["VIC", "NSW", "QLD", "SA", "WA", "TAS", "NT", "ACT"];
 const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -123,8 +124,8 @@ export default function Checkout() {
               <input value={form.address} onChange={set("address")} maxLength={120} placeholder="Street address *" className={`sm:col-span-2 ${input(fieldErrs.address)}`} />
               <input value={form.suburb} onChange={set("suburb")} maxLength={60} placeholder="Suburb *" className={input(fieldErrs.suburb)} />
               <div className="grid grid-cols-2 gap-2.5">
-                <select value={form.state} onChange={set("state")} className="rounded-md border border-line-dark bg-white px-3 py-2.5 text-sm outline-none">{STATES.map((s) => <option key={s}>{s}</option>)}</select>
-                <input value={form.postcode} onChange={(e) => setForm({ ...form, postcode: digits(e.target.value).slice(0, 4) })} placeholder="Postcode *" inputMode="numeric" className={input(fieldErrs.postcode)} />
+                <ThemeSelect value={form.state} onChange={(v) => setForm({ ...form, state: v })} options={STATES} label="State" />
+                <input value={form.postcode} onChange={(e) => setForm({ ...form, postcode: digits(e.target.value).slice(0, 4) })} placeholder="Postcode *" inputMode="numeric" className={`h-11 ${input(fieldErrs.postcode)}`} />
               </div>
               <input value={form.notes} onChange={set("notes")} maxLength={300} placeholder="Delivery notes or VIN (optional)" className={`sm:col-span-2 ${input(false)}`} />
             </div>

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useCatalog } from "../store/catalog";
+import { NEWS } from "../data/content";
 
 const BASE = "Aurex Truck Parts Australia";
 const SITE = "https://aurextruckparts.com.au";
@@ -37,6 +38,17 @@ export default function PageMeta() {
       } else {
         title = "Part Detail | " + BASE;
         desc = "Specifications, fitment, freight and trade pricing for this Aurex line.";
+      }
+    }
+    /* News articles get their real headline + excerpt. */
+    const nm = pathname.match(/^\/news\/([^/]+)/);
+    if (nm) {
+      const a = NEWS.find((x) => x.slug === decodeURIComponent(nm[1]));
+      if (a) {
+        title = `${a.title} | ${BASE}`;
+        desc = a.excerpt || desc;
+      } else {
+        title = "Stock Notes | " + BASE;
       }
     } else {
       const hit = META.find(([rx]) => rx.test(pathname));
