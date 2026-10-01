@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useSite, DEFAULT_SETTINGS } from "../../store/site";
+import { useNotification } from "../../store/notification";
 import { AdminTitle } from "./AdminLayout";
 
 const FIELDS = [
@@ -17,6 +18,7 @@ const FIELDS = [
 
 export default function Settings() {
   const { settings, setSettings, resetSite } = useSite();
+  const { notify } = useNotification();
   const [form, setForm] = useState(settings);
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState("");
@@ -42,6 +44,13 @@ export default function Settings() {
       expressFee: Math.max(0, Number(form.expressFee) || 0),
     });
     setSaved(true);
+    notify.success({
+      kicker: "SETTINGS UPDATED",
+      title: "Settings Saved Successfully!",
+      message: "Store contact info and freight thresholds have been updated.",
+      icon: "check",
+      sound: true,
+    });
   };
   const input = "h-11 w-full rounded-md border border-line-dark bg-white px-3 text-sm outline-none placeholder:text-faint focus:border-gold";
   const label = "mb-1 block text-xs font-bold";

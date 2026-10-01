@@ -7,6 +7,7 @@ import { useCompany } from "../store/site";
 import { useCart } from "../store/cart";
 import { useAuth } from "../store/auth";
 import { useSite } from "../store/site";
+import { useNotification } from "../store/notification";
 import ThemeSelect from "../components/ThemeSelect";
 
 const STATES = ["VIC", "NSW", "QLD", "SA", "WA", "TAS", "NT", "ACT"];
@@ -28,6 +29,7 @@ export default function Checkout() {
   const COMPANY = useCompany();
   const { user, placeOrder } = useAuth();
   const { settings, promos } = useSite();
+  const { notify } = useNotification();
   const go = useNavigate();
 
   const SHIP = [
@@ -98,6 +100,15 @@ export default function Checkout() {
       items: lines.map((l) => ({ sku: l.sku, name: l.name, price: l.price, qty: l.qty })),
       subtotal: total, discount, promoCode: promo ? promo.code : null,
       shipping: shipOpt.id, shippingFee: shipFee, payment: pay, total: grand, address: { ...form },
+    });
+    notify.success({
+      kicker: "ORDER CONFIRMED",
+      title: "Order Placed Successfully!",
+      message: `Order #${order.id} confirmed for ${formatAUD(grand)}. Preparing for dispatch from Campbellfield VIC.`,
+      icon: "order",
+      action: { label: "Track Order", url: `/track?id=${order.id}` },
+      duration: 5000,
+      sound: true,
     });
     clear();
     go(`/order-success/${order.id}`);
@@ -189,6 +200,13 @@ export default function Checkout() {
                     const hit = promos.find((p) => p.active && p.code === promoCode.trim().toUpperCase());
                     if (!hit) { setPromoErr("That code is not active. Check the spelling or ask the counter."); return; }
                     setPromo(hit); setPromoErr("");
+                    notify.success({
+                      kicker: "PROMO CODE APPLIED",
+                      title: "Discount Applied!",
+                      message: `Code ${hit.code} saved you ${hit.pct}% off your order total.`,
+                      icon: "tag",
+                      sound: true,
+                    });
                   }} className="shrink-0 rounded-md border border-ink px-4 text-[13px] font-bold transition-colors hover:bg-ink hover:text-white">Apply</button>
                 </div>
                 {promoErr && <p className="mt-1.5 text-[12px] font-semibold text-red-600">{promoErr}</p>}

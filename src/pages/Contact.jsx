@@ -3,10 +3,12 @@ import { Link } from "react-router-dom";
 import { Clock, Mail, MapPin, Phone, Send } from "lucide-react";
 import { useCompany } from "../store/site";
 import { useSite } from "../store/site";
+import { useNotification } from "../store/notification";
 import ThemeSelect from "../components/ThemeSelect";
 
 export default function Contact() {
   const { addEnquiry } = useSite();
+  const { notify } = useNotification();
   const COMPANY = useCompany();
   const [sent, setSent] = useState(false);
   const [sentName, setSentName] = useState("");
@@ -23,10 +25,20 @@ export default function Contact() {
     if (form.msg.trim().length < 10) fe.msg = "Tell us a little more (10+ characters).";
     setErrs(fe);
     if (Object.keys(fe).length) return;
-    addEnquiry({ name: form.name.trim(), phone: form.phone.trim(), email: form.email.trim().toLowerCase(), topic: form.topic, message: form.msg.trim().slice(0, 2000) });
-    setSentName(form.name.trim().split(" ")[0] || "there");
+    const cleanName = form.name.trim();
+    const firstName = cleanName.split(" ")[0] || "there";
+    addEnquiry({ name: cleanName, phone: form.phone.trim(), email: form.email.trim().toLowerCase(), topic: form.topic, message: form.msg.trim().slice(0, 2000) });
+    setSentName(firstName);
     setForm({ name: "", phone: "", email: "", topic: "Tail Lifts", msg: "" });
     setSent(true);
+    notify.success({
+      kicker: "ENQUIRY SUBMITTED",
+      title: "Contact Form Submitted Successfully!",
+      message: `Thanks ${firstName}! Our Campbellfield parts desk will review your details and respond within 4 business hours.`,
+      icon: "mail",
+      duration: 4500,
+      sound: true,
+    });
   };
   const err = (k) => errs[k] && <span className="mt-1 block text-[12px] font-semibold text-red-600">{errs[k]}</span>;
 

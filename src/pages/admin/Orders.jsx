@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { formatAUD } from "../../data/products";
 import { useAuth } from "../../store/auth";
+import { useNotification } from "../../store/notification";
 import { ORDER_STATUSES } from "../../utils/orders";
 import { AdminTitle, Empty, Modal, td, th } from "./AdminLayout";
 
 export default function Orders() {
   const { orders, setOrders } = useAuth();
+  const { notify } = useNotification();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("All");
   const [sel, setSel] = useState(null);
@@ -21,6 +23,13 @@ export default function Orders() {
   const applyStatus = (id, s) => {
     setOrders((all) => all.map((o) => (o.id === id ? { ...o, status: s } : o)));
     setSel((cur) => (cur && cur.id === id ? { ...cur, status: s } : cur));
+    notify.success({
+      kicker: "ORDER UPDATED",
+      title: `Order #${id} Updated`,
+      message: `Status updated to "${s}". Synced to customer tracking.`,
+      icon: "order",
+      sound: true,
+    });
   };
 
   const input = "h-11 rounded-md border border-line-dark bg-white px-3 text-sm outline-none placeholder:text-faint focus:border-gold";

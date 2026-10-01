@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, BadgeCheck, Eye, EyeOff, Lock, Mail, Phone, ShieldCheck, Truck, User, Building2 } from "lucide-react";
 import { useAuth } from "../store/auth";
+import { useNotification } from "../store/notification";
 
 const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phoneRx = /^0[45]\d{8}$|^0[2378]\d{8}$/;
@@ -36,6 +37,7 @@ const inputCls = (bad) =>
 
 export function AuthCard({ mode: initial = "login" }) {
   const { login, signup } = useAuth();
+  const { notify } = useNotification();
   const go = useNavigate();
   const [tab, setTab] = useState(initial);
   const [name, setName] = useState("");
@@ -94,6 +96,23 @@ export function AuthCard({ mode: initial = "login" }) {
     if (!r.ok) {
       setErr(r.msg);
       return;
+    }
+    if (tab === "signup") {
+      notify.success({
+        kicker: "ACCOUNT CREATED",
+        title: "Account Created Successfully!",
+        message: `Welcome to Aurex, ${name.trim().split(" ")[0]}! Trade accounts and 30-day terms are active.`,
+        icon: "login",
+        sound: true,
+      });
+    } else {
+      notify.success({
+        kicker: "LOGIN SUCCESSFUL",
+        title: "Logged In Successfully!",
+        message: `Welcome back, ${email.trim()}! Trade pricing and order history loaded.`,
+        icon: "login",
+        sound: true,
+      });
     }
     setDone(true);
     setTimeout(() => go(tab === "signup" ? "/profile" : "/orders"), 900);

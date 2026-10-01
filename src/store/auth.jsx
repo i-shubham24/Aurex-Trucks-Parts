@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useNotification } from "./notification";
 
 const AuthCtx = createContext(null);
 const USERS_KEY = "aurex_users";
@@ -24,6 +25,7 @@ function ensureAdmin() {
 }
 
 export function AuthProvider({ children }) {
+  const { notify } = useNotification();
   const [users, setUsers] = useState(() => ensureAdmin());
   const [session, setSession] = useState(() => read(SESSION_KEY, null) ?? readTemp());
   const [persist, setPersist] = useState(() => read(SESSION_KEY, null) != null);
@@ -123,6 +125,13 @@ export function AuthProvider({ children }) {
       localStorage.removeItem(SESSION_KEY);
       sessionStorage.removeItem(TEMP_SESSION_KEY);
     } catch { /* private mode */ }
+    notify.info({
+      kicker: "ACCOUNT LOGOUT",
+      title: "Logged Out Successfully",
+      message: "You have been signed out securely. Cart and guest checkout remain active.",
+      icon: "login",
+      sound: false,
+    });
   };
 
   const placeOrder = (order) => {

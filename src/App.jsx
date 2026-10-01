@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { NotificationProvider } from "./store/notification";
+import NotificationCenter from "./components/NotificationCenter";
 import { CartProvider } from "./store/cart";
 import { AuthProvider } from "./store/auth";
 import { SiteProvider } from "./store/site";
@@ -120,12 +122,14 @@ function Shell() {
 
 export default function App() {
   return (
+    <NotificationProvider>
     <AuthProvider>
     <SiteProvider>
     <CatalogProvider>
     <CartProvider>
       <BrowserRouter>
         <ErrorBoundary>
+          <NotificationCenter />
           <Shell />
         </ErrorBoundary>
       </BrowserRouter>
@@ -133,5 +137,6 @@ export default function App() {
     </CatalogProvider>
     </SiteProvider>
     </AuthProvider>
+    </NotificationProvider>
   );
 }

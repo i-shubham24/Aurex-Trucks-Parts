@@ -4,6 +4,7 @@ import { ArrowRight, Check, MapPin, PackageSearch, Truck } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { imgFor } from "../data/images";
 import { findOrder, orderStatus } from "../utils/orders";
+import { useNotification } from "../store/notification";
 
 function Timeline({ order }) {
   const { steps, idx, cancelled } = orderStatus(order);
@@ -38,6 +39,7 @@ export default function Track() {
   const [id, setId] = useState(paramId);
   const [order, setOrder] = useState(() => (paramId ? findOrder(paramId) : null));
   const [miss, setMiss] = useState(false);
+  const { notify } = useNotification();
   /* Stay in sync when navigating between /track?id=A and /track?id=B without a remount. */
   useEffect(() => {
     if (paramId) { setId(paramId); const found = findOrder(paramId); setOrder(found); setMiss(!found); }
@@ -47,6 +49,15 @@ export default function Track() {
     const found = findOrder(id);
     setOrder(found);
     setMiss(!found);
+    if (found) {
+      notify.success({
+        kicker: "TRACKING RETRIEVED",
+        title: `Order #${found.id} Located!`,
+        message: `Current Status: ${found.status || "In transit"}.`,
+        icon: "order",
+        sound: true,
+      });
+    }
   };
   const st = order ? orderStatus(order) : null;
   const lines = order ? order.items || order.lines || [] : [];

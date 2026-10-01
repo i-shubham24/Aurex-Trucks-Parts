@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { useCompany } from "../store/site";
+import { useNotification } from "../store/notification";
 
 export default function Footer() {
   const COMPANY = useCompany();
+  const { notify } = useNotification();
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
   return (
@@ -27,7 +29,17 @@ export default function Footer() {
         </div>
         <div>
           <p className="text-sm font-bold">Subscribe Newsletter To Get Updated</p>
-          <form className="mt-3 flex" onSubmit={(e) => { e.preventDefault(); setDone(true); }}>
+          <form className="mt-3 flex" onSubmit={(e) => {
+            e.preventDefault();
+            setDone(true);
+            notify.success({
+              kicker: "NEWSLETTER SUBSCRIBED",
+              title: "Subscribed Successfully!",
+              message: "You're now on the priority list for Australian fleet discounts and catalog updates.",
+              icon: "mail",
+              sound: true,
+            });
+          }}>
             <input value={email} onChange={(e) => setEmail(e.target.value)} required type="email" maxLength={120} placeholder="Enter your email address" className="h-10 w-full rounded-l-md border border-line-dark px-3 text-sm outline-none placeholder:text-faint focus:border-gold" />
             <button className="h-10 shrink-0 rounded-r-md bg-gold px-4 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white">Subscribe</button>
           </form>
