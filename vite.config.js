@@ -7,7 +7,13 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     watch: {
-      ignored: ['**/truck-parts-admin/**', '**/truck-parts-api/**'],
+      ignored: [
+        '**/truck-parts-admin/**',
+        '**/truck-parts-api/**',
+        '**/*.pdf',
+        '**/*.backup',
+        '**/.git/**',
+      ],
     },
   },
 })
