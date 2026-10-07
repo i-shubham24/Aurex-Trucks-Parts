@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Check, MapPin, PackageSearch, Truck } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { imgFor } from "../data/images";
+import SafeImage from "../components/SafeImage";
 import { findOrder, orderStatus } from "../utils/orders";
 import { useNotification } from "../store/notification";
 
@@ -87,7 +88,7 @@ export default function Track() {
           <div className="mt-4 overflow-hidden rounded-2xl border border-line bg-white shadow-[0_16px_40px_rgba(0,32,73,0.10)]">
             <div className="flex flex-wrap items-center gap-2 border-b border-line bg-mist px-5 py-4">
               <p className="font-mono text-[17px] font-extrabold text-navy">{order.id}</p>
-              <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wide ${st.cancelled ? "bg-red-50 text-red-700 ring-1 ring-red-200" : st.idx >= 3 ? "bg-green-50 text-green-800 ring-1 ring-green-200" : "bg-gold/25 text-ink ring-1 ring-gold/60"}`}>
+              <span className={`rounded-sm px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wide ${st.cancelled ? "bg-red-50 text-red-700 ring-1 ring-red-200" : st.idx >= 3 ? "bg-green-50 text-green-800 ring-1 ring-green-200" : "bg-gold/25 text-ink ring-1 ring-gold/60"}`}>
                 {st.cancelled ? "Cancelled" : ["Order placed", "Confirmed", "Dispatched", "Delivered"][st.idx]}
               </span>
               <p className="tabular ml-auto text-[17px] font-extrabold text-ink">{formatAUD(order.total)}</p>
@@ -103,7 +104,7 @@ export default function Track() {
                 <div className="rounded-xl border border-line">
                   {lines.map((l) => (
                     <p key={l.sku} className="flex items-center gap-2.5 border-b border-line px-3 py-2 text-[13px] last:border-0">
-                      <span className="h-9 w-9 shrink-0 overflow-hidden rounded bg-mist">{imgFor(l.sku) && <img src={imgFor(l.sku)} alt="" className="h-full w-full object-cover" />}</span>
+                      <span className="h-9 w-9 shrink-0 overflow-hidden rounded bg-mist"><SafeImage src={imgFor(l.sku)} alt="" className="h-full w-full object-cover" fallbackIconSize={14} /></span>
                       <span className="min-w-0 flex-1 truncate"><span className="font-bold">{l.qty} × </span>{l.name}</span>
                       <span className="tabular shrink-0 font-bold">{formatAUD(l.price * l.qty)}</span>
                     </p>

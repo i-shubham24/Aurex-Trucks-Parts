@@ -44,7 +44,7 @@ export default function Policies({ initial = "shipping" }) {
       <h1 className="mt-1 text-3xl font-extrabold tracking-tight md:text-4xl">The fine print, plainly written.</h1>
       <div className="mt-5 flex flex-wrap gap-2">
         {TABS.map((t) => (
-          <button key={t.id} onClick={() => setTab(t.id)} className={`rounded-full px-4 py-1.5 text-[13px] font-bold transition-colors ${tab === t.id ? "bg-ink text-white" : "bg-mist text-steel hover:text-ink"}`}>{t.label}</button>
+          <button key={t.id} onClick={() => setTab(t.id)} className={`rounded-md px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${tab === t.id ? "bg-ink text-white" : "bg-mist text-steel hover:text-ink"}`}>{t.label}</button>
         ))}
       </div>
       <div className="mt-4 rounded-md border border-line bg-white">
@@ -58,7 +58,7 @@ export default function Policies({ initial = "shipping" }) {
           ))}
         </div>
       </div>
-      <p className="mt-4 text-sm text-steel">Something not covered? Call <a className="font-bold text-navy underline" href="tel:0390000000">03 9000 0000</a>.</p>
+      <p className="mt-4 text-sm text-steel">Something not covered? Call <a className="font-bold text-navy underline" href="tel:+61414730467">+61 414 730 467</a>.</p>
     </main>
   );
 }

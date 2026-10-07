@@ -53,14 +53,14 @@ export default function Shop({ preset }) {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">
-      <p className="text-[12px] text-faint"><Link to="/" className="hover:text-navy hover:underline">Home</Link> / <Link to="/shop" className="hover:text-navy hover:underline">Shop</Link>{cat && <> / <span className="font-semibold text-ink">{cat.name}</span></>}</p>
+      <p className="text-[12px] text-faint"><Link to="/" className="hover:text-navy hover:underline">Home</Link> / <Link to="/shop" className="hover:text-navy hover:underline">Shop All</Link>{cat && <> / <span className="font-semibold text-ink">{cat.name}</span></>}</p>
       <h1 className="mt-1 text-3xl font-extrabold tracking-tight md:text-4xl">{cat ? cat.name : "Shop All Products"}</h1>
-      <p className="mt-1 max-w-2xl text-sm text-steel">{cat ? cat.blurb : "All 36 approved lines across tail lifts, trailer parts and accessories."} {cat && cat.slug === "trailer-parts" ? "All lines enquiry only." : ""}</p>
+      <p className="mt-1 max-w-2xl text-sm text-steel">{cat ? cat.blurb : `All ${PRODUCTS.length} commercial lines across tail lifts, trailer parts and accessories.`}</p>
 
       <div className="mt-5 flex flex-wrap items-center gap-2">
-        <Link to="/shop" className={`rounded-full px-4 py-1.5 text-[13px] font-bold transition-colors ${!slug ? "bg-ink text-white" : "bg-mist text-steel hover:text-ink"}`}>All</Link>
+        <Link to="/shop" className={`rounded-md px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${!slug ? "bg-ink text-white" : "bg-mist text-steel hover:text-ink"}`}>All</Link>
         {CATEGORIES.map((c) => (
-          <Link key={c.slug} to={`/shop/${c.slug}`} className={`rounded-full px-4 py-1.5 text-[13px] font-bold transition-colors ${slug === c.slug ? "bg-gold text-ink" : "bg-mist text-steel hover:text-ink"}`}>{c.name}</Link>
+          <Link key={c.slug} to={`/shop/${c.slug}`} className={`rounded-md px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${slug === c.slug ? "bg-gold text-ink" : "bg-mist text-steel hover:text-ink"}`}>{c.name}</Link>
         ))}
       </div>
 

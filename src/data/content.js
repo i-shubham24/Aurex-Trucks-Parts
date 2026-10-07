@@ -18,7 +18,7 @@ export const NEWS = [
       { h: "Picking the right capacity", p: "Match the lift to body type, pallet weight and lift height, not just the badge on the door. Most general-freight rigids suit a 2T lift. Heavy pallet, beverage or building-supply work calls for 3T steel. Vans and light rigids are best served by 1.5T aluminium, which saves tare weight for payload." },
       { h: "Voltage, platform and controls", p: "All Aurex lifts run 12V or 24V electro-hydraulics to suit the truck's system. Platform widths follow the W2450 standard with heights from 2200 to 2600mm. Foot controllers come standard, with hand controllers and wireless options on request." },
       { h: "VIN-matched before dispatch", p: "Send your VIN, body measurements and a photo of the rear frame. Our counter confirms voltage, platform size and bracket geometry before a lift leaves Campbellfield, and every consignment carries its fitting checklist." },
-      { list: ["Free VIN and fitment check on every tail lift order", "Same-day dispatch on stocked lines ordered by 2pm", "Fitting support on 03 9000 0000 during business hours", "Warranty support with parts ex VIC stock"] },
+      { list: ["Free VIN and fitment check on every tail lift order", "Same-day dispatch on stocked lines ordered by 2pm", "Fitting support on +61 414 730 467 during business hours", "Warranty support with parts ex VIC stock"] },
     ],
   },
   {
@@ -55,11 +55,11 @@ export const NEWS = [
 ];
 
 export const TESTIMONIALS = [
-  { name: "Rudi Santoso", role: "Fleet Manager, Melbourne Transport", quote: "Aurex matched our body hardware in one call and had it on the dock next morning. Zero downtime on our linehaul fleet.", rating: 5, sku: "GL-25126", img: "https://randomuser.me/api/portraits/men/32.jpg" },
-  { name: "Sneha Kulkarni", role: "Production Lead, Cutwell Bodies", quote: "Door locking gear and keeper sets match our CAD specs flawlessly. No guessing left or right configurations.", rating: 5, sku: "GL-11113", img: "https://randomuser.me/api/portraits/women/44.jpg" },
-  { name: "Vikram Nair", role: "Maintenance Lead, AusTrans Logistics", quote: "30-day billing, bulk fleet rates, and ADR compliance certificates provided on every consignment without asking.", rating: 5, sku: "GL-19113H1", img: "https://randomuser.me/api/portraits/men/54.jpg" },
-  { name: "Maria Anggraini", role: "Workshop Owner, Geelong Heavy Repairs", quote: "Direct fit replacement powerpacks and hydraulic cylinders arrived within 24 hours. Saved our breakdown crew a full day.", rating: 5, sku: "A20-01S-06", img: "https://randomuser.me/api/portraits/women/68.jpg" },
-  { name: "Aarav Sharma", role: "Quality Head, Aeroworks Transport", quote: "Toolbox latches, locks, and cam seals all in one invoice. Ordered Friday, fitted and certified Monday morning.", rating: 5, sku: "GL-25126", img: "https://randomuser.me/api/portraits/men/75.jpg" },
+  { name: "Rudi Santoso", role: "Fleet Manager, Melbourne Transport", quote: "Aurex matched our body hardware in one call and had it on the dock next morning. Zero downtime on our linehaul fleet.", rating: 5, sku: "ATP-GL-25126", img: "https://randomuser.me/api/portraits/men/32.jpg" },
+  { name: "Sneha Kulkarni", role: "Production Lead, Cutwell Bodies", quote: "Door locking gear and keeper sets match our CAD specs flawlessly. No guessing left or right configurations.", rating: 5, sku: "ATP-GL-11113", img: "https://randomuser.me/api/portraits/women/44.jpg" },
+  { name: "Vikram Nair", role: "Maintenance Lead, AusTrans Logistics", quote: "30-day billing, bulk fleet rates, and ADR compliance certificates provided on every consignment without asking.", rating: 5, sku: "ATP-GL-19113H1", img: "https://randomuser.me/api/portraits/men/54.jpg" },
+  { name: "Maria Anggraini", role: "Workshop Owner, Geelong Heavy Repairs", quote: "Direct fit replacement powerpacks and hydraulic cylinders arrived within 24 hours. Saved our breakdown crew a full day.", rating: 5, sku: "ATP-A20-01S-06", img: "https://randomuser.me/api/portraits/women/68.jpg" },
+  { name: "Aarav Sharma", role: "Quality Head, Aeroworks Transport", quote: "Toolbox latches, locks, and cam seals all in one invoice. Ordered Friday, fitted and certified Monday morning.", rating: 5, sku: "ATP-GL-25126", img: "https://randomuser.me/api/portraits/men/75.jpg" },
 ];
 
 export const BRANDS = ["BEAUWAY", "GANLAND", "CAIYUAN", "AUREX"];

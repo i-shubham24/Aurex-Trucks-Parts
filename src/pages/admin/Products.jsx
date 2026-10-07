@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { formatAUD } from "../../data/products";
 import { imgFor } from "../../data/images";
+import SafeImage from "../../components/SafeImage";
 import { useCatalog } from "../../store/catalog";
 import { AdminTitle, Empty, Modal, td, th } from "./AdminLayout";
 
@@ -101,7 +102,7 @@ export default function Products() {
                 <tr key={p.sku}>
                   <td className={td}>
                     <span className="flex items-center gap-2.5">
-                      <span className="h-10 w-10 shrink-0 overflow-hidden rounded bg-mist">{imgFor(p.sku) && <img src={imgFor(p.sku)} alt="" className="h-full w-full object-cover" />}</span>
+                      <span className="h-10 w-10 shrink-0 overflow-hidden rounded bg-mist"><SafeImage src={imgFor(p.sku)} alt="" className="h-full w-full object-cover" fallbackIconSize={16} /></span>
                       <span><span className="block font-bold">{p.name}</span><span className="font-mono text-[11px] text-faint">{p.sku}{p.brand ? ` · ${p.brand}` : ""}</span></span>
                     </span>
                   </td>

@@ -30,3 +30,12 @@ config.json
 AurexTrucks/
 skills-src/
 skills-lock.json
+
+# Backend folders excluded from frontend repo
+truck-parts-admin/
+truck-parts-api/
+
+# Local backups and scratch artifacts
+public/images/products_backup/
+*.backup
+test_*.jpg

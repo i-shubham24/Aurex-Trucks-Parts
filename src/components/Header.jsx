@@ -8,6 +8,7 @@ import { useAuth } from "../store/auth";
 import { useCatalog } from "../store/catalog";
 import { formatAUD } from "../data/products";
 import { imgFor } from "../data/images";
+import SafeImage from "./SafeImage";
 
 function SearchBox({ onGo }) {
   const [q, setQ] = useState("");
@@ -38,7 +39,7 @@ function SearchBox({ onGo }) {
           {matches.map((p) => (
             <button key={p.sku} type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => { setFocus(false); setQ(""); if (onGo) onGo(); go(`/product/${p.sku}`); }}
               className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-mist">
-              <span className="h-9 w-9 shrink-0 overflow-hidden rounded bg-mist">{imgFor(p.sku) && <img src={imgFor(p.sku)} alt="" className="h-full w-full object-cover" />}</span>
+              <span className="h-9 w-9 shrink-0 overflow-hidden rounded bg-mist"><SafeImage src={imgFor(p.sku)} alt="" className="h-full w-full object-cover" fallbackIconSize={14} /></span>
               <span className="min-w-0 flex-1"><span className="block truncate text-[13px] font-bold">{p.name}</span><span className="font-mono text-[11px] text-faint">{p.sku}</span></span>
               <span className="tabular shrink-0 text-[13px] font-extrabold text-primary">{p.price === null ? "POA" : formatAUD(p.price)}</span>
             </button>
@@ -53,12 +54,20 @@ function SearchBox({ onGo }) {
 export default function Header() {
   const { count, total, setOpen } = useCart();
   const { user, logout } = useAuth();
+  const { products: PRODUCTS } = useCatalog();
   const COMPANY = useCompany();
   const { settings } = useSite();
   const [menu, setMenu] = useState(false);
   const [shop, setShop] = useState(false);
   const [notice, setNotice] = useState(true);
   const loc = useLocation();
+
+  const catCounts = useMemo(() => ({
+    all: PRODUCTS.length,
+    tailLifts: PRODUCTS.filter((p) => p.category === "tail-lifts").length,
+    trailerParts: PRODUCTS.filter((p) => p.category === "trailer-parts").length,
+    accessories: PRODUCTS.filter((p) => p.category === "accessories").length,
+  }), [PRODUCTS]);
 
   const shopActive = loc.pathname.startsWith("/shop");
   const linkCls = (active) => `u-slide px-3.5 py-2.5 text-[14px] font-bold transition-colors hover:text-navy ${active ? "text-navy" : "text-ink"}`;
@@ -73,8 +82,8 @@ export default function Header() {
       )}
       {/* ── Main header bar (yellow) — logo / search / contact / account / cart ── */}
       <div id="top" className="bg-gold text-ink">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-5 gap-y-2 px-4 py-2">
-          <Link to="/" className="shrink-0"><img src="/logo.png" alt="Aurex Truck Parts" className="h-12 w-auto md:h-16" /></Link>
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-5 gap-y-1.5 px-4 py-0.5 sm:py-1">
+          <Link to="/" className="shrink-0 py-0.5"><img src="/logo.png" alt="Aurex Truck Parts" className="h-14 w-auto sm:h-16 md:h-20 lg:h-[84px] object-contain" /></Link>
           <div className="hidden min-w-0 flex-1 md:flex md:justify-end"><div className="w-full max-w-md"><SearchBox /></div></div>
           <a href={COMPANY.phoneHref} className="group hidden shrink-0 items-center gap-2 xl:flex">
             <Phone size={26} className="text-primary transition-colors group-hover:text-navy" />
@@ -104,17 +113,17 @@ export default function Header() {
             <Link to="/shop" aria-haspopup="true" aria-expanded={shop} onFocus={() => setShop(true)} onClick={() => setShop((v) => !v)} className={`flex items-center gap-2.5 rounded-md px-5 py-2.5 text-[13px] font-extrabold uppercase tracking-wide text-white transition-colors ${shopActive ? "bg-navy" : "bg-ink hover:bg-navy"}`}><Menu size={16} /> Shop by Category <ChevronDown size={14} className={`transition-transform ${shop ? "rotate-180" : ""}`} /></Link>
             {shop && (
               <div className="absolute left-0 top-full z-40 w-64 overflow-hidden rounded-md border border-line bg-white py-1 shadow-xl" onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setShop(false); }}>
-                <Link to="/shop" onClick={() => setShop(false)} className="block px-4 py-2.5 text-sm font-bold transition-colors hover:bg-mist hover:text-navy">All Products <span className="float-right font-mono text-[11px] text-faint">36</span></Link>
-                <Link to="/shop/tail-lifts" onClick={() => setShop(false)} className="flex items-center justify-between border-t border-line px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-mist hover:text-navy">Tail Lifts <span className="font-mono text-[11px] text-faint">6 lines</span></Link>
-                <Link to="/shop/trailer-parts" onClick={() => setShop(false)} className="flex items-center justify-between border-t border-line px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-mist hover:text-navy">Trailer Parts <span className="font-mono text-[11px] text-faint">13 lines</span></Link>
-                <Link to="/shop/accessories" onClick={() => setShop(false)} className="flex items-center justify-between border-t border-line px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-mist hover:text-navy">Accessories <span className="font-mono text-[11px] text-faint">17 lines</span></Link>
+                <Link to="/shop" onClick={() => setShop(false)} className="block px-4 py-2.5 text-sm font-bold transition-colors hover:bg-mist hover:text-navy">All Products <span className="float-right font-mono text-[11px] text-faint">{catCounts.all}</span></Link>
+                <Link to="/shop/tail-lifts" onClick={() => setShop(false)} className="flex items-center justify-between border-t border-line px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-mist hover:text-navy">Tail Lifts <span className="font-mono text-[11px] text-faint">{catCounts.tailLifts} lines</span></Link>
+                <Link to="/shop/trailer-parts" onClick={() => setShop(false)} className="flex items-center justify-between border-t border-line px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-mist hover:text-navy">Trailer Parts <span className="font-mono text-[11px] text-faint">{catCounts.trailerParts} lines</span></Link>
+                <Link to="/shop/accessories" onClick={() => setShop(false)} className="flex items-center justify-between border-t border-line px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-mist hover:text-navy">Accessories <span className="font-mono text-[11px] text-faint">{catCounts.accessories} lines</span></Link>
               </div>
             )}
           </div>
           <Link to="/" className={linkCls(loc.pathname === "/")}>Home</Link>
-          <Link to="/shop" className={linkCls(shopActive)}>Shop</Link>
-          <Link to="/about" className={linkCls(loc.pathname === "/about")}>About Us</Link>
+          <Link to="/shop" className={linkCls(shopActive)}>Shop All</Link>
           <Link to="/contact" className={linkCls(loc.pathname === "/contact")}>Contact</Link>
+          <Link to="/about" className={linkCls(loc.pathname === "/about")}>About Us</Link>
           <Link to="/track" className={linkCls(loc.pathname === "/track")}>Track Order</Link>
           <span className="ml-auto hidden items-center gap-3 text-[13px] font-bold lg:flex">
             {user ? (
@@ -140,12 +149,12 @@ export default function Header() {
       {menu && (
         <div className="border-t border-line bg-white px-4 py-2 md:hidden">
           <Link to="/" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">Home</Link>
-          <Link to="/shop" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">Shop All Products</Link>
-          <Link to="/shop/tail-lifts" onClick={() => setMenu(false)} className="block border-t border-line py-3 pl-4 text-sm font-semibold text-steel first:border-0">Tail Lifts</Link>
-          <Link to="/shop/trailer-parts" onClick={() => setMenu(false)} className="block border-t border-line py-3 pl-4 text-sm font-semibold text-steel first:border-0">Trailer Parts</Link>
-          <Link to="/shop/accessories" onClick={() => setMenu(false)} className="block border-t border-line py-3 pl-4 text-sm font-semibold text-steel first:border-0">Accessories</Link>
-          <Link to="/about" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">About Us</Link>
+          <Link to="/shop" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">Shop All ({catCounts.all})</Link>
+          <Link to="/shop/tail-lifts" onClick={() => setMenu(false)} className="block border-t border-line py-3 pl-4 text-sm font-semibold text-steel first:border-0">Tail Lifts ({catCounts.tailLifts})</Link>
+          <Link to="/shop/trailer-parts" onClick={() => setMenu(false)} className="block border-t border-line py-3 pl-4 text-sm font-semibold text-steel first:border-0">Trailer Parts ({catCounts.trailerParts})</Link>
+          <Link to="/shop/accessories" onClick={() => setMenu(false)} className="block border-t border-line py-3 pl-4 text-sm font-semibold text-steel first:border-0">Accessories ({catCounts.accessories})</Link>
           <Link to="/contact" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">Contact</Link>
+          <Link to="/about" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">About Us</Link>
           <Link to="/track" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">Track Order</Link>
           <Link to="/orders" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">My Orders</Link>
           <div className="flex gap-4 border-t border-line py-3 text-[15px] font-bold">

@@ -45,10 +45,10 @@ export default function CompareTray() {
 
   return (
     <>
-      <div className="fixed bottom-4 left-1/2 z-[60] flex max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-2 rounded-full border border-white/10 bg-ink py-2 pl-2 pr-2 text-white shadow-2xl">
-        <span className="flex -space-x-2 pl-2">{items.map((p) => <span key={p.sku} className="grid h-8 w-8 place-items-center rounded-full border border-white/20 bg-white/10 text-[10px] font-black">{p.sku.slice(0, 2)}</span>)}</span>
+      <div className="fixed bottom-4 left-1/2 z-[60] flex max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-2 rounded-md border border-white/10 bg-ink py-2 pl-2 pr-2 text-white shadow-2xl">
+        <span className="flex -space-x-1 pl-2">{items.map((p) => <span key={p.sku} className="grid h-8 w-8 place-items-center rounded-md border border-white/20 bg-white/10 text-[10px] font-black">{p.sku.slice(0, 2)}</span>)}</span>
         <span className="hidden px-1 text-[13px] font-bold min-[420px]:inline">Compare ({items.length}/3)</span>
-        <button onClick={() => setOpen(true)} className="rounded-full bg-gold px-5 py-2 text-[13px] font-bold text-ink transition-colors hover:bg-white">Compare</button>
+        <button onClick={() => setOpen(true)} className="rounded-md bg-gold px-4 py-1.5 text-xs font-extrabold text-ink transition-colors hover:bg-white">Compare</button>
         <button onClick={clearCompare} className="p-2 text-white/50 hover:text-white" aria-label="Clear compare"><X size={15} /></button>
       </div>
       {open && (
@@ -73,7 +73,7 @@ export default function CompareTray() {
                 {items.map((p) => (
                   <div key={p.sku} className="relative overflow-hidden rounded-md border border-line bg-white">
                     <span className="block aspect-[16/9] overflow-hidden bg-mist">{imgFor(p.sku) && <img src={imgFor(p.sku)} alt={p.name} className="h-full w-full object-cover" />}</span>
-                    <button onClick={() => toggleCompare(p.sku)} className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-white text-faint shadow transition-colors hover:text-primary" aria-label={`Remove ${p.sku}`}><Trash2 size={13} /></button>
+                    <button onClick={() => toggleCompare(p.sku)} className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-md bg-white text-faint shadow transition-colors hover:text-primary" aria-label={`Remove ${p.sku}`}><Trash2 size={13} /></button>
                     <div className="p-3">
                       <p className="font-mono text-[10px] uppercase tracking-wide text-faint">{p.sub} . {p.sku}</p>
                       <p className="mt-0.5 line-clamp-2 min-h-9 text-[13px] font-bold leading-snug">{p.name}</p>

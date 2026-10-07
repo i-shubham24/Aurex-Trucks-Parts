@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNotification } from "./notification";
+import { api, API_ON, setToken, tryRefresh, normaliseOrder } from "../lib/api";
 
 const AuthCtx = createContext(null);
 const USERS_KEY = "aurex_users";
@@ -17,14 +18,121 @@ const readTemp = () => { try { const v = sessionStorage.getItem(TEMP_SESSION_KEY
 function ensureAdmin() {
   const users = read(USERS_KEY, []);
   const i = users.findIndex((u) => u.email === ADMIN_EMAIL);
-  const seed = { name: "Store Admin", email: ADMIN_EMAIL, password: ADMIN_PASS, phone: "03 9000 0000", company: "Aurex HQ", createdAt: new Date().toISOString(), role: "admin" };
+  const seed = { name: "Store Admin", email: ADMIN_EMAIL, password: ADMIN_PASS, phone: "+61 414 730 467", company: "Aurex HQ", createdAt: new Date().toISOString(), role: "admin" };
   if (i === -1) users.push(seed);
   else users[i] = { ...users[i], password: ADMIN_PASS, role: "admin" };
   write(USERS_KEY, users);
   return users;
 }
 
-export function AuthProvider({ children }) {
+/* ───────────────────────── API-backed provider ─────────────────────────
+   Active when VITE_API_URL is set. Mirrors orders into the `orders` state,
+   which the existing effect persists to localStorage — so Account/Track/
+   OrderSuccess (which read via utils/orders.js) keep working unchanged. */
+function ApiAuthProvider({ children }) {
+  const { notify } = useNotification();
+  const [user, setUser] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [orders, setOrders] = useState(() => read(ORDERS_KEY, []));
+
+  // Persist orders so the sync localStorage readers (utils/orders.js) see them.
+  useEffect(() => write(ORDERS_KEY, orders), [orders]);
+
+  const loadMyOrders = async () => {
+    try {
+      const { items } = await api.get("/orders/mine");
+      setOrders((items || []).map(normaliseOrder));
+    } catch { /* not logged in / none */ }
+  };
+
+  // Restore an existing session on load via the refresh cookie.
+  useEffect(() => {
+    (async () => {
+      if (await tryRefresh()) {
+        try {
+          const { user } = await api.get("/auth/me");
+          setUser({ ...user, isAdmin: user.role === "admin" || user.email === ADMIN_EMAIL });
+          await loadMyOrders();
+        } catch { /* ignore */ }
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const signup = async ({ name, email, password, phone, company }) => {
+    try {
+      const data = await api.post("/auth/register", { name, email, password, phone, company }, { auth: false });
+      setToken(data.accessToken);
+      setUser({ ...data.user, isAdmin: data.user.isAdmin });
+      await loadMyOrders();
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, msg: e.message || "Could not create account." };
+    }
+  };
+
+  const login = async ({ email, password }) => {
+    try {
+      const data = await api.post("/auth/login", { email, password }, { auth: false });
+      setToken(data.accessToken);
+      setUser({ ...data.user, isAdmin: data.user.isAdmin });
+      await loadMyOrders();
+      return { ok: true };
+    } catch (e) {
+      return { ok: false, msg: e.message || "Email or password did not match." };
+    }
+  };
+
+  const logout = () => {
+    api.post("/auth/logout", {}, { auth: false }).catch(() => {});
+    setToken(null);
+    setUser(null);
+    setOrders([]);
+    notify.info({
+      kicker: "ACCOUNT LOGOUT",
+      title: "Logged Out Successfully",
+      message: "You have been signed out securely. Cart and guest checkout remain active.",
+      icon: "login",
+      sound: false,
+    });
+  };
+
+  // Checkout awaits this. Returns the created (normalised) order, or null on failure.
+  const placeOrder = async (order) => {
+    try {
+      const payload = {
+        items: (order.items || []).map((l) => ({ sku: l.sku, qty: l.qty })),
+        promoCode: order.promoCode || null,
+        shipping: order.shipping,
+        payment: order.payment,
+        address: order.address,
+      };
+      const { order: created } = await api.post("/orders", payload);
+      const norm = normaliseOrder(created);
+      setOrders((o) => [norm, ...o]);
+      return norm;
+    } catch (e) {
+      notify.info({
+        kicker: "ORDER FAILED",
+        title: "We couldn't place your order",
+        message: e.message || "Please check your details and try again.",
+        sound: false,
+      });
+      return null;
+    }
+  };
+
+  const myOrders = useMemo(() => orders, [orders]);
+
+  return (
+    <AuthCtx.Provider value={{ user, session: user?.email || null, users, setUsers, signup, login, logout, orders, setOrders, myOrders, placeOrder }}>
+      {children}
+    </AuthCtx.Provider>
+  );
+}
+
+/* ─────────────────────── localStorage provider (original) ─────────────── */
+function LocalAuthProvider({ children }) {
   const { notify } = useNotification();
   const [users, setUsers] = useState(() => ensureAdmin());
   const [session, setSession] = useState(() => read(SESSION_KEY, null) ?? readTemp());
@@ -32,7 +140,6 @@ export function AuthProvider({ children }) {
   const [orders, setOrders] = useState(() => read(ORDERS_KEY, []));
 
   useEffect(() => write(USERS_KEY, users), [users]);
-  /* Remember-me ON → localStorage (survives restarts). OFF → sessionStorage (this tab only). */
   useEffect(() => {
     try {
       if (persist) {
@@ -64,7 +171,6 @@ export function AuthProvider({ children }) {
 
   const login = ({ email, password, remember = true }) => {
     const cleanEmail = String(email || "").trim().toLowerCase().slice(0, 120);
-    /* Brute-force throttle: 5 failed attempts locks the address for 60 seconds. */
     try {
       const raw = localStorage.getItem("aurex_login_attempts");
       const att = raw ? JSON.parse(raw) : {};
@@ -93,7 +199,6 @@ export function AuthProvider({ children }) {
         localStorage.setItem("aurex_login_attempts", JSON.stringify(att));
       } catch { /* private mode */ }
     };
-    // Demo-only auth: credentials live in this browser's localStorage.
     let f = users.find((u) => u.email === cleanEmail && u.password === password);
     if (!f) {
       try {
@@ -146,9 +251,11 @@ export function AuthProvider({ children }) {
   return <AuthCtx.Provider value={{ user, session, users, setUsers, signup, login, logout, orders, setOrders, myOrders, placeOrder }}>{children}</AuthCtx.Provider>;
 }
 
-/* Safe default: no component may crash if it ever renders outside the
-   provider (e.g. a stale dev-HMR module identity). Real tree always
-   provides a value, so this path only triggers a console warning. */
+export function AuthProvider({ children }) {
+  return API_ON ? <ApiAuthProvider>{children}</ApiAuthProvider> : <LocalAuthProvider>{children}</LocalAuthProvider>;
+}
+
+/* Safe default so no component crashes outside the provider. */
 const authFallback = {
   user: null, session: null, users: [], orders: [], myOrders: [],
   setUsers: () => {}, setOrders: () => {}, logout: () => {},

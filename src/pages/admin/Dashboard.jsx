@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Download, RefreshCw } from "lucide-react";
 import { formatAUD } from "../../data/products";
 import { imgFor } from "../../data/images";
+import SafeImage from "../../components/SafeImage";
 import { useAuth } from "../../store/auth";
 import { useCatalog } from "../../store/catalog";
 import { useSite } from "../../store/site";
@@ -54,7 +55,7 @@ export default function Dashboard() {
           <p className="border-b-2 border-ink px-4 py-2.5 text-sm font-extrabold">Top products by reviews</p>
           {top.map((p) => (
             <div key={p.sku} className="flex items-center gap-3 border-b border-line px-4 py-2.5 last:border-b-0">
-              <span className="h-10 w-10 shrink-0 overflow-hidden rounded bg-mist">{imgFor(p.sku) && <img src={imgFor(p.sku)} alt="" className="h-full w-full object-cover" />}</span>
+              <span className="h-10 w-10 shrink-0 overflow-hidden rounded bg-mist"><SafeImage src={imgFor(p.sku)} alt="" className="h-full w-full object-cover" fallbackIconSize={16} /></span>
               <span className="min-w-0 flex-1"><span className="block truncate text-[13px] font-bold">{p.name}</span><span className="font-mono text-[11px] text-faint">{p.sku} · {p.reviews || 0} reviews</span></span>
               <span className="tabular text-[13px] font-extrabold text-primary">{p.price == null ? "POA" : formatAUD(p.price)}</span>
             </div>

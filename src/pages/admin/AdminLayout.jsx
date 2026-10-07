@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Menu, Package, ShoppingCart, Tags, Users, MailQuestion, Megaphone, Settings, X } from "lucide-react";
+import { LayoutDashboard, Menu, Package, ShoppingCart, Tags, Users, MailQuestion, Megaphone, Settings, X, LogOut } from "lucide-react";
 import { useAuth, ADMIN_EMAIL } from "../../store/auth";
 
 const GROUPS = [
@@ -140,20 +140,45 @@ export default function AdminLayout() {
         </div>
         <div className="flex-1 overflow-auto p-2">{nav}</div>
         <div className="border-t border-white/10 p-4 text-sm">
-          <p className="truncate font-bold">{user.name}</p>
+          <p className="truncate font-bold text-white">{user.name}</p>
           <p className="truncate font-mono text-[11px] text-gray-400">{user.email}</p>
-          <button onClick={() => { logout(); go("/admin"); }} className="mt-2 w-full rounded border border-white/20 py-2 text-[13px] font-bold transition-colors hover:border-gold hover:text-gold">Logout</button>
+          <button
+            onClick={() => { logout(); go("/admin"); }}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-md bg-red-600/90 py-2.5 text-xs font-extrabold text-white transition-colors hover:bg-red-600 shadow-sm"
+          >
+            <LogOut size={14} /> Log Out
+          </button>
         </div>
       </aside>
-      <div className="min-w-0">
-        <div className="sticky top-0 z-30 flex items-center gap-3 border-b border-line bg-white px-4 py-3 lg:hidden">
-          <button onClick={() => setOpen(!open)} aria-label="Menu" className="grid h-10 w-10 place-items-center border border-line-dark">{open ? <X size={20} /> : <Menu size={20} />}</button>
-          <p className="text-sm font-extrabold">Staff Console</p>
-          <button onClick={() => { logout(); go("/admin"); }} className="ml-auto text-[13px] font-bold text-steel">Logout</button>
-        </div>
+      <div className="min-w-0 flex flex-col">
+        {/* Top header bar for desktop & mobile */}
+        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-white px-4 py-3 shadow-xs md:px-6">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setOpen(!open)} aria-label="Menu" className="grid h-9 w-9 place-items-center rounded border border-line-dark lg:hidden">{open ? <X size={18} /> : <Menu size={18} />}</button>
+            <span className="inline-block h-2.5 w-2.5 rounded-full bg-green-500 animate-pulse" />
+            <p className="text-sm font-extrabold text-ink">Staff Console <span className="hidden sm:inline font-mono text-xs font-normal text-faint">· Internal Management</span></p>
+          </div>
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Link to="/" target="_blank" className="hidden text-xs font-bold text-steel hover:text-navy underline sm:inline-flex">Storefront ↗</Link>
+            <div className="hidden h-4 w-px bg-line sm:block" />
+            <div className="text-right">
+              <p className="text-xs font-extrabold text-ink">{user.name}</p>
+              <p className="hidden font-mono text-[10px] text-faint md:block">{user.email}</p>
+            </div>
+            <button
+              onClick={() => { logout(); go("/admin"); }}
+              className="flex items-center gap-1.5 rounded-md bg-red-600 px-3 py-1.5 text-xs font-extrabold text-white shadow-xs transition-colors hover:bg-red-700 active:scale-95"
+              title="Log out of Staff Console"
+            >
+              <LogOut size={13} />
+              <span>Log Out</span>
+            </button>
+          </div>
+        </header>
         {open && <div className="border-b border-line bg-ink p-2 text-white lg:hidden">{nav}</div>}
-        <div className="mx-auto max-w-6xl px-4 py-6"><Outlet /></div>
+        <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6"><Outlet /></div>
       </div>
     </div>
   );
 }
+

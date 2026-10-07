@@ -13,7 +13,7 @@ export default function OrderSuccess() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
       <div className="rounded-2xl border border-line bg-white p-6 text-center shadow-[0_16px_40px_rgba(0,32,73,0.08)]">
-        <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-green-50 ring-1 ring-green-200"><CheckCircle2 size={32} className="text-green-700" /></span>
+        <span className="mx-auto grid h-16 w-16 place-items-center rounded-md bg-green-50 ring-1 ring-green-200"><CheckCircle2 size={32} className="text-green-700" /></span>
         <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-ink">Order locked in</h1>
         <p className="mt-1 text-sm text-steel">Packed in Campbellfield VIC. Keep your order ID for tracking.</p>
         <p className="mx-auto mt-3 w-fit rounded-lg bg-gold px-4 py-1.5 font-mono text-lg font-extrabold text-ink">{id}</p>

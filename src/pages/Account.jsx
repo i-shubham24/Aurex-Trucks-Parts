@@ -4,6 +4,7 @@ import { ArrowRight, Check, ChevronDown, MapPin, Package, PackageSearch, RotateC
 import { listOrders, orderStatus } from "../utils/orders";
 import { formatAUD } from "../data/products";
 import { imgFor } from "../data/images";
+import SafeImage from "../components/SafeImage";
 import { useCart } from "../store/cart";
 import { useAuth } from "../store/auth";
 
@@ -92,7 +93,7 @@ function OrderCard({ order, onReorder }) {
           {shown.map((l) => (
             <li key={l.sku} className="flex items-center gap-3 px-3 py-2.5">
               <span className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-mist ring-1 ring-line">
-                {imgFor(l.sku) ? <img src={imgFor(l.sku)} alt="" className="h-full w-full object-cover" /> : <span className="grid h-full w-full place-items-center text-faint"><Package size={16} /></span>}
+                <SafeImage src={imgFor(l.sku)} alt={l.name || ""} className="h-full w-full object-cover" fallbackIconSize={16} />
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-[13px] font-bold">{l.qty} × {l.name}</span>
@@ -133,9 +134,9 @@ function OrdersToolbar({ q, setQ, status, setStatus, count }) {
       </div>
       <div className="flex flex-wrap gap-1.5">
         {["All", "Active", "Delivered", "Cancelled"].map((s) => (
-          <button key={s} onClick={() => setStatus(s)} className={`rounded-full px-3 py-1.5 text-[12px] font-extrabold transition ${status === s ? "bg-ink text-white" : "bg-mist text-steel hover:text-ink"}`}>{s}</button>
+          <button key={s} onClick={() => setStatus(s)} className={`rounded-md px-3 py-1.5 text-[12px] font-extrabold transition ${status === s ? "bg-ink text-white" : "bg-mist text-steel hover:text-ink"}`}>{s}</button>
         ))}
-        <span className="ml-auto self-center rounded-full bg-ink px-3 py-1 font-mono text-[11px] font-bold text-gold">{count} ORDERS</span>
+        <span className="ml-auto self-center rounded-md bg-ink px-2.5 py-1 font-mono text-[11px] font-bold text-gold">{count} ORDERS</span>
       </div>
     </div>
   );
@@ -215,7 +216,7 @@ export function ProfileBody() {
               <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-navy text-2xl font-extrabold text-white">{(user?.name || "G")[0].toUpperCase()}</span>
               <h1 className="mt-2 truncate text-xl font-extrabold tracking-tight text-ink">{user ? user.name : "Guest Trader"}</h1>
               <p className="truncate text-[13px] text-steel">{user?.email || "Log in for trade pricing and order history."}{user?.company ? ` · ${user.company}` : ""}</p>
-              <span className="mt-2 inline-block rounded-full bg-gold/25 px-3 py-1 text-xs font-extrabold text-ink">{all.length} ORDERS</span>
+              <span className="mt-2 inline-block rounded-md bg-gold/25 px-2.5 py-1 text-xs font-extrabold text-ink">{all.length} ORDERS</span>
               {user && <button onClick={logout} className="mt-3 w-full rounded-lg border border-line-dark py-2 text-sm font-bold text-steel transition hover:border-navy hover:text-navy">Logout</button>}
             </div>
 

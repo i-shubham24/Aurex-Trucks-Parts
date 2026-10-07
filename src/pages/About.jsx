@@ -32,7 +32,7 @@ export default function About() {
 
       <section className="mt-10 bg-ink py-8 text-white">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 md:grid-cols-4">
-          {[["36", "Approved lines"], ["3", "Categories"], ["1", "VIC counter"], ["4hr", "Quote turnaround"]].map(([n, l]) => (
+          {[["140+", "Approved lines"], ["3", "Categories"], ["1", "VIC counter"], ["4hr", "Quote turnaround"]].map(([n, l]) => (
             <div key={l} className="border-l-2 border-gold pl-4">
               <p className="tabular text-3xl font-extrabold md:text-4xl">{n}</p>
               <p className="mt-1 text-[13px] text-gray-300">{l}</p>

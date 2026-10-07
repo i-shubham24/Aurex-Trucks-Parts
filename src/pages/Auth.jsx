@@ -70,7 +70,7 @@ export function AuthCard({ mode: initial = "login" }) {
     </Field>
   );
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     setErr("");
     const fe = {};
@@ -89,9 +89,9 @@ export function AuthCard({ mode: initial = "login" }) {
     if (Object.keys(fe).length) return;
     let r;
     if (tab === "signup") {
-      r = signup({ name, email, password: pass, phone: phone.trim(), company: company.trim() });
+      r = await signup({ name, email, password: pass, phone: phone.trim(), company: company.trim() });
     } else {
-      r = login({ email, password: pass, remember });
+      r = await login({ email, password: pass, remember });
     }
     if (!r.ok) {
       setErr(r.msg);
@@ -144,9 +144,9 @@ export function AuthCard({ mode: initial = "login" }) {
         <p className="text-[10px] font-bold uppercase leading-[1.5] tracking-[0.2em] text-navy">Trade<br />accounts</p>
       </div>
       <div className="flex items-center justify-between gap-3">
-        <div className="inline-flex rounded-full bg-mist p-1">
-          <button type="button" onClick={() => switchTab("login")} className={`rounded-full px-4 py-1 text-[13px] font-extrabold transition ${tab === "login" ? "bg-ink text-white shadow" : "text-steel hover:text-ink"}`}>Login</button>
-          <button type="button" onClick={() => switchTab("signup")} className={`rounded-full px-4 py-1 text-[13px] font-extrabold transition ${tab === "signup" ? "bg-ink text-white shadow" : "text-steel hover:text-ink"}`}>Sign up</button>
+        <div className="inline-flex rounded-md bg-mist p-1">
+          <button type="button" onClick={() => switchTab("login")} className={`rounded-md px-4 py-1 text-[13px] font-extrabold transition ${tab === "login" ? "bg-ink text-white shadow" : "text-steel hover:text-ink"}`}>Login</button>
+          <button type="button" onClick={() => switchTab("signup")} className={`rounded-md px-4 py-1 text-[13px] font-extrabold transition ${tab === "signup" ? "bg-ink text-white shadow" : "text-steel hover:text-ink"}`}>Sign up</button>
         </div>
         <span className="hidden items-center gap-1.5 text-[11px] font-bold text-faint sm:flex"><ShieldCheck size={13} className="text-green-700" /> Secure 256-bit</span>
       </div>
@@ -215,7 +215,7 @@ export function AuthCard({ mode: initial = "login" }) {
             <label className="flex cursor-pointer items-center gap-2 font-semibold text-steel">
               <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-4 w-4 accent-[#002049]" /> Remember me
             </label>
-            <span className="font-semibold text-faint">Forgot password?</span>
+            <Link to="/forgot-password" className="font-semibold text-navy hover:underline">Forgot password?</Link>
           </div>
         )}
 

@@ -16,6 +16,7 @@ import PromoPopup from "./components/PromoPopup";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import TailLiftEnquiry from "./pages/TailLiftEnquiry";
 import Shop, { CategoryByParam } from "./pages/Shop";
 import Policies from "./pages/Policies";
 import ProductDetail from "./pages/ProductDetail";
@@ -25,6 +26,7 @@ import OrderSuccess from "./pages/OrderSuccess";
 import Orders, { ProfileBody } from "./pages/Account";
 import Track from "./pages/Track";
 import Auth from "./pages/Auth";
+import Reset from "./pages/Reset";
 import AdminLayout from "./pages/admin/AdminLayout";
 import Dashboard from "./pages/admin/Dashboard";
 import AdminOrders from "./pages/admin/Orders";
@@ -78,7 +80,7 @@ function Shell() {
 
   /* Standalone account screens: full-screen, no storefront chrome
      (no header, footer, cart drawer, popups) — same treatment as admin. */
-  if (pathname === "/login" || pathname === "/signup") {
+  if (pathname === "/login" || pathname === "/signup" || pathname === "/forgot-password" || pathname === "/reset-password") {
     return (
       <>
         <ScrollManager />
@@ -86,6 +88,8 @@ function Shell() {
         <Routes>
           <Route path="/login" element={<Auth mode="login" />} />
           <Route path="/signup" element={<Auth mode="signup" />} />
+          <Route path="/forgot-password" element={<Reset />} />
+          <Route path="/reset-password" element={<Reset />} />
         </Routes>
       </>
     );
@@ -103,6 +107,8 @@ function Shell() {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/tail-lift-enquiry" element={<TailLiftEnquiry />} />
+        <Route path="/enquiry/tail-lift" element={<TailLiftEnquiry />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/shop/:slug" element={<CategoryByParam />} />
         <Route path="/policies" element={<Policies />} />

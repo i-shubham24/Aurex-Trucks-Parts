@@ -1,13 +1,84 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { PRODUCTS as SEED_PRODUCTS, CATEGORIES as SEED_CATS } from "../data/products";
+import { api, API_ON } from "../lib/api";
 
 const Ctx = createContext(null);
-const K = "aurex_catalog_v1"; // { updated:{sku:patch}, added:[product], deleted:[sku], cats:[...]|null }
+const K = "aurex_catalog_v2"; // { updated:{sku:patch}, added:[product], deleted:[sku], cats:[...]|null }
+
 
 const read = () => { try { const v = localStorage.getItem(K); return v ? JSON.parse(v) : null; } catch { return null; } };
 const blank = () => ({ updated: {}, added: [], deleted: [], cats: null });
 
-export function CatalogProvider({ children }) {
+/* ─────────────── API-backed provider ───────────────
+   Seeded from the bundled catalogue so there is no empty flash, then
+   replaced with live data from the backend. Admin writes are optimistic
+   (instant UI) with the API call in the background; on error we refetch to
+   resync. Category counts are derived from products (same as the original). */
+function ApiCatalogProvider({ children }) {
+  const [products, setProducts] = useState(SEED_PRODUCTS);
+  const [catBase, setCatBase] = useState(SEED_CATS);
+
+  const refresh = async () => {
+    try {
+      const [p, c] = await Promise.all([api.get("/products?limit=1000"), api.get("/categories")]);
+      if (p?.items) setProducts(p.items);
+      if (c?.items) setCatBase(c.items);
+    } catch { /* keep seeded data if the API is unreachable */ }
+  };
+  useEffect(() => { refresh(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+
+  const categories = useMemo(
+    () => catBase.map((c) => ({ ...c, count: products.filter((p) => p.category === c.slug).length })),
+    [catBase, products]
+  );
+
+  const addProduct = (p) => {
+    if (!p.sku.trim() || !p.name.trim()) return { ok: false, msg: "SKU and name are required." };
+    const sku = p.sku.trim().toUpperCase();
+    if (products.some((x) => x.sku === sku)) return { ok: false, msg: "That SKU already exists." };
+    const next = { ...p, sku };
+    setProducts((l) => [...l, next]);
+    api.post("/products", next).catch(refresh);
+    return { ok: true };
+  };
+  const updateProduct = (sku, patch) => {
+    setProducts((l) => l.map((p) => (p.sku === sku ? { ...p, ...patch } : p)));
+    api.put(`/products/${sku}`, patch).catch(refresh);
+  };
+  const deleteProduct = (sku) => {
+    setProducts((l) => l.filter((p) => p.sku !== sku));
+    api.del(`/products/${sku}`).catch(refresh);
+  };
+  const resetCatalog = () => refresh();
+
+  const addCategory = (c) => {
+    const slug = c.slug.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    if (!c.name.trim() || !slug) return { ok: false, msg: "Name required and must be unique." };
+    if (catBase.some((x) => x.slug === slug)) return { ok: false, msg: "That category already exists." };
+    const next = { slug, name: c.name.trim(), tag: c.tag || "", blurb: c.blurb || "" };
+    setCatBase((l) => [...l, next]);
+    api.post("/categories", next).catch(refresh);
+    return { ok: true };
+  };
+  const updateCategory = (slug, patch) => {
+    setCatBase((l) => l.map((c) => (c.slug === slug ? { ...c, ...patch } : c)));
+    api.put(`/categories/${slug}`, patch).catch(refresh);
+  };
+  const deleteCategory = (slug) => {
+    setCatBase((l) => l.filter((c) => c.slug !== slug));
+    api.del(`/categories/${slug}`).catch(refresh);
+  };
+  const resetCategories = () => refresh();
+
+  const value = useMemo(() => ({
+    products, categories, addProduct, updateProduct, deleteProduct, resetCatalog,
+    updateCategory, addCategory, deleteCategory, resetCategories,
+  }), [products, categories]); // eslint-disable-line react-hooks/exhaustive-deps
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+}
+
+/* ─────────────── localStorage provider (original) ─────────────── */
+function LocalCatalogProvider({ children }) {
   const [ov, setOv] = useState(() => read() || blank());
   useEffect(() => { try { localStorage.setItem(K, JSON.stringify(ov)); } catch { /* private mode */ } }, [ov]);
 
@@ -67,6 +138,10 @@ export function CatalogProvider({ children }) {
     updateCategory, addCategory, deleteCategory, resetCategories,
   }), [products, categories]); // eslint-disable-line react-hooks/exhaustive-deps
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+}
+
+export function CatalogProvider({ children }) {
+  return API_ON ? <ApiCatalogProvider>{children}</ApiCatalogProvider> : <LocalCatalogProvider>{children}</LocalCatalogProvider>;
 }
 
 export const useCatalog = () => {

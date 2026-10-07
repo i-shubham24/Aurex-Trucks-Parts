@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { COMPANY } from "../data/company";
+import { api, API_ON } from "../lib/api";
 
 const Ctx = createContext(null);
-const K = { settings: "aurex_settings_v1", promos: "aurex_promos_v1", enquiries: "aurex_enquiries_v1" };
+const K = { settings: "aurex_settings_v2", promos: "aurex_promos_v1", enquiries: "aurex_enquiries_v1" };
 
 const DEFAULT_SETTINGS = {
   storeName: "Aurex Truck Parts Australia",
@@ -14,7 +15,7 @@ const DEFAULT_SETTINGS = {
   standardFee: 24,
   expressFee: 39,
   abn: "ABN 12 345 678 901",
-  announcement: "Free road freight over $500. Order by 2pm for same day dispatch.",
+  announcement: "",
 };
 const DEFAULT_PROMOS = [
   { code: "WELCOME10", label: "First order", pct: 10, active: true },
@@ -27,7 +28,44 @@ const SEED_ENQUIRIES = [
 
 const read = (k, fb) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } };
 
-export function SiteProvider({ children }) {
+/* ─────────────── API-backed provider ───────────────
+   Seeded from defaults (no flash), then settings + active promos are pulled
+   from the backend. Enquiries submit to the API; the admin enquiry list loads
+   when the viewer is an admin. NOTE: in-app admin settings/promo edits persist
+   through the dedicated truck-parts-admin app — use that for admin in API mode. */
+function ApiSiteProvider({ children }) {
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [promos, setPromos] = useState(DEFAULT_PROMOS);
+  const [enquiries, setEnquiries] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      try { const { settings } = await api.get("/settings"); if (settings) setSettings((s) => ({ ...s, ...settings })); } catch { /* keep defaults */ }
+      try { const { items } = await api.get("/promos/active"); if (items) setPromos(items); } catch { /* keep defaults */ }
+      try { const { items } = await api.get("/enquiries"); if (items) setEnquiries(items.map((e) => ({ ...e, id: e.ref, at: e.createdAt }))); } catch { /* non-admin */ }
+    })();
+  }, []);
+
+  const addEnquiry = (e) => {
+    api.post("/enquiries", {
+      name: e.name, phone: e.phone, email: e.email, topic: e.topic, message: e.message, sku: e.sku || null,
+    }).catch(() => {});
+    return "ENQ-SENT";
+  };
+  const setEnquiryStatus = (id, status) => {
+    setEnquiries((l) => l.map((x) => (x.id === id ? { ...x, status } : x)));
+    api.patch(`/enquiries/${id}/status`, { status }).catch(() => {});
+  };
+
+  const value = useMemo(() => ({
+    settings, setSettings, promos, setPromos, enquiries, addEnquiry, setEnquiryStatus,
+    resetSite: () => { setSettings(DEFAULT_SETTINGS); setPromos(DEFAULT_PROMOS); },
+  }), [settings, promos, enquiries]);
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+}
+
+/* ─────────────── localStorage provider (original) ─────────────── */
+function LocalSiteProvider({ children }) {
   const [settings, setSettings] = useState(() => read(K.settings, DEFAULT_SETTINGS));
   const [promos, setPromos] = useState(() => read(K.promos, DEFAULT_PROMOS));
   const [enquiries, setEnquiries] = useState(() => read(K.enquiries, SEED_ENQUIRIES));
@@ -50,6 +88,10 @@ export function SiteProvider({ children }) {
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 
+export function SiteProvider({ children }) {
+  return API_ON ? <ApiSiteProvider>{children}</ApiSiteProvider> : <LocalSiteProvider>{children}</LocalSiteProvider>;
+}
+
 export const useSite = () => {
   const ctx = useContext(Ctx);
   if (!ctx && import.meta.env?.DEV) console.error("[site] useSite rendered without SiteProvider.");
@@ -67,7 +109,7 @@ export const useCompany = () => {
     name: settings.storeName,
     short: "Aurex",
     phone: settings.phone,
-    phoneHref: "tel:" + String(settings.phone || "").replace(/\D/g, ""),
+    phoneHref: "tel:" + (String(settings.phone || "").startsWith("+") ? "+" : "") + String(settings.phone || "").replace(/\D/g, ""),
     email: settings.email,
     address: settings.address,
     hours: settings.hours,

@@ -19,4 +19,11 @@ export const CAT_IMG = {
   "accessories": "/images/ACCESSORIES-CAT.jpg",
 };
 
-export const imgFor = (sku) => SKU_IMG[sku] || null;
+export const imgFor = (sku) => {
+  if (!sku) return null;
+  if (SKU_IMG[sku]) return SKU_IMG[sku];
+  const clean = sku.startsWith("ATP-") ? sku.slice(4) : sku;
+  if (SKU_IMG[clean]) return SKU_IMG[clean];
+  return `/images/products/${sku}.jpg`;
+};
+

@@ -3,11 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { CheckCircle2, CreditCard, Landmark, Truck, Wallet } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { imgFor } from "../data/images";
+import SafeImage from "../components/SafeImage";
 import { useCompany } from "../store/site";
 import { useCart } from "../store/cart";
 import { useAuth } from "../store/auth";
 import { useSite } from "../store/site";
 import { useNotification } from "../store/notification";
+import { api, API_ON } from "../lib/api";
 import ThemeSelect from "../components/ThemeSelect";
 
 const STATES = ["VIC", "NSW", "QLD", "SA", "WA", "TAS", "NT", "ACT"];
@@ -75,7 +77,7 @@ export default function Checkout() {
     setCard((c) => ({ ...c, expiry: d.length > 2 ? d.slice(0, 2) + "/" + d.slice(2) : d }));
   };
 
-  const place = (e) => {
+  const place = async (e) => {
     e.preventDefault();
     const errs = {};
     if (!form.name.trim()) errs.name = 1;
@@ -96,11 +98,21 @@ export default function Checkout() {
     const first = errs.card || (Object.keys(errs).length ? "Check the highlighted fields and try again." : "");
     setErr(first);
     if (Object.keys(errs).length) { window.scrollTo({ top: 0, behavior: "smooth" }); return; }
-    const order = placeOrder({
+    const order = await placeOrder({
       items: lines.map((l) => ({ sku: l.sku, name: l.name, price: l.price, qty: l.qty })),
       subtotal: total, discount, promoCode: promo ? promo.code : null,
       shipping: shipOpt.id, shippingFee: shipFee, payment: pay, total: grand, address: { ...form },
     });
+    if (!order) return; // API mode: placeOrder notified the failure
+    // Card payment with the backend live → send the customer to Stripe's hosted
+    // checkout. If Stripe isn't enabled the call 400s and we fall through to the
+    // normal confirmation flow (demo/offline behaviour, unchanged).
+    if (API_ON && order.payment === "Card") {
+      try {
+        const { url } = await api.post("/payments/create-checkout-session", { ref: order.id });
+        if (url) { clear(); window.location.href = url; return; }
+      } catch { /* Stripe not configured — continue to standard confirmation */ }
+    }
     notify.success({
       kicker: "ORDER CONFIRMED",
       title: "Order Placed Successfully!",
@@ -180,7 +192,7 @@ export default function Checkout() {
           <div className="mt-3 max-h-[280px] space-y-3 overflow-auto pr-1">
             {lines.map((l) => (
               <div key={l.sku} className="flex gap-2.5">
-                <span className="h-12 w-12 shrink-0 overflow-hidden rounded border border-line bg-mist">{imgFor(l.sku) && <img src={imgFor(l.sku)} alt={l.name} className="h-full w-full object-cover" />}</span>
+                <span className="h-12 w-12 shrink-0 overflow-hidden rounded border border-line bg-mist"><SafeImage src={imgFor(l.sku)} alt={l.name} className="h-full w-full object-cover" /></span>
                 <span className="min-w-0 flex-1"><span className="block truncate text-[13px] font-bold">{l.name}</span><span className="font-mono text-[11px] text-faint">{l.sku} × {l.qty}</span></span>
                 <span className="tabular shrink-0 text-[13px] font-extrabold">{formatAUD(l.price * l.qty)}</span>
               </div>

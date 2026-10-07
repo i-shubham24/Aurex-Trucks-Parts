@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Minus, Plus, ShoppingCart, X } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { imgFor } from "../data/images";
+import SafeImage from "./SafeImage";
 import { useCart } from "../store/cart";
 import { useSite } from "../store/site";
 import useLockBody from "../utils/useLockBody";
@@ -80,7 +81,7 @@ export default function CartDrawer() {
           {lines.length === 0 && <p className="py-6 text-center text-sm text-steel">Your cart is empty.<br />Trailer parts are enquiry only, call us for those.</p>}
           {lines.map((l) => (
             <div key={l.sku} className="mb-3 flex gap-3 rounded-md border border-line p-2.5">
-              <span className="h-16 w-16 shrink-0 overflow-hidden rounded bg-mist">{imgFor(l.sku) && <img src={imgFor(l.sku)} alt={l.name} className="h-full w-full object-cover" />}</span>
+              <span className="h-16 w-16 shrink-0 overflow-hidden rounded bg-mist"><SafeImage src={imgFor(l.sku)} alt={l.name} className="h-full w-full object-cover" /></span>
               <div className="min-w-0 flex-1">
                 <p className="line-clamp-2 text-[13px] font-bold leading-snug">{l.name}</p>
                 <p className="mt-0.5 font-mono text-[11px] text-faint">{l.sku}</p>

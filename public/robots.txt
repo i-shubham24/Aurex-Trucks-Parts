@@ -1,7 +1,11 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
 Disallow: /admin
 Disallow: /checkout
 Disallow: /order-success/
+Disallow: /reset
+Disallow: /orders
+Disallow: /profile
 
 Sitemap: https://aurextruckparts.com.au/sitemap.xml
