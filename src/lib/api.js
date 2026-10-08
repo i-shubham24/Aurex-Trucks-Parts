@@ -6,8 +6,12 @@
  * false and every store falls back to its original localStorage behaviour —
  * so the approved build behaves exactly as before.
  */
-export const API_URL = import.meta.env?.VITE_API_URL || "";
-export const API_ON = Boolean(API_URL);
+export const API_URL =
+  import.meta.env?.VITE_API_URL ||
+  (import.meta.env?.PROD
+    ? 'https://truck-parts-api.vercel.app/api/v1'
+    : 'http://localhost:5001/api/v1');
+export const API_ON = true;
 
 // Security: Auth tokens stored in-memory only, preventing XSS credential theft.
 // Session persistence is secured via httpOnly, SameSite cookies.
