@@ -1,7 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { GitCompareArrows, MessageSquare, ShoppingCart, Star } from "lucide-react";
 import { formatAUD } from "../data/products";
-import { useCompany } from "../store/site";
 import { imgFor } from "../data/images";
 import SafeImage from "./SafeImage";
 import { useCart } from "../store/cart";
@@ -98,10 +97,9 @@ function CompareBtn({ p }) {
   );
 }
 
-export default function ProductCard({ p, joined, badges = true }) {
+export default function ProductCard({ p, joined }) {
   const { add } = useCart();
   const navigate = useNavigate();
-  const COMPANY = useCompany();
   const enquiry = p.price === null;
   const isTailLift = p.category === "tail-lifts";
   const targetUrl = `/product/${p.sku}`;

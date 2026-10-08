@@ -1,19 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
-  ArrowLeft,
   CheckCircle2,
   Clock,
-  FileText,
-  Headset,
-  HelpCircle,
-  Mail,
-  MapPin,
   Phone,
   Send,
-  ShieldCheck,
-  Truck,
-  Wrench,
 } from "lucide-react";
 import { useCatalog } from "../store/catalog";
 import { useCompany, useSite } from "../store/site";
@@ -34,13 +25,7 @@ export default function TailLiftEnquiry() {
   const initialProduct = tailLiftProducts.find((p) => p.sku === requestedSku) || tailLiftProducts[0];
 
   const [selectedSku, setSelectedSku] = useState(initialProduct ? initialProduct.sku : "");
-  const selectedProduct = tailLiftProducts.find((p) => p.sku === selectedSku) || initialProduct;
-
-  useEffect(() => {
-    if (requestedSku && tailLiftProducts.some((p) => p.sku === requestedSku)) {
-      setSelectedSku(requestedSku);
-    }
-  }, [requestedSku]);
+  const selectedProduct = tailLiftProducts.find((p) => p.sku === (requestedSku || selectedSku)) || initialProduct;
 
   // Form State
   const [form, setForm] = useState({

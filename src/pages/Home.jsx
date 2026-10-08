@@ -125,64 +125,6 @@ function Arrivals() {
   );
 }
 
-function SubTiles() {
-  const tiles = [
-    ["Door Gear", "ATP-TP-01", "/shop/trailer-parts"],
-    ["Hinges", "ATP-TP-04", "/shop/trailer-parts"],
-    ["Tracks", "ATP-TP-07", "/shop/trailer-parts"],
-    ["Cargo Control", "ATP-TP-14", "/shop/trailer-parts"],
-    ["Tool Boxes", "ATP-ACC-02", "/shop/accessories"],
-    ["Rubber Buffers", "ATP-ACC-01", "/shop/accessories"],
-    ["Safety Signs", "ATP-ACC-06", "/shop/accessories"],
-    ["Tail Lifts", "ATP-TL-01", "/shop/tail-lifts"],
-  ];
-  return (
-    <section className="mt-10 bg-mist py-8">
-      <div className="mx-auto max-w-7xl px-4">
-        <h2 className="mb-4 text-center text-xl font-extrabold tracking-tight md:text-[22px]">Popular Categories</h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {tiles.map(([label, sku, href]) => (
-            <Link key={label} to={href} className="group flex items-center gap-3 rounded-md border border-line bg-white p-2.5 transition-colors hover:border-gold">
-              <span className="h-12 w-12 shrink-0 overflow-hidden rounded bg-white p-1 flex items-center justify-center border border-line">
-                <SafeImage src={imgFor(sku)} alt="" loading="lazy" className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-110" fallbackIconSize={16} />
-              </span>
-              <span className="text-[13px] font-bold leading-snug transition-colors group-hover:text-navy">{label}</span>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function FeatureRow() {
-  const { add } = useCart();
-  const { products } = useCatalog();
-  const accProducts = products.filter((p) => p.category === "accessories");
-  const f = products.find((p) => p.sku === "ATP-ACC-02") || accProducts[0];
-  const rest = accProducts.filter((p) => p.sku !== f?.sku).slice(0, 5);
-
-  if (!f) return null;
-  return (
-    <section id="cat-accessories" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-10">
-      <SecHead title="Accessories & Parts" link="/shop/accessories" linkLabel={`Shop all ${accProducts.length}`} />
-      <div className="grid gap-4 md:grid-cols-3">
-        <div className="card-zoom rounded-md border border-gold bg-gold/10 p-4">
-          <div className="overflow-hidden rounded bg-white p-4 flex items-center justify-center aspect-square">
-            <SafeImage src={imgFor(f.sku)} alt={f.name} loading="lazy" className="max-h-full max-w-full object-contain" fallbackIconSize={32} />
-          </div>
-
-          <p className="mt-3 text-[15px] font-extrabold leading-snug">{f.name}</p>
-          <div className="mt-1 flex items-center gap-1.5 text-[11px]"><span className="text-gold">{"★★★★★"}</span><span className="text-faint">({f.reviews} Reviews)</span></div>
-          <p className="tabular mt-1.5 text-xl font-extrabold text-primary">{formatAUD(f.price)}</p>
-          <button onClick={() => add(f)} className="mt-2.5 w-full rounded bg-gold py-2 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white">Add to Cart</button>
-        </div>
-        <div className="grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5 md:col-span-2">{rest.map((p) => <ProductCard key={p.sku} p={p} joined badges={false} />)}</div>
-      </div>
-      <span id="cat-tail-lifts" className="scroll-mt-24" />
-    </section>
-  );
-}
 
 function LiftsBand() {
   const ref = useRef(null);
