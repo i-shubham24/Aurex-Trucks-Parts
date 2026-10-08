@@ -9,18 +9,14 @@
 export const API_URL = import.meta.env?.VITE_API_URL || "";
 export const API_ON = Boolean(API_URL);
 
-const TOKEN_KEY = "aurex_access";
+// Security: Auth tokens stored in-memory only, preventing XSS credential theft.
+// Session persistence is secured via httpOnly, SameSite cookies.
+try { localStorage.removeItem("aurex_access"); } catch { /* noop */ }
 
-let accessToken = (() => {
-  try { return localStorage.getItem(TOKEN_KEY) || null; } catch { return null; }
-})();
+let accessToken = null;
 
 export function setToken(t) {
   accessToken = t || null;
-  try {
-    if (t) localStorage.setItem(TOKEN_KEY, t);
-    else localStorage.removeItem(TOKEN_KEY);
-  } catch { /* private mode */ }
 }
 export const getToken = () => accessToken;
 
