@@ -24,6 +24,10 @@ export function CartProvider({ children }) {
     setCompare((c) => {
       const exists = c.includes(sku);
       if (exists) return c.filter((x) => x !== sku);
+      return [...c, sku].slice(-3);
+    });
+
+    if (!compare.includes(sku)) {
       notify.success({
         kicker: "COMPARISON UPDATED",
         title: "Added to Compare",
@@ -31,8 +35,7 @@ export function CartProvider({ children }) {
         icon: "tag",
         sound: true,
       });
-      return [...c, sku].slice(-3);
-    });
+    }
   };
   const clearCompare = () => setCompare([]);
   const total = useMemo(() => lines.reduce((s, l) => s + l.price * l.qty, 0), [lines]);

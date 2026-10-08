@@ -45,8 +45,25 @@ apiClient.interceptors.response.use(
     return response.data;
   },
   (error) => {
+    const errorData = error.response?.data;
+    let message = 'API Request failed';
+
+    if (errorData) {
+      if (typeof errorData === 'string') {
+        message = errorData;
+      } else if (typeof errorData.message === 'string') {
+        message = errorData.message;
+      } else if (typeof errorData.error === 'string') {
+        message = errorData.error;
+      } else if (errorData.error && typeof errorData.error.message === 'string') {
+        message = errorData.error.message;
+      }
+    } else if (typeof error.message === 'string') {
+      message = error.message;
+    }
+
     const formattedError = {
-      message: error.response?.data?.message || error.response?.data?.error || error.message || 'API Request failed',
+      message,
       status: error.response?.status || 0,
       data: error.response?.data || null,
       isAxiosError: true,

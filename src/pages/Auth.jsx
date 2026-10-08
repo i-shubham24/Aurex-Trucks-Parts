@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowRight, BadgeCheck, Eye, EyeOff, Lock, Mail, Phone, ShieldCheck, Truck, User, Building2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, BadgeCheck, Eye, EyeOff, Lock, Mail, Phone, ShieldCheck, Truck, User, Building2, Loader2 } from "lucide-react";
 import { useAuth } from "../store/auth";
 import { useNotification } from "../store/notification";
 
@@ -8,13 +8,11 @@ const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phoneRx = /^0[45]\d{8}$|^0[2378]\d{8}$/;
 
 function strength(pass) {
-  let s = 0;
-  if (pass.length >= 6) s++;
-  if (pass.length >= 10) s++;
-  if (/\d/.test(pass)) s++;
-  if (/[A-Z]/.test(pass)) s++;
-  if (/[^A-Za-z0-9]/.test(pass)) s++;
-  return Math.min(s, 4);
+  if (!pass) return 0;
+  if (pass.length < 6) return 1;
+  if (pass.length >= 6 && pass.length < 8) return 2;
+  if (pass.length >= 8 && pass.length < 10) return 3;
+  return 4;
 }
 
 function Field({ label, children, hint, error }) {
@@ -50,6 +48,7 @@ export function AuthCard({ mode: initial = "login" }) {
   const [site, setSite] = useState("");
   const [err, setErr] = useState("");
   const [fieldErr, setFieldErr] = useState({});
+  const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
 
   const pw = strength(pass);
@@ -58,14 +57,14 @@ export function AuthCard({ mode: initial = "login" }) {
   const switchTab = (t) => {
     setTab(t);
     setName(""); setEmail(""); setPhone(""); setCompany(""); setPass("");
-    setErr(""); setFieldErr({}); setShow(false);
+    setErr(""); setFieldErr({}); setShow(false); setLoading(false);
   };
 
   const emailField = (
     <Field label="Email address" error={fieldErr.email}>
       <span className={inputCls(fieldErr.email)}>
         <Mail size={16} className="shrink-0 text-faint" />
-        <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={120} placeholder="you@fleet.com.au" className="w-full bg-transparent outline-none" autoComplete="email" />
+        <input disabled={loading} required type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={120} placeholder="you@fleet.com.au" className="w-full bg-transparent outline-none disabled:opacity-60" autoComplete="email" />
       </span>
     </Field>
   );
@@ -80,42 +79,51 @@ export function AuthCard({ mode: initial = "login" }) {
       if (!name.trim()) fe.name = "Enter your full name.";
       if (!phone.trim()) fe.phone = "Mobile number is required.";
       else if (!phoneRx.test(phone.replace(/\s/g, ""))) fe.phone = "Enter a 10-digit AU mobile, e.g. 04XX XXX XXX.";
-      if (pass.length < 6 || !/\d/.test(pass) || !/[A-Z]/.test(pass))
-        fe.pass = "Min 6 chars, with 1 number + 1 uppercase.";
+      if (pass.length < 6)
+        fe.pass = "Password must be at least 6 characters.";
     } else if (!pass) {
       fe.pass = "Enter your password.";
     }
     setFieldErr(fe);
     if (Object.keys(fe).length) return;
-    let r;
-    if (tab === "signup") {
-      r = await signup({ name, email, password: pass, phone: phone.trim(), company: company.trim() });
-    } else {
-      r = await login({ email, password: pass, remember });
+
+    setLoading(true);
+    try {
+      let r;
+      if (tab === "signup") {
+        r = await signup({ name, email, password: pass, phone: phone.trim(), company: company.trim() });
+      } else {
+        r = await login({ email, password: pass, remember });
+      }
+      if (!r.ok) {
+        setErr(r.msg);
+        setLoading(false);
+        return;
+      }
+      if (tab === "signup") {
+        notify.success({
+          kicker: "ACCOUNT CREATED",
+          title: "Account Created Successfully!",
+          message: `Welcome to Aurex, ${name.trim().split(" ")[0]}! Trade accounts and 30-day terms are active.`,
+          icon: "login",
+          sound: true,
+        });
+      } else {
+        notify.success({
+          kicker: "LOGIN SUCCESSFUL",
+          title: "Logged In Successfully!",
+          message: `Welcome back, ${email.trim()}! Trade pricing and order history loaded.`,
+          icon: "login",
+          sound: true,
+        });
+      }
+      setDone(true);
+      setTimeout(() => go(tab === "signup" ? "/profile" : "/orders"), 900);
+    } catch (err) {
+      setErr(err.message || "An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    if (!r.ok) {
-      setErr(r.msg);
-      return;
-    }
-    if (tab === "signup") {
-      notify.success({
-        kicker: "ACCOUNT CREATED",
-        title: "Account Created Successfully!",
-        message: `Welcome to Aurex, ${name.trim().split(" ")[0]}! Trade accounts and 30-day terms are active.`,
-        icon: "login",
-        sound: true,
-      });
-    } else {
-      notify.success({
-        kicker: "LOGIN SUCCESSFUL",
-        title: "Logged In Successfully!",
-        message: `Welcome back, ${email.trim()}! Trade pricing and order history loaded.`,
-        icon: "login",
-        sound: true,
-      });
-    }
-    setDone(true);
-    setTimeout(() => go(tab === "signup" ? "/profile" : "/orders"), 900);
   };
 
   if (done) {
@@ -166,7 +174,7 @@ export function AuthCard({ mode: initial = "login" }) {
               <Field label="Full name" error={fieldErr.name}>
                 <span className={inputCls(fieldErr.name)}>
                   <User size={16} className="shrink-0 text-faint" />
-                  <input required value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder="e.g. Jack Carter" className="w-full bg-transparent outline-none" />
+                  <input disabled={loading} required value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder="e.g. Jack Carter" className="w-full bg-transparent outline-none disabled:opacity-60" />
                 </span>
               </Field>
               {emailField}
@@ -175,13 +183,13 @@ export function AuthCard({ mode: initial = "login" }) {
               <Field label="Phone *" error={fieldErr.phone}>
                 <span className={inputCls(fieldErr.phone)}>
                   <Phone size={16} className="shrink-0 text-faint" />
-                  <input required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="04XX XXX XXX" maxLength={20} className="w-full bg-transparent outline-none" inputMode="tel" autoComplete="tel" />
+                  <input disabled={loading} required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="04XX XXX XXX" maxLength={20} className="w-full bg-transparent outline-none disabled:opacity-60" inputMode="tel" autoComplete="tel" />
                 </span>
               </Field>
               <Field label="Company / fleet" hint="optional">
                 <span className={inputCls(false)}>
                   <Building2 size={16} className="shrink-0 text-faint" />
-                  <input value={company} onChange={(e) => setCompany(e.target.value)} maxLength={80} placeholder="Carter Haulage" className="w-full bg-transparent outline-none" />
+                  <input disabled={loading} value={company} onChange={(e) => setCompany(e.target.value)} maxLength={80} placeholder="Carter Haulage" className="w-full bg-transparent outline-none disabled:opacity-60" />
                 </span>
               </Field>
             </div>
@@ -189,10 +197,10 @@ export function AuthCard({ mode: initial = "login" }) {
         ) : (
           emailField
         )}
-        <Field label={tab === "signup" ? "Create password" : "Password"} hint={tab === "signup" ? "6+ chars · 1 number · 1 uppercase" : ""} error={fieldErr.pass}>
+        <Field label={tab === "signup" ? "Create password" : "Password"} hint={tab === "signup" ? "Min 6 characters" : ""} error={fieldErr.pass}>
           <span className={inputCls(fieldErr.pass)}>
             <Lock size={16} className="shrink-0 text-faint" />
-            <input required value={pass} onChange={(e) => setPass(e.target.value)} type={show ? "text" : "password"} maxLength={72} placeholder={tab === "signup" ? "Choose a strong password" : "Your password"} className="w-full bg-transparent outline-none" autoComplete={tab === "signup" ? "new-password" : "current-password"} />
+            <input disabled={loading} required value={pass} onChange={(e) => setPass(e.target.value)} type={show ? "text" : "password"} maxLength={72} placeholder={tab === "signup" ? "Choose a password (e.g. 123456)" : "Your password"} className="w-full bg-transparent outline-none disabled:opacity-60" autoComplete={tab === "signup" ? "new-password" : "current-password"} />
             <button type="button" onClick={() => setShow(!show)} aria-label={show ? "Hide password" : "Show password"} className="shrink-0 rounded p-1 text-faint hover:bg-mist hover:text-ink">
               {show ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
@@ -206,33 +214,44 @@ export function AuthCard({ mode: initial = "login" }) {
                 <span key={i} className={`h-1 flex-1 rounded-full ${i < pw ? (pw <= 1 ? "bg-red-500" : pw === 2 ? "bg-gold" : "bg-green-600") : "bg-line"}`} />
               ))}
             </div>
-            <span className="text-[11px] font-bold text-steel">{pw <= 1 ? "Weak" : pw === 2 ? "Okay" : pw === 3 ? "Strong" : "Excellent"}</span>
+            <span className="text-[11px] font-bold text-steel">{pw <= 1 ? "Too short" : pw === 2 ? "Good" : pw === 3 ? "Strong" : "Excellent"}</span>
           </div>
         )}
 
         {tab === "login" && (
           <div className="flex items-center justify-between text-xs">
             <label className="flex cursor-pointer items-center gap-2 font-semibold text-steel">
-              <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-4 w-4 accent-[#002049]" /> Remember me
+              <input disabled={loading} type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-4 w-4 accent-[#002049]" /> Remember me
             </label>
             <Link to="/forgot-password" className="font-semibold text-navy hover:underline">Forgot password?</Link>
           </div>
         )}
 
         {err && (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] font-semibold text-red-700">{err}</p>
+          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] font-semibold text-red-700">
+            {typeof err === "string" ? err : err?.message || "Email or password did not match. Try again or create an account."}
+          </p>
         )}
 
-        <button className="group flex h-10 items-center justify-center gap-2 rounded-lg bg-gold text-sm font-extrabold text-ink transition hover:bg-ink hover:text-white">
-          {tab === "signup" ? "Create trade account" : "Log in"}
-          <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+        <button disabled={loading} className="group flex h-10 items-center justify-center gap-2 rounded-lg bg-gold text-sm font-extrabold text-ink transition hover:bg-ink hover:text-white disabled:cursor-not-allowed disabled:opacity-75">
+          {loading ? (
+            <>
+              <Loader2 size={16} className="animate-spin" />
+              <span>{tab === "signup" ? "Creating account…" : "Logging in…"}</span>
+            </>
+          ) : (
+            <>
+              <span>{tab === "signup" ? "Create trade account" : "Log in"}</span>
+              <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+            </>
+          )}
         </button>
 
         <p className="text-center text-xs text-steel">
           {tab === "login" ? (
-            <>New to Aurex? <button type="button" onClick={() => switchTab("signup")} className="font-extrabold text-navy underline">Create an account</button></>
+            <>New to Aurex? <button type="button" disabled={loading} onClick={() => switchTab("signup")} className="font-extrabold text-navy underline">Create an account</button></>
           ) : (
-            <>Already have an account? <button type="button" onClick={() => switchTab("login")} className="font-extrabold text-navy underline">Log in</button></>
+            <>Already have an account? <button type="button" disabled={loading} onClick={() => switchTab("login")} className="font-extrabold text-navy underline">Log in</button></>
           )}
         </p>
       </form>

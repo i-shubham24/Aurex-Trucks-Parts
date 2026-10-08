@@ -42,9 +42,16 @@ async function request(path, { method = "GET", body, auth = true, _retry = false
 
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const err = new Error(data.error || `Request failed (${res.status})`);
+    const errorMsg =
+      (typeof data.error === 'string'
+        ? data.error
+        : data.error?.message) ||
+      (typeof data.message === 'string'
+        ? data.message
+        : `Request failed (${res.status})`);
+    const err = new Error(errorMsg);
     err.status = res.status;
-    err.details = data.details;
+    err.details = data.details || data.error?.details;
     throw err;
   }
   return data;

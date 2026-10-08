@@ -27,6 +27,24 @@ export function NotificationProvider({ children }) {
   }, []);
 
   const addToast = useCallback((toast) => {
+    const title = toast.title || "Success";
+    const message = toast.message || "";
+    const key = `${title}_${message}`;
+
+    // Deduplicate identical toasts posted within 1 second
+    let duplicate = false;
+    setToasts((prev) => {
+      const now = Date.now();
+      const existing = prev.find((t) => `${t.title}_${t.message}` === key && now - t.createdAt < 1200);
+      if (existing) {
+        duplicate = true;
+        return prev;
+      }
+      return prev;
+    });
+
+    if (duplicate) return null;
+
     const id = "toast_" + Date.now() + "_" + toastSeq++;
     const duration = toast.duration ?? 3500;
     const shouldPlaySound = toast.sound !== false;
@@ -38,8 +56,8 @@ export function NotificationProvider({ children }) {
     const item = {
       id,
       type: toast.type || "success",
-      title: toast.title || "Success",
-      message: toast.message || "",
+      title,
+      message,
       action: toast.action || null,
       image: toast.image || null,
       sku: toast.sku || null,
@@ -50,9 +68,10 @@ export function NotificationProvider({ children }) {
     };
 
     setToasts((prev) => {
-      // Keep up to 3 visible toasts to avoid screen clutter
-      const next = [item, ...prev];
-      return next.slice(0, 3);
+      const now = Date.now();
+      // Filter out recent duplicates if any raced
+      const filtered = prev.filter((t) => !(`${t.title}_${t.message}` === key && now - t.createdAt < 1200));
+      return [item, ...filtered].slice(0, 3);
     });
 
     if (duration > 0) {
