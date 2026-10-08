@@ -2,21 +2,35 @@ import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Phone } from "lucide-react";
 import { NEWS } from "../data/content";
-import { useCatalog } from "../store/catalog";
 import { useCompany } from "../store/site";
 import ProductCard from "../components/ProductCard";
+import { useBlog, useBlogs } from "../hooks/api/useBlogs";
+import { useProducts } from "../hooks/api/useProducts";
 
-const TAG_CAT = { "Tail Lifts": "tail-lifts", "Trailer Parts": "trailer-parts", "Accessories": "accessories", "Tool Boxes": "accessories" };
-
-export function articleBySlug(slug) {
-  return NEWS.find((n) => n.slug === slug);
-}
+const TAG_CAT = {
+  "Tail Lifts": "tail-lifts",
+  "Trailer Parts": "trailer-parts",
+  "Accessories": "accessories",
+  "Tool Boxes": "accessories",
+};
 
 export default function Article() {
   const { slug } = useParams();
   const COMPANY = useCompany();
-  const { products } = useCatalog();
-  const post = articleBySlug(slug);
+
+  const { data: blogData, isLoading: blogLoading } = useBlog(slug);
+  const { data: allBlogsData } = useBlogs({ limit: 6 });
+
+  // Fallback to static NEWS if API didn't return or while transitioning
+  const post = blogData?.blog || NEWS.find((n) => n.slug === slug);
+  const cat = post ? TAG_CAT[post.tag] || post.category || "trailer-parts" : "trailer-parts";
+
+  const { data: productsData } = useProducts({ category: cat, limit: 4 }, { enabled: Boolean(cat) });
+  const related = productsData?.products || [];
+
+  const others = (allBlogsData?.blogs || NEWS)
+    .filter((n) => n.slug !== slug)
+    .slice(0, 3);
 
   /* Per-article BlogPosting schema for rich results. */
   useEffect(() => {
@@ -29,27 +43,40 @@ export default function Article() {
       "@type": "BlogPosting",
       headline: post.title,
       description: post.excerpt,
-      image: post.img,
-      datePublished: post.date,
+      image: post.coverImage || post.img,
+      datePublished: post.publishedAt || post.date,
       author: { "@type": "Organization", name: "Aurex Truck Parts Australia" },
     });
     document.head.appendChild(el);
-    return () => { document.getElementById("article-ld")?.remove(); };
+    return () => {
+      document.getElementById("article-ld")?.remove();
+    };
   }, [post]);
+
+  if (blogLoading) {
+    return (
+      <main className="mx-auto max-w-3xl px-4 py-12 space-y-4">
+        <div className="shimmer h-4 w-32 rounded bg-line" />
+        <div className="shimmer h-10 w-4/5 rounded bg-line" />
+        <div className="shimmer aspect-[16/8] w-full rounded bg-line" />
+        <div className="shimmer h-24 w-full rounded bg-line" />
+      </main>
+    );
+  }
 
   if (!post) {
     return (
       <main className="mx-auto max-w-3xl px-4 py-16 text-center">
         <h1 className="text-2xl font-extrabold">Article not found</h1>
         <p className="mt-2 text-sm text-steel">That story is no longer on the counter.</p>
-        <Link to="/" className="mt-5 inline-block rounded bg-gold px-6 py-3 text-sm font-bold text-ink">Back home</Link>
+        <Link to="/" className="mt-5 inline-block rounded bg-gold px-6 py-3 text-sm font-bold text-ink">
+          Back home
+        </Link>
       </main>
     );
   }
 
-  const cat = TAG_CAT[post.tag];
-  const related = products.filter((p) => p.category === cat).slice(0, 4);
-  const others = NEWS.filter((n) => n.slug !== post.slug).slice(0, 3);
+  const imageSrc = post.coverImage || post.img;
 
   return (
     <main>
@@ -63,27 +90,41 @@ export default function Article() {
         </div>
         <h1 className="mt-2 text-3xl font-extrabold leading-tight tracking-tight md:text-[40px]">{post.title}</h1>
         <p className="mt-2 text-[15px] leading-7 text-steel">{post.excerpt}</p>
-        <div className="card-zoom mt-5 overflow-hidden rounded-md border border-line">
-          <img src={post.img} alt={post.title} className="aspect-[16/8] w-full object-cover" />
-        </div>
+        {imageSrc && (
+          <div className="card-zoom mt-5 overflow-hidden rounded-md border border-line">
+            <img src={imageSrc} alt={post.title} className="aspect-[16/8] w-full object-cover" />
+          </div>
+        )}
         <div className="mt-6 space-y-5">
-          {(post.body || []).map((b, k) => (
-            <section key={k}>
-              {b.h && <h2 className="text-xl font-extrabold tracking-tight">{b.h}</h2>}
-              {b.p && <p className="mt-2 text-[15px] leading-7 text-steel">{b.p}</p>}
-              {b.list && (
-                <ul className="mt-3 grid gap-2 rounded-md border border-gold bg-gold/10 p-4">
-                  {b.list.map((li) => (
-                    <li key={li} className="flex items-start gap-2 text-sm font-semibold"><span className="mt-0.5 text-gold">✓</span>{li}</li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          ))}
+          {Array.isArray(post.body) && post.body.length > 0 ? (
+            post.body.map((b, k) => (
+              <section key={k}>
+                {b.h && <h2 className="text-xl font-extrabold tracking-tight">{b.h}</h2>}
+                {b.p && <p className="mt-2 text-[15px] leading-7 text-steel">{b.p}</p>}
+                {b.list && (
+                  <ul className="mt-3 grid gap-2 rounded-md border border-gold bg-gold/10 p-4">
+                    {b.list.map((li) => (
+                      <li key={li} className="flex items-start gap-2 text-sm font-semibold">
+                        <span className="mt-0.5 text-gold">✓</span>
+                        {li}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            ))
+          ) : post.content ? (
+            <div className="text-[15px] leading-7 text-steel whitespace-pre-line">{post.content}</div>
+          ) : null}
         </div>
         <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-md bg-ink p-5 text-white">
           <p className="text-[15px] font-extrabold">Talk specs with the counter?</p>
-          <a href={COMPANY.phoneHref} className="flex items-center gap-2 rounded bg-gold px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-white"><Phone size={15} /> {COMPANY.phone}</a>
+          <a
+            href={COMPANY.phoneHref}
+            className="flex items-center gap-2 rounded bg-gold px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-white"
+          >
+            <Phone size={15} /> {COMPANY.phone}
+          </a>
         </div>
       </article>
 
@@ -91,26 +132,55 @@ export default function Article() {
         <section className="mx-auto max-w-7xl px-4 pt-10">
           <div className="mb-4 flex items-end justify-between gap-4">
             <h2 className="text-2xl font-extrabold tracking-tight">Shop this story</h2>
-            <Link to={`/shop/${cat}`} className="flex shrink-0 items-center gap-1 text-[13px] font-bold text-steel hover:text-navy">Shop all <ArrowRight size={14} /></Link>
+            <Link
+              to={`/shop/${cat}`}
+              className="flex shrink-0 items-center gap-1 text-[13px] font-bold text-steel hover:text-navy"
+            >
+              Shop all <ArrowRight size={14} />
+            </Link>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">{related.map((p) => <ProductCard key={p.sku} p={p} />)}</div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {related.map((p) => (
+              <ProductCard key={p.sku || p.id} p={p} />
+            ))}
+          </div>
         </section>
       )}
 
       <section className="mx-auto max-w-7xl px-4 pt-10">
         <h2 className="mb-4 text-2xl font-extrabold tracking-tight">More from the counter</h2>
         <div className="grid gap-4 md:grid-cols-3">
-          {others.map((n) => (
-            <Link key={n.slug} to={`/news/${n.slug}`} className="card-zoom group overflow-hidden rounded-md border border-line bg-white transition-all hover:-translate-y-1 hover:border-gold">
-              <span className="block overflow-hidden bg-mist"><img src={n.img} alt={n.title} loading="lazy" className="aspect-[16/9] w-full object-cover" /></span>
-              <span className="block p-4">
-                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-faint">{n.date} · {n.tag}</span>
-                <span className="mt-1 block font-extrabold leading-snug transition-colors group-hover:text-navy">{n.title}</span>
-              </span>
-            </Link>
-          ))}
+          {others.map((n) => {
+            const cardImg = n.coverImage || n.img;
+            return (
+              <Link
+                key={n.slug || n.id}
+                to={`/news/${n.slug}`}
+                className="card-zoom group overflow-hidden rounded-md border border-line bg-white transition-all hover:-translate-y-1 hover:border-gold"
+              >
+                {cardImg && (
+                  <span className="block overflow-hidden bg-mist">
+                    <img src={cardImg} alt={n.title} loading="lazy" className="aspect-[16/9] w-full object-cover" />
+                  </span>
+                )}
+                <span className="block p-4">
+                  <span className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-faint">
+                    {n.date} · {n.tag}
+                  </span>
+                  <span className="mt-1 block font-extrabold leading-snug transition-colors group-hover:text-navy">
+                    {n.title}
+                  </span>
+                </span>
+              </Link>
+            );
+          })}
         </div>
-        <Link to="/" className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-navy hover:underline"><ArrowLeft size={15} /> Back to home</Link>
+        <Link
+          to="/"
+          className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-navy hover:underline"
+        >
+          <ArrowLeft size={15} /> Back to home
+        </Link>
       </section>
     </main>
   );

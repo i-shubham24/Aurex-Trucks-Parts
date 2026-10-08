@@ -2,25 +2,55 @@ import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
 import { CheckCircle2, Minus, Phone, Plus, ShieldCheck, Truck } from "lucide-react";
 import { formatAUD } from "../data/products";
-import { useCatalog } from "../store/catalog";
 import { useCompany, useSite } from "../store/site";
 import { imgFor } from "../data/images";
 import SafeImage from "../components/SafeImage";
 import { useCart } from "../store/cart";
 import ProductCard from "../components/ProductCard";
+import { useProduct } from "../hooks/api/useProducts";
+import ProductDetailSkeleton from "../components/ProductDetailSkeleton";
 
 export default function ProductDetail() {
   const { sku } = useParams();
-  const { products: PRODUCTS } = useCatalog();
   const COMPANY = useCompany();
   const { settings } = useSite();
   const freeOver = formatAUD(settings.freeFreightOver || 500);
-  const p = PRODUCTS.find((x) => x.sku === sku);
+
+  const { data, isLoading, isError } = useProduct(sku);
+  const p = data?.product;
+  const related = data?.relatedProducts || [];
+
   const { add, compare, toggleCompare } = useCart();
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState("specs");
-  if (!p) return <main className="mx-auto max-w-7xl px-4 py-16">Part not on file. <Link to="/shop" className="font-bold text-navy underline">Shop all</Link></main>;
-  const related = PRODUCTS.filter((x) => x.category === p.category && x.sku !== p.sku).slice(0, 5);
+  const [activeImgIdx, setActiveImgIdx] = useState(0);
+
+  if (isLoading) {
+    return <ProductDetailSkeleton />;
+  }
+
+  if (isError || !p) {
+    return (
+      <main className="mx-auto max-w-7xl px-4 py-16 text-center">
+        <h1 className="text-2xl font-extrabold text-ink">Part not on file</h1>
+        <p className="mt-2 text-sm text-steel">We couldn't find the product SKU: <span className="font-mono font-bold text-ink">{sku}</span></p>
+        <div className="mt-6 flex justify-center gap-3">
+          <Link to="/shop" className="rounded bg-gold px-6 py-2.5 text-sm font-bold text-ink hover:bg-navy hover:text-white transition-colors">
+            Shop All Products
+          </Link>
+          <a href={COMPANY.phoneHref} className="rounded border border-ink px-6 py-2.5 text-sm font-bold text-ink hover:bg-ink hover:text-white transition-colors">
+            Call {COMPANY.phone}
+          </a>
+        </div>
+      </main>
+    );
+  }
+
+  const imagesList = Array.isArray(p.images) && p.images.length > 0 
+    ? p.images.map((img) => (typeof img === "string" ? img : img.url)).filter(Boolean)
+    : [p.imageUrl || imgFor(p.sku)].filter(Boolean);
+
+  const primaryImage = imagesList[activeImgIdx] || imagesList[0] || imgFor(p.sku);
   const enquiry = p.price === null;
   const inCompare = compare.includes(p.sku);
 
@@ -31,9 +61,9 @@ export default function ProductDetail() {
         <div>
           <div className="relative overflow-hidden rounded-md border border-line bg-white shadow-xs">
             <div className={`flex aspect-[4/3] w-full items-center justify-center ${p.category === "tail-lifts" ? "p-0 overflow-hidden" : "p-6 bg-white"}`}>
-              {imgFor(p.sku) ? (
+              {primaryImage ? (
                 <SafeImage
-                  src={imgFor(p.sku)}
+                  src={primaryImage}
                   alt={p.name}
                   className={p.category === "tail-lifts" ? "h-full w-full object-cover" : "max-h-full max-w-full object-contain"}
                   fallbackIconSize={32}
@@ -44,6 +74,23 @@ export default function ProductDetail() {
             </div>
             <span className={`absolute left-3 top-3 rounded-sm px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide ${enquiry ? "bg-ink text-white" : p.status === "Built to order" ? "bg-primary text-white" : "bg-gold text-ink"}`}>{enquiry ? "Enquire" : p.status === "Built to order" ? "Built to Order" : "In Stock"}</span>
           </div>
+
+          {/* Image thumbnails if multiple images exist */}
+          {imagesList.length > 1 && (
+            <div className="mt-2.5 flex gap-2 overflow-x-auto pb-1">
+              {imagesList.map((imgSrc, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImgIdx(idx)}
+                  className={`h-16 w-16 shrink-0 overflow-hidden rounded border p-1 bg-white transition-all ${
+                    idx === activeImgIdx ? "border-gold ring-2 ring-gold/50" : "border-line opacity-70 hover:opacity-100"
+                  }`}
+                >
+                  <img src={imgSrc} alt="" className="h-full w-full object-contain" />
+                </button>
+              ))}
+            </div>
+          )}
 
           <div className="mt-3 grid grid-cols-3 gap-px border border-line bg-line text-center text-[12px] font-semibold">
             {[["ADR checked", "Fitment matched"], ["1-2 day dispatch", "Ex Campbellfield"], ["Easy returns", "30 day change of mind"]].map(([t, d]) => (

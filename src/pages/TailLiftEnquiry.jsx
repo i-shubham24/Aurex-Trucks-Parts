@@ -6,22 +6,22 @@ import {
   Phone,
   Send,
 } from "lucide-react";
-import { useCatalog } from "../store/catalog";
 import { useCompany, useSite } from "../store/site";
 import { useNotification } from "../store/notification";
 import { imgFor } from "../data/images";
 import ThemeSelect from "../components/ThemeSelect";
+import { useProducts } from "../hooks/api/useProducts";
+import { apiClient } from "../api/client";
 
 export default function TailLiftEnquiry() {
   const [searchParams] = useSearchParams();
   const requestedSku = searchParams.get("sku") || "";
-  const { products } = useCatalog();
+  const { data: productsData } = useProducts({ category: "tail-lifts", limit: 50 });
+  const tailLiftProducts = productsData?.products || [];
   const { addEnquiry } = useSite();
   const { notify } = useNotification();
   const COMPANY = useCompany();
 
-  // Find all tail lift products
-  const tailLiftProducts = products.filter((p) => p.category === "tail-lifts");
   const initialProduct = tailLiftProducts.find((p) => p.sku === requestedSku) || tailLiftProducts[0];
 
   const [selectedSku, setSelectedSku] = useState(initialProduct ? initialProduct.sku : "");
@@ -135,6 +135,35 @@ Selected Options: ${selectedOptionsList || "Standard configuration"}
 Service: ${form.serviceType}
 Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
     `.trim();
+
+    // Send to backend API
+    apiClient
+      .post("/enquiries", {
+        customerName: form.name.trim(),
+        name: form.name.trim(),
+        companyName: form.company.trim(),
+        phone: form.phone.trim(),
+        email: form.email.trim().toLowerCase(),
+        topic: `Tail Lift Enquiry - ${selectedProduct?.sku || selectedSku || "General"}`,
+        message: compiledMessage,
+        truckDetails: {
+          makeModel: form.vehicleMakeModel.trim(),
+          bodyType: form.bodyType,
+          voltage: form.voltage,
+          bedHeight: form.bedHeight,
+          bodyWidth: form.bodyWidth,
+        },
+        partDetails: {
+          partName: selectedProduct?.name || "Tail Lift",
+          sku: selectedProduct?.sku || selectedSku,
+          capacity: form.liftCapacity,
+          material: form.platformMaterial,
+          serviceType: form.serviceType,
+        },
+      })
+      .catch((err) => {
+        console.warn("Backend enquiry sync notice:", err);
+      });
 
     addEnquiry({
       name: form.name.trim(),
@@ -326,8 +355,12 @@ Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
                       >
                         <div className="flex items-center gap-3">
                           <div className="h-14 w-14 shrink-0 overflow-hidden rounded border border-line bg-white">
-                            {imgFor(p.sku) && (
-                              <img src={imgFor(p.sku)} alt={p.name} className="h-full w-full object-cover" />
+                            {(p.images?.[0]?.url || p.imageUrl || imgFor(p.sku)) && (
+                              <img
+                                src={p.images?.[0]?.url || p.imageUrl || imgFor(p.sku)}
+                                alt={p.name}
+                                className="h-full w-full object-cover"
+                              />
                             )}
                           </div>
                           <div className="min-w-0 flex-1">

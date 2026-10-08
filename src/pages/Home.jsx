@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, BadgeCheck, ClipboardCheck, Headset, Phone, Truck } from "lucide-react";
+import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, ClipboardCheck, Headset, Phone, Truck } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { useCatalog } from "../store/catalog";
 import { FAQS } from "../data/company";
@@ -10,6 +10,13 @@ import { CAT_IMG, imgFor } from "../data/images";
 import { useCart } from "../store/cart";
 import ProductCard from "../components/ProductCard";
 import SafeImage from "../components/SafeImage";
+import { useCategories } from "../hooks/api/useCategories";
+import { CategoryTilesSkeleton } from "../components/CategorySkeleton";
+import { useCarousel } from "../hooks/api/useCarousel";
+import { HeroSkeleton } from "../components/HeroSkeleton";
+import { useProducts } from "../hooks/api/useProducts";
+import { ProductGridSkeleton } from "../components/ProductCardSkeleton";
+import { useBlogs } from "../hooks/api/useBlogs";
 
 const WEB = (n) => `/images/web/${n}.jpg`;
 
@@ -24,71 +31,164 @@ function SecHead({ title, link, linkLabel }) {
   );
 }
 
-const SLIDES = [
-  {
-    img: WEB("hero-tail-lift-yellow"),
-    title: "Heavy Duty Hydraulic Tail Lifts",
-    sub: "1.5T to 3T cantilever tail lifts engineered for Australian commercial truck bodies and fleet logistics. ADR compliant with technical fitment consultation.",
-    href: "/shop/tail-lifts",
-    enquiryHref: "/tail-lift-enquiry",
-  },
-  {
-    img: WEB("hero-trailer-parts-yellow"),
-    title: "Commercial Trailer Parts & Hardware",
-    sub: "Heavy-duty cam locks, door gear, hinges, sliding post bases, coaming rails, and cargo tracks direct to Australian bodybuilders and workshops.",
-    href: "/shop/trailer-parts",
-    enquiryHref: "/tail-lift-enquiry",
-  },
-  {
-    img: WEB("hero-fleet-accessories-yellow"),
-    title: "Truck & Trailer Fleet Accessories",
-    sub: "Underbody toolboxes, load restraint systems, rubber buffers, safety signs, and workshop fittings in stock for immediate dispatch.",
-    href: "/shop/accessories",
-    enquiryHref: "/tail-lift-enquiry",
-  },
-];
-
 function Hero() {
+  const { data: slides = [], isLoading, isError } = useCarousel();
   const [i, setI] = useState(0);
+
+  const nextSlide = () => {
+    if (slides.length === 0) return;
+    setI((v) => (v + 1) % slides.length);
+  };
+
+  const prevSlide = () => {
+    if (slides.length === 0) return;
+    setI((v) => (v - 1 + slides.length) % slides.length);
+  };
+
   useEffect(() => {
-    const id = setInterval(() => setI((v) => (v + 1) % SLIDES.length), 6000);
+    if (!slides || slides.length === 0) return;
+    const id = setInterval(() => setI((v) => (v + 1) % slides.length), 6000);
     return () => clearInterval(id);
-  }, []);
-  const s = SLIDES[i];
+  }, [slides]);
+
+  if (isLoading) {
+    return <HeroSkeleton />;
+  }
+
+  if (isError || !slides || slides.length === 0) {
+    return null;
+  }
+
+  const s = slides[i] || slides[0];
+  const imageSrc = s.image?.url || s.img;
+
   return (
     <section className="mx-auto max-w-7xl px-4 pt-4">
-      <div className="relative grid overflow-hidden rounded-lg bg-mist md:grid-cols-2 md:items-center">
-        <div className="px-6 py-12 md:px-12 md:py-16" key={`t-${i}`}>
+      <div className="group/hero relative grid overflow-hidden rounded-lg bg-mist md:grid-cols-2 md:items-center">
+        <div className="px-6 py-12 md:px-12 md:py-16" key={`t-${i}-${s.id || s.title}`}>
           <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight md:text-[56px]">{s.title}</h1>
-          <p className="mt-3 max-w-sm text-[15px] leading-6 text-steel">{s.sub}</p>
+          <p className="mt-3 max-w-sm text-[15px] leading-6 text-steel">{s.subtitle || s.sub}</p>
           <div className="mt-6 flex gap-2.5 sm:gap-3">
-            <Link to={s.href} className="flex-1 whitespace-nowrap bg-gold px-4 py-3 text-center text-[13px] font-bold text-ink transition-colors hover:bg-navy hover:text-white sm:flex-none sm:px-7 sm:text-sm">Explore Products</Link>
-            <Link to={s.enquiryHref || "/tail-lift-enquiry"} className="flex-1 whitespace-nowrap border border-ink px-4 py-3 text-center text-[13px] font-bold transition-colors hover:bg-ink hover:text-white sm:flex-none sm:px-7 sm:text-sm">Enquiry</Link>
+            <Link
+              to={s.buttonLink || s.href || "/shop"}
+              className="flex-1 whitespace-nowrap bg-gold px-4 py-3 text-center text-[13px] font-bold text-ink transition-colors hover:bg-navy hover:text-white sm:flex-none sm:px-7 sm:text-sm"
+            >
+              {s.buttonText || "Explore Products"}
+            </Link>
+            <Link
+              to={s.enquiryHref || "/tail-lift-enquiry"}
+              className="flex-1 whitespace-nowrap border border-ink px-4 py-3 text-center text-[13px] font-bold transition-colors hover:bg-ink hover:text-white sm:flex-none sm:px-7 sm:text-sm"
+            >
+              Enquiry
+            </Link>
           </div>
-          <div className="mt-7 flex gap-1.5">
-            {SLIDES.map((x, k) => <button key={x.img} onClick={() => setI(k)} aria-label={`Slide ${k + 1}`} className={`h-1.5 rounded-sm transition-all ${k === i ? "w-8 bg-gold" : "w-2.5 bg-line-dark hover:bg-faint"}`} />)}
+          <div className="mt-7 flex items-center gap-3">
+            <div className="flex gap-1.5">
+              {slides.map((x, k) => (
+                <button
+                  key={x.id || x.img || k}
+                  onClick={() => setI(k)}
+                  aria-label={`Slide ${k + 1}`}
+                  className={`h-1.5 rounded-sm transition-all ${k === i ? "w-8 bg-gold" : "w-2.5 bg-line-dark hover:bg-faint"}`}
+                />
+              ))}
+            </div>
+            <div className="flex items-center gap-1 pl-2">
+              <button
+                onClick={prevSlide}
+                aria-label="Previous slide"
+                className="flex h-7 w-7 items-center justify-center rounded border border-line bg-white text-ink transition-colors hover:border-gold hover:bg-gold"
+              >
+                <ChevronLeft size={14} />
+              </button>
+              <button
+                onClick={nextSlide}
+                aria-label="Next slide"
+                className="flex h-7 w-7 items-center justify-center rounded border border-line bg-white text-ink transition-colors hover:border-gold hover:bg-gold"
+              >
+                <ChevronRight size={14} />
+              </button>
+            </div>
           </div>
         </div>
-        <div className="relative min-h-[260px] md:min-h-[380px]" key={`i-${i}`}>
+        <div className="relative min-h-[260px] md:min-h-[380px]" key={`i-${i}-${s.id || s.title}`}>
           <div className="hero-slide absolute inset-y-4 right-6 left-16 rounded-md bg-gold/50 blur-[1px] md:left-24" />
-          <img src={s.img} alt={s.title} fetchPriority="high" className="hero-slide absolute inset-0 h-full w-full rounded-r-lg object-cover [clip-path:polygon(12%_0,100%_0,100%_100%,0_100%)]" />
+          {imageSrc && (
+            <img
+              src={imageSrc}
+              alt={s.title}
+              fetchPriority="high"
+              className="hero-slide absolute inset-0 h-full w-full rounded-r-lg object-cover [clip-path:polygon(12%_0,100%_0,100%_100%,0_100%)]"
+            />
+          )}
         </div>
+
+        {/* Floating Desktop Next / Previous Arrows */}
+        <button
+          onClick={prevSlide}
+          aria-label="Previous slide"
+          className="absolute left-3 top-1/2 -translate-y-1/2 z-10 hidden md:flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white/90 text-ink shadow-md backdrop-blur transition-all hover:bg-gold hover:border-gold hover:scale-105 active:scale-95"
+        >
+          <ChevronLeft size={20} />
+        </button>
+        <button
+          onClick={nextSlide}
+          aria-label="Next slide"
+          className="absolute right-3 top-1/2 -translate-y-1/2 z-10 hidden md:flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white/90 text-ink shadow-md backdrop-blur transition-all hover:bg-gold hover:border-gold hover:scale-105 active:scale-95"
+        >
+          <ChevronRight size={20} />
+        </button>
       </div>
     </section>
   );
 }
 
 function Tiles() {
-  const { categories } = useCatalog();
-  const prices = { "tail-lifts": "Enquiry only", "trailer-parts": "From $3.40", "accessories": "From $3.90" };
+  const { data: categories = [], isLoading, isError } = useCategories();
+
+  if (isLoading) {
+    return <CategoryTilesSkeleton count={3} />;
+  }
+
+  if (isError || !categories || categories.length === 0) {
+    return null;
+  }
+
   return (
     <section id="categories" className="mx-auto grid max-w-7xl scroll-mt-24 gap-4 px-4 pt-6 md:grid-cols-3">
-      {categories.slice(0, 3).map((c) => (
-        <Link key={c.slug} to={`/shop/${c.slug}`} className="card-zoom group grid grid-cols-2 items-center overflow-hidden rounded-md border border-line bg-mist transition-colors hover:border-gold">
-          <span className="p-4 md:p-5"><span className="block text-xl font-extrabold leading-tight md:text-2xl">{c.name}</span><span className="tabular mt-1.5 block text-sm font-extrabold text-primary">{prices[c.slug] || `${c.count} lines`}</span><span className="mt-2.5 inline-block bg-mist px-3 py-1.5 text-xs font-bold transition-colors group-hover:bg-gold">{c.count} lines →</span></span>
-          <span className="block h-full min-h-[110px] overflow-hidden bg-mist">{CAT_IMG[c.slug] && <img src={CAT_IMG[c.slug]} alt={c.name} loading="lazy" className="h-full w-full object-cover" />}</span>
-        </Link>
-      ))}
+      {categories.slice(0, 3).map((c) => {
+        const imageSrc = c.image?.url || c.imageUrl;
+        const lineCount = c.count ?? c.productCount ?? 0;
+        return (
+          <Link
+            key={c.slug || c.id}
+            to={`/shop/${c.slug}`}
+            className="card-zoom group grid grid-cols-2 items-center overflow-hidden rounded-md border border-line bg-mist transition-colors hover:border-gold"
+          >
+            <span className="p-4 md:p-5">
+              <span className="block text-xl font-extrabold leading-tight md:text-2xl">{c.name}</span>
+              <span className="tabular mt-1.5 block text-sm font-extrabold text-primary">
+                {c.tag || `${lineCount} lines`}
+              </span>
+              <span className="mt-2.5 inline-block bg-mist px-3 py-1.5 text-xs font-bold transition-colors group-hover:bg-gold">
+                {lineCount} lines →
+              </span>
+            </span>
+            <span className="block h-full min-h-[110px] overflow-hidden bg-mist">
+              {imageSrc ? (
+                <img
+                  src={imageSrc}
+                  alt={c.name}
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="h-full w-full bg-line/40" />
+              )}
+            </span>
+          </Link>
+        );
+      })}
     </section>
   );
 }
@@ -102,25 +202,48 @@ const TABS = [
 
 function Arrivals() {
   const [tab, setTab] = useState("best");
-  const { products } = useCatalog();
-  const best = ["ATP-TP-01", "ATP-TP-05", "ATP-TP-12", "ATP-ACC-01", "ATP-ACC-08", "ATP-TL-01", "ATP-TP-20", "ATP-ACC-15", "ATP-TP-32", "ATP-ACC-22"]
-    .map((s) => products.find((p) => p.sku === s))
-    .filter(Boolean);
-  const trailers = products.filter((p) => p.category === "trailer-parts").slice(0, 10);
-  const accs = products.filter((p) => p.category === "accessories").slice(0, 10);
-  const lifts = products.filter((p) => p.category === "tail-lifts").slice(0, 5);
-  const items = tab === "best" ? best : tab === "trailer-parts" ? trailers : tab === "accessories" ? accs : lifts;
+
+  const queryParams = {
+    category: tab === "best" ? undefined : tab,
+    sort: tab === "best" ? "popular" : "newest",
+    limit: 10,
+  };
+
+  const { data, isLoading } = useProducts(queryParams);
+  const items = data?.products || [];
+
   return (
     <section id="bestsellers" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-10">
       <div className="mb-4 text-center">
         <h2 className="text-2xl font-extrabold tracking-tight md:text-[28px]">Hot Deals</h2>
         <div className="mt-2.5 flex justify-center gap-2">
           {TABS.map((t) => (
-            <button key={t.id} onClick={() => setTab(t.id)} className={`border px-4 py-1.5 text-[13px] font-bold transition-colors ${tab === t.id ? "border-gold bg-gold text-ink" : "border-line-dark bg-white text-steel hover:border-ink hover:text-ink"}`}>{t.label}</button>
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`border px-4 py-1.5 text-[13px] font-bold transition-colors ${
+                tab === t.id
+                  ? "border-gold bg-gold text-ink"
+                  : "border-line-dark bg-white text-steel hover:border-ink hover:text-ink"
+              }`}
+            >
+              {t.label}
+            </button>
           ))}
         </div>
       </div>
-      <div className="cap-6 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">{items.map((p) => <ProductCard key={p.sku} p={p} bare joined badges={false} />)}</div>
+
+      {isLoading ? (
+        <ProductGridSkeleton count={10} />
+      ) : items.length > 0 ? (
+        <div className="cap-6 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">
+          {items.map((p) => (
+            <ProductCard key={p.sku || p.id} p={p} bare joined badges={false} />
+          ))}
+        </div>
+      ) : (
+        <div className="py-12 text-center text-steel">No products found in this category.</div>
+      )}
     </section>
   );
 }
@@ -128,40 +251,105 @@ function Arrivals() {
 
 function LiftsBand() {
   const ref = useRef(null);
-  const { products } = useCatalog();
-  const items = products.filter((p) => p.category === "tail-lifts");
+  const { data, isLoading } = useProducts({ category: "tail-lifts", limit: 20 });
+  const items = data?.products || [];
+
   return (
     <section className="mt-10 bg-ink py-10 text-white">
       <div className="mx-auto max-w-7xl px-4">
         <div className="mb-4 flex items-end justify-between gap-4">
-          <div><p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-gold"><span className="inline-block h-4 w-1.5 bg-gold" />Tail lifts</p><h2 className="mt-1.5 text-xl font-extrabold tracking-tight text-white md:text-[22px]">Sized for Aussie Bodies</h2></div>
+          <div>
+            <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-gold">
+              <span className="inline-block h-4 w-1.5 bg-gold" />Tail lifts
+            </p>
+            <h2 className="mt-1.5 text-xl font-extrabold tracking-tight text-white md:text-[22px]">
+              Sized for Aussie Bodies
+            </h2>
+          </div>
           <div className="flex shrink-0 gap-2">
-            <button aria-label="Previous" onClick={() => ref.current?.scrollBy({ left: -480, behavior: "smooth" })} className="grid h-8 w-8 place-items-center rounded-md border border-gray-600 text-white transition-colors hover:border-gold hover:text-gold">←</button>
-            <button aria-label="Next" onClick={() => ref.current?.scrollBy({ left: 480, behavior: "smooth" })} className="grid h-8 w-8 place-items-center rounded-md bg-gold font-bold text-ink transition-colors hover:bg-white">→</button>
+            <button
+              aria-label="Previous"
+              onClick={() => ref.current?.scrollBy({ left: -480, behavior: "smooth" })}
+              className="grid h-8 w-8 place-items-center rounded-md border border-gray-600 text-white transition-colors hover:border-gold hover:text-gold"
+            >
+              ←
+            </button>
+            <button
+              aria-label="Next"
+              onClick={() => ref.current?.scrollBy({ left: 480, behavior: "smooth" })}
+              className="grid h-8 w-8 place-items-center rounded-md bg-gold font-bold text-ink transition-colors hover:bg-white"
+            >
+              →
+            </button>
           </div>
         </div>
-        <div ref={ref} className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto pb-1">{items.map((p) => <div key={p.sku} className="w-[270px] shrink-0 snap-start md:w-[300px]"><ProductCard key={p.sku} p={p} bare badges={false} /></div>)}</div>
+
+        {isLoading ? (
+          <div className="flex gap-4 overflow-hidden">
+            {Array.from({ length: 4 }).map((_, idx) => (
+              <div key={idx} className="w-[270px] shrink-0 rounded-md border border-zinc-800 bg-zinc-900/60 p-3.5 space-y-3 md:w-[300px]">
+                <div className="shimmer aspect-[4/3] w-full rounded bg-zinc-800" />
+                <div className="shimmer h-3.5 w-24 rounded bg-zinc-800" />
+                <div className="shimmer h-5 w-3/4 rounded bg-zinc-800" />
+                <div className="shimmer h-3 w-1/2 rounded bg-zinc-800" />
+                <div className="flex items-center justify-between pt-2">
+                  <div className="shimmer h-6 w-24 rounded bg-zinc-800" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div ref={ref} className="no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto pb-1">
+            {items.map((p) => (
+              <div key={p.sku || p.id} className="w-[270px] shrink-0 snap-start md:w-[300px]">
+                <ProductCard key={p.sku || p.id} p={p} bare badges={false} />
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
 }
 
 function TrailerBlock() {
-  const [all, setAll] = useState(false);
-  const { products } = useCatalog();
+  const { data, isLoading } = useProducts({ category: "trailer-parts", limit: 10 });
   const COMPANY = useCompany();
-  const parts = products.filter((p) => p.category === "trailer-parts");
-  const shown = all ? parts : parts.slice(0, 10);
+  const parts = data?.products || [];
+  const totalCount = data?.pagination?.total || data?.total || 107;
+
   return (
     <section id="cat-trailer-parts" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-10">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-2xl font-extrabold tracking-tight md:text-[28px]">Trailer Parts, Priced on Enquiry</h2>
-          <p className="mt-1 max-w-xl text-[13px] text-steel">Profiles and hands vary. Call <a className="font-bold text-primary hover:underline" href={COMPANY.phoneHref}>{COMPANY.phone}</a> with photos and measurements.</p>
+          <p className="mt-1 max-w-xl text-[13px] text-steel">
+            Profiles and hands vary. Call{" "}
+            <a className="font-bold text-primary hover:underline" href={COMPANY.phoneHref}>
+              {COMPANY.phone}
+            </a>{" "}
+            with photos and measurements.
+          </p>
         </div>
-        <button onClick={() => setAll(!all)} className="btn-fill border border-ink px-5 py-2.5 text-sm font-bold transition-colors hover:text-white">{all ? "Show Less" : `View All ${parts.length} Trailer Parts →`}</button>
+        <Link
+          to="/shop/trailer-parts"
+          className="btn-fill border border-ink px-5 py-2.5 text-sm font-bold transition-colors hover:bg-navy hover:border-navy hover:text-white"
+        >
+          View All {totalCount} Trailer Parts →
+        </Link>
       </div>
-      <div className="cap-6 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">{shown.map((p) => <ProductCard key={p.sku} p={p} joined badges={false} />)}</div>
+
+      {isLoading ? (
+        <ProductGridSkeleton count={10} />
+      ) : parts.length > 0 ? (
+        <div className="cap-6 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">
+          {parts.map((p) => (
+            <ProductCard key={p.sku || p.id} p={p} joined badges={false} />
+          ))}
+        </div>
+      ) : (
+        <div className="py-12 text-center text-steel">No trailer parts currently available.</div>
+      )}
     </section>
   );
 }
@@ -243,8 +431,27 @@ const articleHref = (n) => (n.slug ? `/news/${n.slug}` : TAG_LINKS[n.tag] || "/s
 
 function Blog() {
   const COMPANY = useCompany();
-  const posts = NEWS.slice(0, 4);
+  const { data: blogData, isLoading } = useBlogs({ limit: 4 });
+  const posts = blogData?.blogs && blogData.blogs.length > 0 ? blogData.blogs : NEWS.slice(0, 4);
   const [lead, ...rest] = posts;
+
+  if (isLoading) {
+    return (
+      <section className="mx-auto max-w-7xl px-4 pt-12">
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div className="shimmer aspect-[16/9] w-full rounded-md bg-mist" />
+          <div className="grid gap-4">
+            <div className="shimmer h-24 w-full rounded-md bg-mist" />
+            <div className="shimmer h-24 w-full rounded-md bg-mist" />
+            <div className="shimmer h-24 w-full rounded-md bg-mist" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!lead) return null;
+
   return (
     <section className="mx-auto max-w-7xl px-4 pt-12">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
@@ -257,7 +464,13 @@ function Blog() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Link to={articleHref(lead)} className="card-zoom group grid border-2 border-ink bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(0,32,73,0.18)]">
           <span className="relative block overflow-hidden bg-mist">
-            <img src={lead.img} alt={lead.title} loading="lazy" className="aspect-[16/9] w-full object-cover" />
+            <SafeImage
+              src={lead.coverImage || lead.img}
+              alt={lead.title}
+              loading="lazy"
+              className="aspect-[16/9] w-full object-cover"
+              fallbackIconSize={32}
+            />
             <span className="absolute left-3 top-3 bg-gold px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-ink">{lead.tag}</span>
           </span>
           <span className="flex flex-wrap items-center gap-x-4 gap-y-2 p-5">
@@ -270,9 +483,15 @@ function Blog() {
         </Link>
         <div className="grid content-start gap-4">
           {rest.map((n, k) => (
-            <Link key={n.title} to={articleHref(n)} className="card-zoom group grid grid-cols-[140px_minmax(0,1fr)] border-2 border-ink bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(0,32,73,0.18)] sm:grid-cols-[200px_minmax(0,1fr)]">
+            <Link key={n.slug || n.id || n.title} to={articleHref(n)} className="card-zoom group grid grid-cols-[140px_minmax(0,1fr)] border-2 border-ink bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(0,32,73,0.18)] sm:grid-cols-[200px_minmax(0,1fr)]">
               <span className="relative block min-h-full overflow-hidden bg-mist">
-                <img src={n.img} alt={n.title} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+                <SafeImage
+                  src={n.coverImage || n.img}
+                  alt={n.title}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover"
+                  fallbackIconSize={20}
+                />
               </span>
               <span className="flex min-w-0 flex-col justify-center gap-1.5 p-4">
                 <span className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-faint">

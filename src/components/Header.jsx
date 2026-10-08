@@ -5,46 +5,88 @@ import { useCompany } from "../store/site";
 import { useSite } from "../store/site";
 import { useCart } from "../store/cart";
 import { useAuth } from "../store/auth";
-import { useCatalog } from "../store/catalog";
 import { formatAUD } from "../data/products";
 import { imgFor } from "../data/images";
 import SafeImage from "./SafeImage";
+import { useCategories } from "../hooks/api/useCategories";
+import { useProducts } from "../hooks/api/useProducts";
 
 function SearchBox({ onGo }) {
   const [q, setQ] = useState("");
   const [focus, setFocus] = useState(false);
   const go = useNavigate();
-  const { products: PRODUCTS } = useCatalog();
-  const matches = useMemo(() => {
-    const query = q.toLowerCase().trim();
-    if (!query) return [];
-    return PRODUCTS.filter((p) => `${p.sku} ${p.name} ${p.sub}`.toLowerCase().includes(query)).slice(0, 6);
-  }, [q, PRODUCTS]);
+
+  const trimmed = q.trim();
+  const { data } = useProducts(
+    { search: trimmed, limit: 6 },
+    { enabled: trimmed.length > 0 }
+  );
+  const matches = data?.products || [];
+
   const submit = (e) => {
     e.preventDefault();
     setFocus(false);
     if (onGo) onGo();
     go(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop");
   };
+
   return (
     <div className="relative w-full">
       <form onSubmit={submit} className="flex w-full items-center">
-        <input value={q} onChange={(e) => setQ(e.target.value)} onFocus={() => setFocus(true)} onBlur={() => setTimeout(() => setFocus(false), 150)}
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          onFocus={() => setFocus(true)}
+          onBlur={() => setTimeout(() => setFocus(false), 200)}
           placeholder="Search by part number, OEM, or keyword"
-          className="h-10 w-full min-w-0 rounded-l-md border border-line-dark bg-white px-4 text-sm text-ink outline-none placeholder:text-faint focus:border-gold" />
-        <button className="grid h-10 w-12 shrink-0 place-items-center rounded-r-md bg-ink text-white transition-colors hover:bg-navy" aria-label="Search"><Search size={17} /></button>
+          className="h-10 w-full min-w-0 rounded-l-md border border-line-dark bg-white px-4 text-sm text-ink outline-none placeholder:text-faint focus:border-gold"
+        />
+        <button
+          className="grid h-10 w-12 shrink-0 place-items-center rounded-r-md bg-ink text-white transition-colors hover:bg-navy"
+          aria-label="Search"
+        >
+          <Search size={17} />
+        </button>
       </form>
-      {focus && matches.length > 0 && (
+
+      {focus && trimmed.length > 0 && matches.length > 0 && (
         <div className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-md border border-line bg-white shadow-xl">
-          {matches.map((p) => (
-            <button key={p.sku} type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => { setFocus(false); setQ(""); if (onGo) onGo(); go(`/product/${p.sku}`); }}
-              className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-mist">
-              <span className="h-9 w-9 shrink-0 overflow-hidden rounded bg-mist"><SafeImage src={imgFor(p.sku)} alt="" className="h-full w-full object-cover" fallbackIconSize={14} /></span>
-              <span className="min-w-0 flex-1"><span className="block truncate text-[13px] font-bold">{p.name}</span><span className="font-mono text-[11px] text-faint">{p.sku}</span></span>
-              <span className="tabular shrink-0 text-[13px] font-extrabold text-primary">{p.price === null ? "POA" : formatAUD(p.price)}</span>
-            </button>
-          ))}
-          <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={submit} className="block w-full bg-mist px-3 py-2 text-center text-[13px] font-bold transition-colors hover:text-navy">See all results →</button>
+          {matches.map((p) => {
+            const imgSrc = p.images?.[0]?.url || p.imageUrl || imgFor(p.sku);
+            return (
+              <button
+                key={p.sku || p.id}
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  setFocus(false);
+                  setQ("");
+                  if (onGo) onGo();
+                  go(`/product/${p.sku}`);
+                }}
+                className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-mist"
+              >
+                <span className="h-9 w-9 shrink-0 overflow-hidden rounded bg-mist">
+                  <SafeImage src={imgSrc} alt="" className="h-full w-full object-cover" fallbackIconSize={14} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[13px] font-bold">{p.name}</span>
+                  <span className="font-mono text-[11px] text-faint">{p.sku}</span>
+                </span>
+                <span className="tabular shrink-0 text-[13px] font-extrabold text-primary">
+                  {p.price === null ? "POA" : formatAUD(p.price)}
+                </span>
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={submit}
+            className="block w-full bg-mist px-3 py-2 text-center text-[13px] font-bold transition-colors hover:text-navy"
+          >
+            See all results →
+          </button>
         </div>
       )}
     </div>
@@ -54,7 +96,7 @@ function SearchBox({ onGo }) {
 export default function Header() {
   const { count, total, setOpen } = useCart();
   const { user, logout } = useAuth();
-  const { products: PRODUCTS } = useCatalog();
+  const { data: categories = [] } = useCategories();
   const COMPANY = useCompany();
   const { settings } = useSite();
   const [menu, setMenu] = useState(false);
@@ -62,61 +104,147 @@ export default function Header() {
   const [notice, setNotice] = useState(true);
   const loc = useLocation();
 
-  const catCounts = useMemo(() => ({
-    all: PRODUCTS.length,
-    tailLifts: PRODUCTS.filter((p) => p.category === "tail-lifts").length,
-    trailerParts: PRODUCTS.filter((p) => p.category === "trailer-parts").length,
-    accessories: PRODUCTS.filter((p) => p.category === "accessories").length,
-  }), [PRODUCTS]);
+  const totalLines = useMemo(
+    () => categories.reduce((sum, c) => sum + (c.count || c.productCount || 0), 0),
+    [categories]
+  );
 
   const shopActive = loc.pathname.startsWith("/shop");
-  const linkCls = (active) => `u-slide px-3.5 py-2.5 text-[14px] font-bold transition-colors hover:text-navy ${active ? "text-navy" : "text-ink"}`;
+  const linkCls = (active) =>
+    `u-slide px-3.5 py-2.5 text-[14px] font-bold transition-colors hover:text-navy ${active ? "text-navy" : "text-ink"}`;
 
   return (
     <header className="sticky top-0 z-40">
       {notice && settings.announcement && (
         <div className="flex items-center justify-center gap-3 bg-ink px-4 py-1.5 text-center">
           <p className="truncate text-[12px] font-semibold text-white">{settings.announcement}</p>
-          <button onClick={() => setNotice(false)} aria-label="Dismiss announcement" className="shrink-0 text-gray-400 transition-colors hover:text-gold"><X size={14} /></button>
+          <button
+            onClick={() => setNotice(false)}
+            aria-label="Dismiss announcement"
+            className="shrink-0 text-gray-400 transition-colors hover:text-gold"
+          >
+            <X size={14} />
+          </button>
         </div>
       )}
+
       {/* ── Main header bar (yellow) — logo / search / contact / account / cart ── */}
       <div id="top" className="bg-gold text-ink">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-5 gap-y-1.5 px-4 py-0.5 sm:py-1">
-          <Link to="/" className="shrink-0 py-0.5"><img src="/logo.png" alt="Aurex Truck Parts" className="h-14 w-auto sm:h-16 md:h-20 lg:h-[84px] object-contain" /></Link>
-          <div className="hidden min-w-0 flex-1 md:flex md:justify-end"><div className="w-full max-w-md"><SearchBox /></div></div>
+          <Link to="/" className="shrink-0 py-0.5">
+            <img
+              src="/logo.png"
+              alt="Aurex Truck Parts"
+              className="h-14 w-auto sm:h-16 md:h-20 lg:h-[84px] object-contain"
+            />
+          </Link>
+          <div className="hidden min-w-0 flex-1 md:flex md:justify-end">
+            <div className="w-full max-w-md">
+              <SearchBox />
+            </div>
+          </div>
           <a href={COMPANY.phoneHref} className="group hidden shrink-0 items-center gap-2 xl:flex">
             <Phone size={26} className="text-primary transition-colors group-hover:text-navy" />
-            <span className="leading-tight"><span className="block text-[12px] text-ink/70">Call to order</span><span className="tabular block text-[17px] font-extrabold text-ink group-hover:text-navy">{COMPANY.phone}</span></span>
+            <span className="leading-tight">
+              <span className="block text-[12px] text-ink/70">Call to order</span>
+              <span className="tabular block text-[17px] font-extrabold text-ink group-hover:text-navy">
+                {COMPANY.phone}
+              </span>
+            </span>
           </a>
           <div className="ml-auto flex shrink-0 items-center gap-2.5">
             {user ? (
-              <Link to="/profile" aria-label="Profile" title={user.name} className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-ink text-lg font-extrabold leading-none text-gold transition-colors hover:bg-navy">
+              <Link
+                to="/profile"
+                aria-label="Profile"
+                title={user.name}
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-ink text-lg font-extrabold leading-none text-gold transition-colors hover:bg-navy"
+              >
                 {(user.name || "A")[0].toUpperCase()}
               </Link>
             ) : (
-              <Link to="/login" aria-label="Account" className="grid h-11 w-11 place-items-center rounded-md border border-ink/30 text-ink transition-colors hover:border-navy hover:text-navy"><User size={20} /></Link>
+              <Link
+                to="/login"
+                aria-label="Account"
+                className="grid h-11 w-11 place-items-center rounded-md border border-ink/30 text-ink transition-colors hover:border-navy hover:text-navy"
+              >
+                <User size={20} />
+              </Link>
             )}
-            <button onClick={() => setOpen(true)} aria-label="Open cart" title={count > 0 ? `${count} items` : "Cart is empty"} className="flex h-11 shrink-0 items-center gap-1.5 rounded-md bg-ink px-2.5 text-white transition-colors hover:bg-navy">
-              <span className="relative shrink-0"><ShoppingCart size={19} />{count > 0 && <span className="absolute -right-2 -top-2 grid h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-[11px] font-bold text-ink">{count}</span>}</span>
+            <button
+              onClick={() => setOpen(true)}
+              aria-label="Open cart"
+              title={count > 0 ? `${count} items` : "Cart is empty"}
+              className="flex h-11 shrink-0 items-center gap-1.5 rounded-md bg-ink px-2.5 text-white transition-colors hover:bg-navy"
+            >
+              <span className="relative shrink-0">
+                <ShoppingCart size={19} />
+                {count > 0 && (
+                  <span className="absolute -right-2 -top-2 grid h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-[11px] font-bold text-ink">
+                    {count}
+                  </span>
+                )}
+              </span>
               <span className="tabular max-w-[72px] truncate text-sm font-extrabold">{formatAUD(total)}</span>
             </button>
-            <button className="grid h-11 w-11 place-items-center rounded-md text-ink hover:bg-ink/10 md:hidden" onClick={() => setMenu(!menu)} aria-label="Menu">{menu ? <X size={24} /> : <Menu size={24} />}</button>
+            <button
+              className="grid h-11 w-11 place-items-center rounded-md text-ink hover:bg-ink/10 md:hidden"
+              onClick={() => setMenu(!menu)}
+              aria-label="Menu"
+            >
+              {menu ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
           {/* mobile search — second line */}
-          <div className="w-full md:hidden"><SearchBox onGo={() => setMenu(false)} /></div>
+          <div className="w-full md:hidden">
+            <SearchBox onGo={() => setMenu(false)} />
+          </div>
         </div>
       </div>
+
       <nav className="hidden border-b border-line bg-white md:block">
         <div className="mx-auto flex max-w-7xl items-center gap-1 px-4 py-2">
           <div className="relative" onMouseEnter={() => setShop(true)} onMouseLeave={() => setShop(false)}>
-            <Link to="/shop" aria-haspopup="true" aria-expanded={shop} onFocus={() => setShop(true)} onClick={() => setShop((v) => !v)} className={`flex items-center gap-2.5 rounded-md px-5 py-2.5 text-[13px] font-extrabold uppercase tracking-wide text-white transition-colors ${shopActive ? "bg-navy" : "bg-ink hover:bg-navy"}`}><Menu size={16} /> Shop by Category <ChevronDown size={14} className={`transition-transform ${shop ? "rotate-180" : ""}`} /></Link>
+            <Link
+              to="/shop"
+              aria-haspopup="true"
+              aria-expanded={shop}
+              onFocus={() => setShop(true)}
+              onClick={() => setShop((v) => !v)}
+              className={`flex items-center gap-2.5 rounded-md px-5 py-2.5 text-[13px] font-extrabold uppercase tracking-wide text-white transition-colors ${
+                shopActive ? "bg-navy" : "bg-ink hover:bg-navy"
+              }`}
+            >
+              <Menu size={16} /> Shop by Category{" "}
+              <ChevronDown size={14} className={`transition-transform ${shop ? "rotate-180" : ""}`} />
+            </Link>
             {shop && (
-              <div className="absolute left-0 top-full z-40 w-64 overflow-hidden rounded-md border border-line bg-white py-1 shadow-xl" onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget)) setShop(false); }}>
-                <Link to="/shop" onClick={() => setShop(false)} className="block px-4 py-2.5 text-sm font-bold transition-colors hover:bg-mist hover:text-navy">All Products <span className="float-right font-mono text-[11px] text-faint">{catCounts.all}</span></Link>
-                <Link to="/shop/tail-lifts" onClick={() => setShop(false)} className="flex items-center justify-between border-t border-line px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-mist hover:text-navy">Tail Lifts <span className="font-mono text-[11px] text-faint">{catCounts.tailLifts} lines</span></Link>
-                <Link to="/shop/trailer-parts" onClick={() => setShop(false)} className="flex items-center justify-between border-t border-line px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-mist hover:text-navy">Trailer Parts <span className="font-mono text-[11px] text-faint">{catCounts.trailerParts} lines</span></Link>
-                <Link to="/shop/accessories" onClick={() => setShop(false)} className="flex items-center justify-between border-t border-line px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-mist hover:text-navy">Accessories <span className="font-mono text-[11px] text-faint">{catCounts.accessories} lines</span></Link>
+              <div
+                className="absolute left-0 top-full z-40 w-64 overflow-hidden rounded-md border border-line bg-white py-1 shadow-xl"
+                onBlur={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget)) setShop(false);
+                }}
+              >
+                <Link
+                  to="/shop"
+                  onClick={() => setShop(false)}
+                  className="block px-4 py-2.5 text-sm font-bold transition-colors hover:bg-mist hover:text-navy"
+                >
+                  All Products <span className="float-right font-mono text-[11px] text-faint">{totalLines || 149}</span>
+                </Link>
+                {categories.map((c) => (
+                  <Link
+                    key={c.slug || c.id}
+                    to={`/shop/${c.slug}`}
+                    onClick={() => setShop(false)}
+                    className="flex items-center justify-between border-t border-line px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-mist hover:text-navy"
+                  >
+                    {c.name}{" "}
+                    <span className="font-mono text-[11px] text-faint">
+                      {c.count ?? c.productCount ?? 0} lines
+                    </span>
+                  </Link>
+                ))}
               </div>
             )}
           </div>
@@ -146,24 +274,36 @@ export default function Header() {
           </span>
         </div>
       </nav>
+
       {menu && (
         <div className="border-t border-line bg-white px-4 py-2 md:hidden">
           <Link to="/" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">Home</Link>
-          <Link to="/shop" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">Shop All ({catCounts.all})</Link>
-          <Link to="/shop/tail-lifts" onClick={() => setMenu(false)} className="block border-t border-line py-3 pl-4 text-sm font-semibold text-steel first:border-0">Tail Lifts ({catCounts.tailLifts})</Link>
-          <Link to="/shop/trailer-parts" onClick={() => setMenu(false)} className="block border-t border-line py-3 pl-4 text-sm font-semibold text-steel first:border-0">Trailer Parts ({catCounts.trailerParts})</Link>
-          <Link to="/shop/accessories" onClick={() => setMenu(false)} className="block border-t border-line py-3 pl-4 text-sm font-semibold text-steel first:border-0">Accessories ({catCounts.accessories})</Link>
+          <Link to="/shop" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">Shop All ({totalLines || 149})</Link>
+          {categories.map((c) => (
+            <Link
+              key={c.slug || c.id}
+              to={`/shop/${c.slug}`}
+              onClick={() => setMenu(false)}
+              className="block border-t border-line py-3 pl-4 text-sm font-semibold text-steel first:border-0"
+            >
+              {c.name} ({c.count ?? c.productCount ?? 0})
+            </Link>
+          ))}
           <Link to="/contact" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">Contact</Link>
           <Link to="/about" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">About Us</Link>
           <Link to="/track" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">Track Order</Link>
           <Link to="/orders" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">My Orders</Link>
           <div className="flex gap-4 border-t border-line py-3 text-[15px] font-bold">
             {user ? (
-              <><Link to="/profile" onClick={() => setMenu(false)}>{user.name}</Link>
-              <button onClick={logout}>Logout</button></>
+              <>
+                <Link to="/profile" onClick={() => setMenu(false)}>{user.name}</Link>
+                <button onClick={logout}>Logout</button>
+              </>
             ) : (
-              <><Link to="/login" onClick={() => setMenu(false)}>Login</Link>
-              <Link to="/signup" onClick={() => setMenu(false)}>Sign Up</Link></>
+              <>
+                <Link to="/login" onClick={() => setMenu(false)}>Login</Link>
+                <Link to="/signup" onClick={() => setMenu(false)}>Sign Up</Link>
+              </>
             )}
           </div>
         </div>

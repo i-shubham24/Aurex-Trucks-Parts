@@ -6,9 +6,9 @@ import SafeImage from "./SafeImage";
 import { useCart } from "../store/cart";
 
 export function PartVisual({ p }) {
-  const img = imgFor(p.sku);
+  const img = p.images?.[0]?.url || p.imageUrl || imgFor(p.sku);
   if (img) {
-    const isTailLift = p.category === "tail-lifts";
+    const isTailLift = p.category === "tail-lifts" || p.categorySlug === "tail-lifts";
     // Tail lifts are landscape yard photos — use full object-cover without padding so they aren't shrunken
     if (isTailLift) {
       return (
