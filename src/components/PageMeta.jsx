@@ -24,6 +24,9 @@ const META = [
   [/^\/login$/, ["Login | " + BASE, "Log in for faster checkout, order tracking and trade pricing."]],
   [/^\/signup$/, ["Create Trade Account | " + BASE, "Join free for counter pricing, 30-day fleet terms and saved vehicles."]],
   [/^\/reset$/, ["Reset Password | " + BASE, "Secure password reset for your Aurex Truck Parts trade account."]],
+  [/^\/forgot-password$/, ["Forgot Password | " + BASE, "Reset your trade account password securely."]],
+  [/^\/reset-password$/, ["Set New Password | " + BASE, "Set a new password for your Aurex Truck Parts trade account."]],
+  [/^\/order-success(\/|$)/, ["Order Confirmed | " + BASE, "Thank you for your order with Aurex Truck Parts Australia. Your commercial truck parts are being prepared for dispatch from Campbellfield VIC."]],
   [/^\/policies$/, ["Shipping, Returns & Policies | " + BASE, "Plain-English shipping, returns, warranty, terms and privacy policies."]],
 ];
 

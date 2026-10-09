@@ -1,25 +1,89 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Power, Trash2 } from "lucide-react";
 import { useSite } from "../../store/site";
 import { AdminTitle } from "./AdminLayout";
+import { api, API_ON } from "../../lib/api";
 
 export default function Marketing() {
-  const { promos, setPromos } = useSite();
+  const { promos: sitePromos, setPromos: updateSitePromos } = useSite();
+  const [promos, setPromos] = useState(sitePromos);
   const [code, setCode] = useState("");
   const [pct, setPct] = useState("");
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const add = (e) => {
+  const reload = async () => {
+    if (!API_ON) return;
+    try {
+      const res = await api.get("/promos");
+      const items = res?.items || res?.data?.items;
+      if (Array.isArray(items)) {
+        setPromos(items);
+        updateSitePromos(items);
+      }
+    } catch {}
+  };
+
+  useEffect(() => {
+    if (API_ON) {
+      setLoading(true);
+      reload().finally(() => setLoading(false));
+    } else {
+      setPromos(sitePromos);
+    }
+  }, []);
+
+  const add = async (e) => {
     e.preventDefault();
     const c = code.trim().toUpperCase();
     if (!c) { setErr("Code is required."); return; }
     if (promos.some((p) => p.code === c)) { setErr("That code already exists."); return; }
     const n = Number(pct);
     if (!(n > 0 && n <= 90)) { setErr("Percent must be 1 to 90."); return; }
-    setPromos((l) => [...l, { code: c, label: "Custom", pct: n, active: true }]);
+
+    if (API_ON) {
+      try {
+        await api.post("/promos", { code: c, label: "Custom", pct: n, active: true });
+        await reload();
+      } catch (e2) {
+        setErr(e2.message || "Failed to create promo");
+        return;
+      }
+    } else {
+      const next = [...promos, { code: c, label: "Custom", pct: n, active: true }];
+      setPromos(next);
+      updateSitePromos(next);
+    }
     setCode("");
     setPct("");
     setErr("");
+  };
+
+  const toggle = async (p) => {
+    if (API_ON) {
+      try {
+        await api.put(`/promos/${p.code}`, { active: !p.active });
+        await reload();
+      } catch (e2) { alert(e2.message); }
+    } else {
+      const next = promos.map((x) => (x.code === p.code ? { ...x, active: !x.active } : x));
+      setPromos(next);
+      updateSitePromos(next);
+    }
+  };
+
+  const remove = async (p) => {
+    if (!window.confirm(`Delete ${p.code}?`)) return;
+    if (API_ON) {
+      try {
+        await api.del(`/promos/${p.code}`);
+        await reload();
+      } catch (e2) { alert(e2.message); }
+    } else {
+      const next = promos.filter((x) => x.code !== p.code);
+      setPromos(next);
+      updateSitePromos(next);
+    }
   };
 
   const input = "h-11 rounded-md border border-line-dark bg-white px-3 text-sm outline-none placeholder:text-faint focus:border-gold";
@@ -29,7 +93,8 @@ export default function Marketing() {
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="border-2 border-ink bg-white">
           <p className="border-b-2 border-ink px-4 py-2.5 text-sm font-extrabold">Promo codes</p>
-          {promos.length === 0 && <p className="p-4 text-sm text-steel">No codes. Add one below.</p>}
+          {loading && promos.length === 0 && <p className="p-4 text-sm text-steel">Loading promos…</p>}
+          {!loading && promos.length === 0 && <p className="p-4 text-sm text-steel">No codes. Add one below.</p>}
           {promos.map((p) => (
             <div key={p.code} className="flex items-center gap-3 border-b border-line px-4 py-3 last:border-b-0">
               <span className="bg-ink px-2.5 py-1 font-mono text-[12px] font-bold text-gold">{p.code}</span>
@@ -37,11 +102,11 @@ export default function Marketing() {
                 <span className="block text-sm font-bold">{p.label}</span>
                 <span className="tabular text-xs text-steel">{p.pct}% off · {p.active ? "Active" : "Paused"}</span>
               </span>
-              <button onClick={() => setPromos((l) => l.map((x) => (x.code === p.code ? { ...x, active: !x.active } : x)))}
+              <button onClick={() => toggle(p)}
                 aria-label="Toggle active" className={`grid h-9 w-9 place-items-center border transition-colors ${p.active ? "border-navy bg-navy text-white" : "border-line-dark text-faint hover:border-navy hover:text-navy"}`}>
                 <Power size={15} />
               </button>
-              <button onClick={() => { if (window.confirm(`Delete ${p.code}?`)) setPromos((l) => l.filter((x) => x.code !== p.code)); }}
+              <button onClick={() => remove(p)}
                 aria-label="Delete" className="grid h-9 w-9 place-items-center border border-line-dark text-steel transition-colors hover:border-red-500 hover:text-red-600">
                 <Trash2 size={15} />
               </button>

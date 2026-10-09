@@ -6,6 +6,7 @@ import { imgFor } from "../data/images";
 import SafeImage from "../components/SafeImage";
 import { findOrder, orderStatus } from "../utils/orders";
 import { useNotification } from "../store/notification";
+import { api, API_ON, normaliseOrder } from "../lib/api";
 
 function Timeline({ order }) {
   const { steps, idx, cancelled } = orderStatus(order);
@@ -41,15 +42,40 @@ export default function Track() {
   const [order, setOrder] = useState(() => (paramId ? findOrder(paramId) : null));
   const [miss, setMiss] = useState(false);
   const { notify } = useNotification();
+
+  const resolveOrder = async (searchId) => {
+    const clean = String(searchId || '').trim();
+    if (!clean) { setOrder(null); setMiss(false); return null; }
+    let found = findOrder(clean);
+    if (!found && API_ON) {
+      try {
+        const res = await api.get(`/orders/track/${encodeURIComponent(clean)}`);
+        const liveOrder = res?.order || res?.data?.order;
+        if (liveOrder) found = normaliseOrder(liveOrder);
+      } catch {
+        try {
+          const res2 = await api.get(`/orders/${encodeURIComponent(clean)}`);
+          const liveOrder2 = res2?.order || res2?.data?.order;
+          if (liveOrder2) found = normaliseOrder(liveOrder2);
+        } catch {}
+      }
+    }
+    setOrder(found || null);
+    setMiss(!found);
+    return found;
+  };
+
   /* Stay in sync when navigating between /track?id=A and /track?id=B without a remount. */
   useEffect(() => {
-    if (paramId) { setId(paramId); const found = findOrder(paramId); setOrder(found); setMiss(!found); }
+    if (paramId) {
+      setId(paramId);
+      resolveOrder(paramId);
+    }
   }, [paramId]);
-  const lookup = (e) => {
+
+  const lookup = async (e) => {
     e.preventDefault();
-    const found = findOrder(id);
-    setOrder(found);
-    setMiss(!found);
+    const found = await resolveOrder(id);
     if (found) {
       notify.success({
         kicker: "TRACKING RETRIEVED",
@@ -69,11 +95,11 @@ export default function Track() {
         <p className="text-[12px] text-faint"><Link to="/" className="hover:text-navy hover:underline">Home</Link> / <span className="font-semibold text-ink">Track Order</span></p>
         <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.22em] text-faint">Live courier status</p>
         <h1 className="mt-1 text-3xl font-extrabold tracking-tight md:text-4xl">Track your order</h1>
-        <p className="mt-1 text-sm text-steel">Enter the order ID from your receipt, e.g. AUX-4821 or AX-483920.</p>
+        <p className="mt-1 text-sm text-steel">Enter your order ID from your receipt or confirmation email (e.g. ATP-019973-772).</p>
 
         <form onSubmit={lookup} className="mt-4 flex items-stretch rounded-xl border border-line bg-white p-1.5 shadow-sm focus-within:border-gold">
           <span className="grid w-11 shrink-0 place-items-center"><PackageSearch size={18} className="text-faint" /></span>
-          <input value={id} onChange={(e) => setId(e.target.value)} maxLength={16} placeholder="Order ID" className="h-11 min-w-0 flex-1 bg-transparent font-mono text-[15px] font-bold uppercase outline-none placeholder:font-sans placeholder:font-normal placeholder:normal-case placeholder:text-faint" />
+          <input value={id} onChange={(e) => setId(e.target.value)} maxLength={24} placeholder="e.g. ATP-019973-772" className="h-11 min-w-0 flex-1 bg-transparent font-mono text-[15px] font-bold uppercase outline-none placeholder:font-sans placeholder:font-normal placeholder:normal-case placeholder:text-faint" />
           <button className="flex shrink-0 items-center gap-1.5 rounded-lg bg-navy px-6 text-sm font-extrabold text-white transition hover:bg-ink"><Truck size={15} /> Track</button>
         </form>
 

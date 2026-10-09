@@ -8,6 +8,9 @@ import { useCategories } from "../hooks/api/useCategories";
 import { useProducts } from "../hooks/api/useProducts";
 import { ProductGridSkeleton } from "../components/ProductCardSkeleton";
 
+// Part-number order: ATP-ACC-01, -02 … then ATP-TL-…, ATP-TP-… (numeric, so -99 sorts before -100).
+const bySku = (a, b) => String(a.sku).localeCompare(String(b.sku), "en", { numeric: true });
+
 export default function Shop({ preset }) {
   const COMPANY = useCompany();
   const { slug: paramSlug } = useParams();
@@ -21,7 +24,7 @@ export default function Shop({ preset }) {
   const [q, setQ] = useState(urlQ);
   const [sub, setSub] = useState("All");
   const [avail, setAvail] = useState("All");
-  const [sort, setSort] = useState("featured");
+  const [sort, setSort] = useState("sku");
 
   // Keep the filter box in sync when arriving via header search (?q=) while already on /shop.
   useEffect(() => {
@@ -31,7 +34,7 @@ export default function Shop({ preset }) {
 
   const queryParams = {
     category: slug || undefined,
-    limit: 150,
+    limit: 500,
   };
 
   const { data, isLoading: prodsLoading } = useProducts(queryParams);
@@ -49,6 +52,7 @@ export default function Shop({ preset }) {
     if (avail === "order") list = list.filter((p) => String(p.status).toLowerCase().includes("order"));
     if (avail === "enquiry") list = list.filter((p) => p.price === null);
     if (query) list = list.filter((p) => `${p.sku} ${p.name} ${p.sub}`.toLowerCase().includes(query));
+    if (sort === "sku") list = [...list].sort(bySku);
     if (sort === "low") list = [...list].sort((a, b) => (a.price ?? 1e12) - (b.price ?? 1e12));
     if (sort === "high") list = [...list].sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
     return list;
@@ -75,7 +79,7 @@ export default function Shop({ preset }) {
     { value: "enquiry", label: "Enquiry only" },
   ];
   const SORT_OPTS = [
-    { value: "featured", label: "Featured" },
+    { value: "sku", label: "Part number" },
     { value: "low", label: "Price low to high" },
     { value: "high", label: "Price high to low" },
   ];

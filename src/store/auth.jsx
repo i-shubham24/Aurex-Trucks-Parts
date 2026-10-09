@@ -50,22 +50,14 @@ function ApiAuthProvider({ children }) {
     } catch { /* not logged in / none */ }
   };
 
-  // Restore an existing session on load via stored token or refresh cookie.
+  // Restore an existing session on load via secure httpOnly refresh cookie.
   useEffect(() => {
     (async () => {
+      // Security: Clean up any legacy token stored in web storage
       try {
-        const storedToken = localStorage.getItem("aurex_access_token") || sessionStorage.getItem("aurex_access_token");
-        if (storedToken) {
-          setToken(storedToken);
-          setAuthToken(storedToken);
-          const me = await getMeApi();
-          if (me) {
-            setUser({ ...me, isAdmin: me.role === "SUPER_ADMIN" || me.role === "ADMIN" || me.role === "admin" || me.email === ADMIN_EMAIL || !!me.isAdmin });
-            await loadMyOrders();
-            return;
-          }
-        }
-      } catch { /* proceed to refresh */ }
+        localStorage.removeItem("aurex_access_token");
+        sessionStorage.removeItem("aurex_access_token");
+      } catch { /* noop */ }
 
       if (await tryRefresh()) {
         try {
@@ -117,10 +109,8 @@ function ApiAuthProvider({ children }) {
         setToken(accessToken);
         setAuthToken(accessToken);
         if (remember) {
-          localStorage.setItem("aurex_access_token", accessToken);
           localStorage.setItem(SESSION_KEY, JSON.stringify(email));
         } else {
-          sessionStorage.setItem("aurex_access_token", accessToken);
           sessionStorage.setItem(TEMP_SESSION_KEY, JSON.stringify(email));
         }
       }
@@ -157,9 +147,13 @@ function ApiAuthProvider({ children }) {
   const placeOrder = async (order) => {
     try {
       const payload = {
-        items: (order.items || []).map((l) => ({ sku: l.sku, qty: l.qty })),
+        items: (order.items || []).map((l) => ({ sku: l.sku, qty: l.qty, name: l.name, price: l.price })),
         promoCode: order.promoCode || null,
         shipping: order.shipping,
+        shippingFee: order.shippingFee,
+        total: order.total,
+        subtotal: order.subtotal,
+        discount: order.discount,
         payment: order.payment,
         address: order.address,
       };
@@ -167,6 +161,10 @@ function ApiAuthProvider({ children }) {
       const created = res.order || res.data?.order || res.data;
       const norm = normaliseOrder(created);
       setOrders((o) => [norm, ...o]);
+      try {
+        const stored = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
+        localStorage.setItem(ORDERS_KEY, JSON.stringify([norm, ...stored.filter((x) => x.id !== norm.id)]));
+      } catch {}
       return norm;
     } catch (e) {
       notify.info({

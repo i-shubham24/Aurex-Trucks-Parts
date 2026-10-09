@@ -187,7 +187,7 @@ export default function Checkout() {
             )}
           </section>
         </div>
-        <aside className="rounded-md border border-line bg-white p-5 lg:sticky lg:top-44">
+        <aside className="rounded-md border border-line bg-white p-5 lg:sticky lg:top-24">
           <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-faint">Order summary</p>
           <div className="mt-3 max-h-[280px] space-y-3 overflow-auto pr-1">
             {lines.map((l) => (

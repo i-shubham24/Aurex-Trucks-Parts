@@ -26,6 +26,8 @@ dist-ssr
 # Agent & local directories
 .agents/
 .aider/
+.claude/
+*.pdf
 config.json
 AurexTrucks/
 skills-src/

@@ -71,10 +71,11 @@ function StaffLogin() {
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
   const input = "h-12 w-full rounded-lg border border-white/15 bg-white/5 px-4 text-[15px] text-white outline-none placeholder:text-gray-500 focus:border-gold focus:ring-2 focus:ring-gold/30";
-  const go = (e) => {
+  const go = async (e) => {
     e.preventDefault();
-    const r = login({ email, password });
-    if (!r.ok) setErr(r.msg + " Hint: the staff seed is admin@aurex.com.au / Admin123! unless changed.");
+    setErr("");
+    const r = await login({ email, password });
+    if (!r?.ok) setErr((r?.msg || "Login failed.") + " Hint: the staff seed is admin@aurex.com.au / Admin123! unless changed.");
   };
   return (
     <main className="grid min-h-screen place-items-center bg-[#0b0e14] px-4 py-10">

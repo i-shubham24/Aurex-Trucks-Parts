@@ -1,15 +1,47 @@
+import { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { CheckCircle2, Printer, Truck } from "lucide-react";
+import { CheckCircle2, Printer, Truck, Loader2 } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { useCompany } from "../store/site";
 import { findOrder } from "../utils/orders";
 import { useSite } from "../store/site";
+import { api, API_ON, normaliseOrder } from "../lib/api";
 
 export default function OrderSuccess() {
   const { id } = useParams();
   const { settings } = useSite();
   const COMPANY = useCompany();
-  const order = findOrder(id);
+  const [order, setOrder] = useState(() => findOrder(id));
+  const [loading, setLoading] = useState(!order);
+
+  useEffect(() => {
+    let active = true;
+    if (!order && id && API_ON) {
+      setLoading(true);
+      (async () => {
+        try {
+          const res = await api.get(`/orders/track/${encodeURIComponent(id)}`);
+          const live = res?.order || res?.data?.order;
+          if (live && active) {
+            setOrder(normaliseOrder(live));
+          }
+        } catch {
+          try {
+            const res2 = await api.get(`/orders/${encodeURIComponent(id)}`);
+            const live2 = res2?.order || res2?.data?.order;
+            if (live2 && active) {
+              setOrder(normaliseOrder(live2));
+            }
+          } catch {}
+        } finally {
+          if (active) setLoading(false);
+        }
+      })();
+    } else {
+      setLoading(false);
+    }
+    return () => { active = false; };
+  }, [id]);
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
       <div className="rounded-2xl border border-line bg-white p-6 text-center shadow-[0_16px_40px_rgba(0,32,73,0.08)]">
@@ -23,7 +55,12 @@ export default function OrderSuccess() {
           <Link to="/shop" className="rounded-lg border border-line-dark px-6 py-2.5 text-sm font-bold text-steel transition-colors hover:border-navy hover:text-navy">Keep shopping</Link>
         </div>
       </div>
-      {order ? (
+      {loading ? (
+        <div className="mt-5 flex items-center justify-center gap-2 rounded-md border border-line bg-mist p-8 text-sm font-semibold text-steel">
+          <Loader2 className="animate-spin text-navy" size={18} />
+          <span>Retrieving official tax invoice details…</span>
+        </div>
+      ) : order ? (
         <div className="mt-5 rounded-md border border-line bg-white p-6">
           <div className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-ink pb-4">
             <div>

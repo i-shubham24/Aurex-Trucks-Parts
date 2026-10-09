@@ -64,7 +64,7 @@ function Hero() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 pt-4">
-      <div className="group/hero relative grid overflow-hidden rounded-lg bg-mist md:grid-cols-2 md:items-center">
+      <div className="relative grid overflow-hidden rounded-lg bg-mist md:grid-cols-2 md:items-center">
         <div className="px-6 py-12 md:px-12 md:py-16" key={`t-${i}-${s.id || s.title}`}>
           <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight md:text-[56px]">{s.title}</h1>
           <p className="mt-3 max-w-sm text-[15px] leading-6 text-steel">{s.subtitle || s.sub}</p>
@@ -122,22 +122,6 @@ function Hero() {
             />
           )}
         </div>
-
-        {/* Floating Desktop Next / Previous Arrows */}
-        <button
-          onClick={prevSlide}
-          aria-label="Previous slide"
-          className="absolute left-3 top-1/2 -translate-y-1/2 z-10 hidden md:flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white/90 text-ink shadow-md backdrop-blur transition-all hover:bg-gold hover:border-gold hover:scale-105 active:scale-95"
-        >
-          <ChevronLeft size={20} />
-        </button>
-        <button
-          onClick={nextSlide}
-          aria-label="Next slide"
-          className="absolute right-3 top-1/2 -translate-y-1/2 z-10 hidden md:flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white/90 text-ink shadow-md backdrop-blur transition-all hover:bg-gold hover:border-gold hover:scale-105 active:scale-95"
-        >
-          <ChevronRight size={20} />
-        </button>
       </div>
     </section>
   );
@@ -585,7 +569,7 @@ function Faq() {
   return (
     <section id="faq" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-12">
       <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
-        <div className="lg:sticky lg:top-44 lg:self-start">
+        <div className="lg:sticky lg:top-24 lg:self-start">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">FAQ</p>
           <h2 className="mt-1 text-2xl font-extrabold tracking-tight md:text-[28px]">Straight Answers</h2>
           <p className="mt-2 text-sm leading-6 text-steel">The questions we hear at the counter every week. Anything else, call and ask.</p>

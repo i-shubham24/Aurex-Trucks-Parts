@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Download, RefreshCw } from "lucide-react";
 import { formatAUD } from "../../data/products";
 import { imgFor } from "../../data/images";
@@ -8,12 +8,32 @@ import { useAuth } from "../../store/auth";
 import { useCatalog } from "../../store/catalog";
 import { useSite } from "../../store/site";
 import { AdminTitle, Stat, td, th } from "./AdminLayout";
+import { api, API_ON, normaliseOrder } from "../../lib/api";
 
 export default function Dashboard() {
-  const { users, orders } = useAuth();
+  const { users, orders, setOrders, setUsers } = useAuth();
   const { products } = useCatalog();
-  const { enquiries, promos } = useSite();
+  const { enquiries, promos, setEnquiries } = useSite();
   const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    if (API_ON) {
+      api.get("/orders").then((res) => {
+        const items = res?.items || res?.data?.items || res?.data?.orders || [];
+        if (Array.isArray(items) && setOrders) setOrders(items.map(normaliseOrder));
+      }).catch(() => {});
+
+      api.get("/admin/customers").then((res) => {
+        const items = res?.items || res?.data?.items || res?.data || [];
+        if (Array.isArray(items) && setUsers) setUsers(items);
+      }).catch(() => {});
+
+      api.get("/enquiries").then((res) => {
+        const items = res?.items || res?.data?.items || [];
+        if (Array.isArray(items) && setEnquiries) setEnquiries(items.map((e) => ({ ...e, id: e.ref || e.id, at: e.createdAt })));
+      }).catch(() => {});
+    }
+  }, [tick]);
 
   const revenue = orders.reduce((s, o) => s + (Number(o.total) || 0), 0);
   const freshEnquiries = enquiries.filter((e) => e.status === "New");

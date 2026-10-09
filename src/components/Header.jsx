@@ -1,6 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ChevronDown, Menu, PackageSearch, Phone, Search, ShoppingCart, User, X } from "lucide-react";
+import {
+  ArrowRight, ChevronDown, ClipboardList, LogIn, LogOut, Menu,
+  PackageSearch, Phone, Search, ShoppingCart, User, UserPlus, X,
+} from "lucide-react";
 import { useCompany } from "../store/site";
 import { useSite } from "../store/site";
 import { useCart } from "../store/cart";
@@ -8,49 +11,70 @@ import { useAuth } from "../store/auth";
 import { formatAUD } from "../data/products";
 import { imgFor } from "../data/images";
 import SafeImage from "./SafeImage";
+import useLockBody from "../utils/useLockBody";
 import { useCategories } from "../hooks/api/useCategories";
 import { useProducts } from "../hooks/api/useProducts";
 
-function SearchBox({ onGo }) {
+const iconBtn =
+  "group/tip relative grid h-11 w-11 shrink-0 place-items-center rounded-md text-ink transition-colors hover:bg-mist focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy";
+const panel = "menu-in overflow-hidden rounded-lg border border-line bg-white shadow-[0_24px_60px_rgba(17,17,17,0.14)]";
+const menuItem = "flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:bg-mist hover:text-navy";
+
+/* Icon-only controls still need a name: shown on hover / keyboard focus (desktop). */
+function Tip({ children }) {
+  return (
+    <span className="pointer-events-none absolute left-1/2 top-full z-50 mt-1.5 hidden -translate-x-1/2 whitespace-nowrap rounded bg-ink px-2 py-1 text-[11px] font-semibold text-white opacity-0 transition-opacity group-hover/tip:opacity-100 group-focus-visible/tip:opacity-100 lg:block">
+      {children}
+    </span>
+  );
+}
+
+function SearchBox({ onDone, autoFocus = false }) {
   const [q, setQ] = useState("");
+  const [term, setTerm] = useState("");
   const [focus, setFocus] = useState(false);
   const go = useNavigate();
 
-  const trimmed = q.trim();
-  const { data } = useProducts(
-    { search: trimmed, limit: 6 },
-    { enabled: trimmed.length > 0 }
-  );
-  const matches = data?.products || [];
+  // Debounced so a fast typist doesn't fire one catalogue request per keystroke.
+  useEffect(() => {
+    const id = setTimeout(() => setTerm(q.trim()), 220);
+    return () => clearTimeout(id);
+  }, [q]);
+
+  const { data } = useProducts({ search: term, limit: 6 }, { enabled: term.length > 1 });
+  const matches = term.length > 1 ? data?.products || [] : [];
 
   const submit = (e) => {
     e.preventDefault();
     setFocus(false);
-    if (onGo) onGo();
-    go(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop");
+    if (onDone) onDone();
+    go(q.trim() ? `/shop?q=${encodeURIComponent(q.trim())}` : "/shop");
   };
 
   return (
     <div className="relative w-full">
-      <form onSubmit={submit} className="flex w-full items-center">
+      <form onSubmit={submit} role="search" className="relative flex w-full items-center">
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
           onFocus={() => setFocus(true)}
           onBlur={() => setTimeout(() => setFocus(false), 200)}
+          autoFocus={autoFocus}
+          aria-label="Search the catalogue"
           placeholder="Search by part number, OEM, or keyword"
-          className="h-10 w-full min-w-0 rounded-l-md border border-line-dark bg-white px-4 text-sm text-ink outline-none placeholder:text-faint focus:border-gold"
+          className="h-11 w-full min-w-0 rounded-md border border-line-dark bg-mist pl-4 pr-12 text-[15px] text-ink outline-none transition-colors placeholder:text-faint focus:border-ink focus:bg-white"
         />
         <button
-          className="grid h-10 w-12 shrink-0 place-items-center rounded-r-md bg-ink text-white transition-colors hover:bg-navy"
+          type="submit"
           aria-label="Search"
+          className="absolute right-1.5 flex h-8 w-8 items-center justify-center rounded bg-gold text-ink transition-colors hover:bg-navy hover:text-white"
         >
           <Search size={17} />
         </button>
       </form>
 
-      {focus && trimmed.length > 0 && matches.length > 0 && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-md border border-line bg-white shadow-xl">
+      {focus && matches.length > 0 && (
+        <div className={`absolute left-0 right-0 top-full z-50 mt-2 ${panel}`}>
           {matches.map((p) => {
             const imgSrc = p.images?.[0]?.url || p.imageUrl || imgFor(p.sku);
             return (
@@ -61,7 +85,7 @@ function SearchBox({ onGo }) {
                 onClick={() => {
                   setFocus(false);
                   setQ("");
-                  if (onGo) onGo();
+                  if (onDone) onDone();
                   go(`/product/${p.sku}`);
                 }}
                 className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-mist"
@@ -83,7 +107,7 @@ function SearchBox({ onGo }) {
             type="button"
             onMouseDown={(e) => e.preventDefault()}
             onClick={submit}
-            className="block w-full bg-mist px-3 py-2 text-center text-[13px] font-bold transition-colors hover:text-navy"
+            className="block w-full border-t border-line bg-mist px-3 py-2.5 text-center text-[13px] font-bold transition-colors hover:text-navy"
           >
             See all results →
           </button>
@@ -94,27 +118,88 @@ function SearchBox({ onGo }) {
 }
 
 export default function Header() {
-  const { count, total, setOpen } = useCart();
+  const { count, setOpen: setCartOpen } = useCart();
   const { user, logout } = useAuth();
   const { data: categories = [] } = useCategories();
   const COMPANY = useCompany();
   const { settings } = useSite();
-  const [menu, setMenu] = useState(false);
-  const [shop, setShop] = useState(false);
-  const [notice, setNotice] = useState(true);
   const loc = useLocation();
+
+  const [open, setOpen] = useState(null); // dropdown: "categories" | "account" | null
+  const [drawer, setDrawer] = useState(false); // mobile menu
+  const [searching, setSearching] = useState(false);
+  const [notice, setNotice] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
+  const headerRef = useRef(null);
+  const sentinelRef = useRef(null);
+  const closeTimer = useRef(null);
+
+  useLockBody(drawer);
 
   const totalLines = useMemo(
     () => categories.reduce((sum, c) => sum + (c.count || c.productCount || 0), 0),
     [categories]
   );
 
-  const shopActive = loc.pathname.startsWith("/shop");
-  const linkCls = (active) =>
-    `u-slide px-3.5 py-2.5 text-[14px] font-bold transition-colors hover:text-navy ${active ? "text-navy" : "text-ink"}`;
+  /* The bar is taller than the part that sticks (lg:-top-11), so its height never
+     changes and the page can't jump; `scrolled` only re-centres the row and
+     shrinks the logo inside that fixed box. */
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > (sentinelRef.current?.offsetTop || 0) + 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [notice, settings.announcement]);
+
+  const closeAll = () => {
+    setOpen(null);
+    setDrawer(false);
+    setSearching(false);
+  };
+  useEffect(closeAll, [loc.pathname, loc.search, loc.hash]);
+
+  useEffect(() => {
+    if (!open && !searching && !drawer) return;
+    const onKey = (e) => { if (e.key === "Escape") closeAll(); };
+    const onDown = (e) => { if (headerRef.current && !headerRef.current.contains(e.target)) closeAll(); };
+    const onResize = () => { if (window.innerWidth >= 1024) setDrawer(false); };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onDown);
+    window.addEventListener("resize", onResize);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [open, searching, drawer]);
+
+  /* Dropdowns open on mouse hover, and toggle on tap / Enter so they work without a mouse. */
+  const hover = (name) => ({
+    onPointerEnter: (e) => {
+      if (e.pointerType !== "mouse") return;
+      clearTimeout(closeTimer.current);
+      setOpen(name);
+    },
+    onPointerLeave: (e) => {
+      if (e.pointerType !== "mouse") return;
+      clearTimeout(closeTimer.current);
+      closeTimer.current = setTimeout(() => setOpen((v) => (v === name ? null : v)), 140);
+    },
+  });
+  const press = (name) => (e) => {
+    const mouse = e.nativeEvent.pointerType === "mouse"; // hover already opened it
+    setSearching(false);
+    setDrawer(false);
+    setOpen((v) => (v === name && !mouse ? null : name));
+  };
+
+  const at = (path) => loc.pathname === path;
+  const navCls = (active) =>
+    `u-slide flex items-center gap-1 px-3 py-2 text-[15px] font-bold transition-colors hover:text-navy ${active ? "active text-navy" : "text-ink"}`;
+  const firstName = (user?.name || "").trim().split(" ")[0];
 
   return (
-    <header className="sticky top-0 z-40">
+    <>
       {notice && settings.announcement && (
         <div className="flex items-center justify-center gap-3 bg-ink px-4 py-1.5 text-center">
           <p className="truncate text-[12px] font-semibold text-white">{settings.announcement}</p>
@@ -127,187 +212,228 @@ export default function Header() {
           </button>
         </div>
       )}
+      <div ref={sentinelRef} aria-hidden="true" />
 
-      {/* ── Main header bar (yellow) — logo / search / contact / account / cart ── */}
-      <div id="top" className="bg-gold text-ink">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-5 gap-y-1.5 px-4 py-0.5 sm:py-1">
-          <Link to="/" className="shrink-0 py-0.5">
+      <header
+        ref={headerRef}
+        className={`sticky top-0 z-40 border-b border-line bg-white transition-shadow duration-300 lg:-top-11 ${
+          scrolled ? "shadow-[0_8px_24px_rgba(17,17,17,0.07)]" : ""
+        }`}
+      >
+        <div
+          className={`mx-auto flex h-[68px] max-w-7xl items-center gap-2 px-4 transition-[padding] duration-300 lg:h-28 lg:gap-8 ${
+            scrolled ? "lg:pt-11" : ""
+          }`}
+        >
+          <Link to="/" aria-label="Aurex Truck Parts, home" className="shrink-0">
             <img
-              src="/logo.png"
+              src="/logo-header.webp"
               alt="Aurex Truck Parts"
-              className="h-14 w-auto sm:h-16 md:h-20 lg:h-[84px] object-contain"
+              width="371"
+              height="288"
+              className={`h-14 w-auto transition-[height] duration-300 ${scrolled ? "lg:h-[52px]" : "lg:h-24"}`}
             />
           </Link>
-          <div className="hidden min-w-0 flex-1 md:flex md:justify-end">
-            <div className="w-full max-w-md">
+
+          <nav aria-label="Main" className="hidden items-stretch gap-0.5 self-stretch lg:flex">
+            <div className="flex items-center">
+              <Link to="/shop" className={navCls(at("/shop"))}>Shop All</Link>
+            </div>
+
+            <div className="relative flex items-center" {...hover("categories")}>
+              <button
+                type="button"
+                aria-haspopup="true"
+                aria-expanded={open === "categories"}
+                aria-controls="nav-categories"
+                onClick={press("categories")}
+                className={navCls(loc.pathname.startsWith("/shop/"))}
+              >
+                Categories
+                <ChevronDown size={15} className={`transition-transform duration-200 ${open === "categories" ? "rotate-180" : ""}`} />
+              </button>
+              {open === "categories" && (
+                <div id="nav-categories" className="absolute -left-24 top-full z-50 w-[min(46rem,calc(100vw-2rem))] pt-2">
+                  <div className={panel}>
+                    <div className="grid grid-cols-3 gap-3 p-4">
+                      {categories.map((c) => {
+                        const src = c.image?.url || c.imageUrl;
+                        return (
+                          <Link
+                            key={c.slug || c.id}
+                            to={`/shop/${c.slug}`}
+                            className="card-zoom overflow-hidden rounded-md border border-line bg-mist transition-colors hover:border-gold"
+                          >
+                            <span className="block aspect-[16/10] overflow-hidden bg-pale">
+                              {src && <img src={src} alt="" loading="lazy" className="h-full w-full object-cover" />}
+                            </span>
+                            <span className="block px-3 py-2.5">
+                              <span className="block text-[15px] font-extrabold leading-tight">{c.name}</span>
+                              <span className="tabular mt-1 block text-[12px] font-semibold text-steel">
+                                {c.count ?? c.productCount ?? 0} lines{c.tag ? ` · ${c.tag}` : ""}
+                              </span>
+                            </span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                    <div className="flex items-center justify-between gap-4 border-t border-line bg-mist px-4 py-3">
+                      <Link to="/shop" className="flex items-center gap-1.5 text-sm font-extrabold transition-colors hover:text-navy">
+                        Shop all {totalLines || ""} products <ArrowRight size={15} />
+                      </Link>
+                      <a href={COMPANY.phoneHref} className="tabular text-[13px] font-bold text-steel transition-colors hover:text-navy">
+                        Can't find a part? {COMPANY.phone}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center">
+              <Link to="/about" className={navCls(at("/about"))}>About</Link>
+            </div>
+            <div className="flex items-center">
+              <Link to="/contact" className={navCls(at("/contact"))}>Contact</Link>
+            </div>
+          </nav>
+
+          <div className="hidden min-w-0 flex-1 lg:block">
+            <div className="ml-auto max-w-md">
               <SearchBox />
             </div>
           </div>
-          <a href={COMPANY.phoneHref} className="group hidden shrink-0 items-center gap-2 xl:flex">
-            <Phone size={26} className="text-primary transition-colors group-hover:text-navy" />
-            <span className="leading-tight">
-              <span className="block text-[12px] text-ink/70">Call to order</span>
-              <span className="tabular block text-[17px] font-extrabold text-ink group-hover:text-navy">
-                {COMPANY.phone}
-              </span>
-            </span>
-          </a>
-          <div className="ml-auto flex shrink-0 items-center gap-2.5">
-            {user ? (
-              <Link
-                to="/profile"
-                aria-label="Profile"
-                title={user.name}
-                className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-ink text-lg font-extrabold leading-none text-gold transition-colors hover:bg-navy"
-              >
-                {(user.name || "A")[0].toUpperCase()}
-              </Link>
-            ) : (
-              <Link
-                to="/login"
-                aria-label="Account"
-                className="grid h-11 w-11 place-items-center rounded-md border border-ink/30 text-ink transition-colors hover:border-navy hover:text-navy"
-              >
-                <User size={20} />
-              </Link>
-            )}
+
+          <div className="ml-auto flex items-center gap-1 self-stretch lg:gap-1.5">
             <button
-              onClick={() => setOpen(true)}
-              aria-label="Open cart"
-              title={count > 0 ? `${count} items` : "Cart is empty"}
-              className="flex h-11 shrink-0 items-center gap-1.5 rounded-md bg-ink px-2.5 text-white transition-colors hover:bg-navy"
+              type="button"
+              aria-label={searching ? "Close search" : "Search the catalogue"}
+              aria-expanded={searching}
+              onClick={() => {
+                setOpen(null);
+                setDrawer(false);
+                setSearching((v) => !v);
+              }}
+              className={`${iconBtn} lg:hidden`}
             >
-              <span className="relative shrink-0">
-                <ShoppingCart size={19} />
-                {count > 0 && (
-                  <span className="absolute -right-2 -top-2 grid h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-[11px] font-bold text-ink">
-                    {count}
+              {searching ? <X size={21} /> : <Search size={21} />}
+            </button>
+
+            <a href={COMPANY.phoneHref} aria-label={`Call ${COMPANY.phone}`} className={`${iconBtn} max-sm:hidden`}>
+              <Phone size={20} />
+              <Tip>Call {COMPANY.phone}</Tip>
+            </a>
+
+            <div className="flex items-center self-stretch sm:relative" {...hover("account")}>
+              <button
+                type="button"
+                aria-label={user ? `Account menu for ${user.name}` : "Account menu"}
+                aria-haspopup="true"
+                aria-expanded={open === "account"}
+                aria-controls="nav-account"
+                onClick={press("account")}
+                className={iconBtn}
+              >
+                {user ? (
+                  <span className="grid h-8 w-8 place-items-center rounded-full bg-gold text-sm font-extrabold leading-none text-ink">
+                    {(user.name || user.email || "A")[0].toUpperCase()}
                   </span>
+                ) : (
+                  <User size={21} />
                 )}
-              </span>
-              <span className="tabular max-w-[72px] truncate text-sm font-extrabold">{formatAUD(total)}</span>
-            </button>
+              </button>
+              {open === "account" && (
+                <div id="nav-account" className="absolute right-4 top-full z-50 w-64 pt-2 sm:right-0">
+                  <div className={`${panel} py-1.5`}>
+                    {user ? (
+                      <>
+                        <p className="border-b border-line px-4 pb-2.5 pt-1.5">
+                          <span className="block truncate text-sm font-extrabold">Hi, {firstName || "there"}</span>
+                          <span className="block truncate text-[12px] text-steel">{user.email}</span>
+                        </p>
+                        <Link to="/profile" className={menuItem}><User size={17} className="shrink-0 text-faint" /> My profile</Link>
+                        <Link to="/orders" className={menuItem}><ClipboardList size={17} className="shrink-0 text-faint" /> My orders</Link>
+                        <Link to="/track" className={menuItem}><PackageSearch size={17} className="shrink-0 text-faint" /> Track an order</Link>
+                        <button type="button" onClick={() => { closeAll(); logout(); }} className={`${menuItem} w-full border-t border-line`}>
+                          <LogOut size={17} className="shrink-0 text-faint" /> Log out
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <Link to="/login" className={menuItem}><LogIn size={17} className="shrink-0 text-faint" /> Log in</Link>
+                        <Link to="/signup" className={menuItem}><UserPlus size={17} className="shrink-0 text-faint" /> Create an account</Link>
+                        <Link to="/track" className={`${menuItem} border-t border-line`}><PackageSearch size={17} className="shrink-0 text-faint" /> Track an order</Link>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <button
-              className="grid h-11 w-11 place-items-center rounded-md text-ink hover:bg-ink/10 md:hidden"
-              onClick={() => setMenu(!menu)}
-              aria-label="Menu"
+              type="button"
+              onClick={() => { closeAll(); setCartOpen(true); }}
+              aria-label={count > 0 ? `Open cart, ${count} item${count === 1 ? "" : "s"}` : "Open cart, empty"}
+              className="group/tip relative grid h-11 w-11 shrink-0 place-items-center rounded-md bg-ink text-white transition-colors hover:bg-navy focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy"
             >
-              {menu ? <X size={24} /> : <Menu size={24} />}
+              <ShoppingCart size={20} />
+              {count > 0 && (
+                <span className="tabular absolute -right-1.5 -top-1.5 grid h-5 min-w-5 place-items-center rounded-full bg-gold px-1 text-[11px] font-extrabold text-ink ring-2 ring-white">
+                  {count}
+                </span>
+              )}
+              <Tip>Cart</Tip>
+            </button>
+
+            <button
+              type="button"
+              aria-label={drawer ? "Close menu" : "Open menu"}
+              aria-expanded={drawer}
+              aria-controls="nav-mobile"
+              onClick={() => {
+                setOpen(null);
+                setSearching(false);
+                setDrawer((v) => !v);
+              }}
+              className={`${iconBtn} lg:hidden`}
+            >
+              {drawer ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
-          {/* mobile search — second line */}
-          <div className="w-full md:hidden">
-            <SearchBox onGo={() => setMenu(false)} />
-          </div>
         </div>
-      </div>
 
-      <nav className="hidden border-b border-line bg-white md:block">
-        <div className="mx-auto flex max-w-7xl items-center gap-1 px-4 py-2">
-          <div className="relative" onMouseEnter={() => setShop(true)} onMouseLeave={() => setShop(false)}>
-            <Link
-              to="/shop"
-              aria-haspopup="true"
-              aria-expanded={shop}
-              onFocus={() => setShop(true)}
-              onClick={() => setShop((v) => !v)}
-              className={`flex items-center gap-2.5 rounded-md px-5 py-2.5 text-[13px] font-extrabold uppercase tracking-wide text-white transition-colors ${
-                shopActive ? "bg-navy" : "bg-ink hover:bg-navy"
-              }`}
-            >
-              <Menu size={16} /> Shop by Category{" "}
-              <ChevronDown size={14} className={`transition-transform ${shop ? "rotate-180" : ""}`} />
-            </Link>
-            {shop && (
-              <div
-                className="absolute left-0 top-full z-40 w-64 overflow-hidden rounded-md border border-line bg-white py-1 shadow-xl"
-                onBlur={(e) => {
-                  if (!e.currentTarget.contains(e.relatedTarget)) setShop(false);
-                }}
-              >
-                <Link
-                  to="/shop"
-                  onClick={() => setShop(false)}
-                  className="block px-4 py-2.5 text-sm font-bold transition-colors hover:bg-mist hover:text-navy"
-                >
-                  All Products <span className="float-right font-mono text-[11px] text-faint">{totalLines || 149}</span>
-                </Link>
-                {categories.map((c) => (
-                  <Link
-                    key={c.slug || c.id}
-                    to={`/shop/${c.slug}`}
-                    onClick={() => setShop(false)}
-                    className="flex items-center justify-between border-t border-line px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-mist hover:text-navy"
-                  >
-                    {c.name}{" "}
-                    <span className="font-mono text-[11px] text-faint">
-                      {c.count ?? c.productCount ?? 0} lines
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            )}
+        {searching && (
+          <div className="border-t border-line px-4 py-2.5 lg:hidden">
+            <SearchBox autoFocus onDone={() => setSearching(false)} />
           </div>
-          <Link to="/" className={linkCls(loc.pathname === "/")}>Home</Link>
-          <Link to="/shop" className={linkCls(shopActive)}>Shop All</Link>
-          <Link to="/contact" className={linkCls(loc.pathname === "/contact")}>Contact</Link>
-          <Link to="/about" className={linkCls(loc.pathname === "/about")}>About Us</Link>
-          <Link to="/track" className={linkCls(loc.pathname === "/track")}>Track Order</Link>
-          <span className="ml-auto hidden items-center gap-3 text-[13px] font-bold lg:flex">
-            {user ? (
-              <>
-                <Link to="/profile" className="transition-colors hover:text-navy hover:underline">{user.name}</Link>
-                <span className="h-3.5 w-px bg-line-dark" />
-                <button onClick={logout} className="transition-colors hover:text-navy hover:underline">Logout</button>
-                <span className="h-3.5 w-px bg-line-dark" />
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="transition-colors hover:text-navy hover:underline">Login</Link>
-                <span className="h-3.5 w-px bg-line-dark" />
-                <Link to="/signup" className="rounded-md bg-ink px-4 py-1.5 text-white transition-colors hover:bg-navy">Sign Up</Link>
-                <span className="h-3.5 w-px bg-line-dark" />
-              </>
-            )}
-            <PackageSearch size={15} className="text-faint" />
-            <Link to="/orders" className="transition-colors hover:text-navy hover:underline">My Orders</Link>
-          </span>
-        </div>
-      </nav>
+        )}
 
-      {menu && (
-        <div className="border-t border-line bg-white px-4 py-2 md:hidden">
-          <Link to="/" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">Home</Link>
-          <Link to="/shop" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">Shop All ({totalLines || 149})</Link>
-          {categories.map((c) => (
-            <Link
-              key={c.slug || c.id}
-              to={`/shop/${c.slug}`}
-              onClick={() => setMenu(false)}
-              className="block border-t border-line py-3 pl-4 text-sm font-semibold text-steel first:border-0"
-            >
-              {c.name} ({c.count ?? c.productCount ?? 0})
+        {drawer && (
+          <nav
+            id="nav-mobile"
+            aria-label="Mobile"
+            className="absolute inset-x-0 top-full max-h-[calc(100dvh-68px)] overflow-y-auto overscroll-contain border-t border-line bg-white px-4 pb-5 shadow-[0_24px_40px_rgba(17,17,17,0.16)] lg:hidden"
+          >
+            <Link to="/shop" className="flex items-center justify-between border-b border-line py-3 pt-4 text-[15px] font-bold">
+              Shop All <span className="tabular font-mono text-[12px] text-faint">{totalLines || ""}</span>
             </Link>
-          ))}
-          <Link to="/contact" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">Contact</Link>
-          <Link to="/about" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">About Us</Link>
-          <Link to="/track" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">Track Order</Link>
-          <Link to="/orders" onClick={() => setMenu(false)} className="block border-t border-line py-3 text-[15px] font-bold first:border-0">My Orders</Link>
-          <div className="flex gap-4 border-t border-line py-3 text-[15px] font-bold">
-            {user ? (
-              <>
-                <Link to="/profile" onClick={() => setMenu(false)}>{user.name}</Link>
-                <button onClick={logout}>Logout</button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" onClick={() => setMenu(false)}>Login</Link>
-                <Link to="/signup" onClick={() => setMenu(false)}>Sign Up</Link>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-    </header>
+
+            <p className="pb-1 pt-4 text-[11px] font-bold uppercase tracking-[0.18em] text-faint">Categories</p>
+            {categories.map((c) => (
+              <Link key={c.slug || c.id} to={`/shop/${c.slug}`} className="flex items-center justify-between border-b border-line py-3 text-[15px] font-bold pl-3 font-semibold">
+                {c.name} <span className="tabular font-mono text-[12px] text-faint">{c.count ?? c.productCount ?? 0}</span>
+              </Link>
+            ))}
+
+            <Link to="/about" className="flex items-center justify-between border-b border-line py-3 text-[15px] font-bold">About</Link>
+            <Link to="/contact" className="flex items-center justify-between border-b border-line py-3 text-[15px] font-bold">Contact</Link>
+
+            <a href={COMPANY.phoneHref} className="tabular mt-5 flex items-center justify-center gap-2 border border-ink py-3.5 text-[15px] font-bold text-ink">
+              <Phone size={17} /> Call {COMPANY.phone}
+            </a>
+          </nav>
+        )}
+      </header>
+    </>
   );
 }

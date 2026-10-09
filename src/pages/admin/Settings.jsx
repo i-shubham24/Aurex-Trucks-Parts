@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSite, DEFAULT_SETTINGS } from "../../store/site";
 import { useNotification } from "../../store/notification";
 import { AdminTitle } from "./AdminLayout";
+import { api, API_ON } from "../../lib/api";
 
 const FIELDS = [
   ["storeName", "Store name", "text"],
@@ -22,12 +23,25 @@ export default function Settings() {
   const [form, setForm] = useState(settings);
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState("");
+
+  useEffect(() => {
+    if (API_ON) {
+      api.get("/settings").then((res) => {
+        const live = res?.settings || res?.data?.settings;
+        if (live) {
+          setForm((f) => ({ ...f, ...live }));
+          setSettings((s) => ({ ...s, ...live }));
+        }
+      }).catch(() => {});
+    }
+  }, []);
+
   const set = (k) => (e) => {
     const v = e.target.value;
     setForm({ ...form, [k]: e.target.type === "number" ? Number(v) : v });
     setSaved(false);
   };
-  const save = (e) => {
+  const save = async (e) => {
     e.preventDefault();
     setErr("");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(form.email || "").trim())) { setErr("Store email is invalid."); return; }
@@ -35,14 +49,23 @@ export default function Settings() {
     for (const k of ["freeFreightOver", "standardFee", "expressFee"]) {
       if (!(Number(form[k]) >= 0)) { setErr("Freight fees must be 0 or more."); return; }
     }
-    setSettings({
+    const updated = {
       ...form,
       email: String(form.email).trim(),
       phone: String(form.phone).trim(),
       freeFreightOver: Math.max(0, Number(form.freeFreightOver) || 0),
       standardFee: Math.max(0, Number(form.standardFee) || 0),
       expressFee: Math.max(0, Number(form.expressFee) || 0),
-    });
+    };
+    if (API_ON) {
+      try {
+        await api.put("/settings", updated);
+      } catch (e2) {
+        setErr(e2.message || "Failed to update settings on server.");
+        return;
+      }
+    }
+    setSettings(updated);
     setSaved(true);
     notify.success({
       kicker: "SETTINGS UPDATED",

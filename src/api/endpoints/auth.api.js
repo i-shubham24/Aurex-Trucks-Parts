@@ -14,9 +14,8 @@ export async function loginApi({ email, password }) {
 
   if (accessToken) {
     setAuthToken(accessToken);
-    try {
-      localStorage.setItem('aurex_access_token', accessToken);
-    } catch (e) {}
+    // Security: tokens kept in-memory only, not written to localStorage
+    try { localStorage.removeItem('aurex_access_token'); } catch (e) {}
   }
 
   return {
@@ -43,9 +42,8 @@ export async function registerApi({ name, email, password, phone, company }) {
 
   if (accessToken) {
     setAuthToken(accessToken);
-    try {
-      localStorage.setItem('aurex_access_token', accessToken);
-    } catch (e) {}
+    // Security: tokens kept in-memory only, not written to localStorage
+    try { localStorage.removeItem('aurex_access_token'); } catch (e) {}
   }
 
   return {

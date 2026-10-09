@@ -58,7 +58,7 @@ function ApiSiteProvider({ children }) {
   };
 
   const value = useMemo(() => ({
-    settings, setSettings, promos, setPromos, enquiries, addEnquiry, setEnquiryStatus,
+    settings, setSettings, promos, setPromos, enquiries, setEnquiries, addEnquiry, setEnquiryStatus,
     resetSite: () => { setSettings(DEFAULT_SETTINGS); setPromos(DEFAULT_PROMOS); },
   }), [settings, promos, enquiries]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
@@ -82,7 +82,7 @@ function LocalSiteProvider({ children }) {
   const setEnquiryStatus = (id, status) => setEnquiries((l) => l.map((x) => (x.id === id ? { ...x, status } : x)));
 
   const value = useMemo(() => ({
-    settings, setSettings, promos, setPromos, enquiries, addEnquiry, setEnquiryStatus,
+    settings, setSettings, promos, setPromos, enquiries, setEnquiries, addEnquiry, setEnquiryStatus,
     resetSite: () => { setSettings(DEFAULT_SETTINGS); setPromos(DEFAULT_PROMOS); },
   }), [settings, promos, enquiries]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

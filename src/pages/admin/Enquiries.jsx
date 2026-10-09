@@ -1,16 +1,50 @@
+import { useState, useEffect } from "react";
 import { useSite } from "../../store/site";
 import { AdminTitle, Empty } from "./AdminLayout";
+import { api, API_ON } from "../../lib/api";
 
 const ENQ = ["New", "Replied", "Closed"];
 
 export default function Enquiries() {
-  const { enquiries, setEnquiryStatus } = useSite();
+  const { enquiries: siteEnquiries, setEnquiryStatus: updateSiteEnquiry } = useSite();
+  const [list, setList] = useState(siteEnquiries);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (API_ON) {
+      setLoading(true);
+      api.get("/enquiries")
+        .then((res) => {
+          const items = res?.items || res?.data?.items || [];
+          if (Array.isArray(items)) {
+            setList(items.map((e) => ({ ...e, id: e.ref || e.id, at: e.createdAt })));
+          }
+        })
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    } else {
+      setList(siteEnquiries);
+    }
+  }, [siteEnquiries]);
+
+  const setStatus = (id, s) => {
+    setList((l) => l.map((x) => (x.id === id ? { ...x, status: s } : x)));
+    if (API_ON) {
+      api.patch(`/enquiries/${id}/status`, { status: s }).catch(() => {});
+    }
+    updateSiteEnquiry(id, s);
+  };
+
   return (
     <div>
-      <AdminTitle kicker="Sales" title={`Enquiries (${enquiries.length})`} />
-      {enquiries.length === 0 ? <Empty text="No enquiries yet. The contact form feeds this list." /> : (
+      <AdminTitle kicker="Sales" title={`Enquiries (${list.length})`} />
+      {loading && list.length === 0 ? (
+        <p className="text-sm font-semibold text-steel">Loading enquiries…</p>
+      ) : list.length === 0 ? (
+        <Empty text="No enquiries yet. The contact form feeds this list." />
+      ) : (
         <div className="grid gap-3">
-          {enquiries.map((e) => (
+          {list.map((e) => (
             <div key={e.id} className="border-2 border-ink bg-white p-4">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="font-mono text-sm font-extrabold">{e.id}</p>
@@ -21,7 +55,7 @@ export default function Enquiries() {
               <p className="mt-1 text-sm leading-6 text-steel">{e.message}</p>
               <div className="mt-2.5 flex flex-wrap gap-2">
                 {ENQ.map((s) => (
-                  <button key={s} onClick={() => setEnquiryStatus(e.id, s)}
+                  <button key={s} onClick={() => setStatus(e.id, s)}
                     className={`border px-3 py-1.5 text-[12px] font-bold transition-colors ${e.status === s ? "border-navy bg-navy text-white" : "border-line-dark hover:border-navy hover:text-navy"}`}>{s}</button>
                 ))}
               </div>

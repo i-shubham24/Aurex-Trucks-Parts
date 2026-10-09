@@ -165,7 +165,7 @@ export default function Orders() {
       <div className="mx-auto max-w-7xl px-4 py-8">
         <p className="text-[12px] text-faint"><Link to="/" className="hover:text-navy hover:underline">Home</Link> / <span className="font-semibold text-ink">My Orders</span></p>
         <div className="mt-3 grid items-start gap-5 lg:grid-cols-[300px_minmax(0,1fr)]">
-          <aside className="grid content-start gap-3 lg:sticky lg:top-44">
+          <aside className="grid content-start gap-3 lg:sticky lg:top-24">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-faint">Purchase history</p>
               <h1 className="mt-1 text-3xl font-extrabold tracking-tight">My Orders</h1>
@@ -211,7 +211,7 @@ export function ProfileBody() {
       <div className="mx-auto max-w-7xl px-4 py-8">
         <p className="text-[12px] text-faint"><Link to="/" className="hover:text-navy hover:underline">Home</Link> / <span className="font-semibold text-ink">Profile</span></p>
         <div className="mt-3 grid items-start gap-5 lg:grid-cols-[300px_minmax(0,1fr)]">
-          <aside className="grid content-start gap-3 lg:sticky lg:top-44">
+          <aside className="grid content-start gap-3 lg:sticky lg:top-24">
             <div className="rounded-2xl border border-line bg-white p-5 text-center shadow-[0_10px_30px_rgba(0,32,73,0.07)]">
               <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-navy text-2xl font-extrabold text-white">{(user?.name || "G")[0].toUpperCase()}</span>
               <h1 className="mt-2 truncate text-xl font-extrabold tracking-tight text-ink">{user ? user.name : "Guest Trader"}</h1>

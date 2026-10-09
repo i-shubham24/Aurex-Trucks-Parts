@@ -151,7 +151,7 @@ export default function Contact() {
           </form>
         )}
 
-        <aside className="h-fit rounded-md bg-ink p-6 text-white lg:sticky lg:top-44">
+        <aside className="h-fit rounded-md bg-ink p-6 text-white lg:sticky lg:top-24">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">Before you send</p>
           <ul className="mt-3 space-y-2.5 text-sm text-gray-200">
             <li>• Photos beat part names. Snap the fitting.</li>

@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { formatAUD } from "../../data/products";
 import { useAuth } from "../../store/auth";
 import { useNotification } from "../../store/notification";
 import { ORDER_STATUSES } from "../../utils/orders";
 import { AdminTitle, Empty, Modal, td, th } from "./AdminLayout";
+import { api, API_ON, normaliseOrder } from "../../lib/api";
 
 export default function Orders() {
   const { orders, setOrders } = useAuth();
@@ -11,6 +12,17 @@ export default function Orders() {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("All");
   const [sel, setSel] = useState(null);
+
+  useEffect(() => {
+    if (API_ON) {
+      api.get("/orders").then((res) => {
+        const items = res?.items || res?.data?.items || res?.data?.orders || [];
+        if (Array.isArray(items) && items.length) {
+          setOrders(items.map(normaliseOrder));
+        }
+      }).catch(() => {});
+    }
+  }, []);
 
   const query = q.toLowerCase().trim();
   const list = orders.filter((o) => {
@@ -23,6 +35,9 @@ export default function Orders() {
   const applyStatus = (id, s) => {
     setOrders((all) => all.map((o) => (o.id === id ? { ...o, status: s } : o)));
     setSel((cur) => (cur && cur.id === id ? { ...cur, status: s } : cur));
+    if (API_ON) {
+      api.patch(`/orders/${id}/status`, { status: s }).catch(() => {});
+    }
     notify.success({
       kicker: "ORDER UPDATED",
       title: `Order #${id} Updated`,
