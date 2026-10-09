@@ -7,6 +7,7 @@ import ThemeSelect from "../components/ThemeSelect";
 import { useCategories } from "../hooks/api/useCategories";
 import { useProducts } from "../hooks/api/useProducts";
 import { ProductGridSkeleton } from "../components/ProductCardSkeleton";
+import { makeMatcher } from "../utils/search";
 
 // Part-number order: ATP-ACC-01, -02 … then ATP-TL-…, ATP-TP-… (numeric, so -99 sorts before -100).
 const bySku = (a, b) => String(a.sku).localeCompare(String(b.sku), "en", { numeric: true });
@@ -51,7 +52,10 @@ export default function Shop({ preset }) {
     if (avail === "stock") list = list.filter((p) => String(p.status).toLowerCase().includes("in stock") || p.inventory?.stock > 0);
     if (avail === "order") list = list.filter((p) => String(p.status).toLowerCase().includes("order"));
     if (avail === "enquiry") list = list.filter((p) => p.price === null);
-    if (query) list = list.filter((p) => `${p.sku} ${p.name} ${p.sub}`.toLowerCase().includes(query));
+    if (query) {
+      const matches = makeMatcher(query);
+      list = list.filter((p) => matches(`${p.sku} ${p.name} ${p.sub}`));
+    }
     if (sort === "sku") list = [...list].sort(bySku);
     if (sort === "low") list = [...list].sort((a, b) => (a.price ?? 1e12) - (b.price ?? 1e12));
     if (sort === "high") list = [...list].sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
@@ -127,7 +131,8 @@ export default function Shop({ preset }) {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Filter by SKU or keyword"
-            className="w-full bg-transparent text-[13px] outline-none"
+            aria-label="Filter by SKU or keyword"
+            className="h-full w-full bg-transparent text-[13px] outline-none"
           />
         </span>
         <span className="grid grid-cols-2 gap-2 sm:contents">

@@ -19,14 +19,9 @@ export function useReorder() {
 function StatusPill({ order }) {
   const { idx, live, cancelled } = orderStatus(order);
   const label = cancelled ? "Cancelled" : ["Order placed", "Confirmed", "Dispatched", "Delivered"][idx];
-  const cls = cancelled
-    ? "bg-red-50 text-red-700 ring-red-200"
-    : idx >= 3
-      ? "bg-green-50 text-green-800 ring-green-200"
-      : "bg-gold/20 text-ink ring-gold/60";
+  const cls = cancelled ? "text-red-700" : idx >= 3 ? "text-green-700" : "text-steel";
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-extrabold uppercase tracking-wide ring-1 ${cls}`}>
-      <span className={`h-1.5 w-1.5 rounded-full ${cancelled ? "bg-red-500" : idx >= 3 ? "bg-green-600" : "bg-navy"}`} />
+    <span className={`text-[11px] font-extrabold uppercase tracking-wide ${cls}`}>
       {label}
       {live && !cancelled && order.status ? ` · ${order.status}` : ""}
     </span>
@@ -109,7 +104,7 @@ function OrderCard({ order, onReorder }) {
           </button>
         )}
         {open && <InlineTrack order={order} />}
-        <div className="mt-4 grid gap-2 sm:grid-cols-3">
+        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
           <button onClick={() => setOpen(!open)} className={`flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-extrabold transition ${open ? "bg-navy text-white" : "bg-gold text-ink hover:bg-navy hover:text-white"}`}>
             <Truck size={16} /> {open ? "Hide tracking" : "Track"}
           </button>
@@ -136,7 +131,7 @@ function OrdersToolbar({ q, setQ, status, setStatus, count }) {
         {["All", "Active", "Delivered", "Cancelled"].map((s) => (
           <button key={s} onClick={() => setStatus(s)} className={`rounded-md px-3 py-1.5 text-[12px] font-extrabold transition ${status === s ? "bg-ink text-white" : "bg-mist text-steel hover:text-ink"}`}>{s}</button>
         ))}
-        <span className="ml-auto self-center rounded-md bg-ink px-2.5 py-1 font-mono text-[11px] font-bold text-gold">{count} ORDERS</span>
+        <span className="ml-auto self-center font-mono text-[11px] font-bold text-primary">{count} ORDERS</span>
       </div>
     </div>
   );
@@ -164,7 +159,7 @@ export default function Orders() {
     <main className="bg-mist">
       <div className="mx-auto max-w-7xl px-4 py-8">
         <p className="text-[12px] text-faint"><Link to="/" className="hover:text-navy hover:underline">Home</Link> / <span className="font-semibold text-ink">My Orders</span></p>
-        <div className="mt-3 grid items-start gap-5 lg:grid-cols-[300px_minmax(0,1fr)]">
+        <div className="mt-3 grid grid-cols-1 items-start gap-5 lg:grid-cols-[300px_minmax(0,1fr)]">
           <aside className="grid content-start gap-3 lg:sticky lg:top-24">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-faint">Purchase history</p>
@@ -174,7 +169,7 @@ export default function Orders() {
             <OrdersToolbar q={q} setQ={setQ} status={status} setStatus={setStatus} count={orders.length} />
             <div className="flex flex-wrap gap-2 text-[13px] font-bold">
               <Link to="/track" className="flex-1 whitespace-nowrap rounded-lg border border-ink bg-white px-4 py-2.5 text-center transition hover:bg-ink hover:text-white">Track by ID</Link>
-              <Link to="/policies" className="flex-1 whitespace-nowrap rounded-lg border border-line-dark bg-white px-4 py-2.5 text-center transition hover:border-navy hover:text-navy">Returns</Link>
+              <Link to="/policies?tab=returns" className="flex-1 whitespace-nowrap rounded-lg border border-line-dark bg-white px-4 py-2.5 text-center transition hover:border-navy hover:text-navy">Returns</Link>
             </div>
           </aside>
           <div>
@@ -186,7 +181,7 @@ export default function Orders() {
                 <Link to="/shop" className="mt-5 inline-block rounded-lg bg-gold px-6 py-2.5 text-sm font-extrabold text-ink transition hover:bg-ink hover:text-white">Shop All Products</Link>
               </div>
             ) : (
-              <div className="grid items-start gap-4 xl:grid-cols-2">{orders.map((o) => <OrderCard key={o.id} order={o} onReorder={reorder} />)}</div>
+              <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-2">{orders.map((o) => <OrderCard key={o.id} order={o} onReorder={reorder} />)}</div>
             )}
           </div>
         </div>
@@ -210,13 +205,13 @@ export function ProfileBody() {
     <main className="bg-mist">
       <div className="mx-auto max-w-7xl px-4 py-8">
         <p className="text-[12px] text-faint"><Link to="/" className="hover:text-navy hover:underline">Home</Link> / <span className="font-semibold text-ink">Profile</span></p>
-        <div className="mt-3 grid items-start gap-5 lg:grid-cols-[300px_minmax(0,1fr)]">
+        <div className="mt-3 grid grid-cols-1 items-start gap-5 lg:grid-cols-[300px_minmax(0,1fr)]">
           <aside className="grid content-start gap-3 lg:sticky lg:top-24">
             <div className="rounded-2xl border border-line bg-white p-5 text-center shadow-[0_10px_30px_rgba(0,32,73,0.07)]">
               <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-navy text-2xl font-extrabold text-white">{(user?.name || "G")[0].toUpperCase()}</span>
               <h1 className="mt-2 truncate text-xl font-extrabold tracking-tight text-ink">{user ? user.name : "Guest Trader"}</h1>
               <p className="truncate text-[13px] text-steel">{user?.email || "Log in for trade pricing and order history."}{user?.company ? ` · ${user.company}` : ""}</p>
-              <span className="mt-2 inline-block rounded-md bg-gold/25 px-2.5 py-1 text-xs font-extrabold text-ink">{all.length} ORDERS</span>
+              <span className="mt-2 inline-block text-xs font-extrabold text-primary">{all.length} ORDERS</span>
               {user && <button onClick={logout} className="mt-3 w-full rounded-lg border border-line-dark py-2 text-sm font-bold text-steel transition hover:border-navy hover:text-navy">Logout</button>}
             </div>
 
@@ -233,7 +228,7 @@ export function ProfileBody() {
             <div className="grid gap-2">
               <Link to="/orders" className="rounded-lg border border-ink bg-white py-2 text-center text-[13px] font-bold transition hover:bg-ink hover:text-white">All Orders</Link>
               <Link to="/track" className="rounded-lg border border-ink bg-white py-2 text-center text-[13px] font-bold transition hover:bg-ink hover:text-white">Track Order</Link>
-              <Link to="/policies" className="rounded-lg border border-ink bg-white py-2 text-center text-[13px] font-bold transition hover:bg-ink hover:text-white">Returns Policy</Link>
+              <Link to="/policies?tab=returns" className="rounded-lg border border-ink bg-white py-2 text-center text-[13px] font-bold transition hover:bg-ink hover:text-white">Returns Policy</Link>
             </div>
           </aside>
 
@@ -245,7 +240,7 @@ export function ProfileBody() {
             <div className="mt-3">
               {orders.length === 0
                 ? <p className="rounded-2xl border border-line bg-white p-6 text-sm text-steel">No orders on this device yet. <Link to="/shop" className="font-bold text-navy underline">Shop now</Link>.</p>
-                : <div className="grid items-start gap-4 xl:grid-cols-2">{orders.map((o) => <OrderCard key={o.id} order={o} onReorder={reorder} />)}</div>}
+                : <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-2">{orders.map((o) => <OrderCard key={o.id} order={o} onReorder={reorder} />)}</div>}
             </div>
           </div>
         </div>

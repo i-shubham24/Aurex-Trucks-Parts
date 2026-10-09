@@ -9,7 +9,7 @@
 export const API_URL =
   import.meta.env?.VITE_API_URL ||
   (import.meta.env?.PROD
-    ? 'https://truck-parts-api.vercel.app/api/v1'
+    ? '/api/v1'
     : 'http://localhost:5001/api/v1');
 export const API_ON = true;
 

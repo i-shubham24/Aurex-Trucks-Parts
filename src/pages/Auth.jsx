@@ -64,7 +64,7 @@ export function AuthCard({ mode: initial = "login" }) {
     <Field label="Email address" error={fieldErr.email}>
       <span className={inputCls(fieldErr.email)}>
         <Mail size={16} className="shrink-0 text-faint" />
-        <input disabled={loading} required type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={120} placeholder="you@fleet.com.au" className="w-full bg-transparent outline-none disabled:opacity-60" autoComplete="email" />
+        <input disabled={loading} required type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={120} placeholder="you@fleet.com.au" className="h-full w-full bg-transparent outline-none disabled:opacity-60" autoComplete="email" />
       </span>
     </Field>
   );
@@ -147,21 +147,21 @@ export function AuthCard({ mode: initial = "login" }) {
   return (
     <div className="p-4 sm:p-5">
       <div className="mb-3 flex items-center gap-2.5 lg:hidden">
-        <img src="/logo.png" alt="Aurex Truck Parts" className="h-9 w-auto" />
+        <img src="/logo-header.webp" alt="Aurex Truck Parts" className="h-9 w-auto" />
         <span className="h-7 w-px bg-line" aria-hidden="true" />
         <p className="text-[10px] font-bold uppercase leading-[1.5] tracking-[0.2em] text-navy">Trade<br />accounts</p>
       </div>
       <div className="flex items-center justify-between gap-3">
         <div className="inline-flex rounded-md bg-mist p-1">
-          <button type="button" onClick={() => switchTab("login")} className={`rounded-md px-4 py-1 text-[13px] font-extrabold transition ${tab === "login" ? "bg-ink text-white shadow" : "text-steel hover:text-ink"}`}>Login</button>
-          <button type="button" onClick={() => switchTab("signup")} className={`rounded-md px-4 py-1 text-[13px] font-extrabold transition ${tab === "signup" ? "bg-ink text-white shadow" : "text-steel hover:text-ink"}`}>Sign up</button>
+          <button type="button" onClick={() => switchTab("login")} className={`rounded-md px-4 py-2 text-[13px] font-extrabold transition ${tab === "login" ? "bg-ink text-white shadow" : "text-steel hover:text-ink"}`}>Login</button>
+          <button type="button" onClick={() => switchTab("signup")} className={`rounded-md px-4 py-2 text-[13px] font-extrabold transition ${tab === "signup" ? "bg-ink text-white shadow" : "text-steel hover:text-ink"}`}>Sign up</button>
         </div>
         <span className="hidden items-center gap-1.5 text-[11px] font-bold text-faint sm:flex"><ShieldCheck size={13} className="text-green-700" /> Secure 256-bit</span>
       </div>
 
-      <h2 className="mt-2.5 text-xl font-extrabold leading-tight tracking-tight">
+      <h1 className="mt-2.5 text-xl font-extrabold leading-tight tracking-tight">
         {tab === "login" ? "Welcome back, driver." : "Create your trade account."}
-      </h2>
+      </h1>
       <p className="mt-0.5 text-[13px] text-steel">
         {tab === "login" ? "Log in for faster checkout, order tracking and trade pricing." : "Counter pricing, 30-day fleet terms and saved vehicles. Free to join."}
       </p>
@@ -170,26 +170,26 @@ export function AuthCard({ mode: initial = "login" }) {
         <span className="hidden" aria-hidden="true"><input type="text" value={site} onChange={(e) => setSite(e.target.value)} tabIndex={-1} autoComplete="off" /></span>
         {tab === "signup" ? (
           <>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Field label="Full name" error={fieldErr.name}>
                 <span className={inputCls(fieldErr.name)}>
                   <User size={16} className="shrink-0 text-faint" />
-                  <input disabled={loading} required value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder="e.g. Jack Carter" className="w-full bg-transparent outline-none disabled:opacity-60" />
+                  <input disabled={loading} required value={name} onChange={(e) => setName(e.target.value)} maxLength={80} placeholder="e.g. Jack Carter" className="h-full w-full bg-transparent outline-none disabled:opacity-60" />
                 </span>
               </Field>
               {emailField}
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Field label="Phone *" error={fieldErr.phone}>
                 <span className={inputCls(fieldErr.phone)}>
                   <Phone size={16} className="shrink-0 text-faint" />
-                  <input disabled={loading} required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="04XX XXX XXX" maxLength={20} className="w-full bg-transparent outline-none disabled:opacity-60" inputMode="tel" autoComplete="tel" />
+                  <input disabled={loading} required value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="04XX XXX XXX" maxLength={20} className="h-full w-full bg-transparent outline-none disabled:opacity-60" inputMode="tel" autoComplete="tel" />
                 </span>
               </Field>
               <Field label="Company / fleet" hint="optional">
                 <span className={inputCls(false)}>
                   <Building2 size={16} className="shrink-0 text-faint" />
-                  <input disabled={loading} value={company} onChange={(e) => setCompany(e.target.value)} maxLength={80} placeholder="Carter Haulage" className="w-full bg-transparent outline-none disabled:opacity-60" />
+                  <input disabled={loading} value={company} onChange={(e) => setCompany(e.target.value)} maxLength={80} placeholder="Carter Haulage" className="h-full w-full bg-transparent outline-none disabled:opacity-60" />
                 </span>
               </Field>
             </div>
@@ -200,8 +200,8 @@ export function AuthCard({ mode: initial = "login" }) {
         <Field label={tab === "signup" ? "Create password" : "Password"} hint={tab === "signup" ? "Min 6 characters" : ""} error={fieldErr.pass}>
           <span className={inputCls(fieldErr.pass)}>
             <Lock size={16} className="shrink-0 text-faint" />
-            <input disabled={loading} required value={pass} onChange={(e) => setPass(e.target.value)} type={show ? "text" : "password"} maxLength={72} placeholder={tab === "signup" ? "Choose a password (e.g. 123456)" : "Your password"} className="w-full bg-transparent outline-none disabled:opacity-60" autoComplete={tab === "signup" ? "new-password" : "current-password"} />
-            <button type="button" onClick={() => setShow(!show)} aria-label={show ? "Hide password" : "Show password"} className="shrink-0 rounded p-1 text-faint hover:bg-mist hover:text-ink">
+            <input disabled={loading} required value={pass} onChange={(e) => setPass(e.target.value)} type={show ? "text" : "password"} maxLength={72} placeholder={tab === "signup" ? "Choose a password (e.g. 123456)" : "Your password"} className="h-full w-full bg-transparent outline-none disabled:opacity-60" autoComplete={tab === "signup" ? "new-password" : "current-password"} />
+            <button type="button" onClick={() => setShow(!show)} aria-label={show ? "Hide password" : "Show password"} className="-mr-1.5 shrink-0 rounded p-2 text-faint hover:bg-mist hover:text-ink">
               {show ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </span>
@@ -265,7 +265,7 @@ function BrandPanel() {
       <img src="/images/web/hero-roadtrain.jpg" alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-40" />
       <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent" />
       <div className="relative flex items-center gap-3">
-        <img src="/logo.png" alt="Aurex Truck Parts" className="h-14 w-auto shrink-0 brightness-0 invert" />
+        <img src="/logo-header.webp" alt="Aurex Truck Parts" className="h-14 w-auto shrink-0 brightness-0 invert" />
         <span className="h-10 w-px shrink-0 bg-white/15" aria-hidden="true" />
         <p className="text-[11px] font-bold uppercase leading-[1.5] tracking-[0.2em] text-gold">Trade<br />accounts</p>
       </div>
@@ -286,7 +286,7 @@ export default function Auth({ mode = "login" }) {
     <main className="grid min-h-screen place-items-center overflow-hidden bg-mist px-4 py-3">
       <div className="w-full max-w-4xl">
         <Link to="/" className="inline-flex items-center gap-2 text-[13px] font-bold text-steel hover:text-navy"><ArrowLeft size={15} /> Back to store</Link>
-        <div className="mt-2 grid max-h-[calc(100dvh-4rem)] overflow-y-auto rounded-2xl border border-line bg-white shadow-[0_24px_60px_rgba(0,32,73,0.12)] lg:grid-cols-[320px_minmax(0,1fr)]">
+        <div className="mt-2 grid grid-cols-1 max-h-[calc(100dvh-4rem)] overflow-y-auto rounded-2xl border border-line bg-white shadow-[0_24px_60px_rgba(0,32,73,0.12)] lg:grid-cols-[320px_minmax(0,1fr)]">
           <BrandPanel />
           <AuthCard key={mode} mode={mode} />
         </div>

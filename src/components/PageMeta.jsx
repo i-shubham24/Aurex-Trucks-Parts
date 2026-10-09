@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { useCatalog } from "../store/catalog";
+import { useProduct } from "../hooks/api/useProducts";
 import { NEWS } from "../data/content";
 import { imgFor } from "../data/images";
 
@@ -45,7 +45,9 @@ function setMetaTag(selector, attr, value) {
 
 export default function PageMeta() {
   const { pathname } = useLocation();
-  const { products } = useCatalog();
+  const skuMatch = pathname.match(/^\/product\/([^/]+)/);
+  const { data: productData } = useProduct(skuMatch ? decodeURIComponent(skuMatch[1]) : null);
+  const metaProduct = productData?.product || null;
 
   useEffect(() => {
     let title = "Shop Truck Parts | " + BASE;
@@ -56,7 +58,7 @@ export default function PageMeta() {
     /* Product pages get their real name + SKU in the title (highest value SEO). */
     const pm = pathname.match(/^\/product\/([^/]+)/);
     if (pm) {
-      const p = products.find((x) => x.sku === decodeURIComponent(pm[1]));
+      const p = metaProduct;
       if (p) {
         title = `${p.name} (${p.sku}) | ${BASE}`;
         desc = `${p.name}, ${p.fit || "Heavy-duty commercial fitment"}. ${p.price == null ? "Technical quote on enquiry" : `Live VIC stock at $${p.price.toFixed(2)} AUD`} at Aurex Truck Parts Campbellfield.`;
@@ -73,10 +75,10 @@ export default function PageMeta() {
           "image": [pageImage],
           "description": p.desc || desc,
           "sku": p.sku,
-          "mpn": p.oem || p.sku,
+          "mpn": p.sku,
           "brand": {
             "@type": "Brand",
-            "name": p.brand || "Aurex"
+            "name": "Aurex"
           },
           "offers": {
             "@type": "Offer",
@@ -148,7 +150,7 @@ export default function PageMeta() {
     } else if (scriptTag) {
       scriptTag.remove();
     }
-  }, [pathname, products]);
+  }, [pathname, metaProduct]);
 
   return null;
 }

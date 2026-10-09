@@ -16,6 +16,7 @@ export function PartVisual({ p }) {
           alt={p.name}
           loading="lazy"
           src={img}
+          cdnWidth={480}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
       );
@@ -27,6 +28,7 @@ export function PartVisual({ p }) {
           alt={p.name}
           loading="lazy"
           src={img}
+          cdnWidth={480}
           className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
         />
       </div>
@@ -59,20 +61,20 @@ function Stars({ rating, reviews }) {
 export function StatusBadge({ p }) {
   if (p.price === null) {
     return (
-      <span className="grid h-7 min-w-7 place-items-center rounded-sm bg-ink px-2 text-[10px] font-extrabold uppercase tracking-wider text-white">
+      <span className="text-[10px] font-extrabold uppercase tracking-wider text-steel">
         Enquire
       </span>
     );
   }
   if (p.status === "Built to order") {
     return (
-      <span className="grid h-7 min-w-7 place-items-center rounded-sm bg-primary px-2 text-[10px] font-extrabold uppercase tracking-wider text-white">
+      <span className="text-[10px] font-extrabold uppercase tracking-wider text-primary">
         Built to Order
       </span>
     );
   }
   return (
-    <span className="grid h-7 min-w-7 place-items-center rounded-sm bg-gold px-2 text-[10px] font-extrabold uppercase tracking-wider text-ink">
+    <span className="text-[10px] font-extrabold uppercase tracking-wider text-green-700">
       In Stock
     </span>
   );
@@ -143,7 +145,7 @@ export default function ProductCard({ p, joined }) {
                   add(p);
                 }
               }}
-              className="pointer-events-auto grid h-7 w-7 place-items-center rounded-md bg-white text-ink shadow transition-colors hover:bg-gold"
+              className="pointer-events-auto grid h-9 w-9 place-items-center rounded-md bg-white text-ink shadow transition-colors hover:bg-gold md:h-7 md:w-7"
             >
               <ShoppingCart size={14} />
             </span>
@@ -161,7 +163,7 @@ export default function ProductCard({ p, joined }) {
                 e.stopPropagation();
                 navigate(enquiryUrl);
               }}
-              className="pointer-events-auto grid h-7 w-7 place-items-center rounded-md bg-white text-ink shadow transition-colors hover:bg-gold"
+              className="pointer-events-auto grid h-9 w-9 place-items-center rounded-md bg-white text-ink shadow transition-colors hover:bg-gold md:h-7 md:w-7"
             >
               <MessageSquare size={14} />
             </button>

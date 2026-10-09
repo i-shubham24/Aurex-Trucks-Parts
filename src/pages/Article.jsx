@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { blogImage } from "../data/images";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Phone } from "lucide-react";
 import { NEWS } from "../data/content";
@@ -43,7 +44,7 @@ export default function Article() {
       "@type": "BlogPosting",
       headline: post.title,
       description: post.excerpt,
-      image: post.coverImage || post.img,
+      image: blogImage(post),
       datePublished: post.publishedAt || post.date,
       author: { "@type": "Organization", name: "Aurex Truck Parts Australia" },
     });
@@ -76,7 +77,7 @@ export default function Article() {
     );
   }
 
-  const imageSrc = post.coverImage || post.img;
+  const imageSrc = blogImage(post);
 
   return (
     <main>
@@ -85,7 +86,7 @@ export default function Article() {
           <Link to="/" className="hover:text-navy hover:underline">Home</Link> / <span className="font-semibold text-ink">Stock Notes</span>
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="bg-gold px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-ink">{post.tag}</span>
+          <span className="font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-primary">{post.tag}</span>
           <span className="font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-faint">{post.date}</span>
         </div>
         <h1 className="mt-2 text-3xl font-extrabold leading-tight tracking-tight md:text-[40px]">{post.title}</h1>
@@ -149,9 +150,9 @@ export default function Article() {
 
       <section className="mx-auto max-w-7xl px-4 pt-10">
         <h2 className="mb-4 text-2xl font-extrabold tracking-tight">More from the counter</h2>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {others.map((n) => {
-            const cardImg = n.coverImage || n.img;
+            const cardImg = blogImage(n);
             return (
               <Link
                 key={n.slug || n.id}

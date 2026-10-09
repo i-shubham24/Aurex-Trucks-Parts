@@ -75,7 +75,7 @@ function StaffLogin() {
     e.preventDefault();
     setErr("");
     const r = await login({ email, password });
-    if (!r?.ok) setErr((r?.msg || "Login failed.") + " Hint: the staff seed is admin@aurex.com.au / Admin123! unless changed.");
+    if (!r?.ok) setErr(r?.msg || "Login failed. Check your email and password.");
   };
   return (
     <main className="grid min-h-screen place-items-center bg-[#0b0e14] px-4 py-10">

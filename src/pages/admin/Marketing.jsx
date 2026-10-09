@@ -90,7 +90,7 @@ export default function Marketing() {
   return (
     <div>
       <AdminTitle kicker="Catalog" title="Marketing & Promos" />
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="border-2 border-ink bg-white">
           <p className="border-b-2 border-ink px-4 py-2.5 text-sm font-extrabold">Promo codes</p>
           {loading && promos.length === 0 && <p className="p-4 text-sm text-steel">Loading promos…</p>}

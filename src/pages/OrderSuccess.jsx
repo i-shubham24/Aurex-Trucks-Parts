@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 import { CheckCircle2, Printer, Truck, Loader2 } from "lucide-react";
 import { formatAUD } from "../data/products";
@@ -6,6 +7,7 @@ import { useCompany } from "../store/site";
 import { findOrder } from "../utils/orders";
 import { useSite } from "../store/site";
 import { api, API_ON, normaliseOrder } from "../lib/api";
+import { apiClient } from "../api/client";
 
 export default function OrderSuccess() {
   const { id } = useParams();
@@ -42,13 +44,29 @@ export default function OrderSuccess() {
     }
     return () => { active = false; };
   }, [id]);
+  // An order is only "paid" once staff or the card gateway say so.
+  const paid = ["PAID", "AUTHORIZED"].includes(order?.paymentStatus);
+  const awaitingPayment = Boolean(order) && !paid;
+  const byTransfer = awaitingPayment && /bank|transfer/i.test(order.payment || "");
+  const { data: payConfig } = useQuery({
+    queryKey: ["payment-config"],
+    queryFn: () => apiClient.get("/payments/config").then((r) => r?.data || {}),
+    staleTime: 5 * 60 * 1000,
+    enabled: byTransfer,
+  });
+  const bank = payConfig?.directBankTransfer;
+
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
       <div className="rounded-2xl border border-line bg-white p-6 text-center shadow-[0_16px_40px_rgba(0,32,73,0.08)]">
         <span className="mx-auto grid h-16 w-16 place-items-center rounded-md bg-green-50 ring-1 ring-green-200"><CheckCircle2 size={32} className="text-green-700" /></span>
-        <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-ink">Order locked in</h1>
-        <p className="mt-1 text-sm text-steel">Packed in Campbellfield VIC. Keep your order ID for tracking.</p>
-        <p className="mx-auto mt-3 w-fit rounded-lg bg-gold px-4 py-1.5 font-mono text-lg font-extrabold text-ink">{id}</p>
+        <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-ink">{awaitingPayment ? "Order received" : "Order locked in"}</h1>
+        <p className="mt-1 text-sm text-steel">
+          {byTransfer ? "We pack and dispatch as soon as your transfer lands. Keep your order ID for tracking."
+            : awaitingPayment ? "Pay when you collect from the Campbellfield counter. Keep your order ID for tracking."
+            : "Packed in Campbellfield VIC. Keep your order ID for tracking."}
+        </p>
+        <p className="mt-3 font-mono text-xl font-extrabold text-navy">{id}</p>
         <div className="mt-5 flex flex-wrap justify-center gap-2.5">
           <Link to={`/track?id=${id}`} className="rounded-lg bg-gold px-6 py-2.5 text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white">Track this order →</Link>
           <button onClick={() => window.print()} className="flex items-center gap-2 rounded-lg border border-line-dark px-6 py-2.5 text-sm font-bold text-steel transition-colors hover:border-navy hover:text-navy"><Printer size={15} /> Print Tax Invoice</button>
@@ -61,6 +79,26 @@ export default function OrderSuccess() {
           <span>Retrieving official tax invoice details…</span>
         </div>
       ) : order ? (
+
+        <>
+        {byTransfer && (
+          <div className="mt-5 rounded-md border border-gold bg-gold/15 p-5">
+            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-ink">How to pay</p>
+            <p className="mt-1 text-sm text-steel">
+              Transfer <strong className="tabular text-ink">{formatAUD(order.total)}</strong> and use your order ID <strong className="font-mono text-ink">{order.id}</strong> as the reference.
+            </p>
+            {bank?.accountNumber ? (
+              <dl className="tabular mt-3 grid grid-cols-1 gap-x-6 gap-y-1.5 text-sm sm:grid-cols-2">
+                <div className="flex justify-between gap-3 sm:block"><dt className="text-steel">Account name</dt><dd className="font-bold">{bank.accountName}</dd></div>
+                <div className="flex justify-between gap-3 sm:block"><dt className="text-steel">Bank</dt><dd className="font-bold">{bank.bankName}</dd></div>
+                <div className="flex justify-between gap-3 sm:block"><dt className="text-steel">BSB</dt><dd className="font-mono font-bold">{bank.bsbOrRouting}</dd></div>
+                <div className="flex justify-between gap-3 sm:block"><dt className="text-steel">Account number</dt><dd className="font-mono font-bold">{bank.accountNumber}</dd></div>
+              </dl>
+            ) : (
+              <p className="mt-2 text-sm text-steel">For our bank details, call <a href={COMPANY.phoneHref} className="font-bold text-navy underline">{COMPANY.phone}</a>.</p>
+            )}
+          </div>
+        )}
         <div className="mt-5 rounded-md border border-line bg-white p-6">
           <div className="flex flex-wrap items-start justify-between gap-3 border-b-2 border-ink pb-4">
             <div>
@@ -73,7 +111,7 @@ export default function OrderSuccess() {
               <p>{new Date(order.placedAt).toLocaleString("en-AU")}</p>
             </div>
           </div>
-          <div className="mt-4 grid gap-4 text-sm sm:grid-cols-2">
+          <div className="mt-4 grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-faint">Billed / deliver to</p>
               <p className="mt-1 font-bold">{order.address?.name}</p>
@@ -98,9 +136,10 @@ export default function OrderSuccess() {
             {order.discount > 0 && <p className="flex justify-between text-green-700"><span>Promo{order.promoCode ? ` (${order.promoCode})` : ""}</span><span className="tabular font-bold">−{formatAUD(order.discount)}</span></p>}
             <p className="flex justify-between text-steel"><span>Freight</span><span className="tabular font-bold text-ink">{order.shippingFee === 0 ? "FREE" : formatAUD(order.shippingFee)}</span></p>
             <p className="flex justify-between text-steel"><span>GST included (10%)</span><span className="tabular font-bold text-ink">{formatAUD(order.total / 11)}</span></p>
-            <p className="tabular flex justify-between pt-1 text-lg font-extrabold"><span>Total paid</span><span>{formatAUD(order.total)}</span></p>
+            <p className="tabular flex justify-between pt-1 text-lg font-extrabold"><span>{paid ? "Total paid" : "Total due"}</span><span>{formatAUD(order.total)}</span></p>
           </div>
         </div>
+        </>
       ) : (
         <p className="mt-5 rounded-md border border-line bg-mist p-5 text-center text-sm text-steel">Receipt not found on this device, but your order ID above still tracks fine.</p>
       )}

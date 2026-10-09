@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Package } from "lucide-react";
+import { cld } from "../utils/img";
 
 export default function SafeImage({
   src,
@@ -8,6 +9,7 @@ export default function SafeImage({
   fallbackIconSize = 18,
   loading,
   fetchPriority,
+  cdnWidth,
   ...props
 }) {
   const [failed, setFailed] = useState(false);
@@ -26,9 +28,10 @@ export default function SafeImage({
 
   return (
     <img
-      src={src}
+      src={cld(src, cdnWidth)}
       alt={alt}
       loading={loading}
+      decoding="async"
       fetchPriority={fetchPriority}
       onError={() => setFailed(true)}
       className={className}

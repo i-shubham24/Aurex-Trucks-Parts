@@ -23,9 +23,3 @@ export const FAQS = [
   { q: "Do you offer trade pricing?", a: "Yes. ABN workshops save 5 percent with priority quotes. Fleets with 5 plus vehicles save 10 percent with 30 day terms and saved lists. Volume breaks apply over 5 units." },
   { q: "Are parts ADR compliant?", a: "Our range is selected for Australian bodies and tested to suit ADR requirements. If a line needs a drawing or compliance note, we supply it with the quote." },
 ];
-
-export const REVIEWS = [
-  { name: "Fleet Manager, Northern VIC", text: "Matched our door gear off photos. Fit first time. Freight landed next day." },
-  { name: "Body Builder, Campbellfield", text: "Tail lift kit arrived complete. Brackets, lights, controls. No missing bits." },
-  { name: "Workshop, Western Sydney", text: "Tracks and fittings exactly as specced. Quote back in two hours." },
-];

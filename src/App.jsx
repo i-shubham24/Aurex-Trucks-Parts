@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { NotificationProvider } from "./store/notification";
 import NotificationCenter from "./components/NotificationCenter";
@@ -14,28 +14,35 @@ import CartDrawer from "./components/CartDrawer";
 import CompareTray from "./components/CompareTray";
 import PromoPopup from "./components/PromoPopup";
 import Home from "./pages/Home";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import TailLiftEnquiry from "./pages/TailLiftEnquiry";
-import Shop, { CategoryByParam } from "./pages/Shop";
-import Policies from "./pages/Policies";
-import ProductDetail from "./pages/ProductDetail";
-import Article from "./pages/Article";
-import Checkout from "./pages/Checkout";
-import OrderSuccess from "./pages/OrderSuccess";
-import Orders, { ProfileBody } from "./pages/Account";
-import Track from "./pages/Track";
-import Auth from "./pages/Auth";
-import Reset from "./pages/Reset";
-import AdminLayout from "./pages/admin/AdminLayout";
-import Dashboard from "./pages/admin/Dashboard";
-import AdminOrders from "./pages/admin/Orders";
-import AdminProducts from "./pages/admin/Products";
-import AdminCategories from "./pages/admin/Categories";
-import AdminCustomers from "./pages/admin/Customers";
-import AdminEnquiries from "./pages/admin/Enquiries";
-import AdminMarketing from "./pages/admin/Marketing";
-import AdminSettings from "./pages/admin/Settings";
+
+/* Everything except the landing page loads on demand. */
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/Contact"));
+const TailLiftEnquiry = lazy(() => import("./pages/TailLiftEnquiry"));
+const Shop = lazy(() => import("./pages/Shop"));
+const CategoryByParam = lazy(() => import("./pages/Shop").then((m) => ({ default: m.CategoryByParam })));
+const Policies = lazy(() => import("./pages/Policies"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail"));
+const Article = lazy(() => import("./pages/Article"));
+const Checkout = lazy(() => import("./pages/Checkout"));
+const OrderSuccess = lazy(() => import("./pages/OrderSuccess"));
+const Orders = lazy(() => import("./pages/Account"));
+const ProfileBody = lazy(() => import("./pages/Account").then((m) => ({ default: m.ProfileBody })));
+const Track = lazy(() => import("./pages/Track"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Reset = lazy(() => import("./pages/Reset"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
+const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
+const AdminOrders = lazy(() => import("./pages/admin/Orders"));
+const AdminProducts = lazy(() => import("./pages/admin/Products"));
+const AdminCategories = lazy(() => import("./pages/admin/Categories"));
+const AdminCustomers = lazy(() => import("./pages/admin/Customers"));
+const AdminEnquiries = lazy(() => import("./pages/admin/Enquiries"));
+const AdminMarketing = lazy(() => import("./pages/admin/Marketing"));
+const AdminSettings = lazy(() => import("./pages/admin/Settings"));
+
+const PageFallback = () => <div className="min-h-[60vh]" aria-busy="true" />;
 
 function ScrollManager() {
   const { pathname, hash } = useLocation();
@@ -62,6 +69,7 @@ function Shell() {
     return (
       <>
         <ScrollManager />
+        <Suspense fallback={<PageFallback />}>
         <Routes>
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
@@ -74,6 +82,7 @@ function Shell() {
             <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Routes>
+        </Suspense>
       </>
     );
   }
@@ -85,12 +94,14 @@ function Shell() {
       <>
         <ScrollManager />
         <PageMeta />
+        <Suspense fallback={<PageFallback />}>
         <Routes>
           <Route path="/login" element={<Auth mode="login" />} />
           <Route path="/signup" element={<Auth mode="signup" />} />
           <Route path="/forgot-password" element={<Reset />} />
           <Route path="/reset-password" element={<Reset />} />
         </Routes>
+        </Suspense>
       </>
     );
   }
@@ -103,6 +114,7 @@ function Shell() {
       <CartDrawer />
       <CompareTray />
       <PromoPopup />
+      <Suspense fallback={<PageFallback />}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
@@ -119,8 +131,9 @@ function Shell() {
         <Route path="/orders" element={<Orders />} />
         <Route path="/profile" element={<ProfileBody />} />
         <Route path="/track" element={<Track />} />
-        <Route path="*" element={<Home />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
+      </Suspense>
       <Footer />
     </>
   );

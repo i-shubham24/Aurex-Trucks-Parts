@@ -2,13 +2,14 @@ import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, ClipboardCheck, Headset, Phone, Truck } from "lucide-react";
 import { formatAUD } from "../data/products";
-import { useCatalog } from "../store/catalog";
 import { FAQS } from "../data/company";
 import { useCompany, useSite } from "../store/site";
 import { NEWS, TESTIMONIALS } from "../data/content";
-import { CAT_IMG, imgFor } from "../data/images";
+import { PHOTO, blogImage } from "../data/images";
 import { useCart } from "../store/cart";
 import ProductCard from "../components/ProductCard";
+import LazySection from "../components/LazySection";
+import { cld } from "../utils/img";
 import SafeImage from "../components/SafeImage";
 import { useCategories } from "../hooks/api/useCategories";
 import { CategoryTilesSkeleton } from "../components/CategorySkeleton";
@@ -18,7 +19,6 @@ import { useProducts } from "../hooks/api/useProducts";
 import { ProductGridSkeleton } from "../components/ProductCardSkeleton";
 import { useBlogs } from "../hooks/api/useBlogs";
 
-const WEB = (n) => `/images/web/${n}.jpg`;
 
 function SecHead({ title, link, linkLabel }) {
   const Cmp = link && link.startsWith("/") ? Link : "a";
@@ -64,7 +64,7 @@ function Hero() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 pt-4">
-      <div className="relative grid overflow-hidden rounded-lg bg-mist md:grid-cols-2 md:items-center">
+      <div className="relative grid grid-cols-1 overflow-hidden rounded-lg bg-mist md:grid-cols-2 md:items-center">
         <div className="px-6 py-12 md:px-12 md:py-16" key={`t-${i}-${s.id || s.title}`}>
           <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight md:text-[56px]">{s.title}</h1>
           <p className="mt-3 max-w-sm text-[15px] leading-6 text-steel">{s.subtitle || s.sub}</p>
@@ -83,28 +83,31 @@ function Hero() {
             </Link>
           </div>
           <div className="mt-7 flex items-center gap-3">
-            <div className="flex gap-1.5">
+            <div className="flex gap-0.5">
               {slides.map((x, k) => (
                 <button
                   key={x.id || x.img || k}
                   onClick={() => setI(k)}
                   aria-label={`Slide ${k + 1}`}
-                  className={`h-1.5 rounded-sm transition-all ${k === i ? "w-8 bg-gold" : "w-2.5 bg-line-dark hover:bg-faint"}`}
-                />
+                  aria-current={k === i}
+                  className="group/dot flex h-8 items-center px-0.5"
+                >
+                  <span className={`block h-1.5 rounded-sm transition-all ${k === i ? "w-8 bg-gold" : "w-2.5 bg-line-dark group-hover/dot:bg-faint"}`} />
+                </button>
               ))}
             </div>
             <div className="flex items-center gap-1 pl-2">
               <button
                 onClick={prevSlide}
                 aria-label="Previous slide"
-                className="flex h-7 w-7 items-center justify-center rounded border border-line bg-white text-ink transition-colors hover:border-gold hover:bg-gold"
+                className="flex h-9 w-9 items-center justify-center rounded border border-line bg-white text-ink transition-colors hover:border-gold hover:bg-gold md:h-8 md:w-8"
               >
                 <ChevronLeft size={14} />
               </button>
               <button
                 onClick={nextSlide}
                 aria-label="Next slide"
-                className="flex h-7 w-7 items-center justify-center rounded border border-line bg-white text-ink transition-colors hover:border-gold hover:bg-gold"
+                className="flex h-9 w-9 items-center justify-center rounded border border-line bg-white text-ink transition-colors hover:border-gold hover:bg-gold md:h-8 md:w-8"
               >
                 <ChevronRight size={14} />
               </button>
@@ -115,7 +118,7 @@ function Hero() {
           <div className="hero-slide absolute inset-y-4 right-6 left-16 rounded-md bg-gold/50 blur-[1px] md:left-24" />
           {imageSrc && (
             <img
-              src={imageSrc}
+              src={cld(imageSrc, 1400)}
               alt={s.title}
               fetchPriority="high"
               className="hero-slide absolute inset-0 h-full w-full rounded-r-lg object-cover [clip-path:polygon(12%_0,100%_0,100%_100%,0_100%)]"
@@ -139,7 +142,7 @@ function Tiles() {
   }
 
   return (
-    <section id="categories" className="mx-auto grid max-w-7xl scroll-mt-24 gap-4 px-4 pt-6 md:grid-cols-3">
+    <section id="categories" className="mx-auto grid grid-cols-1 max-w-7xl scroll-mt-24 gap-4 px-4 pt-6 md:grid-cols-3">
       {categories.slice(0, 3).map((c) => {
         const imageSrc = c.image?.url || c.imageUrl;
         const lineCount = c.count ?? c.productCount ?? 0;
@@ -154,16 +157,17 @@ function Tiles() {
               <span className="tabular mt-1.5 block text-sm font-extrabold text-primary">
                 {c.tag || `${lineCount} lines`}
               </span>
-              <span className="mt-2.5 inline-block bg-mist px-3 py-1.5 text-xs font-bold transition-colors group-hover:bg-gold">
+              <span className="mt-2.5 inline-block text-xs font-bold text-steel transition-colors group-hover:text-navy">
                 {lineCount} lines →
               </span>
             </span>
             <span className="block h-full min-h-[110px] overflow-hidden bg-mist">
               {imageSrc ? (
                 <img
-                  src={imageSrc}
+                  src={cld(imageSrc, 640)}
                   alt={c.name}
                   loading="lazy"
+                  decoding="async"
                   className="h-full w-full object-cover"
                 />
               ) : (
@@ -200,7 +204,7 @@ function Arrivals() {
     <section id="bestsellers" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-10">
       <div className="mb-4 text-center">
         <h2 className="text-2xl font-extrabold tracking-tight md:text-[28px]">Hot Deals</h2>
-        <div className="mt-2.5 flex justify-center gap-2">
+        <div className="mt-2.5 flex flex-wrap justify-center gap-2">
           {TABS.map((t) => (
             <button
               key={t.id}
@@ -343,12 +347,9 @@ function CounterBand() {
   return (
     <section className="mt-12 bg-mist border-y border-line">
       <div className="mx-auto max-w-7xl px-4 py-12">
-        <div className="grid items-center gap-8 lg:grid-cols-12">
+        <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
           <div className="lg:col-span-6">
-            <div className="inline-flex items-center gap-2 rounded bg-gold/20 px-3 py-1 font-mono text-xs font-bold uppercase tracking-wider text-ink">
-              <span className="h-2 w-2 rounded-full bg-gold" />
-              Campbellfield Trade Desk & Warehouse
-            </div>
+            <p className="font-mono text-xs font-bold uppercase tracking-wider text-primary">Campbellfield Trade Desk & Warehouse</p>
             <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink md:text-4xl">
               149+ Commercial Lines in Stock. Pick Up Today.
             </h2>
@@ -389,18 +390,15 @@ function CounterBand() {
           <div className="lg:col-span-6">
             <div className="relative overflow-hidden rounded-lg border-2 border-ink bg-white shadow-[0_16px_36px_rgba(0,32,73,0.14)]">
               <img
-                src={WEB("campbellfield-trade-counter")}
+                src={PHOTO.tradeCounter}
                 alt="Aurex Truck Parts Campbellfield Trade Counter and Warehouse"
                 loading="lazy"
                 className="aspect-[16/10] w-full object-cover"
               />
-              <div className="absolute top-3 left-3 rounded bg-navy/90 px-3 py-1.5 font-mono text-xs font-bold text-white shadow backdrop-blur-xs">
-                MELBOURNE WAREHOUSE • VIC 3061
-              </div>
-              <div className="absolute bottom-3 right-3 rounded-md bg-gold px-4 py-2 text-center text-xs font-black uppercase tracking-wider text-ink shadow-lg">
-                <span className="block text-base leading-none font-extrabold">149+</span>
-                <span>Lines In Stock</span>
-              </div>
+              <p className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-3 font-mono text-xs font-bold uppercase tracking-wider">
+                <span className="text-primary">Melbourne Warehouse · VIC 3061</span>
+                <span className="text-steel">149+ lines in stock</span>
+              </p>
             </div>
           </div>
         </div>
@@ -422,7 +420,7 @@ function Blog() {
   if (isLoading) {
     return (
       <section className="mx-auto max-w-7xl px-4 pt-12">
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div className="shimmer aspect-[16/9] w-full rounded-md bg-mist" />
           <div className="grid gap-4">
             <div className="shimmer h-24 w-full rounded-md bg-mist" />
@@ -445,20 +443,19 @@ function Blog() {
         </div>
         <span className="font-mono text-[11px] font-bold text-faint">N01 / N{String(posts.length).padStart(2, "0")}</span>
       </div>
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Link to={articleHref(lead)} className="card-zoom group grid border-2 border-ink bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(0,32,73,0.18)]">
           <span className="relative block overflow-hidden bg-mist">
             <SafeImage
-              src={lead.coverImage || lead.img}
+              src={blogImage(lead)}
               alt={lead.title}
               loading="lazy"
               className="aspect-[16/9] w-full object-cover"
               fallbackIconSize={32}
             />
-            <span className="absolute left-3 top-3 bg-gold px-2.5 py-1 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-ink">{lead.tag}</span>
           </span>
           <span className="flex flex-wrap items-center gap-x-4 gap-y-2 p-5">
-            <span className="font-mono text-[11px] font-bold text-faint">{lead.date.toUpperCase()}</span>
+            <span className="font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-faint"><span className="text-primary">{lead.tag}</span> · {lead.date}</span>
             <span className="min-w-52 flex-1">
               <span className="block text-xl font-extrabold leading-snug transition-colors group-hover:text-navy md:text-2xl">{lead.title}</span>
             </span>
@@ -470,7 +467,7 @@ function Blog() {
             <Link key={n.slug || n.id || n.title} to={articleHref(n)} className="card-zoom group grid grid-cols-[140px_minmax(0,1fr)] border-2 border-ink bg-white transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(0,32,73,0.18)] sm:grid-cols-[200px_minmax(0,1fr)]">
               <span className="relative block min-h-full overflow-hidden bg-mist">
                 <SafeImage
-                  src={n.coverImage || n.img}
+                  src={blogImage(n)}
                   alt={n.title}
                   loading="lazy"
                   className="absolute inset-0 h-full w-full object-cover"
@@ -507,7 +504,7 @@ function Trust() {
   ];
   return (
     <section className="mx-auto max-w-7xl px-4 pt-10">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {items.map(([Icon, t, d]) => (
           <div key={t} className="group rounded-md border border-line bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-gold hover:shadow-[0_10px_24px_rgba(0,0,0,0.08)]">
             <span className="grid h-10 w-10 place-items-center rounded-md bg-gold text-ink transition-colors group-hover:bg-navy group-hover:text-white"><Icon size={19} /></span>
@@ -552,7 +549,7 @@ function Reviews() {
         <div className="mt-7 flex items-center justify-center gap-4">
           <button onClick={() => setI((i + items.length - 1) % items.length)} aria-label="Previous review" className="grid h-8 w-8 place-items-center rounded-md border border-gray-600 text-white transition-colors hover:border-gold hover:text-gold">←</button>
           <div className="flex gap-1.5">
-            {items.map((x, k) => <button key={x.name} onClick={() => setI(k)} aria-label={`Review ${k + 1}`} className={`h-1.5 rounded-sm transition-all ${k === i ? "w-8 bg-gold" : "w-2.5 bg-gray-600 hover:bg-gray-400"}`} />)}
+            {items.map((x, k) => <button key={x.name} onClick={() => setI(k)} aria-label={`Review ${k + 1}`} aria-current={k === i} className="group/dot flex h-8 items-center px-0.5"><span className={`block h-1.5 rounded-sm transition-all ${k === i ? "w-8 bg-gold" : "w-2.5 bg-gray-600 group-hover/dot:bg-gray-400"}`} /></button>)}
           </div>
           <button onClick={() => setI((i + 1) % items.length)} aria-label="Next review" className="grid h-8 w-8 place-items-center rounded-md bg-gold font-bold text-ink transition-colors hover:bg-white">→</button>
         </div>
@@ -568,7 +565,7 @@ function Faq() {
   const freeOver = formatAUD(settings.freeFreightOver || 500);
   return (
     <section id="faq" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-12">
-      <div className="grid gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
         <div className="lg:sticky lg:top-24 lg:self-start">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">FAQ</p>
           <h2 className="mt-1 text-2xl font-extrabold tracking-tight md:text-[28px]">Straight Answers</h2>
@@ -604,13 +601,13 @@ export default function Home() {
       <Hero />
       <Tiles />
       <Arrivals />
-      <LiftsBand />
-      <TrailerBlock />
-      <CounterBand />
-      <Blog />
-      <Trust />
-      <Reviews />
-      <Faq />
+      <LazySection minHeight={520}><LiftsBand /></LazySection>
+      <LazySection id="cat-trailer-parts" minHeight={760}><TrailerBlock /></LazySection>
+      <LazySection minHeight={520}><CounterBand /></LazySection>
+      <LazySection minHeight={560}><Blog /></LazySection>
+      <LazySection minHeight={220}><Trust /></LazySection>
+      <LazySection id="reviews" minHeight={460}><Reviews /></LazySection>
+      <LazySection id="faq" minHeight={520}><Faq /></LazySection>
     </main>
   );
 }

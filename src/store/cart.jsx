@@ -1,10 +1,24 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNotification } from "./notification";
 
 const CartCtx = createContext(null);
+const CART_KEY = "aurex_cart_v1";
+
+const readCart = () => {
+  try {
+    const saved = JSON.parse(localStorage.getItem(CART_KEY));
+    return Array.isArray(saved) ? saved.filter((l) => l && l.sku && typeof l.price === "number" && l.qty > 0) : [];
+  } catch {
+    return [];
+  }
+};
 
 export function CartProvider({ children }) {
-  const [lines, setLines] = useState([]);
+  const [lines, setLines] = useState(readCart);
+  // A refresh, or coming back tomorrow, should not empty the cart.
+  useEffect(() => {
+    try { localStorage.setItem(CART_KEY, JSON.stringify(lines)); } catch { /* private mode */ }
+  }, [lines]);
   const [open, setOpen] = useState(false);
   const [compare, setCompare] = useState([]);
   const { notify } = useNotification();

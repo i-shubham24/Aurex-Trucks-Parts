@@ -114,14 +114,14 @@ export default function Track() {
           <div className="mt-4 overflow-hidden rounded-2xl border border-line bg-white shadow-[0_16px_40px_rgba(0,32,73,0.10)]">
             <div className="flex flex-wrap items-center gap-2 border-b border-line bg-mist px-5 py-4">
               <p className="font-mono text-[17px] font-extrabold text-navy">{order.id}</p>
-              <span className={`rounded-sm px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wide ${st.cancelled ? "bg-red-50 text-red-700 ring-1 ring-red-200" : st.idx >= 3 ? "bg-green-50 text-green-800 ring-1 ring-green-200" : "bg-gold/25 text-ink ring-1 ring-gold/60"}`}>
+              <span className={`text-[11px] font-extrabold uppercase tracking-wide ${st.cancelled ? "text-red-700" : st.idx >= 3 ? "text-green-700" : "text-steel"}`}>
                 {st.cancelled ? "Cancelled" : ["Order placed", "Confirmed", "Dispatched", "Delivered"][st.idx]}
               </span>
-              <p className="tabular ml-auto text-[17px] font-extrabold text-ink">{formatAUD(order.total)}</p>
+              {order.total != null && <p className="tabular ml-auto text-[17px] font-extrabold text-ink">{formatAUD(order.total)}</p>}
             </div>
             <div className="p-5">
               {order.status && (
-                <p className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13px] font-bold ${st.cancelled ? "bg-red-50 text-red-700" : "bg-green-50 text-green-800"}`}>
+                <p className={`flex items-center gap-1.5 text-[13px] font-bold ${st.cancelled ? "text-red-700" : "text-green-700"}`}>
                   <Truck size={15} /> Live status: {order.status}
                 </p>
               )}
@@ -132,7 +132,7 @@ export default function Track() {
                     <p key={l.sku} className="flex items-center gap-2.5 border-b border-line px-3 py-2 text-[13px] last:border-0">
                       <span className="h-9 w-9 shrink-0 overflow-hidden rounded bg-mist"><SafeImage src={imgFor(l.sku)} alt="" className="h-full w-full object-cover" fallbackIconSize={14} /></span>
                       <span className="min-w-0 flex-1 truncate"><span className="font-bold">{l.qty} × </span>{l.name}</span>
-                      <span className="tabular shrink-0 font-bold">{formatAUD(l.price * l.qty)}</span>
+                      {l.price != null && <span className="tabular shrink-0 font-bold">{formatAUD(l.price * l.qty)}</span>}
                     </p>
                   ))}
                 </div>
@@ -153,7 +153,7 @@ export default function Track() {
         )}
 
         {!order && !miss && (
-          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
             <Link to="/orders" className="rounded-xl border border-line bg-white p-4 text-sm font-extrabold transition hover:border-navy hover:text-navy">My Orders: inline tracking per order →</Link>
             <Link to="/contact" className="rounded-xl border border-line bg-white p-4 text-sm font-extrabold transition hover:border-navy hover:text-navy">Missing a parcel? Contact counter →</Link>
           </div>

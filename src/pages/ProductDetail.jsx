@@ -16,7 +16,7 @@ export default function ProductDetail() {
   const { settings } = useSite();
   const freeOver = formatAUD(settings.freeFreightOver || 500);
 
-  const { data, isLoading, isError } = useProduct(sku);
+  const { data, isLoading, isError, error, refetch, isFetching } = useProduct(sku);
   const p = data?.product;
   const related = data?.relatedProducts || [];
 
@@ -27,6 +27,25 @@ export default function ProductDetail() {
 
   if (isLoading) {
     return <ProductDetailSkeleton />;
+  }
+
+  // Only a 404 means the part is gone. Anything else (API waking up, network blip)
+  // is a failed load of a part that probably exists, so say that and offer a retry.
+  if (isError && error?.status !== 404) {
+    return (
+      <main className="mx-auto max-w-7xl px-4 py-16 text-center">
+        <h1 className="text-2xl font-extrabold text-ink">We couldn't load this part</h1>
+        <p className="mt-2 text-sm text-steel">The catalogue didn't answer for <span className="font-mono font-bold text-ink">{sku}</span>. It is usually back in a moment.</p>
+        <div className="mt-6 flex justify-center gap-3">
+          <button onClick={() => refetch()} disabled={isFetching} className="rounded bg-gold px-6 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white disabled:opacity-60">
+            {isFetching ? "Trying again…" : "Try again"}
+          </button>
+          <a href={COMPANY.phoneHref} className="rounded border border-ink px-6 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-ink hover:text-white">
+            Call {COMPANY.phone}
+          </a>
+        </div>
+      </main>
+    );
   }
 
   if (isError || !p) {
@@ -57,7 +76,7 @@ export default function ProductDetail() {
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">
       <p className="text-[12px] text-faint"><Link to="/" className="hover:text-navy hover:underline">Home</Link> / <Link to="/shop" className="hover:text-navy hover:underline">Shop</Link> / <span className="font-semibold text-ink">{p.sku}</span></p>
-      <div className="mt-4 grid gap-8 md:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-2">
         <div>
           <div className="relative overflow-hidden rounded-md border border-line bg-white shadow-xs">
             <div className={`flex aspect-[4/3] w-full items-center justify-center ${p.category === "tail-lifts" ? "p-0 overflow-hidden" : "p-6 bg-white"}`}>
@@ -72,7 +91,7 @@ export default function ProductDetail() {
                 <span className="grid h-full w-full place-items-center font-mono text-sm font-bold text-faint">{p.sku}</span>
               )}
             </div>
-            <span className={`absolute left-3 top-3 rounded-sm px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide ${enquiry ? "bg-ink text-white" : p.status === "Built to order" ? "bg-primary text-white" : "bg-gold text-ink"}`}>{enquiry ? "Enquire" : p.status === "Built to order" ? "Built to Order" : "In Stock"}</span>
+            <span className={`absolute left-3 top-3 text-[11px] font-extrabold uppercase tracking-wide ${enquiry ? "text-steel" : p.status === "Built to order" ? "text-primary" : "text-green-700"}`}>{enquiry ? "Enquire" : p.status === "Built to order" ? "Built to Order" : "In Stock"}</span>
           </div>
 
           {/* Image thumbnails if multiple images exist */}
@@ -112,7 +131,7 @@ export default function ProductDetail() {
                     ? "Custom sized to your truck chassis and body dimensions. Engineering review in 4 hours."
                     : "Priced to your drawing or sample. Back within 4 business hours."}
                 </p>
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {p.category === "tail-lifts" ? (
                     <Link
                       to={`/tail-lift-enquiry?sku=${p.sku}`}
@@ -159,7 +178,7 @@ export default function ProductDetail() {
           <div className="mt-4 rounded-md border border-line bg-white p-4 text-sm">
             <p className="flex items-start gap-2"><CheckCircle2 size={16} className="mt-0.5 shrink-0 text-green-600" /> Good match for this line. Add to cart and we double check before dispatch.</p>
             <p className="mt-2 flex items-start gap-2"><Truck size={16} className="mt-0.5 shrink-0 text-green-600" /> {p.status}. {p.lead}.</p>
-            <p className="mt-2 border-t border-line pt-2 text-[13px] text-steel"><Link className="font-bold text-navy underline" to="/policies">Shipping</Link> . <Link className="font-bold text-navy underline" to="/policies">Returns</Link> . <Link className="font-bold text-navy underline" to="/policies">Warranty</Link></p>
+            <p className="mt-2 border-t border-line pt-2 text-[13px] text-steel"><Link className="font-bold text-navy underline" to="/policies?tab=shipping">Shipping</Link> . <Link className="font-bold text-navy underline" to="/policies?tab=returns">Returns</Link> . <Link className="font-bold text-navy underline" to="/policies?tab=warranty">Warranty</Link></p>
           </div>
         </div>
       </div>
@@ -196,7 +215,7 @@ export default function ProductDetail() {
               <p className="text-xs text-steel">
                 Standard technical architecture following Australian commercial cantilever tail lift specifications (similar to Dhollandia DH-LM series):
               </p>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {Object.entries(p.dhollandiaSpecs).map(([title, detail]) => (
                   <div key={title} className="rounded border border-line bg-mist/50 p-3.5">
                     <p className="text-xs font-extrabold uppercase tracking-wider text-navy">{title}</p>
@@ -218,7 +237,7 @@ export default function ProductDetail() {
               <p>Check measurements against your old part, or send our VIC desk your VIN on <a className="font-bold text-navy underline" href={COMPANY.phoneHref}>{COMPANY.phone}</a>.</p>
             </div>
           )}
-          {tab === "freight" && <p className="max-w-3xl text-sm leading-6 text-steel">Order by 2pm for same day dispatch ex Campbellfield. Free road freight over {freeOver}. Unused parts in original packaging can be returned within 30 days, see our <Link className="font-bold text-navy underline" to="/policies">returns policy</Link>.</p>}
+          {tab === "freight" && <p className="max-w-3xl text-sm leading-6 text-steel">Order by 2pm for same day dispatch ex Campbellfield. Free road freight over {freeOver}. Unused parts in original packaging can be returned within 30 days, see our <Link className="font-bold text-navy underline" to="/policies?tab=returns">returns policy</Link>.</p>}
         </div>
       </div>
       <div className="mt-8 flex items-center gap-2 rounded-md bg-ink p-4 text-white">

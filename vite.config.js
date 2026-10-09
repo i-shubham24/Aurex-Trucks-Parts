@@ -16,6 +16,11 @@ export default defineConfig({
       ],
     },
   },
+  // Production builds call the API on their own origin (/api/v1, rewritten by vercel.json),
+  // so `vite preview` needs the same hop to the local API.
+  preview: {
+    proxy: { '/api': 'http://localhost:5001' },
+  },
   build: {
     sourcemap: false,
   },

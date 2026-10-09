@@ -5,12 +5,12 @@ import {
   PackageSearch, Phone, Search, ShoppingCart, User, UserPlus, X,
 } from "lucide-react";
 import { useCompany } from "../store/site";
-import { useSite } from "../store/site";
 import { useCart } from "../store/cart";
 import { useAuth } from "../store/auth";
 import { formatAUD } from "../data/products";
 import { imgFor } from "../data/images";
 import SafeImage from "./SafeImage";
+import { cld } from "../utils/img";
 import useLockBody from "../utils/useLockBody";
 import { useCategories } from "../hooks/api/useCategories";
 import { useProducts } from "../hooks/api/useProducts";
@@ -61,7 +61,7 @@ function SearchBox({ onDone, autoFocus = false }) {
           onBlur={() => setTimeout(() => setFocus(false), 200)}
           autoFocus={autoFocus}
           aria-label="Search the catalogue"
-          placeholder="Search by part number, OEM, or keyword"
+          placeholder="Search by part number or keyword"
           className="h-11 w-full min-w-0 rounded-md border border-line-dark bg-mist pl-4 pr-12 text-[15px] text-ink outline-none transition-colors placeholder:text-faint focus:border-ink focus:bg-white"
         />
         <button
@@ -91,7 +91,7 @@ function SearchBox({ onDone, autoFocus = false }) {
                 className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-mist"
               >
                 <span className="h-9 w-9 shrink-0 overflow-hidden rounded bg-mist">
-                  <SafeImage src={imgSrc} alt="" className="h-full w-full object-cover" fallbackIconSize={14} />
+                  <SafeImage src={imgSrc} cdnWidth={96} alt="" className="h-full w-full object-cover" fallbackIconSize={14} />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[13px] font-bold">{p.name}</span>
@@ -122,16 +122,13 @@ export default function Header() {
   const { user, logout } = useAuth();
   const { data: categories = [] } = useCategories();
   const COMPANY = useCompany();
-  const { settings } = useSite();
   const loc = useLocation();
 
   const [open, setOpen] = useState(null); // dropdown: "categories" | "account" | null
   const [drawer, setDrawer] = useState(false); // mobile menu
   const [searching, setSearching] = useState(false);
-  const [notice, setNotice] = useState(true);
   const [scrolled, setScrolled] = useState(false);
   const headerRef = useRef(null);
-  const sentinelRef = useRef(null);
   const closeTimer = useRef(null);
 
   useLockBody(drawer);
@@ -145,11 +142,11 @@ export default function Header() {
      changes and the page can't jump; `scrolled` only re-centres the row and
      shrinks the logo inside that fixed box. */
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > (sentinelRef.current?.offsetTop || 0) + 8);
+    const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [notice, settings.announcement]);
+  }, []);
 
   const closeAll = () => {
     setOpen(null);
@@ -200,19 +197,6 @@ export default function Header() {
 
   return (
     <>
-      {notice && settings.announcement && (
-        <div className="flex items-center justify-center gap-3 bg-ink px-4 py-1.5 text-center">
-          <p className="truncate text-[12px] font-semibold text-white">{settings.announcement}</p>
-          <button
-            onClick={() => setNotice(false)}
-            aria-label="Dismiss announcement"
-            className="shrink-0 text-gray-400 transition-colors hover:text-gold"
-          >
-            <X size={14} />
-          </button>
-        </div>
-      )}
-      <div ref={sentinelRef} aria-hidden="true" />
 
       <header
         ref={headerRef}
@@ -265,7 +249,7 @@ export default function Header() {
                             className="card-zoom overflow-hidden rounded-md border border-line bg-mist transition-colors hover:border-gold"
                           >
                             <span className="block aspect-[16/10] overflow-hidden bg-pale">
-                              {src && <img src={src} alt="" loading="lazy" className="h-full w-full object-cover" />}
+                              {src && <img src={cld(src, 480)} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />}
                             </span>
                             <span className="block px-3 py-2.5">
                               <span className="block text-[15px] font-extrabold leading-tight">{c.name}</span>

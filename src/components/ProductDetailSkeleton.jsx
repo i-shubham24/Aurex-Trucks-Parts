@@ -13,7 +13,7 @@ export function ProductDetailSkeleton() {
       </div>
 
       {/* Main Grid */}
-      <div className="mt-4 grid gap-8 md:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-2">
         {/* Left Column - Product Image & Trust Badges */}
         <div>
           <div className="relative overflow-hidden rounded-md border border-line bg-white shadow-xs">

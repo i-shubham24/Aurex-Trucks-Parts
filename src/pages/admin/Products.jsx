@@ -126,8 +126,8 @@ export default function Products() {
       {modal && (
         <Modal close={() => setModal(null)} wide>
           <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-faint">{modal === "add" ? "Add product" : `Edit ${modal}`}</p>
-          <form onSubmit={save} className="mt-3 grid gap-3 sm:grid-cols-2">
-            <label className="block"><span className={label}>SKU *</span><input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value.toUpperCase() })} disabled={modal !== "add"} placeholder="GL-00000" className={`${input} disabled:bg-mist`} /></label>
+          <form onSubmit={save} className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <label className="block"><span className={label}>SKU *</span><input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value.toUpperCase() })} disabled={modal !== "add"} placeholder="ATP-ACC-00" className={`${input} disabled:bg-mist`} /></label>
             <label className="block"><span className={label}>Category</span>
               <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className={input}>
                 {categories.map((c) => <option key={c.slug} value={c.slug}>{c.name}</option>)}
@@ -139,7 +139,7 @@ export default function Products() {
               <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className={input}>{STATUSES.map((s) => <option key={s}>{s}</option>)}</select>
             </label>
             <label className="block"><span className={label}>Sub line</span><input value={form.sub} onChange={(e) => setForm({ ...form, sub: e.target.value })} placeholder="e.g. Tail Lifts" className={input} /></label>
-            <label className="block"><span className={label}>Brand</span><input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} placeholder="e.g. Beauway" className={input} /></label>
+            <label className="block"><span className={label}>Brand</span><input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} placeholder="e.g. Aurex" className={input} /></label>
             <label className="block sm:col-span-2"><span className={label}>Fitment</span><input value={form.fit} onChange={(e) => setForm({ ...form, fit: e.target.value })} placeholder="Suits…" className={input} /></label>
             <label className="block"><span className={label}>OEM cross</span><input value={form.oem} onChange={(e) => setForm({ ...form, oem: e.target.value })} className={input} /></label>
             <label className="block"><span className={label}>Lead time</span><input value={form.lead} onChange={(e) => setForm({ ...form, lead: e.target.value })} placeholder="e.g. Ships in 24 hrs" className={input} /></label>

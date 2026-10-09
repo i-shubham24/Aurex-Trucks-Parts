@@ -3,7 +3,7 @@ import { ArrowRight, BadgeCheck, ClipboardCheck, Phone, Truck } from "lucide-rea
 import { useCompany, useSite } from "../store/site";
 import { formatAUD } from "../data/products";
 
-const WEB = (n) => `/images/web/${n}.jpg`;
+import { PHOTO } from "../data/images";
 
 export default function About() {
   const COMPANY = useCompany();
@@ -13,7 +13,7 @@ export default function About() {
     <main>
       <section className="mx-auto max-w-7xl px-4 pt-6">
         <p className="text-[12px] text-faint"><Link to="/" className="hover:text-navy hover:underline">Home</Link> / <span className="font-semibold text-ink">About Us</span></p>
-        <div className="mt-3 grid items-center gap-8 md:grid-cols-2">
+        <div className="mt-3 grid grid-cols-1 items-center gap-8 md:grid-cols-2">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-primary">About Aurex . Campbellfield VIC</p>
             <h1 className="mt-2 text-4xl font-extrabold leading-[1.05] tracking-tight md:text-5xl">The Counter Behind the Catalogue.</h1>
@@ -24,8 +24,8 @@ export default function About() {
             </div>
           </div>
           <div className="card-zoom relative overflow-hidden rounded-md border border-line">
-            <img src={WEB("hero-semi")} alt="Heavy rigid on the road" loading="lazy" className="aspect-[16/10] w-full object-cover" />
-            <span className="absolute bottom-3 left-3 rounded bg-gold px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-ink">Campbellfield VIC</span>
+            <img src={PHOTO.tradeCounter} alt="Aurex trade counter and warehouse racking in Campbellfield" loading="lazy" decoding="async" className="aspect-[16/10] w-full object-cover" />
+            <span className="block px-3 py-2 text-xs font-bold uppercase tracking-wide text-primary">Campbellfield VIC</span>
           </div>
         </div>
       </section>
@@ -44,7 +44,7 @@ export default function About() {
       <section className="mx-auto max-w-7xl px-4 pt-10">
         <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">How we work</p>
         <h2 className="mt-1 text-2xl font-extrabold tracking-tight md:text-[28px]">Three Steps, Zero Guesswork</h2>
-        <div className="mt-5 grid gap-4 md:grid-cols-3">
+        <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
           {[["01", "Send specs", "VIN, photos and measurements through the counter, phone or email."], ["02", "We match it", "Profile, hand, finish and OEM cross checked before a price leaves."], ["03", "Freighted fast", `Daily tracked runs ex Campbellfield. Free road freight over ${freeOver}.`]].map(([n, t, d]) => (
             <div key={n} className="group rounded-md border border-line bg-white p-6 transition-colors hover:border-gold">
               <p className="font-mono text-sm font-bold text-gold">{n}</p>
@@ -55,9 +55,9 @@ export default function About() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-4 pt-10 md:grid-cols-2 md:items-center">
+      <section className="mx-auto grid grid-cols-1 max-w-7xl gap-8 px-4 pt-10 md:grid-cols-2 md:items-center">
         <div className="card-zoom overflow-hidden rounded-md border border-line">
-          <img src={WEB("service")} alt="Workshop fitment support" loading="lazy" className="aspect-[16/10] w-full object-cover" />
+          <img src={PHOTO.trailerBuild} alt="Trailer body under build with door gear being fitted" loading="lazy" decoding="async" className="aspect-[16/10] w-full object-cover" />
         </div>
         <div>
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">Why workshops stay</p>
@@ -73,7 +73,7 @@ export default function About() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 pt-10">
-        <div className="grid items-center gap-5 rounded-md bg-ink p-6 text-white md:grid-cols-2 md:p-8">
+        <div className="grid grid-cols-1 items-center gap-5 rounded-md bg-ink p-6 text-white md:grid-cols-2 md:p-8">
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gold">Visit the counter</p>
             <p className="mt-2 text-xl font-extrabold md:text-2xl">{COMPANY.address}</p>

@@ -30,6 +30,8 @@ export function useProduct(sku, options = {}) {
     queryFn: () => getProductBySkuApi(sku),
     enabled: Boolean(sku),
     staleTime: 1000 * 60 * 5,
+    retry: (failures, err) => err?.status !== 404 && failures < 2,
+    retryDelay: (attempt) => 600 * (attempt + 1),
     ...options,
   });
 }

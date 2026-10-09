@@ -1,7 +1,7 @@
 const NEW_KEY = "aurex_orders";
 const LEGACY_KEY = "aurex-orders";
 
-export const ORDER_STATUSES = ["Packed in Campbellfield VIC", "Courier booked", "In transit", "Delivered", "Cancelled"];
+export const ORDER_STATUSES = ["Pending payment", "Packed in Campbellfield VIC", "Courier booked", "In transit", "Delivered", "Cancelled"];
 
 function readKey(key) {
   try {
@@ -34,6 +34,7 @@ export function makeId() {
 }
 
 const STATUS_STEP = {
+  "Pending payment": 0,
   "Packed in Campbellfield VIC": 1,
   "Courier booked": 2,
   "In transit": 2,
@@ -41,13 +42,10 @@ const STATUS_STEP = {
   "Cancelled": 1,
 };
 
-/* Explicit admin-set status wins; otherwise fall back to age-based demo timeline. */
+/* The timeline only ever reflects the status staff have set. An order we can't
+   place on it (unknown label) stays at "Order placed" rather than guessing. */
 export function orderStatus(order) {
   const steps = ["Order placed", "Confirmed", "Dispatched", "Delivered"];
-  if (order && Object.prototype.hasOwnProperty.call(STATUS_STEP, order.status)) {
-    return { steps, idx: STATUS_STEP[order.status], live: true, cancelled: order.status === "Cancelled" };
-  }
-  const ageHrs = (Date.now() - new Date(order.placedAt).getTime()) / 36e5;
-  const idx = ageHrs < 4 ? 1 : ageHrs < 30 ? 2 : 3;
-  return { steps, idx, live: false, cancelled: false };
+  const known = order && Object.prototype.hasOwnProperty.call(STATUS_STEP, order.status);
+  return { steps, idx: known ? STATUS_STEP[order.status] : 0, live: Boolean(known), cancelled: order?.status === "Cancelled" };
 }

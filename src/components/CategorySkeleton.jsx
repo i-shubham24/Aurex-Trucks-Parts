@@ -17,7 +17,7 @@ export function CategoryCardSkeleton() {
 
 export function CategoryTilesSkeleton({ count = 3 }) {
   return (
-    <section className="mx-auto grid max-w-7xl gap-4 px-4 pt-6 md:grid-cols-3" aria-label="Loading categories">
+    <section className="mx-auto grid grid-cols-1 max-w-7xl gap-4 px-4 pt-6 md:grid-cols-3" aria-label="Loading categories">
       {Array.from({ length: count }).map((_, idx) => (
         <CategoryCardSkeleton key={idx} />
       ))}

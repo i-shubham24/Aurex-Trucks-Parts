@@ -1,4 +1,5 @@
 import { useState } from "react";
+import EmailLink from "../components/EmailLink";
 import { Link, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Clock, Mail, MapPin, Phone, Send, ArrowRight } from "lucide-react";
 import { useCompany } from "../store/site";
@@ -16,9 +17,10 @@ export default function Contact() {
   const [sentDetails, setSentDetails] = useState({ name: "", email: "", topic: "", ref: "" });
   const [form, setForm] = useState({ name: "", phone: "", email: "", topic: initialTopic, msg: "" });
   const [errs, setErrs] = useState({});
+  const [sending, setSending] = useState(false);
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
   const input = (bad) => `h-11 w-full rounded-md border bg-white px-3 text-sm outline-none placeholder:text-faint focus:border-gold ${bad ? "border-red-500" : "border-line-dark"}`;
-  const send = (e) => {
+  const send = async (e) => {
     e.preventDefault();
     const fe = {};
     if (form.name.trim().length < 2) fe.name = "Enter your full name.";
@@ -29,9 +31,18 @@ export default function Contact() {
     if (Object.keys(fe).length) return;
     const cleanName = form.name.trim();
     const firstName = cleanName.split(" ")[0] || "there";
-    const refCode = `ATP-ENQ-${Math.floor(100000 + Math.random() * 900000)}`;
-    addEnquiry({ name: cleanName, phone: form.phone.trim(), email: form.email.trim().toLowerCase(), topic: form.topic, message: form.msg.trim().slice(0, 2000) });
-    setSentDetails({ name: cleanName, email: form.email.trim(), topic: form.topic, ref: refCode });
+    if (sending) return;
+    setSending(true);
+    let ref = "";
+    try {
+      ref = await addEnquiry({ name: cleanName, phone: form.phone.trim(), email: form.email.trim().toLowerCase(), topic: form.topic, message: form.msg.trim().slice(0, 2000) });
+    } catch {
+      setSending(false);
+      setErrs({ form: `We couldn't send your enquiry just now. Please try again, or call ${COMPANY.phone}.` });
+      return;
+    }
+    setSending(false);
+    setSentDetails({ name: cleanName, email: form.email.trim(), topic: form.topic, ref: ref || "" });
     setForm({ name: "", phone: "", email: "", topic: "Tail Lifts", msg: "" });
     setSent(true);
     notify.success({
@@ -52,17 +63,17 @@ export default function Contact() {
         <h1 className="mt-2 text-4xl font-extrabold tracking-tight md:text-5xl">Get It Sorted in One Call.</h1>
         <p className="mt-2 max-w-xl text-[15px] text-steel">Send your VIN, photos and measurements for an exact price within 4 business hours.</p>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <a href={COMPANY.phoneHref} className="group rounded-md border border-line bg-white p-5 transition-colors hover:border-gold">
             <Phone size={20} className="text-primary transition-colors group-hover:text-navy" />
             <p className="mt-2 text-[11px] font-bold uppercase tracking-wider text-faint">Phone</p>
             <p className="tabular mt-0.5 text-lg font-extrabold">{COMPANY.phone}</p>
           </a>
-          <a href={`mailto:${COMPANY.email}`} className="group rounded-md border border-line bg-white p-5 transition-colors hover:border-gold">
+          <EmailLink email={COMPANY.email} className="group rounded-md border border-line bg-white p-5 transition-colors hover:border-gold">
             <Mail size={20} className="text-primary transition-colors group-hover:text-navy" />
             <p className="mt-2 text-[11px] font-bold uppercase tracking-wider text-faint">Email</p>
             <p className="mt-0.5 text-[15px] font-extrabold">{COMPANY.email}</p>
-          </a>
+          </EmailLink>
           <div className="rounded-md border border-line bg-white p-5">
             <MapPin size={20} className="text-primary" />
             <p className="mt-2 text-[11px] font-bold uppercase tracking-wider text-faint">Counter</p>
@@ -89,7 +100,7 @@ export default function Contact() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-6 px-4 pt-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <section className="mx-auto grid grid-cols-1 max-w-7xl gap-6 px-4 pt-8 lg:grid-cols-[minmax(0,1fr)_320px]">
         {sent ? (
           <div className="rounded-xl border border-line bg-white p-8 text-center shadow-md">
             <div className="mx-auto grid h-16 w-16 place-items-center rounded-md bg-gold text-ink shadow-sm">
@@ -101,10 +112,12 @@ export default function Contact() {
             <p className="mt-2 text-sm leading-relaxed text-steel max-w-lg mx-auto">
               Our Campbellfield parts and engineering desk will review your details and get back to you within 4 business hours.
             </p>
-            <div className="mt-4 inline-flex items-center gap-2 rounded-md bg-mist px-4 py-2 font-mono text-xs font-bold text-steel border border-line">
-              <span>REFERENCE NUMBER:</span>
-              <span className="font-extrabold text-navy">{sentDetails.ref}</span>
-            </div>
+            {sentDetails.ref && (
+              <div className="mt-4 inline-flex items-center gap-2 font-mono text-xs font-bold text-steel">
+                <span>REFERENCE NUMBER:</span>
+                <span className="font-extrabold text-navy">{sentDetails.ref}</span>
+              </div>
+            )}
             <div className="mt-6 mx-auto max-w-md rounded-lg border border-line bg-mist/60 p-4 text-left text-xs">
               <div className="flex justify-between py-1 border-b border-line">
                 <span className="text-faint font-bold">NAME:</span>
@@ -138,7 +151,7 @@ export default function Contact() {
           <form className="rounded-md border border-line bg-mist p-5 md:p-7" onSubmit={send}>
             <p className="text-lg font-extrabold">Request a Quote</p>
             <p className="mt-1 text-[13px] text-steel">For trailer parts, photos and measurements get you an exact price fastest.</p>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label className="block"><span className="mb-1 block text-xs font-bold">Full name *</span><input required value={form.name} onChange={set("name")} placeholder="Jane Citizen" maxLength={80} className={input(errs.name)} />{err("name")}</label>
               <label className="block"><span className="mb-1 block text-xs font-bold">Phone *</span><input required value={form.phone} onChange={set("phone")} placeholder="04XX XXX XXX" maxLength={20} inputMode="tel" className={input(errs.phone)} />{err("phone")}</label>
             </div>
@@ -147,7 +160,8 @@ export default function Contact() {
               <ThemeSelect value={form.topic} onChange={(v) => setForm({ ...form, topic: v })} options={["Tail Lifts", "Trailer Parts", "Accessories", "Trade Account", "Something else"]} label="Topic" />
             </label>
             <label className="mt-3 block"><span className="mb-1 block text-xs font-bold">What do you need? *</span><textarea required value={form.msg} onChange={set("msg")} rows={5} maxLength={2000} placeholder="Body type, SKU, sizes, VIN if critical" className={`w-full rounded-md border bg-white px-3 py-2.5 text-sm outline-none placeholder:text-faint focus:border-gold ${errs.msg ? "border-red-500" : "border-line-dark"}`} />{err("msg")}</label>
-            <button className="mt-4 flex items-center gap-2 rounded bg-gold px-6 py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white"><Send size={15} /> Send Enquiry</button>
+            {errs.form && <p role="alert" className="mt-3 text-[13px] font-semibold text-red-600">{errs.form}</p>}
+            <button disabled={sending} className="mt-4 flex items-center gap-2 rounded bg-gold px-6 py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white disabled:cursor-wait disabled:opacity-60"><Send size={15} /> {sending ? "Sending…" : "Send Enquiry"}</button>
           </form>
         )}
 

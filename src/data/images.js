@@ -1,29 +1,30 @@
-// Image paths kept from the old Aurex build.
-// Product shots: public/images/products/<SKU>.jpg (36 files).
-// Category banners: public/images/*-CAT.jpg.
-const SKUS = [
-  "TL-20-2450-2400", "TL-20-2450-2200", "TL-20-2450-2600", "TL-15-2450-2400",
-  "TL-30-2450-2600-S", "PU-12V-22KW", "GL-25126", "A20-01S-06", "GL-12140",
-  "GL-14175", "GL-14175B", "A02-01S-01", "GL-11113", "GL-11113-NL", "GL-11113S",
-  "GL-13112", "GL-13198B", "GL-13213", "GL-13195S", "GL-19113H1", "GL-19113SH1",
-  "GL-19111H1", "F07-04C-01", "CANVAS-1995-1600", "CANVAS-2045-1600",
-  "CANVAS-1250-1600", "GL-15616", "GL-23116", "GL-ASJ04", "GL-19120", "GL-19117",
-  "GL-16513", "GL-16511S", "GL-19116", "GL-19116B", "FZ-26184",
-];
+// Local product shots live at public/images/products/<ATP part number>.jpg and are the
+// fallback when a part has no image in the catalogue.
+export const imgFor = (sku) => (sku ? `/images/products/${sku}.jpg` : null);
 
-export const SKU_IMG = Object.fromEntries(SKUS.map((sku) => [sku, `/images/products/${sku}.jpg`]));
-
-export const CAT_IMG = {
-  "tail-lifts": "/images/TAIL-LIFTS-CAT.jpg",
-  "trailer-parts": "/images/TRAILER-PARTS-CAT.jpg",
-  "accessories": "/images/ACCESSORIES-CAT.jpg",
+/* Editorial photos (web-sized). */
+export const PHOTO = {
+  tradeCounter: "/images/web/campbellfield-trade-counter.webp",
+  tailLift: "/images/web/hero-tail-lift-yellow.webp",
+  trailerBuild: "/images/web/hero-trailer-parts-yellow.webp",
+  fleetAccessories: "/images/web/hero-fleet-accessories-yellow.webp",
 };
 
-export const imgFor = (sku) => {
-  if (!sku) return null;
-  if (SKU_IMG[sku]) return SKU_IMG[sku];
-  const clean = sku.startsWith("ATP-") ? sku.slice(4) : sku;
-  if (SKU_IMG[clean]) return SKU_IMG[clean];
-  return `/images/products/${sku}.jpg`;
+/* Article covers: a scene that matches the story rather than a product cut-out.
+   Known posts are matched by slug; a post with no cover of its own falls back
+   to a photo for its topic. Anything else keeps the cover set in the CMS. */
+const BLOG_BY_SLUG = {
+  "tail-lifts-land-in-vic": PHOTO.tailLift,
+  "tracks-caps-fittings-explained": PHOTO.trailerBuild,
+  "stainless-hinges-paddle-latches": PHOTO.tradeCounter,
+  "toolbox-door-hardware-refresh": PHOTO.fleetAccessories,
+};
+const BLOG_BY_TAG = {
+  "Tail Lifts": PHOTO.tailLift,
+  "Trailer Parts": PHOTO.trailerBuild,
+  "Accessories": PHOTO.fleetAccessories,
+  "Tool Boxes": PHOTO.fleetAccessories,
 };
 
+export const blogImage = (post) =>
+  BLOG_BY_SLUG[post?.slug] || post?.coverImage || post?.img || BLOG_BY_TAG[post?.tag] || PHOTO.tradeCounter;

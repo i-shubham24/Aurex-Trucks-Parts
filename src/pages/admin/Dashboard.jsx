@@ -64,13 +64,13 @@ export default function Dashboard() {
           <button onClick={csv} className="flex items-center gap-1.5 rounded bg-ink px-4 py-2 text-[13px] font-bold text-white transition-colors hover:bg-navy"><Download size={14} /> Export CSV</button>
         </div>
       } />
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Stat label="Total Revenue" value={formatAUD(revenue)} sub={`${orders.length} orders`} />
         <Stat label="Total Orders" value={orders.length} sub={`${freshEnquiries.length} new enquiries`} />
         <Stat label="Customers" value={users.length} sub="Registered accounts" />
         <Stat label="Live SKUs" value={products.length} sub={`${promos.filter((p) => p.active).length} active promos`} />
       </div>
-      <div className="mt-4 grid gap-4 xl:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
         <div className="border-2 border-ink bg-white">
           <p className="border-b-2 border-ink px-4 py-2.5 text-sm font-extrabold">Top products by reviews</p>
           {top.map((p) => (

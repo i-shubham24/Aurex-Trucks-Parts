@@ -10,7 +10,7 @@ import useLockBody from "../utils/useLockBody";
 export default function CompareTray() {
   const { compare, toggleCompare, clearCompare, add } = useCart();
   const COMPANY = useCompany();
-  const { data } = useProducts({ limit: 150 });
+  const { data } = useProducts({ limit: 500 }, { enabled: compare.length > 0 });
   const products = data?.products || [];
 
   const [open, setOpen] = useState(false);
@@ -38,7 +38,7 @@ export default function CompareTray() {
             <span className="tabular text-[17px] font-extrabold">{formatAUD(p.price)}</span>
           )}
           {bestSku === p.sku && (
-            <span className="bg-green-600 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+            <span className="text-[10px] font-bold uppercase tracking-wide text-green-700">
               Best price
             </span>
           )}
@@ -61,7 +61,7 @@ export default function CompareTray() {
           <b className="text-[13px]">{p.rating}</b>
           <span className="text-xs text-faint">({p.reviews || p.reviewCount || 0})</span>
           {topRated === p.sku && items.length > 1 && (
-            <span className="bg-gold/25 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-ink">
+            <span className="text-[10px] font-bold uppercase tracking-wide text-primary">
               Top rated
             </span>
           )}

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getCarouselSlidesApi } from '../../api/endpoints/carousel.api';
+import { persisted, remember } from '../../lib/persisted';
 
 export const CAROUSEL_QUERY_KEYS = {
   all: ['carousel'],
@@ -12,7 +13,8 @@ export const CAROUSEL_QUERY_KEYS = {
 export function useCarousel(options = {}) {
   return useQuery({
     queryKey: CAROUSEL_QUERY_KEYS.slides(),
-    queryFn: getCarouselSlidesApi,
+    queryFn: () => getCarouselSlidesApi().then(remember('aurex_cache_carousel')),
+    ...persisted('aurex_cache_carousel'),
     staleTime: 1000 * 60 * 5, // 5 mins cache
     ...options,
   });

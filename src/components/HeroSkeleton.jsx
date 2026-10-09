@@ -1,7 +1,7 @@
 export function HeroSkeleton() {
   return (
     <section className="mx-auto max-w-7xl px-4 pt-4" aria-label="Loading carousel">
-      <div className="relative grid overflow-hidden rounded-lg bg-mist md:grid-cols-2 md:items-center">
+      <div className="relative grid grid-cols-1 overflow-hidden rounded-lg bg-mist md:grid-cols-2 md:items-center">
         {/* Left text skeleton */}
         <div className="px-6 py-12 md:px-12 md:py-16 space-y-4">
           <div className="shimmer h-10 md:h-14 w-11/12 rounded bg-line" />

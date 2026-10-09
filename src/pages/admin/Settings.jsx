@@ -82,7 +82,7 @@ export default function Settings() {
       <AdminTitle kicker="System" title="Settings" right={
         <button onClick={() => { if (window.confirm("Reset all site settings?")) { resetSite(); setForm(DEFAULT_SETTINGS); } }} className="rounded border border-line-dark px-4 py-2 text-[13px] font-bold transition-colors hover:border-navy hover:text-navy">Reset to defaults</button>
       } />
-      <form onSubmit={save} className="grid gap-3 border-2 border-ink bg-white p-5 sm:grid-cols-2">
+      <form onSubmit={save} className="grid grid-cols-1 gap-3 border-2 border-ink bg-white p-5 sm:grid-cols-2">
         {FIELDS.map(([k, l, t]) => (
           <label key={k} className="block"><span className={label}>{l}</span>
             <input type={t} value={form[k]} onChange={set(k)} className={input} />

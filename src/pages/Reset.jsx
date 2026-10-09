@@ -96,11 +96,11 @@ export default function Reset() {
         <form onSubmit={setNewPassword} className="mt-4 grid gap-2.5">
           <label className="block">
             <span className="mb-1 block text-[11px] font-extrabold uppercase tracking-[0.12em] text-steel">New password</span>
-            <span className={inputCls(false)}><Lock size={16} className="shrink-0 text-faint" /><input value={pass} onChange={(e) => setPass(e.target.value)} type="password" maxLength={72} placeholder="New password" className="w-full bg-transparent outline-none" autoComplete="new-password" /></span>
+            <span className={inputCls(false)}><Lock size={16} className="shrink-0 text-faint" /><input value={pass} onChange={(e) => setPass(e.target.value)} type="password" maxLength={72} placeholder="New password" className="h-full w-full bg-transparent outline-none" autoComplete="new-password" /></span>
           </label>
           <label className="block">
             <span className="mb-1 block text-[11px] font-extrabold uppercase tracking-[0.12em] text-steel">Confirm password</span>
-            <span className={inputCls(false)}><Lock size={16} className="shrink-0 text-faint" /><input value={confirm} onChange={(e) => setConfirm(e.target.value)} type="password" maxLength={72} placeholder="Re-enter password" className="w-full bg-transparent outline-none" autoComplete="new-password" /></span>
+            <span className={inputCls(false)}><Lock size={16} className="shrink-0 text-faint" /><input value={confirm} onChange={(e) => setConfirm(e.target.value)} type="password" maxLength={72} placeholder="Re-enter password" className="h-full w-full bg-transparent outline-none" autoComplete="new-password" /></span>
           </label>
           {err && <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] font-semibold text-red-700">{err}</p>}
           <button disabled={busy} className="group flex h-10 items-center justify-center gap-2 rounded-lg bg-gold text-sm font-extrabold text-ink transition hover:bg-ink hover:text-white disabled:opacity-60">
@@ -119,7 +119,7 @@ export default function Reset() {
       <form onSubmit={requestLink} className="mt-4 grid gap-2.5">
         <label className="block">
           <span className="mb-1 block text-[11px] font-extrabold uppercase tracking-[0.12em] text-steel">Email address</span>
-          <span className={inputCls(false)}><Mail size={16} className="shrink-0 text-faint" /><input value={email} onChange={(e) => setEmail(e.target.value)} type="email" maxLength={120} placeholder="you@fleet.com.au" className="w-full bg-transparent outline-none" autoComplete="email" /></span>
+          <span className={inputCls(false)}><Mail size={16} className="shrink-0 text-faint" /><input value={email} onChange={(e) => setEmail(e.target.value)} type="email" maxLength={120} placeholder="you@fleet.com.au" className="h-full w-full bg-transparent outline-none" autoComplete="email" /></span>
         </label>
         {err && <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] font-semibold text-red-700">{err}</p>}
         <button disabled={busy} className="group flex h-10 items-center justify-center gap-2 rounded-lg bg-gold text-sm font-extrabold text-ink transition hover:bg-ink hover:text-white disabled:opacity-60">

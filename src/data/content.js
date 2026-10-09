@@ -1,17 +1,8 @@
 // Editorial content carried over from the previous Aurex build.
 // Staged for the coming optimization round (guides hub, news, testimonials).
-export const GUIDES = [
-  { title: "How to pick the right tail lift", desc: "Capacity, platform size and body match in five minutes.", tag: "Tail Lifts", img: "/images/TAIL-LIFTS-CAT.jpg" },
-  { title: "Door gear and hinge checklist", desc: "Left/right, latch and stainless options explained.", tag: "Trailer Parts", img: "/images/products/GL-11113.jpg" },
-  { title: "Q track vs F track", desc: "Lengths, materials and end caps matched.", tag: "Accessories", img: "/images/products/GL-19113H1.jpg" },
-  { title: "Toolbox lock and latch guide", desc: "Paddle latches, locks and handles sized.", tag: "Tool Boxes", img: "/images/products/GL-25126.jpg" },
-  { title: "Canvas stand measuring guide", desc: "Widths and heights for tautliner bodies.", tag: "Trailer Parts", img: "/images/products/CANVAS-1995-1600.jpg" },
-  { title: "Cargo control basics", desc: "Bars, buffers and end fittings that hold.", tag: "Accessories", img: "/images/products/GL-15616.jpg" },
-];
-
 export const NEWS = [
   {
-    title: "New Aurex range: tail lifts land in VIC", date: "02 Sep 2026", tag: "Tail Lifts", img: "/images/TAIL-LIFTS-CAT.jpg",
+    title: "New Aurex range: tail lifts land in VIC", date: "02 Sep 2026", tag: "Tail Lifts", img: "/images/web/hero-tail-lift-yellow.webp",
     slug: "tail-lifts-land-in-vic", excerpt: "1.5T aluminium to 3T steel tail lifts with full fitting kits, stocked in Campbellfield and VIN-matched before dispatch.",
     body: [
       { p: "Our new tail lift range has landed in Campbellfield VIC: 1.5-tonne aluminium lifts for vans and light rigids, 2-tonne aluminium and steel lifts for general rigid work, and 3-tonne steel lifts for heavy pallet and fleet bodies. Every lift ships as a complete kit with platform, arms, powerpack, controls, lights and fasteners, so nothing holds up the fit-off." },
@@ -22,7 +13,7 @@ export const NEWS = [
     ],
   },
   {
-    title: "Toolbox and door hardware refresh", date: "21 Aug 2026", tag: "Tool Boxes", img: "/images/products/GL-25126.jpg",
+    title: "Toolbox and door hardware refresh", date: "21 Aug 2026", tag: "Tool Boxes", img: "/images/web/hero-fleet-accessories-yellow.webp",
     slug: "toolbox-door-hardware-refresh", excerpt: "Steel toolboxes, paddle latches, cam locks and door locking gear refreshed, with matched sets invoiced together and freighted daily.",
     body: [
       { p: "The toolbox and door hardware shelves have been refreshed: steel toolboxes in the popular 1200mm footprint, stainless paddle latches, cam locks with dust covers, and complete door locking gear sets with keepers. Order the box, latch and lock together and they arrive on one invoice, keyed and checked as a set." },
@@ -32,7 +23,7 @@ export const NEWS = [
     ],
   },
   {
-    title: "Tracks, caps and fittings explained", date: "09 Aug 2026", tag: "Trailer Parts", img: "/images/products/GL-19111H1.jpg",
+    title: "Tracks, caps and fittings explained", date: "09 Aug 2026", tag: "Trailer Parts", img: "/images/web/hero-trailer-parts-yellow.webp",
     slug: "tracks-caps-fittings-explained", excerpt: "Q-track vs F-track, lengths, materials and end fittings: how to spec restraint track for tautliners and flat tops.",
     body: [
       { p: "Restraint track looks simple until you try to order it: Q-track and F-track profiles are not interchangeable, lengths run to 3050mm and beyond, and end caps, joiners and fasteners differ by system. This guide covers how our counter specs track for tautliner curtains, flat-top decks and fit-outs." },
@@ -43,7 +34,7 @@ export const NEWS = [
     ],
   },
   {
-    title: "New stock: stainless hinges and paddle latches", date: "28 Jul 2026", tag: "Accessories", img: "/images/products/A20-01S-06.jpg",
+    title: "New stock: stainless hinges and paddle latches", date: "28 Jul 2026", tag: "Accessories", img: "/images/web/campbellfield-trade-counter.webp",
     slug: "stainless-hinges-paddle-latches", excerpt: "Stainless hinges, paddle latches and keepers now stocked in depth: corrosion-proof hardware for doors, toolboxes and bodies.",
     body: [
       { p: "Fresh stock has landed across stainless hinges, paddle latches, keepers and associated fasteners. If your doors live outdoors, near the coast or through washdown bays, stainless hardware pays for itself in avoided call-outs and seized fittings." },
@@ -55,11 +46,10 @@ export const NEWS = [
 ];
 
 export const TESTIMONIALS = [
-  { name: "Rudi Santoso", role: "Fleet Manager, Melbourne Transport", quote: "Aurex matched our body hardware in one call and had it on the dock next morning. Zero downtime on our linehaul fleet.", rating: 5, sku: "ATP-GL-25126", img: "https://randomuser.me/api/portraits/men/32.jpg" },
-  { name: "Sneha Kulkarni", role: "Production Lead, Cutwell Bodies", quote: "Door locking gear and keeper sets match our CAD specs flawlessly. No guessing left or right configurations.", rating: 5, sku: "ATP-GL-11113", img: "https://randomuser.me/api/portraits/women/44.jpg" },
-  { name: "Vikram Nair", role: "Maintenance Lead, AusTrans Logistics", quote: "30-day billing, bulk fleet rates, and ADR compliance certificates provided on every consignment without asking.", rating: 5, sku: "ATP-GL-19113H1", img: "https://randomuser.me/api/portraits/men/54.jpg" },
-  { name: "Maria Anggraini", role: "Workshop Owner, Geelong Heavy Repairs", quote: "Direct fit replacement powerpacks and hydraulic cylinders arrived within 24 hours. Saved our breakdown crew a full day.", rating: 5, sku: "ATP-A20-01S-06", img: "https://randomuser.me/api/portraits/women/68.jpg" },
-  { name: "Aarav Sharma", role: "Quality Head, Aeroworks Transport", quote: "Toolbox latches, locks, and cam seals all in one invoice. Ordered Friday, fitted and certified Monday morning.", rating: 5, sku: "ATP-GL-25126", img: "https://randomuser.me/api/portraits/men/75.jpg" },
+  { name: "Rudi Santoso", role: "Fleet Manager, Melbourne Transport", quote: "Aurex matched our body hardware in one call and had it on the dock next morning. Zero downtime on our linehaul fleet.", rating: 5 },
+  { name: "Sneha Kulkarni", role: "Production Lead, Cutwell Bodies", quote: "Door locking gear and keeper sets match our CAD specs flawlessly. No guessing left or right configurations.", rating: 5 },
+  { name: "Vikram Nair", role: "Maintenance Lead, AusTrans Logistics", quote: "30-day billing, bulk fleet rates, and ADR compliance certificates provided on every consignment without asking.", rating: 5 },
+  { name: "Maria Anggraini", role: "Workshop Owner, Geelong Heavy Repairs", quote: "Direct fit replacement powerpacks and hydraulic cylinders arrived within 24 hours. Saved our breakdown crew a full day.", rating: 5 },
+  { name: "Aarav Sharma", role: "Quality Head, Aeroworks Transport", quote: "Toolbox latches, locks, and cam seals all in one invoice. Ordered Friday, fitted and certified Monday morning.", rating: 5 },
 ];
 
-export const BRANDS = ["BEAUWAY", "GANLAND", "CAIYUAN", "AUREX"];

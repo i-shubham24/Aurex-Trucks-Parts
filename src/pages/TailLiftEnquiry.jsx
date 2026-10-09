@@ -11,7 +11,6 @@ import { useNotification } from "../store/notification";
 import { imgFor } from "../data/images";
 import ThemeSelect from "../components/ThemeSelect";
 import { useProducts } from "../hooks/api/useProducts";
-import { apiClient } from "../api/client";
 
 export default function TailLiftEnquiry() {
   const [searchParams] = useSearchParams();
@@ -88,7 +87,7 @@ export default function TailLiftEnquiry() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const fe = {};
 
@@ -107,7 +106,6 @@ export default function TailLiftEnquiry() {
     }
 
     setSubmitting(true);
-    const refCode = `ATP-TL-${Math.floor(100000 + Math.random() * 900000)}`;
 
     const selectedOptionsList = Object.entries(form.options)
       .filter(([, v]) => v)
@@ -124,7 +122,7 @@ export default function TailLiftEnquiry() {
       .join(", ");
 
     const compiledMessage = `
-[TAIL LIFT ENGINEERING ENQUIRY - REF: ${refCode}]
+[TAIL LIFT ENGINEERING ENQUIRY]
 Selected Model: ${selectedProduct ? selectedProduct.name : "Custom Tail Lift"} (SKU: ${selectedProduct?.sku || selectedSku})
 Capacity: ${form.liftCapacity} | Platform Material: ${form.platformMaterial} | Platform Height: ${form.platformHeight}
 Company: ${form.company.trim()} | Location: ${form.state} | Preferred Contact: ${form.preferredContact}
@@ -136,10 +134,9 @@ Service: ${form.serviceType}
 Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
     `.trim();
 
-    // Send to backend API
-    apiClient
-      .post("/enquiries", {
-        customerName: form.name.trim(),
+    let reference = "";
+    try {
+      reference = await addEnquiry({
         name: form.name.trim(),
         companyName: form.company.trim(),
         phone: form.phone.trim(),
@@ -160,20 +157,14 @@ Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
           material: form.platformMaterial,
           serviceType: form.serviceType,
         },
-      })
-      .catch((err) => {
-        console.warn("Backend enquiry sync notice:", err);
       });
+    } catch {
+      setSubmitting(false);
+      setErrors({ form: "We couldn't send your enquiry just now. Please try again in a moment, or call us with your vehicle details." });
+      return;
+    }
 
-    addEnquiry({
-      name: form.name.trim(),
-      phone: form.phone.trim(),
-      email: form.email.trim().toLowerCase(),
-      topic: "Tail Lifts",
-      message: compiledMessage,
-    });
-
-    setReferenceId(refCode);
+    setReferenceId(reference || "");
     setSubmitting(false);
     setSubmitted(true);
     window.scrollTo({ top: 100, behavior: "smooth" });
@@ -240,16 +231,18 @@ Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
               <p className="mt-2 text-[15px] text-gray-200">
                 Our tail lift engineering and technical team will review your specifications and get back to you within a few hours.
               </p>
-              <div className="mt-4 inline-flex items-center gap-2 rounded-md bg-white/10 px-4 py-1.5 font-mono text-xs font-bold tracking-wider text-gold backdrop-blur-sm">
-                <span>ENQUIRY REFERENCE:</span>
-                <span className="font-extrabold text-white">{referenceId}</span>
-              </div>
+              {referenceId && (
+                <div className="mt-4 inline-flex items-center gap-2 font-mono text-xs font-bold tracking-wider text-gold">
+                  <span>ENQUIRY REFERENCE:</span>
+                  <span className="font-extrabold text-white">{referenceId}</span>
+                </div>
+              )}
             </div>
 
             <div className="p-6 md:p-8">
               <div className="rounded-lg border border-line bg-mist p-5">
                 <h3 className="text-sm font-extrabold uppercase tracking-wider text-navy">Submission Summary</h3>
-                <div className="mt-3 grid gap-3 sm:grid-cols-2 text-sm">
+                <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 text-sm">
                   <div>
                     <span className="text-xs font-bold text-faint uppercase">Contact Person:</span>
                     <p className="font-extrabold text-ink">{form.name} ({form.company})</p>
@@ -340,7 +333,7 @@ Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
                   Choose the model you are interested in. If you are unsure, select the closest match and note your requirements below.
                 </p>
 
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {tailLiftProducts.map((p) => {
                     const isSelected = p.sku === selectedSku;
                     return (
@@ -384,7 +377,7 @@ Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
                   <h2 className="text-lg font-extrabold text-ink">Your Contact & Company Details</h2>
                 </div>
 
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <label className="block">
                     <span className="mb-1 block text-xs font-bold text-ink">Full Name *</span>
                     <input
@@ -467,7 +460,7 @@ Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
                   Accurate body dimensions guarantee zero fitment surprises upon delivery.
                 </p>
 
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <label className="block sm:col-span-2">
                     <span className="mb-1 block text-xs font-bold text-ink">Truck Make & Model *</span>
                     <input
@@ -541,7 +534,7 @@ Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
                   <h2 className="text-lg font-extrabold text-ink">Tail Lift Operating Requirements</h2>
                 </div>
 
-                <div className="mt-4 grid gap-4 sm:grid-cols-3">
+                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
                   <label className="block">
                     <span className="mb-1 block text-xs font-bold text-ink">Lifting Capacity</span>
                     <ThemeSelect
@@ -579,7 +572,7 @@ Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
                 {/* Optional Hardware Equipment */}
                 <div className="mt-5">
                   <span className="mb-2 block text-xs font-bold text-ink">Required Hardware & Safety Options:</span>
-                  <div className="grid gap-2.5 sm:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                     {[
                       ["footControls", "Dual Platform Foot Controls (Hands-free loading)"],
                       ["rollStops", "Roll-Stop Cart / Pallet Barriers (Fold-up stops)"],
@@ -643,6 +636,7 @@ Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
 
               {/* Submit CTA */}
               <div className="border-t border-line pt-6">
+                {errors.form && <p role="alert" className="mb-3 text-center text-[13px] font-semibold text-red-600">{errors.form}</p>}
                 <button
                   type="submit"
                   disabled={submitting}

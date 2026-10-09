@@ -1,31 +1,18 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNotification } from "./notification";
-import { api, API_ON, setToken, tryRefresh, normaliseOrder } from "../lib/api";
-import { loginApi, registerApi, getMeApi, logoutApi } from "../api/endpoints/auth.api";
+import { api, setToken, tryRefresh, normaliseOrder } from "../lib/api";
+import { loginApi, registerApi, logoutApi } from "../api/endpoints/auth.api";
 import { setAuthToken } from "../api/client";
 
 const AuthCtx = createContext(null);
-const USERS_KEY = "aurex_users";
 const SESSION_KEY = "aurex_session";
 const ORDERS_KEY = "aurex_orders";
 
 export const ADMIN_EMAIL = "admin@aurex.com.au";
-const ADMIN_PASS = "Admin123!";
 
 const read = (k, fb) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } };
 const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode */ } };
 const TEMP_SESSION_KEY = "aurex_session_temp";
-const readTemp = () => { try { const v = sessionStorage.getItem(TEMP_SESSION_KEY); return v ? JSON.parse(v) : null; } catch { return null; } };
-
-function ensureAdmin() {
-  const users = read(USERS_KEY, []);
-  const i = users.findIndex((u) => u.email === ADMIN_EMAIL);
-  const seed = { name: "Store Admin", email: ADMIN_EMAIL, password: ADMIN_PASS, phone: "+61 414 730 467", company: "Aurex HQ", createdAt: new Date().toISOString(), role: "admin" };
-  if (i === -1) users.push(seed);
-  else users[i] = { ...users[i], password: ADMIN_PASS, role: "admin" };
-  write(USERS_KEY, users);
-  return users;
-}
 
 /* ───────────────────────── API-backed provider ─────────────────────────
    Active when VITE_API_URL is set. Mirrors orders into the `orders` state,
@@ -59,7 +46,9 @@ function ApiAuthProvider({ children }) {
         sessionStorage.removeItem("aurex_access_token");
       } catch { /* noop */ }
 
-      if (await tryRefresh()) {
+      let hinted = true;
+      try { hinted = Boolean(localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(TEMP_SESSION_KEY)); } catch { /* private mode: just try */ }
+      if (hinted && (await tryRefresh())) {
         try {
           const res = await api.get("/auth/me");
           const me = res?.user || res?.data?.user || res?.data;
@@ -92,6 +81,7 @@ function ApiAuthProvider({ children }) {
         setToken(accessToken);
         setAuthToken(accessToken);
       }
+      try { localStorage.setItem(SESSION_KEY, JSON.stringify(createdUser?.email || email)); } catch { /* private mode */ }
       setUser({ ...createdUser, isAdmin: createdUser?.isAdmin || createdUser?.role === "SUPER_ADMIN" || createdUser?.role === "ADMIN" || createdUser?.role === "admin" || createdUser?.email === ADMIN_EMAIL });
       await loadMyOrders();
       return { ok: true, user: createdUser };
@@ -186,128 +176,8 @@ function ApiAuthProvider({ children }) {
   );
 }
 
-/* ─────────────────────── localStorage provider (original) ─────────────── */
-function LocalAuthProvider({ children }) {
-  const { notify } = useNotification();
-  const [users, setUsers] = useState(() => ensureAdmin());
-  const [session, setSession] = useState(() => read(SESSION_KEY, null) ?? readTemp());
-  const [persist, setPersist] = useState(() => read(SESSION_KEY, null) != null);
-  const [orders, setOrders] = useState(() => read(ORDERS_KEY, []));
-
-  useEffect(() => write(USERS_KEY, users), [users]);
-  useEffect(() => {
-    try {
-      if (persist) {
-        localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-        sessionStorage.removeItem(TEMP_SESSION_KEY);
-      } else {
-        sessionStorage.setItem(TEMP_SESSION_KEY, JSON.stringify(session));
-        localStorage.removeItem(SESSION_KEY);
-      }
-    } catch { /* private mode */ }
-  }, [session, persist]);
-  useEffect(() => write(ORDERS_KEY, orders), [orders]);
-
-  const user = useMemo(() => {
-    const u = users.find((x) => x.email === session);
-    if (!u) return null;
-    return { ...u, isAdmin: u.email === ADMIN_EMAIL || u.role === "admin" };
-  }, [users, session]);
-
-  const signup = ({ name, email, password, phone, company }) => {
-    const cleanEmail = String(email || "").trim().toLowerCase();
-    if (users.some((u) => u.email === cleanEmail)) return { ok: false, msg: "An account with this email already exists. Please log in." };
-    const nu = { name: String(name || "").trim(), email: cleanEmail, password, phone: phone || "", company: company || "", createdAt: new Date().toISOString(), role: "customer" };
-    setUsers((u) => [...u, nu]);
-    setPersist(true);
-    setSession(cleanEmail);
-    return { ok: true };
-  };
-
-  const login = ({ email, password, remember = true }) => {
-    const cleanEmail = String(email || "").trim().toLowerCase().slice(0, 120);
-    try {
-      const raw = localStorage.getItem("aurex_login_attempts");
-      const att = raw ? JSON.parse(raw) : {};
-      const rec = att[cleanEmail];
-      if (rec && rec.lockedUntil && Date.now() < rec.lockedUntil) {
-        const s = Math.ceil((rec.lockedUntil - Date.now()) / 1000);
-        return { ok: false, msg: `Too many attempts. Try again in ${s} seconds.` };
-      }
-    } catch { /* private mode */ }
-    const fail = () => {
-      try {
-        const raw = localStorage.getItem("aurex_login_attempts");
-        const att = raw ? JSON.parse(raw) : {};
-        const rec = att[cleanEmail] || { fails: 0 };
-        rec.fails += 1;
-        if (rec.fails >= 5) { rec.lockedUntil = Date.now() + 60000; rec.fails = 0; }
-        att[cleanEmail] = rec;
-        localStorage.setItem("aurex_login_attempts", JSON.stringify(att));
-      } catch { /* private mode */ }
-    };
-    const pass = () => {
-      try {
-        const raw = localStorage.getItem("aurex_login_attempts");
-        const att = raw ? JSON.parse(raw) : {};
-        delete att[cleanEmail];
-        localStorage.setItem("aurex_login_attempts", JSON.stringify(att));
-      } catch { /* private mode */ }
-    };
-    let f = users.find((u) => u.email === cleanEmail && u.password === password);
-    if (!f) {
-      try {
-        const raw = localStorage.getItem(USERS_KEY);
-        const arr = raw ? JSON.parse(raw) : [];
-        if (Array.isArray(arr)) {
-          const hit = arr.find((u) => u.email === cleanEmail && u.password === password);
-          if (hit) {
-            setUsers(arr);
-            setPersist(remember !== false);
-            setSession(cleanEmail);
-            pass();
-            return { ok: true };
-          }
-        }
-      } catch { /* private mode */ }
-      fail();
-      return { ok: false, msg: "Email or password did not match. Try again or create an account." };
-    }
-    setPersist(remember !== false);
-    setSession(cleanEmail);
-    pass();
-    return { ok: true };
-  };
-
-  const logout = () => {
-    setSession(null);
-    try {
-      localStorage.removeItem(SESSION_KEY);
-      sessionStorage.removeItem(TEMP_SESSION_KEY);
-    } catch { /* private mode */ }
-    notify.info({
-      kicker: "ACCOUNT LOGOUT",
-      title: "Logged Out Successfully",
-      message: "You have been signed out securely. Cart and guest checkout remain active.",
-      icon: "login",
-      sound: false,
-    });
-  };
-
-  const placeOrder = (order) => {
-    const id = "AUX-" + Math.floor(1000 + Math.random() * 9000);
-    const full = { ...order, id, email: session, placedAt: new Date().toISOString(), status: "Packed in Campbellfield VIC" };
-    setOrders((o) => [full, ...o]);
-    return full;
-  };
-
-  const myOrders = useMemo(() => orders.filter((o) => o.email === session), [orders, session]);
-
-  return <AuthCtx.Provider value={{ user, session, users, setUsers, signup, login, logout, orders, setOrders, myOrders, placeOrder }}>{children}</AuthCtx.Provider>;
-}
-
 export function AuthProvider({ children }) {
-  return API_ON ? <ApiAuthProvider>{children}</ApiAuthProvider> : <LocalAuthProvider>{children}</LocalAuthProvider>;
+  return <ApiAuthProvider>{children}</ApiAuthProvider>;
 }
 
 /* Safe default so no component crashes outside the provider. */

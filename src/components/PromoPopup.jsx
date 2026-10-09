@@ -1,13 +1,20 @@
 import { useEffect, useState } from "react";
 import { Check, Gift, X } from "lucide-react";
 import { useSite } from "../store/site";
+import { formatAUD } from "../data/products";
 import useLockBody from "../utils/useLockBody";
 
 const KEY = "aurex_popup_seen_v2";
 
 export default function PromoPopup() {
-  const { promos } = useSite();
-  const active = [...promos].filter((p) => p.active).sort((a, b) => b.pct - a.pct)[0] || { code: "WELCOME10", pct: 10 };
+  const { promos, addEnquiry } = useSite();
+  // Only ever advertise a code the checkout will honour.
+  const active = [...promos].filter((p) => p.active).sort((a, b) => (b.pct || 0) - (a.pct || 0))[0] || null;
+  const offer = !active
+    ? "Get new stock and specials first"
+    : active.type === "FIXED"
+      ? `Take ${formatAUD(active.value)} off${active.minOrder ? ` orders over ${formatAUD(active.minOrder)}` : " your order"}`
+      : `Take ${active.value ?? active.pct}% off your order`;
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
@@ -30,14 +37,15 @@ export default function PromoPopup() {
     if (!email.trim()) return;
     setDone(true);
     try { localStorage.setItem(KEY, "1"); } catch { /* private mode */ }
-    setTimeout(() => setShow(false), 1600);
+    Promise.resolve(addEnquiry({ name: "Newsletter subscriber", email: email.trim().toLowerCase(), topic: "Newsletter sign-up", message: "Signed up from the welcome offer pop-up." })).catch(() => {});
+    setTimeout(() => setShow(false), active ? 6000 : 1600);
   };
 
   if (!show) return null;
   return (
     <div className="fixed inset-0 z-[70] grid place-items-center p-4">
       <div className="absolute inset-0 bg-black/55" onClick={close} />
-      <div className="popup-in relative grid max-h-[92vh] w-full max-w-4xl overflow-hidden rounded-md bg-white shadow-2xl sm:grid-cols-[340px_minmax(0,1fr)]">
+      <div className="popup-in relative grid grid-cols-1 max-h-[92vh] w-full max-w-4xl overflow-hidden rounded-md bg-white shadow-2xl sm:grid-cols-[340px_minmax(0,1fr)]">
         <div className="relative hidden flex-col justify-between overflow-hidden bg-ink p-7 text-white sm:flex">
           <img src="/images/web/hero-roadtrain.jpg" alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-45" />
           <span className="relative grid h-13 w-13 place-items-center rounded-full bg-gold text-ink"><Gift size={22} /></span>
@@ -52,13 +60,13 @@ export default function PromoPopup() {
             <div className="py-6 text-center">
               <p className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-green-100 text-green-700"><Check size={26} /></p>
               <h3 className="mt-4 text-2xl font-extrabold">You are on the list</h3>
-              <p className="mt-2 text-[15px] text-steel">Watch your inbox. Your code is ready. Show it at checkout or mention it on the phone.</p>
-              <p className="mx-auto mt-4 w-fit border-2 border-dashed border-gold bg-gold/15 px-8 py-2.5 font-mono text-2xl font-extrabold tracking-[0.2em]">{active.code}</p>
+              <p className="mt-2 text-[15px] text-steel">{active ? "Enter this code at checkout, or mention it on the phone." : "We will be in touch when new stock and specials land."}</p>
+              {active && <p className="mt-4 font-mono text-3xl font-extrabold tracking-[0.2em] text-primary">{active.code}</p>}
             </div>
           ) : (
             <form onSubmit={submit}>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary sm:hidden">Join the trade list</p>
-              <h3 className="text-2xl font-extrabold md:text-[28px]">Take {active.pct}% off your first order</h3>
+              <h3 className="text-2xl font-extrabold md:text-[28px]">{offer}</h3>
               <p className="mt-2 text-[15px] leading-6 text-steel">New stock, weekly specials and fitment tips for Australian truck and trailer fleets. No spam, unsubscribe anytime.</p>
               <input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={120} placeholder="Your work email"
                 className="mt-4 h-14 w-full rounded-md border border-line-dark bg-white px-4 text-[15px] outline-none placeholder:text-faint focus:border-gold" />
