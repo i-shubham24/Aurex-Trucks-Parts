@@ -81,20 +81,20 @@ export default function CartDrawer() {
           {lines.length === 0 && <p className="py-6 text-center text-sm text-steel">Your cart is empty.<br />Trailer parts are enquiry only, call us for those.</p>}
           {lines.map((l) => (
             <div key={l.sku} className="mb-3 flex gap-3 rounded-md border border-line p-2.5">
-              <span className="h-16 w-16 shrink-0 overflow-hidden rounded bg-mist"><SafeImage src={imgFor(l.sku)} alt={l.name} className="h-full w-full object-cover" /></span>
+              <span className="h-16 w-16 shrink-0 overflow-hidden rounded bg-mist"><SafeImage src={l.image || imgFor(l.sku)} alt={l.name} className="h-full w-full object-cover" /></span>
               <div className="min-w-0 flex-1">
                 <p className="line-clamp-2 text-[13px] font-bold leading-snug">{l.name}</p>
                 <p className="mt-0.5 font-mono text-[11px] text-faint">{l.sku}</p>
                 <div className="mt-1.5 flex items-center justify-between">
                   <span className="flex items-center rounded border border-line-dark">
-                    <button onClick={() => setQty(l.sku, l.qty - 1)} className="px-2 py-1 transition-colors hover:bg-mist" aria-label="Decrease"><Minus size={13} /></button>
+                    <button onClick={() => setQty(l.itemId || l.sku, l.qty - 1)} className="px-2 py-1 transition-colors hover:bg-mist" aria-label="Decrease"><Minus size={13} /></button>
                     <span className="tabular w-7 text-center text-[13px] font-bold">{l.qty}</span>
-                    <button onClick={() => setQty(l.sku, l.qty + 1)} className="px-2 py-1 transition-colors hover:bg-mist" aria-label="Increase"><Plus size={13} /></button>
+                    <button onClick={() => setQty(l.itemId || l.sku, l.qty + 1)} className="px-2 py-1 transition-colors hover:bg-mist" aria-label="Increase"><Plus size={13} /></button>
                   </span>
                   <span className="tabular text-sm font-extrabold text-primary">{formatAUD(l.price * l.qty)}</span>
                 </div>
               </div>
-              <button onClick={() => remove(l.sku)} className="self-start text-[11px] font-bold text-faint underline transition-colors hover:text-navy">Remove</button>
+              <button onClick={() => remove(l.itemId || l.sku)} className="self-start text-[11px] font-bold text-faint underline transition-colors hover:text-navy">Remove</button>
             </div>
           ))}
         </div>

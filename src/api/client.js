@@ -27,11 +27,38 @@ export const apiClient = axios.create({
   },
 });
 
-// Request Interceptor: Attach bearer token if active
+const CART_SESSION_KEY = 'aurex_cart_session_id';
+
+export const getCartSessionId = () => {
+  try {
+    let id = localStorage.getItem(CART_SESSION_KEY);
+    if (!id) {
+      id = 'cs_' + Math.random().toString(36).substring(2, 12) + Date.now().toString(36);
+      localStorage.setItem(CART_SESSION_KEY, id);
+    }
+    return id;
+  } catch {
+    return null;
+  }
+};
+
+export const setCartSessionId = (id) => {
+  try {
+    if (id) localStorage.setItem(CART_SESSION_KEY, id);
+  } catch { /* ignore */ }
+};
+
+// Request Interceptor: Attach bearer token and session id
 apiClient.interceptors.request.use(
   (config) => {
     if (activeToken) {
       config.headers.Authorization = `Bearer ${activeToken}`;
+    }
+    if (config.url && (config.url.includes('/cart') || config.url.includes('/checkout'))) {
+      const sessionId = getCartSessionId();
+      if (sessionId) {
+        config.headers['x-session-id'] = sessionId;
+      }
     }
     return config;
   },

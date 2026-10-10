@@ -94,7 +94,7 @@ export function NotificationProvider({ children }) {
         title: "Added to Cart Successfully",
         message: `${product.name || product.sku} (${qtyText}) added to your dispatch list.`,
         sku: product.sku,
-        image: product.image,
+        image: product.image || product.imageUrl || (Array.isArray(product.images) && product.images.length > 0 ? (typeof product.images[0] === 'string' ? product.images[0] : product.images[0]?.url) : null),
         action: onOpenCart ? { label: "View Cart", onClick: onOpenCart } : null,
         duration: 3500,
         sound: true,
@@ -112,6 +112,13 @@ export function NotificationProvider({ children }) {
       });
     },
     info: (opts) => addToast({ ...opts, type: "info" }),
+    error: (opts) => addToast({
+      ...opts,
+      type: "error",
+      kicker: opts.kicker || "ATTENTION REQUIRED",
+      duration: opts.duration ?? 4500,
+      sound: false,
+    }),
   };
 
   const clearToasts = useCallback(() => {
@@ -139,6 +146,7 @@ const fallbackNotification = {
     cart: () => "",
     order: () => "",
     info: () => "",
+    error: () => "",
   },
 };
 

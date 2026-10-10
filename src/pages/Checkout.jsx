@@ -1,7 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
-import { CheckCircle2, CreditCard, Landmark, Truck, Wallet } from "lucide-react";
+import {
+  CheckCircle2,
+  CreditCard,
+  Edit2,
+  Landmark,
+  Lock,
+  Minus,
+  Plus,
+  Truck,
+  Wallet,
+} from "lucide-react";
 import { formatAUD } from "../data/products";
 import { imgFor } from "../data/images";
 import SafeImage from "../components/SafeImage";
@@ -21,45 +31,122 @@ const pcRx = /^\d{4}$/;
 
 const PICKUP = "Click and Collect VIC";
 
-/* Mirrors the server's coupon maths (utils/pricing.js) so the summary matches the invoice. */
-const promoDiscount = (promo, amount) => {
-  if (!promo || (promo.minOrder && amount < promo.minOrder)) return 0;
-  let d = promo.type === "FIXED" ? Math.min(amount, promo.value || 0) : amount * ((promo.value ?? promo.pct ?? 0) / 100);
-  if (promo.maxDiscount && d > promo.maxDiscount) d = promo.maxDiscount;
-  return Math.round(d * 100) / 100;
-};
-
 const digits = (v) => v.replace(/\D/g, "");
 
 export default function Checkout() {
-  const { lines, total, clear } = useCart();
+  const { lines, total, clear, setQty, remove } = useCart();
   const COMPANY = useCompany();
-  const { user, placeOrder } = useAuth();
-  const { settings, promos } = useSite();
+  const { user, openAuthModal, updateProfile, placeOrder } = useAuth();
+  const { settings } = useSite();
   const { notify } = useNotification();
   const go = useNavigate();
 
   const SHIP = [
-    { id: "Standard road", name: "Standard Road", desc: `Free over ${formatAUD(settings.freeFreightOver)}, else ${formatAUD(settings.standardFee)}. 1 to 5 days.`, fee: (t) => (t >= settings.freeFreightOver ? 0 : settings.standardFee) },
-    { id: "Express priority", name: "Express", desc: `${formatAUD(settings.expressFee)} flat. VIC metro next day.`, fee: () => settings.expressFee },
-    { id: PICKUP, name: "Click and Collect", desc: "Free. Ready in 4 hours, Campbellfield.", fee: () => 0 },
+    {
+      id: "Standard road",
+      name: "Standard Road",
+      desc: `Free over ${formatAUD(settings.freeFreightOver)}, else ${formatAUD(settings.standardFee)}. 1 to 5 days.`,
+      fee: (t) => (t >= settings.freeFreightOver ? 0 : settings.standardFee),
+    },
+    {
+      id: "Express priority",
+      name: "Express",
+      desc: `${formatAUD(settings.expressFee)} flat. VIC metro next day.`,
+      fee: () => settings.expressFee,
+    },
+    {
+      id: PICKUP,
+      name: "Click and Collect",
+      desc: "Free. Ready in 4 hours, Campbellfield.",
+      fee: () => 0,
+    },
   ];
 
-  const [form, setForm] = useState({ name: "", phone: "", email: "", address: "", suburb: "", state: "VIC", postcode: "", notes: "" });
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    suburb: "",
+    state: "VIC",
+    postcode: "",
+    notes: "",
+  });
   const [ship, setShip] = useState(SHIP[0].id);
   const [pay, setPay] = useState("Bank transfer");
   const [placing, setPlacing] = useState(false);
   const [err, setErr] = useState("");
   const [fieldErrs, setFieldErrs] = useState({});
-  const [promoCode, setPromoCode] = useState("");
-  const [promo, setPromo] = useState(null);
-  const [promoErr, setPromoErr] = useState("");
-  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
 
+  const set = (k) => (e) => setForm((prev) => ({ ...prev, [k]: e.target.value }));
+
+  // Query saved addresses from the profile API when user is logged in
+  const { data: addressData } = useQuery({
+    queryKey: ["user-addresses", user?.id || user?._id],
+    queryFn: async () => {
+      if (!user) return [];
+      try {
+        const res = await apiClient.get("/addresses");
+        return res?.data?.addresses || [];
+      } catch {
+        return [];
+      }
+    },
+    enabled: !!user,
+  });
+
+  // Determine saved address from profile or API
+  const savedAddress = useMemo(() => {
+    if (!user) return null;
+    const defaultFromApi = addressData?.find?.((a) => a.isDefault) || addressData?.[0];
+    const profileAddr = user.shippingAddress || user.address;
+    const candidate = defaultFromApi || profileAddr;
+
+    if (candidate && (candidate.addressLine1 || candidate.address || candidate.streetAddress)) {
+      return {
+        name:
+          candidate.fullName ||
+          candidate.name ||
+          user.name ||
+          `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+        phone: candidate.phone || user.phone || "",
+        email: candidate.email || user.email || "",
+        company: candidate.companyName || user.companyName || "",
+        address: candidate.addressLine1 || candidate.address || candidate.streetAddress || "",
+        suburb: candidate.suburbOrCity || candidate.suburb || "",
+        state: candidate.state || "VIC",
+        postcode: candidate.postalCode || candidate.postcode || "",
+        notes: candidate.deliveryInstructions || candidate.notes || "",
+      };
+    }
+    return null;
+  }, [user, addressData]);
+
+  // Pre-fill form when user logs in or saved address loads
   useEffect(() => {
-    if (user) setForm((f) => ({ ...f, name: f.name || user.name || "", email: f.email || user.email || "", phone: f.phone || user.phone || "" }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+    if (!user) return;
+    if (savedAddress) {
+      setForm((prev) => ({
+        ...prev,
+        name: prev.name || savedAddress.name,
+        email: prev.email || savedAddress.email,
+        phone: prev.phone || savedAddress.phone,
+        address: prev.address || savedAddress.address,
+        suburb: prev.suburb || savedAddress.suburb,
+        state: prev.state || savedAddress.state,
+        postcode: prev.postcode || savedAddress.postcode,
+        notes: prev.notes || savedAddress.notes,
+      }));
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        name: prev.name || user.name || `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+        email: prev.email || user.email || "",
+        phone: prev.phone || user.phone || "",
+      }));
+    }
+  }, [user, savedAddress]);
 
   const { data: payConfig } = useQuery({
     queryKey: ["payment-config"],
@@ -68,32 +155,69 @@ export default function Checkout() {
   });
   const cardEnabled = Boolean(payConfig?.card?.enabled);
 
-  if (lines.length === 0) return (
-    <main className="mx-auto max-w-xl px-4 py-14 text-center">
-      <Truck size={36} className="mx-auto text-faint" />
-      <h1 className="mt-3 text-2xl font-extrabold">Your cart is empty</h1>
-      <p className="mt-1 text-sm text-steel">Add some lines first, then come back to check out.</p>
-      <Link to="/shop" className="mt-5 inline-block rounded bg-gold px-6 py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white">Shop All Products</Link>
-    </main>
-  );
+  if (lines.length === 0)
+    return (
+      <main className="mx-auto max-w-xl px-4 py-14 text-center">
+        <Truck size={36} className="mx-auto text-faint" />
+        <h1 className="mt-3 text-2xl font-extrabold">Your cart is empty</h1>
+        <p className="mt-1 text-sm text-steel">Add some lines first, then come back to check out.</p>
+        <Link
+          to="/shop"
+          className="mt-5 inline-block rounded bg-gold px-6 py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white"
+        >
+          Shop All Products
+        </Link>
+      </main>
+    );
 
   const shipOpt = SHIP.find((s) => s.id === ship) || SHIP[0];
-  const discount = promoDiscount(promo, total);
-  const shipFee = shipOpt.fee(total - discount);
-  const grand = Math.round((total - discount + shipFee) * 100) / 100;
+  const shipFee = shipOpt.fee(total);
+  const grand = Math.round((total + shipFee) * 100) / 100;
 
   const PAYMENTS = [
-    cardEnabled && { id: "Card", name: "Card", desc: "Visa and Mastercard, on our secure payment page.", icon: CreditCard },
-    { id: "Bank transfer", name: "Bank Transfer", desc: "EFT details shown with your order confirmation.", icon: Landmark },
-    ship === PICKUP && { id: "Pay on pickup", name: "Pay on Pickup", desc: "Pay at the Campbellfield counter when you collect.", icon: Wallet },
-    { id: "30 day fleet terms", name: "30 Day Fleet Terms", desc: user?.isTradeApproved ? "Charged to your trade account." : "Approved trade accounts only. Call us to apply.", icon: Truck, disabled: !user?.isTradeApproved },
+    cardEnabled && {
+      id: "Card",
+      name: "Card",
+      desc: "Visa and Mastercard, on our secure payment page.",
+      icon: CreditCard,
+    },
+    {
+      id: "Bank transfer",
+      name: "Bank Transfer",
+      desc: "EFT details shown with your order confirmation.",
+      icon: Landmark,
+    },
+    ship === PICKUP && {
+      id: "Pay on pickup",
+      name: "Pay on Pickup",
+      desc: "Pay at the Campbellfield counter when you collect.",
+      icon: Wallet,
+    },
+    {
+      id: "30 day fleet terms",
+      name: "30 Day Fleet Terms",
+      desc: user?.isTradeApproved
+        ? "Charged to your trade account."
+        : "Approved trade accounts only. Call us to apply.",
+      icon: Truck,
+      disabled: !user?.isTradeApproved,
+    },
   ].filter(Boolean);
-  // A choice can stop applying (e.g. pay-on-pickup after switching to road freight).
+
   const payId = PAYMENTS.some((m) => m.id === pay && !m.disabled) ? pay : "Bank transfer";
-  const input = (bad) => `w-full rounded-md border bg-white px-3.5 py-2.5 text-sm outline-none placeholder:text-faint transition ${bad ? "border-red-500" : "border-line-dark focus:border-gold"}`;
+  const input = (bad) =>
+    `w-full rounded-md border bg-white px-3.5 py-2.5 text-sm outline-none placeholder:text-faint transition ${
+      bad ? "border-red-500" : "border-line-dark focus:border-gold"
+    }`;
 
   const place = async (e) => {
     e.preventDefault();
+
+    if (!user) {
+      openAuthModal?.("login");
+      return;
+    }
+
     const errs = {};
     if (!form.name.trim()) errs.name = 1;
     if (!emailRx.test(form.email.trim())) errs.email = 1;
@@ -105,30 +229,63 @@ export default function Checkout() {
     }
     setFieldErrs(errs);
     setErr(Object.keys(errs).length ? "Check the highlighted fields and try again." : "");
-    if (Object.keys(errs).length) { window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+    if (Object.keys(errs).length) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
     if (placing) return;
     setPlacing(true);
+
+    // Save whatever address user writes here to their profile!
+    try {
+      if (updateProfile) {
+        await updateProfile({
+          address: { ...form },
+          shippingAddress: { ...form },
+        });
+      }
+    } catch (saveErr) {
+      console.warn("Could not save address to profile:", saveErr);
+    }
+
     const order = await placeOrder({
       items: lines.map((l) => ({ sku: l.sku, name: l.name, price: l.price, qty: l.qty })),
-      subtotal: total, discount, promoCode: promo ? promo.code : null,
-      shipping: shipOpt.id, shippingFee: shipFee, payment: payId, total: grand, address: { ...form },
+      subtotal: total,
+      discount: 0,
+      promoCode: null,
+      shipping: "Standard road",
+      shippingFee: 0,
+      payment: "Bank transfer",
+      total: total,
+      address: { ...form },
     });
     setPlacing(false);
-    if (!order) return; // API mode: placeOrder notified the failure
-    const charged = order.total ?? grand; // the server's figure is the one on the invoice
-    // Card payment with the backend live → send the customer to Stripe's hosted
-    // checkout. If Stripe isn't enabled the call 400s and we fall through to the
-    // normal confirmation flow (demo/offline behaviour, unchanged).
+    if (!order) return;
+
+    const charged = order.total ?? total;
+
     if (API_ON && order.payment === "Card") {
       try {
         const { url } = await api.post("/payments/create-checkout-session", { ref: order.id });
-        if (url) { clear(); window.location.href = url; return; }
-      } catch { /* Stripe not configured — continue to standard confirmation */ }
+        if (url) {
+          clear();
+          window.location.href = url;
+          return;
+        }
+      } catch {
+        /* fallback to standard order confirmation */
+      }
     }
+
     notify.success({
       kicker: "ORDER RECEIVED",
       title: "Order Placed Successfully!",
-      message: `Order #${order.id} for ${formatAUD(charged)}. ${order.paymentStatus === "PENDING" ? "Payment details are on your confirmation." : "Preparing for dispatch from Campbellfield VIC."}`,
+      message: `Order #${order.id} for ${formatAUD(charged)}. ${
+        order.paymentStatus === "PENDING"
+          ? "Payment details are on your confirmation."
+          : "Preparing for dispatch from Campbellfield VIC."
+      }`,
       icon: "order",
       action: { label: "Track Order", url: `/track?id=${order.id}` },
       duration: 5000,
@@ -140,102 +297,303 @@ export default function Checkout() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">
-      <p className="text-[12px] text-faint"><Link to="/" className="hover:text-navy hover:underline">Home</Link> / <span className="font-semibold text-ink">Checkout</span></p>
+      <p className="text-[12px] text-faint">
+        <Link to="/" className="hover:text-navy hover:underline">
+          Home
+        </Link>{" "}
+        / <span className="font-semibold text-ink">Checkout</span>
+      </p>
       <h1 className="mt-1 text-3xl font-extrabold tracking-tight md:text-4xl">Checkout</h1>
-      {!user && (
-        <p className="mt-3 rounded-md border border-gold bg-gold/15 px-4 py-3 text-sm text-steel">
-          Checking out as a guest. <Link to="/login" className="font-bold text-navy underline">Login</Link> or <Link to="/signup" className="font-bold text-navy underline">create an account</Link> to check out faster and keep order history.
+
+      {err && (
+        <p className="mt-3 rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+          {err}
         </p>
       )}
-      {err && <p className="mt-3 rounded-md border border-red-300 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{err}</p>}
-      <form onSubmit={place} className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
+
+      <form onSubmit={place} className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="grid gap-5">
+          {/* PRODUCTS IN YOUR ORDER (ALWAYS VISIBLE) */}
           <section className="rounded-md border border-line bg-white p-5">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-faint">01 . Contact + Delivery</p>
-            <div className="mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-              <input value={form.name} onChange={set("name")} maxLength={80} placeholder="Full name *" className={input(fieldErrs.name)} />
-              <input value={form.phone} onChange={set("phone")} maxLength={20} placeholder="Phone (04XX XXX XXX) *" className={input(fieldErrs.phone)} />
-              <input value={form.email} onChange={set("email")} type="email" maxLength={120} placeholder="Email for receipt + tracking *" className={`sm:col-span-2 ${input(fieldErrs.email)}`} />
-              <input value={form.address} onChange={set("address")} maxLength={120} placeholder="Street address *" className={`sm:col-span-2 ${input(fieldErrs.address)}`} />
-              <input value={form.suburb} onChange={set("suburb")} maxLength={60} placeholder="Suburb *" className={input(fieldErrs.suburb)} />
-              <div className="grid grid-cols-2 gap-2.5">
-                <ThemeSelect value={form.state} onChange={(v) => setForm({ ...form, state: v })} options={STATES} label="State" />
-                <input value={form.postcode} onChange={(e) => setForm({ ...form, postcode: digits(e.target.value).slice(0, 4) })} placeholder="Postcode *" inputMode="numeric" className={`h-11 ${input(fieldErrs.postcode)}`} />
-              </div>
-              <input value={form.notes} onChange={set("notes")} maxLength={300} placeholder="Delivery notes or VIN (optional)" className={`sm:col-span-2 ${input(false)}`} />
+            <div className="flex items-center justify-between border-b border-line pb-3">
+              <h2 className="text-base font-extrabold text-ink">
+                Products in Your Order
+              </h2>
+              <span className="rounded bg-mist px-2.5 py-1 text-xs font-bold text-navy">
+                {lines.reduce((s, l) => s + l.qty, 0)} Items
+              </span>
             </div>
-          </section>
-          <section className="rounded-md border border-line bg-white p-5">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-faint">02 . Freight</p>
-            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
-              {SHIP.map((s) => (
-                <button key={s.id} type="button" onClick={() => setShip(s.id)} className={`rounded-md border p-3.5 text-left transition-colors ${ship === s.id ? "border-navy bg-gold/15" : "border-line hover:border-navy"}`}>
-                  <span className="flex items-center gap-1.5 text-sm font-bold"><Truck size={15} className="text-primary" />{s.name}</span>
-                  <span className="mt-1 block text-xs text-steel">{s.desc}</span>
-                  <span className="tabular mt-1.5 block text-sm font-extrabold">{s.fee(total) === 0 ? "FREE" : formatAUD(s.fee(total))}</span>
-                </button>
+
+            <div className="mt-4 divide-y divide-line">
+              {lines.map((l) => (
+                <div key={l.sku} className="flex items-center gap-3.5 py-3.5 first:pt-0 last:pb-0">
+                  <span className="h-16 w-16 shrink-0 overflow-hidden rounded border border-line bg-mist">
+                    <SafeImage
+                      src={l.image || imgFor(l.sku)}
+                      alt={l.name}
+                      className="h-full w-full object-cover"
+                    />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="line-clamp-2 text-sm font-bold text-ink leading-snug">{l.name}</p>
+                    <p className="mt-0.5 font-mono text-xs text-faint">{l.sku}</p>
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className="flex items-center rounded border border-line-dark">
+                        <button
+                          type="button"
+                          onClick={() => setQty(l.itemId || l.sku, l.qty - 1)}
+                          className="px-2 py-1 transition-colors hover:bg-mist cursor-pointer"
+                          aria-label="Decrease quantity"
+                        >
+                          <Minus size={13} />
+                        </button>
+                        <span className="tabular w-7 text-center text-xs font-bold">{l.qty}</span>
+                        <button
+                          type="button"
+                          onClick={() => setQty(l.itemId || l.sku, l.qty + 1)}
+                          className="px-2 py-1 transition-colors hover:bg-mist cursor-pointer"
+                          aria-label="Increase quantity"
+                        >
+                          <Plus size={13} />
+                        </button>
+                      </span>
+                      <span className="tabular text-sm font-extrabold text-primary">
+                        {formatAUD(l.price * l.qty)}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => remove(l.itemId || l.sku)}
+                    className="self-start text-xs font-bold text-faint underline transition-colors hover:text-navy cursor-pointer"
+                  >
+                    Remove
+                  </button>
+                </div>
               ))}
             </div>
           </section>
-          <section className="rounded-md border border-line bg-white p-5">
-            <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-faint">03 . Payment</p>
-            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {PAYMENTS.map((m) => (
-                <button key={m.id} type="button" disabled={m.disabled} aria-pressed={payId === m.id} onClick={() => setPay(m.id)} className={`rounded-md border p-3.5 text-left transition-colors ${payId === m.id ? "border-navy bg-gold/15" : m.disabled ? "cursor-not-allowed border-line opacity-55" : "border-line hover:border-navy"}`}>
-                  <span className="flex items-center gap-1.5 text-sm font-bold"><m.icon size={15} className="text-primary" />{m.name}</span>
-                  <span className="mt-1 block text-xs text-steel">{m.desc}</span>
-                </button>
-              ))}
-            </div>
-          </section>
+
+          {/* CONTACT + DELIVERY ADDRESS (WHEN LOGGED IN) */}
+          {user && (
+            <section className="rounded-md border border-line bg-white p-5">
+                <div className="flex items-center justify-between border-b border-line pb-3">
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-faint">
+                      Contact + Delivery Address
+                    </p>
+                    <p className="text-xs text-steel">
+                      Delivery details will be saved to your profile for future orders
+                    </p>
+                  </div>
+                  {savedAddress && (
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingAddress((prev) => !prev)}
+                      className="flex items-center gap-1.5 text-xs font-bold text-navy hover:underline"
+                    >
+                      <Edit2 size={13} />
+                      <span>{isEditingAddress ? "Use Saved Address" : "Change / Edit Address"}</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Directly show saved address if available and not actively editing */}
+                {savedAddress && !isEditingAddress ? (
+                  <div className="mt-4 rounded-lg border-2 border-emerald-600/40 bg-emerald-50/50 p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-800">
+                        <CheckCircle2 size={16} className="text-emerald-600" />
+                        <span>Saved Profile Delivery Address</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingAddress(true)}
+                        className="text-xs font-bold text-navy underline hover:text-ink"
+                      >
+                        Edit Address
+                      </button>
+                    </div>
+                    <div className="mt-2.5 space-y-0.5 text-sm">
+                      <p className="font-bold text-ink">{form.name || savedAddress.name}</p>
+                      <p className="text-steel">
+                        {form.address || savedAddress.address}, {form.suburb || savedAddress.suburb}{" "}
+                        {form.state || savedAddress.state} {form.postcode || savedAddress.postcode}
+                      </p>
+                      <p className="text-xs text-faint">
+                        Phone: {form.phone || savedAddress.phone} • Email: {form.email || savedAddress.email}
+                      </p>
+                      {form.notes && (
+                        <p className="mt-1.5 rounded bg-white/70 px-2.5 py-1 text-xs text-steel">
+                          <strong>Delivery note:</strong> {form.notes}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  /* Editable form inputs */
+                  <div className="mt-4">
+                    <div className="mb-3 flex items-center justify-between">
+                      <p className="text-xs font-semibold text-steel">
+                        {savedAddress ? "Update your delivery address below:" : "Enter your delivery address:"}
+                      </p>
+                      <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-700">
+                        <CheckCircle2 size={12} /> Automatically saves to your profile
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                      <input
+                        value={form.name}
+                        onChange={set("name")}
+                        maxLength={80}
+                        placeholder="Full name *"
+                        className={input(fieldErrs.name)}
+                      />
+                      <input
+                        value={form.phone}
+                        onChange={set("phone")}
+                        maxLength={20}
+                        placeholder="Phone (04XX XXX XXX) *"
+                        className={input(fieldErrs.phone)}
+                      />
+                      <input
+                        value={form.email}
+                        onChange={set("email")}
+                        type="email"
+                        maxLength={120}
+                        placeholder="Email for receipt + tracking *"
+                        className={`sm:col-span-2 ${input(fieldErrs.email)}`}
+                      />
+                      <input
+                        value={form.address}
+                        onChange={set("address")}
+                        maxLength={120}
+                        placeholder="Street address *"
+                        className={`sm:col-span-2 ${input(fieldErrs.address)}`}
+                      />
+                      <input
+                        value={form.suburb}
+                        onChange={set("suburb")}
+                        maxLength={60}
+                        placeholder="Suburb *"
+                        className={input(fieldErrs.suburb)}
+                      />
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <ThemeSelect
+                          value={form.state}
+                          onChange={(v) => setForm({ ...form, state: v })}
+                          options={STATES}
+                          label="State"
+                        />
+                        <input
+                          value={form.postcode}
+                          onChange={(e) =>
+                            setForm({ ...form, postcode: digits(e.target.value).slice(0, 4) })
+                          }
+                          placeholder="Postcode *"
+                          inputMode="numeric"
+                          className={`h-11 ${input(fieldErrs.postcode)}`}
+                        />
+                      </div>
+                      <input
+                        value={form.notes}
+                        onChange={set("notes")}
+                        maxLength={300}
+                        placeholder="Delivery notes, forklift on site or VIN (optional)"
+                        className={`sm:col-span-2 ${input(false)}`}
+                      />
+                    </div>
+                    {savedAddress && (
+                      <div className="mt-3 text-right">
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingAddress(false)}
+                          className="text-xs font-bold text-steel hover:underline"
+                        >
+                          Cancel and use saved address
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </section>
+          )}
         </div>
+
+        {/* ORDER SUMMARY ASIDE */}
         <aside className="rounded-md border border-line bg-white p-5 lg:sticky lg:top-24">
           <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-faint">Order summary</p>
           <div className="mt-3 max-h-[280px] space-y-3 overflow-auto pr-1">
             {lines.map((l) => (
               <div key={l.sku} className="flex gap-2.5">
-                <span className="h-12 w-12 shrink-0 overflow-hidden rounded border border-line bg-mist"><SafeImage src={imgFor(l.sku)} alt={l.name} className="h-full w-full object-cover" /></span>
-                <span className="min-w-0 flex-1"><span className="block truncate text-[13px] font-bold">{l.name}</span><span className="font-mono text-[11px] text-faint">{l.sku} × {l.qty}</span></span>
-                <span className="tabular shrink-0 text-[13px] font-extrabold">{formatAUD(l.price * l.qty)}</span>
+                <span className="h-12 w-12 shrink-0 overflow-hidden rounded border border-line bg-mist">
+                  <SafeImage
+                    src={l.image || imgFor(l.sku)}
+                    alt={l.name}
+                    className="h-full w-full object-cover"
+                  />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[13px] font-bold">{l.name}</span>
+                  <span className="font-mono text-[11px] text-faint">
+                    {l.sku} × {l.qty}
+                  </span>
+                </span>
+                <span className="tabular shrink-0 text-[13px] font-extrabold">
+                  {formatAUD(l.price * l.qty)}
+                </span>
               </div>
             ))}
           </div>
-          <div className="mt-3 border-t border-line pt-3">
-            {promo ? (
-              <p className="flex items-center justify-between text-sm">
-                <span className="font-mono font-extrabold text-green-800">{promo.code} · −{formatAUD(discount)}</span>
-                <button type="button" onClick={() => { setPromo(null); setPromoCode(""); }} className="text-[12px] font-bold text-faint underline hover:text-ink">Remove</button>
-              </p>
-            ) : (
-              <>
-                <div className="flex gap-2">
-                  <input value={promoCode} onChange={(e) => { setPromoCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 16)); setPromoErr(""); }} placeholder="Promo code" aria-label="Promo code" className="h-10 min-w-0 flex-1 rounded-md border border-line-dark bg-white px-3 font-mono text-[13px] uppercase outline-none placeholder:normal-case placeholder:text-faint focus:border-gold" />
-                  <button type="button" onClick={() => {
-                    const hit = promos.find((p) => p.active && p.code === promoCode.trim().toUpperCase());
-                    if (!hit) { setPromoErr("That code is not active. Check the spelling or ask the counter."); return; }
-                    if (hit.minOrder && total < hit.minOrder) { setPromoErr(`${hit.code} needs an order of ${formatAUD(hit.minOrder)} or more.`); return; }
-                    setPromo(hit); setPromoErr("");
-                    notify.success({
-                      kicker: "PROMO CODE APPLIED",
-                      title: "Discount Applied!",
-                      message: `Code ${hit.code} takes ${formatAUD(promoDiscount(hit, total))} off this order.`,
-                      icon: "tag",
-                      sound: true,
-                    });
-                  }} className="shrink-0 rounded-md border border-ink px-4 text-[13px] font-bold transition-colors hover:bg-ink hover:text-white">Apply</button>
-                </div>
-                {promoErr && <p className="mt-1.5 text-[12px] font-semibold text-red-600">{promoErr}</p>}
-              </>
-            )}
-          </div>
+
           <div className="mt-3 space-y-1 border-t border-line pt-3 text-sm">
-            <p className="flex justify-between text-steel"><span>Subtotal</span><span className="tabular font-bold text-ink">{formatAUD(total)}</span></p>
-            {promo && <p className="flex justify-between text-green-700"><span>Promo ({promo.code})</span><span className="tabular font-bold">−{formatAUD(discount)}</span></p>}
-            <p className="flex justify-between text-steel"><span>Freight ({shipOpt.name})</span><span className="tabular font-bold text-ink">{shipFee === 0 ? "FREE" : formatAUD(shipFee)}</span></p>
-            <p className="tabular flex justify-between pt-1 text-lg font-extrabold"><span>Total <span className="text-[11px] font-semibold text-faint">inc. GST</span></span><span>{formatAUD(grand)}</span></p>
+            <p className="flex justify-between text-steel">
+              <span>Subtotal</span>
+              <span className="tabular font-bold text-ink">{formatAUD(total)}</span>
+            </p>
+            <p className="tabular flex justify-between pt-1 text-lg font-extrabold">
+              <span>
+                Total <span className="text-[11px] font-semibold text-faint">inc. GST</span>
+              </span>
+              <span>{formatAUD(total)}</span>
+            </p>
           </div>
-          <button disabled={placing} className="mt-4 flex w-full items-center justify-center gap-2 rounded bg-gold py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white disabled:cursor-wait disabled:opacity-60"><CheckCircle2 size={16} /> {placing ? "Placing order…" : "Place Order"}</button>
-          <p className="mt-2 text-center text-[11px] text-faint">Fitment double-checked before dispatch. {COMPANY.phone}.</p>
+
+          {/* ACTION BUTTON: If LOGGED IN -> Place Order. If NOT LOGGED IN -> Login to Checkout */}
+          {user ? (
+            <button
+              type="submit"
+              disabled={placing}
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded bg-gold py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white disabled:cursor-wait disabled:opacity-60"
+            >
+              <CheckCircle2 size={16} />
+              {placing ? "Placing order…" : "Place Order"}
+            </button>
+          ) : (
+            <div>
+              <button
+                type="button"
+                onClick={() => openAuthModal?.("login")}
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded bg-gold py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white cursor-pointer"
+              >
+                <Lock size={16} /> Login to Checkout
+              </button>
+              <p className="mt-2 text-center text-xs text-steel">
+                New trade customer?{" "}
+                <button
+                  type="button"
+                  onClick={() => openAuthModal?.("signup")}
+                  className="font-bold text-navy underline hover:text-ink cursor-pointer bg-transparent border-none p-0"
+                >
+                  Create Account
+                </button>
+              </p>
+            </div>
+          )}
+
+          <p className="mt-2 text-center text-[11px] text-faint">
+            Fitment double-checked before dispatch. {COMPANY.phone}.
+          </p>
         </aside>
       </form>
     </main>

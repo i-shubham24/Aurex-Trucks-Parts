@@ -119,7 +119,7 @@ function SearchBox({ onDone, autoFocus = false }) {
 
 export default function Header() {
   const { count, setOpen: setCartOpen } = useCart();
-  const { user, logout } = useAuth();
+  const { user, logout, openAuthModal } = useAuth();
   const { data: categories = [] } = useCategories();
   const COMPANY = useCompany();
   const loc = useLocation();
@@ -344,8 +344,8 @@ export default function Header() {
                       </>
                     ) : (
                       <>
-                        <Link to="/login" className={menuItem}><LogIn size={17} className="shrink-0 text-faint" /> Log in</Link>
-                        <Link to="/signup" className={menuItem}><UserPlus size={17} className="shrink-0 text-faint" /> Create an account</Link>
+                        <button type="button" onClick={() => { closeAll(); openAuthModal?.("login"); }} className={`${menuItem} w-full text-left`}><LogIn size={17} className="shrink-0 text-faint" /> Log in</button>
+                        <button type="button" onClick={() => { closeAll(); openAuthModal?.("signup"); }} className={`${menuItem} w-full text-left`}><UserPlus size={17} className="shrink-0 text-faint" /> Create an account</button>
                         <Link to="/track" className={`${menuItem} border-t border-line`}><PackageSearch size={17} className="shrink-0 text-faint" /> Track an order</Link>
                       </>
                     )}

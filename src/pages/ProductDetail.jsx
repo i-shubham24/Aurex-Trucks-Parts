@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
-import { CheckCircle2, Minus, Phone, Plus, ShieldCheck, Truck } from "lucide-react";
+import { CheckCircle2, Minus, Phone, Plus, ShieldCheck, Truck, ShoppingCart } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { useCompany, useSite } from "../store/site";
 import { imgFor } from "../data/images";
@@ -20,10 +20,14 @@ export default function ProductDetail() {
   const p = data?.product;
   const related = data?.relatedProducts || [];
 
-  const { add, compare, toggleCompare } = useCart();
+  const { lines, add, setQty: setCartQty, setOpen, compare, toggleCompare } = useCart();
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState("specs");
   const [activeImgIdx, setActiveImgIdx] = useState(0);
+
+  const cartItem = lines.find((l) => l.sku === p?.sku);
+  const inCart = Boolean(cartItem);
+  const cartQty = cartItem ? cartItem.qty : 0;
 
   if (isLoading) {
     return <ProductDetailSkeleton />;
@@ -164,14 +168,53 @@ export default function ProductDetail() {
                 <p className="text-right font-mono text-[11px] leading-4 text-faint">{p.status.toUpperCase()}<br />{p.lead.toUpperCase()}</p>
               </div>
               <p className="mt-1.5 flex items-center gap-1.5 text-[13px] text-steel"><Truck size={14} className="text-green-600" /> Order by 2pm, dispatched today ex Campbellfield.</p>
-              <div className="mt-3 flex flex-wrap items-stretch gap-2">
-                <span className="flex items-center rounded border border-line-dark bg-white">
-                  <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-3 py-2.5 hover:bg-mist" aria-label="Decrease"><Minus size={15} /></button>
-                  <span className="tabular w-8 text-center text-sm font-extrabold">{qty}</span>
-                  <button onClick={() => setQty(qty + 1)} className="px-3 py-2.5 hover:bg-mist" aria-label="Increase"><Plus size={15} /></button>
-                </span>
-                <button onClick={() => add(p, qty)} className="flex-1 rounded bg-gold px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white">Add to Cart</button>
-              </div>
+              {inCart ? (
+                <div className="mt-3 flex flex-wrap items-stretch gap-2">
+                  <div className="flex flex-1 items-center justify-between rounded-md border-2 border-emerald-600 bg-emerald-50/50 px-3 py-1.5 shadow-xs">
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-800">
+                      <CheckCircle2 size={16} className="shrink-0 text-emerald-600" />
+                      <span>In Cart</span>
+                    </span>
+                    <div className="flex items-center rounded border border-emerald-300 bg-white shadow-xs">
+                      <button
+                        onClick={() => setCartQty(p.sku, cartQty - 1)}
+                        className="px-3 py-2 text-ink transition-colors hover:bg-mist active:scale-95"
+                        aria-label="Decrease quantity in cart"
+                        title={cartQty === 1 ? "Remove from cart" : "Decrease quantity"}
+                      >
+                        <Minus size={14} />
+                      </button>
+                      <span className="tabular min-w-8 text-center text-sm font-extrabold text-ink">
+                        {cartQty}
+                      </span>
+                      <button
+                        onClick={() => setCartQty(p.sku, cartQty + 1)}
+                        className="px-3 py-2 text-ink transition-colors hover:bg-mist active:scale-95"
+                        aria-label="Increase quantity in cart"
+                        title="Increase quantity"
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setOpen(true)}
+                    className="flex items-center justify-center gap-2 rounded-md bg-gold px-5 py-2.5 text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white"
+                  >
+                    <ShoppingCart size={16} />
+                    <span>View Cart ({cartQty})</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-3 flex flex-wrap items-stretch gap-2">
+                  <span className="flex items-center rounded border border-line-dark bg-white">
+                    <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-3 py-2.5 hover:bg-mist" aria-label="Decrease"><Minus size={15} /></button>
+                    <span className="tabular w-8 text-center text-sm font-extrabold">{qty}</span>
+                    <button onClick={() => setQty(qty + 1)} className="px-3 py-2.5 hover:bg-mist" aria-label="Increase"><Plus size={15} /></button>
+                  </span>
+                  <button onClick={() => add(p, qty)} className="flex-1 rounded bg-gold px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white">Add to Cart</button>
+                </div>
+              )}
               <button onClick={() => toggleCompare(p.sku)} className={`mt-2 w-full rounded border py-2.5 text-[13px] font-bold transition-colors ${inCompare ? "border-navy bg-navy text-white" : "border-line-dark text-steel hover:border-navy hover:text-navy"}`}>{inCompare ? "Added to Compare ✓" : "Add to Compare"}</button></>
             )}
           </div>

@@ -167,10 +167,54 @@ function ApiAuthProvider({ children }) {
     }
   };
 
+  const updateProfile = async (profileData) => {
+    try {
+      const res = await apiClient.put("/auth/profile", profileData);
+      const updatedUser = res?.data?.user || res?.user;
+      if (updatedUser) {
+        setUser((prev) => ({ ...prev, ...updatedUser }));
+      }
+      return { ok: true, user: updatedUser };
+    } catch (e) {
+      return { ok: false, msg: getErrorMessage(e, "Could not update profile.") };
+    }
+  };
+
+  const [authModal, setAuthModal] = useState({ isOpen: false, mode: "login", onComplete: null });
+
+  const openAuthModal = (options = {}) => {
+    const mode = typeof options === "string" ? options : options?.mode || "login";
+    const onComplete = typeof options === "object" && typeof options?.onComplete === "function" ? options.onComplete : null;
+    setAuthModal({ isOpen: true, mode, onComplete });
+  };
+
+  const closeAuthModal = () => {
+    setAuthModal((prev) => ({ ...prev, isOpen: false }));
+  };
+
   const myOrders = useMemo(() => orders, [orders]);
 
   return (
-    <AuthCtx.Provider value={{ user, session: user?.email || null, users, setUsers, signup, login, logout, orders, setOrders, myOrders, placeOrder }}>
+    <AuthCtx.Provider
+      value={{
+        user,
+        setUser,
+        updateProfile,
+        session: user?.email || null,
+        users,
+        setUsers,
+        signup,
+        login,
+        logout,
+        orders,
+        setOrders,
+        myOrders,
+        placeOrder,
+        openAuthModal,
+        closeAuthModal,
+        authModal,
+      }}
+    >
       {children}
     </AuthCtx.Provider>
   );

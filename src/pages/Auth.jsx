@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, BadgeCheck, Eye, EyeOff, Lock, Mail, Phone, ShieldCheck, Truck, User, Building2, Loader2 } from "lucide-react";
 import { useAuth } from "../store/auth";
 import { useNotification } from "../store/notification";
@@ -33,10 +33,12 @@ const inputCls = (bad) =>
     bad ? "border-red-400 ring-2 ring-red-100" : "border-line-dark focus:border-navy focus:ring-2 focus:ring-gold/40"
   }`;
 
-export function AuthCard({ mode: initial = "login" }) {
+export function AuthCard({ mode: initial = "login", onComplete }) {
   const { login, signup } = useAuth();
   const { notify } = useNotification();
   const go = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTarget = searchParams.get("redirect") || "";
   const [tab, setTab] = useState(initial);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -118,7 +120,14 @@ export function AuthCard({ mode: initial = "login" }) {
         });
       }
       setDone(true);
-      setTimeout(() => go(tab === "signup" ? "/profile" : "/orders"), 900);
+      setTimeout(() => {
+        if (onComplete) {
+          onComplete();
+        } else {
+          const destination = redirectTarget || (tab === "signup" ? "/profile" : "/orders");
+          go(destination);
+        }
+      }, 700);
     } catch (err) {
       setErr(err.message || "An unexpected error occurred. Please try again.");
     } finally {
@@ -259,7 +268,7 @@ export function AuthCard({ mode: initial = "login" }) {
   );
 }
 
-function BrandPanel() {
+export function BrandPanel() {
   return (
     <div className="relative hidden flex-col justify-between overflow-hidden bg-ink p-6 text-white lg:flex">
       <img src="/images/web/hero-roadtrain.jpg" alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-40" />
