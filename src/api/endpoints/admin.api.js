@@ -64,6 +64,32 @@ export async function updateAdminProductApi(identifier, productPayload) {
 }
 
 /**
+ * Upload a product image to the server/CDN
+ */
+export async function uploadAdminImageApi(file) {
+  const formData = new FormData();
+  formData.append('image', file);
+  try {
+    const response = await apiClient.post('/uploads', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    const url = response?.url || response?.data?.url || response?.path;
+    if (url) return url;
+    throw new Error('No URL returned from upload');
+  } catch (err) {
+    console.warn('[uploadAdminImageApi] Backend upload failed, reading as base64 data URL:', err);
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = () => resolve('');
+      reader.readAsDataURL(file);
+    });
+  }
+}
+
+/**
  * Delete a product from the catalog
  */
 export async function deleteAdminProductApi(identifier) {
@@ -121,6 +147,7 @@ export default {
   getAdminProductsApi,
   createAdminProductApi,
   updateAdminProductApi,
+  uploadAdminImageApi,
   deleteAdminProductApi,
   getAdminOrdersApi,
   getAdminOrderDetailApi,

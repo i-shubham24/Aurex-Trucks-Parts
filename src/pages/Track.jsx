@@ -121,14 +121,14 @@ export default function Track() {
           <div className="mt-4 overflow-hidden rounded-2xl border border-line bg-white shadow-[0_16px_40px_rgba(0,32,73,0.10)]">
             <div className="flex flex-wrap items-center gap-2 border-b border-line bg-mist px-5 py-4">
               <p className="font-mono text-[17px] font-extrabold text-navy">{order.id}</p>
-              <span className={`text-[11px] font-extrabold uppercase tracking-wide ${st.cancelled ? "text-red-700" : st.idx >= 4 ? "text-green-700" : "text-steel"}`}>
-                {st.cancelled ? "Cancelled" : st.steps[st.idx] || "Order placed"}
+              <span className={`text-[11px] font-extrabold uppercase tracking-wide ${st.cancelled || st.failed ? "text-red-700" : st.idx >= 4 ? "text-green-700" : "text-steel"}`}>
+                {order.status || (st.cancelled ? "Cancelled" : st.failed ? "Payment failed" : st.steps[st.idx] || "Order placed")}
               </span>
               {order.total != null && <p className="tabular ml-auto text-[17px] font-extrabold text-ink">{formatAUD(order.total)}</p>}
             </div>
             <div className="p-5">
               {order.status && (
-                <p className={`flex items-center gap-1.5 text-[13px] font-bold ${st.cancelled ? "text-red-700" : "text-green-700"}`}>
+                <p className={`flex items-center gap-1.5 text-[13px] font-bold ${st.cancelled || st.failed ? "text-red-700" : "text-green-700"}`}>
                   <Truck size={15} /> Live status: {order.status === "Packed in Campbellfield VIC" ? "Packed" : order.status}
                 </p>
               )}

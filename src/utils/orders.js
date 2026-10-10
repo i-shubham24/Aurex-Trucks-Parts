@@ -45,7 +45,7 @@ const STATUS_STEP = {
   "Pending payment": 0,
   "Order placed": 0,
   "Confirmed": 1,
-  "Packed in Campbellfield VIC": 1,
+  "Packed in Campbellfield VIC": 2,
   "Packed": 2,
   "Dispatched": 3,
   "Courier booked": 3,
@@ -56,33 +56,34 @@ const STATUS_STEP = {
 };
 
 export function isFailedOrder(order) {
+  const status = String(order?.status || order?.orderStatus || "").trim().toLowerCase();
+  if (status === "cancelled" || status === "payment failed") return true;
+  if (["confirmed", "packed", "dispatched", "delivered"].includes(status)) return false;
+  const paymentStatus = String(order?.paymentStatus || "").trim().toUpperCase();
+  if (paymentStatus === "CANCELLED" || paymentStatus === "FAILED") return true;
   const isCardUnpaid =
     /card/i.test(order?.payment || "") &&
-    order?.paymentStatus !== "PAID" &&
-    order?.paymentStatus !== "AUTHORIZED";
-  return (
-    order?.status === "Cancelled" ||
-    order?.status === "Payment failed" ||
-    order?.paymentStatus === "CANCELLED" ||
-    order?.paymentStatus === "FAILED" ||
-    isCardUnpaid
-  );
+    paymentStatus !== "PAID" &&
+    paymentStatus !== "AUTHORIZED";
+  return isCardUnpaid;
 }
 
-/* The timeline only ever reflects the status staff have set. An order we can't
-   place on it (unknown label) stays at "Order placed" rather than guessing. */
+/* The timeline reflects the status set by staff / API. */
 export function orderStatus(order) {
   const steps = ["Order placed", "Confirmed", "Packed", "Dispatched", "Delivered"];
-  const isFailed = isFailedOrder(order);
   const rawStatus = order?.status || order?.orderStatus || "";
-  const known = Object.prototype.hasOwnProperty.call(STATUS_STEP, rawStatus);
+  const cleanStatus = rawStatus === "Packed in Campbellfield VIC" ? "Packed" : rawStatus;
+  const isCancelled = cleanStatus === "Cancelled" || String(order?.paymentStatus || "").toUpperCase() === "CANCELLED";
+  const isPaymentFailed = cleanStatus === "Payment failed" || (!isCancelled && String(order?.paymentStatus || "").toUpperCase() === "FAILED");
+  const known = Object.prototype.hasOwnProperty.call(STATUS_STEP, cleanStatus);
   const isPaid = order?.paymentStatus === "PAID" || order?.paymentStatus === "AUTHORIZED";
   const defaultIdx = isPaid ? 1 : 0;
   return {
     steps,
-    idx: known ? STATUS_STEP[rawStatus] : defaultIdx,
+    idx: known ? STATUS_STEP[cleanStatus] : defaultIdx,
     live: Boolean(known),
-    cancelled: isFailed,
-    failed: isFailed,
+    cancelled: isCancelled,
+    failed: isPaymentFailed,
+    statusText: cleanStatus || (isCancelled ? "Cancelled" : isPaymentFailed ? "Payment failed" : steps[defaultIdx]),
   };
 }

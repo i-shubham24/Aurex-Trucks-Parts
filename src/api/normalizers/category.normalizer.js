@@ -5,7 +5,7 @@ export function normalizeCategory(cat) {
   if (!cat) return null;
 
   const slug = cat.slug || '';
-  const imageUrl = cat.image?.url || '';
+  const imageUrl = (typeof cat.image === 'string' ? cat.image : cat.image?.url) || cat.imageUrl || '';
 
   return {
     id: cat._id || cat.id || slug,

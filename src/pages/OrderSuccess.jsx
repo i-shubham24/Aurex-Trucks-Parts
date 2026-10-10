@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Printer, Truck, Loader2 } from "lucide-react";
 import { formatAUD } from "../data/products";
+import { downloadInvoice } from "../utils/invoice";
 import { useCompany } from "../store/site";
 import { findOrder } from "../utils/orders";
 import { useSite } from "../store/site";
@@ -130,7 +131,7 @@ export default function OrderSuccess() {
         <p className="mt-3 font-mono text-xl font-extrabold text-navy">{id}</p>
         <div className="mt-5 flex flex-wrap justify-center gap-2.5">
           <Link to={`/track?id=${id}`} className="rounded-lg bg-gold px-6 py-2.5 text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white">Track this order →</Link>
-          <button onClick={() => window.print()} className="flex items-center gap-2 rounded-lg border border-line-dark px-6 py-2.5 text-sm font-bold text-steel transition-colors hover:border-navy hover:text-navy"><Printer size={15} /> Print Tax Invoice</button>
+          <button onClick={() => order ? downloadInvoice(order) : window.print()} className="flex items-center gap-2 rounded-lg border border-line-dark px-6 py-2.5 text-sm font-bold text-steel transition-colors hover:border-navy hover:text-navy"><Printer size={15} /> Print Tax Invoice</button>
           <Link to="/shop" className="rounded-lg border border-line-dark px-6 py-2.5 text-sm font-bold text-steel transition-colors hover:border-navy hover:text-navy">Keep shopping</Link>
         </div>
       </div>

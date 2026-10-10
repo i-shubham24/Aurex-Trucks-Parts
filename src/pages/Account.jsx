@@ -40,8 +40,37 @@ export function useReorder() {
 }
 
 function StatusPill({ order }) {
-  const isFailed = isFailedOrder(order);
-  if (isFailed) {
+  const apiStatus = order?.status || order?.orderStatus || "";
+  const paymentStatus = String(order?.paymentStatus || "").toUpperCase();
+
+  let label = apiStatus;
+  if (!label) {
+    if (paymentStatus === "CANCELLED") label = "Cancelled";
+    else if (paymentStatus === "FAILED") label = "Payment failed";
+    else if (paymentStatus === "PAID" || paymentStatus === "AUTHORIZED") label = "Confirmed";
+    else label = "Pending payment";
+  }
+
+  if (label === "Packed in Campbellfield VIC") {
+    label = "Packed";
+  }
+
+  const isCancelled = /^cancelled$/i.test(label) || paymentStatus === "CANCELLED";
+  const isPaymentFailed = /^payment failed$/i.test(label) || (!isCancelled && paymentStatus === "FAILED");
+  const isDelivered = /^delivered$/i.test(label);
+  const isDispatched = /^dispatched$/i.test(label);
+  const isPacked = /^packed$/i.test(label);
+  const isConfirmed = /^confirmed$/i.test(label);
+
+  if (isCancelled) {
+    return (
+      <span className="rounded bg-red-50 border border-red-200 px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-red-700">
+        Cancelled
+      </span>
+    );
+  }
+
+  if (isPaymentFailed) {
     return (
       <span className="rounded bg-red-50 border border-red-200 px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-red-700">
         Payment Failed
@@ -49,43 +78,78 @@ function StatusPill({ order }) {
     );
   }
 
-  const { steps, idx, live, cancelled } = orderStatus(order);
-  const label = cancelled ? "Cancelled" : steps[idx] || "Order placed";
-  const cls = cancelled ? "text-red-700" : idx >= 4 ? "text-green-700" : "text-steel";
+  if (isDelivered) {
+    return (
+      <span className="rounded bg-green-50 border border-green-200 px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-green-700">
+        Delivered
+      </span>
+    );
+  }
+
+  if (isDispatched) {
+    return (
+      <span className="rounded bg-indigo-50 border border-indigo-200 px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-indigo-700">
+        Dispatched
+      </span>
+    );
+  }
+
+  if (isPacked) {
+    return (
+      <span className="rounded bg-amber-50 border border-amber-200 px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-amber-800">
+        Packed
+      </span>
+    );
+  }
+
+  if (isConfirmed) {
+    return (
+      <span className="rounded bg-blue-50 border border-blue-200 px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-navy">
+        Confirmed
+      </span>
+    );
+  }
+
   return (
-    <span className={`text-[11px] font-extrabold uppercase tracking-wide ${cls}`}>
-      {label}
+    <span className="rounded bg-amber-50 border border-amber-200 px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-amber-800">
+      {label || "Pending payment"}
     </span>
   );
 }
 
 function InlineTrack({ order }) {
-  const { steps, idx, cancelled } = orderStatus(order);
-  const isCardUnpaid = /card/i.test(order?.payment || "") && order?.paymentStatus !== "PAID" && order?.paymentStatus !== "AUTHORIZED";
-  const failed = cancelled || isCardUnpaid;
+  const { steps, idx, cancelled, failed } = orderStatus(order);
+  const rawStatus = order?.status || order?.orderStatus || "";
+  const isCancelled = cancelled || /^cancelled$/i.test(rawStatus);
+  const isPaymentFailed = failed || /^payment failed$/i.test(rawStatus);
+
   return (
     <div className="mt-3 rounded-xl bg-mist p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-[12px] font-extrabold uppercase tracking-[0.14em] text-steel">Live tracking</p>
-        {order.status && (
-          <p className={`text-[12px] font-bold ${failed ? "text-red-600" : "text-green-700"}`}>
-            {failed ? "Payment incomplete · Order cancelled" : order.status === "Packed in Campbellfield VIC" ? "Packed" : (order.status || steps[idx])}
-          </p>
-        )}
+        <p className={`text-[12px] font-bold ${isCancelled || isPaymentFailed ? "text-red-600" : "text-green-700"}`}>
+          {isCancelled
+            ? "Order cancelled"
+            : isPaymentFailed
+            ? "Payment failed"
+            : rawStatus === "Packed in Campbellfield VIC"
+            ? "Packed"
+            : (rawStatus || steps[idx])}
+        </p>
       </div>
       <ol className="mt-3">
         {steps.map((s, k) => (
           <li key={s} className="flex gap-3">
             <span className="flex flex-col items-center">
-              <span className={`grid h-7 w-7 place-items-center rounded-full text-[12px] font-extrabold ${k <= idx && !cancelled ? "bg-navy text-white" : "bg-white text-faint ring-1 ring-line"}`}>
-                {k < idx && !cancelled ? <Check size={14} /> : k + 1}
+              <span className={`grid h-7 w-7 place-items-center rounded-full text-[12px] font-extrabold ${k <= idx && !isCancelled && !isPaymentFailed ? "bg-navy text-white" : "bg-white text-faint ring-1 ring-line"}`}>
+                {k < idx && !isCancelled && !isPaymentFailed ? <Check size={14} /> : k + 1}
               </span>
-              {k < steps.length - 1 && <span className={`w-0.5 min-h-6 flex-1 ${k < idx && !cancelled ? "bg-navy" : "bg-line"}`} />}
+              {k < steps.length - 1 && <span className={`w-0.5 min-h-6 flex-1 ${k < idx && !isCancelled && !isPaymentFailed ? "bg-navy" : "bg-line"}`} />}
             </span>
             <span className="pb-4">
-              <span className={`block text-[13px] font-extrabold ${k <= idx && !cancelled ? "text-ink" : "text-faint"}`}>{s}</span>
+              <span className={`block text-[13px] font-extrabold ${k <= idx && !isCancelled && !isPaymentFailed ? "text-ink" : "text-faint"}`}>{s}</span>
               {k === 0 && <span className="block text-[12px] text-faint">{new Date(order.placedAt).toLocaleString("en-AU")}</span>}
-              {k === idx && !cancelled && (
+              {k === idx && !isCancelled && !isPaymentFailed && (
                 <span className="mt-0.5 block text-[12px] font-semibold text-green-700">
                   {k === 1 && "Order confirmed. Allocated for warehouse packing."}
                   {k === 2 && "Packed in Campbellfield VIC. Courier updates appear here."}
@@ -146,46 +210,29 @@ function OrderCard({ order, onReorder }) {
             {open ? "Show fewer lines" : `+ ${lines.length - 3} more lines`} <ChevronDown size={14} className={`transition-transform ${open ? "rotate-180" : ""}`} />
           </button>
         )}
-        {!isFailed && open && <InlineTrack order={order} />}
-        {isFailed ? (
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            <Link
-              to={`/track?id=${order.id}`}
-              className="flex items-center justify-center gap-1 rounded-lg border border-ink py-2.5 text-sm font-extrabold transition hover:bg-ink hover:text-white"
-            >
-              Details <ArrowRight size={15} />
-            </Link>
-            <button
-              onClick={() => onReorder(order)}
-              className="flex items-center justify-center gap-2 rounded-lg border border-line-dark bg-mist py-2.5 text-sm font-extrabold transition hover:border-navy hover:text-navy cursor-pointer"
-            >
-              <RotateCcw size={15} /> Reorder
-            </button>
-          </div>
-        ) : (
-          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <button
-              onClick={() => setOpen(!open)}
-              className={`flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-extrabold transition ${
-                open ? "bg-navy text-white" : "bg-gold text-ink hover:bg-navy hover:text-white"
-              }`}
-            >
-              <Truck size={16} /> {open ? "Hide tracking" : "Track"}
-            </button>
-            <Link
-              to={`/track?id=${order.id}`}
-              className="flex items-center justify-center gap-1 rounded-lg border border-ink py-2.5 text-sm font-extrabold transition hover:bg-ink hover:text-white"
-            >
-              Details <ArrowRight size={15} />
-            </Link>
-            <button
-              onClick={() => onReorder(order)}
-              className="flex items-center justify-center gap-2 rounded-lg border border-line-dark bg-mist py-2.5 text-sm font-extrabold transition hover:border-navy hover:text-navy cursor-pointer"
-            >
-              <RotateCcw size={15} /> Reorder
-            </button>
-          </div>
-        )}
+        {open && <InlineTrack order={order} />}
+        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <button
+            onClick={() => setOpen(!open)}
+            className={`flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-extrabold transition ${
+              open ? "bg-navy text-white" : "bg-gold text-ink hover:bg-navy hover:text-white"
+            }`}
+          >
+            <Truck size={16} /> {open ? "Hide tracking" : "Track"}
+          </button>
+          <Link
+            to={`/track?id=${order.id}`}
+            className="flex items-center justify-center gap-1 rounded-lg border border-ink py-2.5 text-sm font-extrabold transition hover:bg-ink hover:text-white"
+          >
+            Details <ArrowRight size={15} />
+          </Link>
+          <button
+            onClick={() => onReorder(order)}
+            className="flex items-center justify-center gap-2 rounded-lg border border-line-dark bg-mist py-2.5 text-sm font-extrabold transition hover:border-navy hover:text-navy cursor-pointer"
+          >
+            <RotateCcw size={15} /> Reorder
+          </button>
+        </div>
       </div>
     </article>
   );
@@ -662,7 +709,7 @@ export function ProfileBody() {
               <h1 className="mt-2 truncate text-xl font-extrabold tracking-tight text-ink">{user ? user.name : "Guest Trader"}</h1>
               <p className="truncate text-[13px] text-steel">{user?.email || "Log in for trade pricing and order history."}{user?.company ? ` · ${user.company}` : ""}</p>
               <span className="mt-2 inline-block text-xs font-extrabold text-primary">
-                {validOrders.length} {validOrders.length === 1 ? "ORDER" : "ORDERS"}
+                {all.length} {all.length === 1 ? "ORDER" : "ORDERS"}
               </span>
               {user && <button onClick={logout} className="mt-3 w-full rounded-lg border border-line-dark py-2 text-sm font-bold text-steel transition hover:border-navy hover:text-navy">Logout</button>}
             </div>

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Search, RefreshCw, Loader2, CheckCircle2, Clock, Truck, XCircle, Printer, ExternalLink, AlertCircle } from "lucide-react";
 import { formatAUD } from "../../data/products";
 import { ORDER_STATUSES } from "../../utils/orders";
+import { downloadInvoice } from "../../utils/invoice";
 import { AdminTitle, Empty, Modal } from "./AdminLayout";
 import { getAdminOrdersApi, updateAdminOrderStatusApi } from "../../api/endpoints/admin.api";
 import { useNotification } from "../../store/notification";
@@ -13,8 +14,16 @@ const STATUS_FILTERS = [
   "Dispatched",
   "Delivered",
   "Pending payment",
+  "Payment failed",
   "Cancelled",
 ];
+
+export const getCanonicalStatus = (o) => {
+  const raw = o.status || o.orderStatus || "";
+  if (raw === "Packed in Campbellfield VIC") return "Confirmed";
+  if (raw === "Courier booked" || raw === "In transit") return "Dispatched";
+  return raw || "Pending payment";
+};
 
 export default function Orders() {
   const { notify } = useNotification();
@@ -49,11 +58,24 @@ export default function Orders() {
     loadOrders();
   }, []);
 
+  const statusCounts = useMemo(() => {
+    const counts = { All: orders.length };
+    STATUS_FILTERS.forEach((s) => {
+      if (s !== "All") counts[s] = 0;
+    });
+
+    orders.forEach((o) => {
+      const canonical = getCanonicalStatus(o);
+      counts[canonical] = (counts[canonical] || 0) + 1;
+    });
+    return counts;
+  }, [orders]);
+
   const filtered = useMemo(() => {
     const needle = q.toLowerCase().trim();
     return orders.filter((o) => {
-      const st = o.status || o.orderStatus || "";
-      if (statusFilter !== "All" && st !== statusFilter) return false;
+      const canonical = getCanonicalStatus(o);
+      if (statusFilter !== "All" && canonical !== statusFilter) return false;
       if (!needle) return true;
 
       const itemsStr = (o.items || o.lines || []).map((l) => `${l.sku || ""} ${l.name || ""}`).join(" ");
@@ -127,32 +149,53 @@ export default function Orders() {
         }
       />
 
-      {/* Filter and Search Bar */}
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        <div className="relative min-w-[240px] flex-1">
-          <Search size={15} className="absolute left-3 top-2.5 text-steel" />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search by Order ID, Customer Name, Email, SKU…"
-            className="h-10 w-full rounded-lg border border-line-dark bg-white pl-9 pr-3 text-xs outline-none focus:border-navy"
-          />
+      {/* Status Filter Pills & Search Toolbar */}
+      <div className="mb-5 space-y-3">
+        {/* Horizontal scrollable Status Filter Pills */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          {STATUS_FILTERS.map((s) => {
+            const count = statusCounts[s] || 0;
+            const isSelected = statusFilter === s;
+
+            return (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setStatusFilter(s)}
+                className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                  isSelected
+                    ? "bg-navy text-white shadow-xs ring-1 ring-navy"
+                    : "border border-line-dark bg-white text-steel hover:border-navy hover:text-ink"
+                }`}
+              >
+                <span>{s === "All" ? "All Orders" : s}</span>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-[10px] font-mono font-bold ${
+                    isSelected ? "bg-white/20 text-white" : "bg-mist text-steel"
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
         </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          aria-label="Filter Order Status"
-          className="h-10 rounded-lg border border-line-dark bg-white px-3 text-xs font-semibold text-steel outline-none focus:border-navy"
-        >
-          {STATUS_FILTERS.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
-        <span className="font-mono text-xs text-faint">
-          Showing {filtered.length} of {orders.length} orders
-        </span>
+
+        {/* Search Input Bar + Counter */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative min-w-[240px] flex-1">
+            <Search size={15} className="absolute left-3 top-2.5 text-steel" />
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search by Order ID, Customer Name, Email, SKU…"
+              className="h-10 w-full rounded-lg border border-line-dark bg-white pl-9 pr-3 text-xs outline-none focus:border-navy"
+            />
+          </div>
+          <span className="font-mono text-xs text-faint">
+            Showing {filtered.length} of {orders.length} orders
+          </span>
+        </div>
       </div>
 
       {loading ? (
@@ -218,17 +261,13 @@ export default function Orders() {
                         <span
                           className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-bold ${
                             isFailed
-                              ? "bg-red-50 text-red-700"
+                              ? "bg-red-50 text-red-700 ring-1 ring-red-200"
                               : isPaid
-                              ? "bg-blue-50 text-navy"
-                              : "bg-gold/20 text-ink"
+                              ? "bg-blue-50 text-navy ring-1 ring-blue-200"
+                              : "bg-gold/20 text-ink ring-1 ring-gold/40"
                           }`}
                         >
-                          {o.status === "Packed in Campbellfield VIC"
-                            ? "Confirmed"
-                            : o.status === "Courier booked" || o.status === "In transit"
-                            ? "Dispatched"
-                            : o.status || o.orderStatus || "Pending payment"}
+                          {getCanonicalStatus(o)}
                         </span>
                       </td>
                       <td className="px-5 py-3.5 text-right">
@@ -249,23 +288,51 @@ export default function Orders() {
       )}
 
       {/* Order Detail & Fulfilment Modal */}
-      {selectedOrder && (
-        <Modal close={() => setSelectedOrder(null)} wide>
-          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line pb-4">
-            <div>
-              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-faint">Order Invoice</p>
-              <h2 className="text-2xl font-extrabold text-navy font-mono">
-                {selectedOrder.id || selectedOrder.ref}
-              </h2>
-              <p className="text-xs text-steel mt-0.5">
-                Placed on {new Date(selectedOrder.placedAt).toLocaleString("en-AU")}
-              </p>
+      {selectedOrder && (() => {
+        const rawCurrent = selectedOrder.status || selectedOrder.orderStatus || "Confirmed";
+        const currentStatus = rawCurrent === "Packed in Campbellfield VIC" ? "Confirmed" : rawCurrent;
+        const statusPillBg =
+          currentStatus === "Confirmed" ? "bg-blue-50 text-blue-800 border-blue-200" :
+          currentStatus === "Packed" ? "bg-amber-50 text-amber-800 border-amber-200" :
+          currentStatus === "Dispatched" ? "bg-purple-50 text-purple-800 border-purple-200" :
+          currentStatus === "Delivered" ? "bg-green-50 text-green-800 border-green-200" :
+          currentStatus === "Pending payment" ? "bg-yellow-50 text-yellow-800 border-yellow-200" :
+          "bg-red-50 text-red-800 border-red-200";
+
+        return (
+          <Modal close={() => setSelectedOrder(null)} wide>
+            <div className="flex flex-wrap items-start justify-between gap-3 border-b border-line pb-4">
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-faint">Order Invoice</p>
+                  <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wide border ${statusPillBg}`}>
+                    <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" />
+                    Current Status: {currentStatus}
+                  </span>
+                </div>
+                <h2 className="text-2xl font-extrabold text-navy font-mono mt-1">
+                  {selectedOrder.id || selectedOrder.ref}
+                </h2>
+                <p className="text-xs text-steel mt-0.5">
+                  Placed on {new Date(selectedOrder.placedAt).toLocaleString("en-AU")}
+                </p>
+              </div>
+              <div className="flex flex-col items-end gap-2 text-right">
+                <div>
+                  <span className="tabular text-xl font-extrabold text-ink">{formatAUD(selectedOrder.total)}</span>
+                  <p className="text-xs text-steel font-bold">{selectedOrder.payment || "Card"} · {selectedOrder.paymentStatus || "PENDING"}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => downloadInvoice(selectedOrder)}
+                  className="flex items-center gap-1.5 rounded-lg bg-navy px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:bg-ink transition"
+                  title="Download and print physical Tax Invoice / Packing Slip to attach to physical order"
+                >
+                  <Printer size={13} />
+                  <span>Download Invoice</span>
+                </button>
+              </div>
             </div>
-            <div className="text-right">
-              <span className="tabular text-xl font-extrabold text-ink">{formatAUD(selectedOrder.total)}</span>
-              <p className="text-xs text-steel font-bold">{selectedOrder.payment || "Card"} · {selectedOrder.paymentStatus || "PENDING"}</p>
-            </div>
-          </div>
 
           {/* Customer & Address Details */}
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 rounded-xl bg-mist p-4 text-xs">
@@ -385,27 +452,38 @@ export default function Orders() {
               </div>
             </div>
 
-            <div className="mt-4 flex justify-end gap-2">
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
               <button
                 type="button"
-                onClick={() => setSelectedOrder(null)}
-                className="rounded-lg border border-line-dark px-4 py-2 text-xs font-bold text-steel hover:bg-mist"
+                onClick={() => downloadInvoice(selectedOrder)}
+                className="flex items-center gap-1.5 rounded-lg border border-line-dark bg-mist px-3.5 py-2 text-xs font-bold text-navy hover:bg-navy hover:text-white transition"
               >
-                Close
+                <Printer size={13} />
+                <span>Download Physical Invoice</span>
               </button>
-              <button
-                type="button"
-                disabled={updating}
-                onClick={handleUpdateStatus}
-                className="flex items-center gap-1.5 rounded-lg bg-gold px-5 py-2 text-xs font-extrabold text-ink hover:bg-navy hover:text-white transition disabled:opacity-50"
-              >
-                {updating && <Loader2 size={13} className="animate-spin" />}
-                <span>Save Status Change</span>
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedOrder(null)}
+                  className="rounded-lg border border-line-dark px-4 py-2 text-xs font-bold text-steel hover:bg-mist"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  disabled={updating}
+                  onClick={handleUpdateStatus}
+                  className="flex items-center gap-1.5 rounded-lg bg-gold px-5 py-2 text-xs font-extrabold text-ink hover:bg-navy hover:text-white transition disabled:opacity-50"
+                >
+                  {updating && <Loader2 size={13} className="animate-spin" />}
+                  <span>Save Status Change</span>
+                </button>
+              </div>
             </div>
           </div>
         </Modal>
-      )}
+      );
+    })()}
     </div>
   );
 }

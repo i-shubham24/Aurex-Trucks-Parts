@@ -120,7 +120,7 @@ export const api = {
 export function normaliseOrder(o) {
   if (!o) return o;
   const rawStatus = o.orderStatus || o.status || "";
-  const cleanStatus = rawStatus === "Packed in Campbellfield VIC" ? "Confirmed" : rawStatus;
+  const cleanStatus = rawStatus === "Packed in Campbellfield VIC" ? "Packed" : rawStatus;
   const orderId = o.orderNumber || o.ref || o.id;
   return {
     ...o,

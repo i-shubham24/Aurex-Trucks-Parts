@@ -52,22 +52,59 @@ export function CatalogProvider({ children }) {
     api.del(`/products/${sku}`).catch(refresh);
   };
 
-  const addCategory = (c) => {
-    const slug = c.slug.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
-    if (!c.name.trim() || !slug) return { ok: false, msg: "Name required and must be unique." };
+  const addCategory = async (c) => {
+    const rawSlug = c.slug || c.name || "";
+    const slug = rawSlug.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    if (!c.name?.trim() || !slug) return { ok: false, msg: "Category name is required." };
     if (catBase.some((x) => x.slug === slug)) return { ok: false, msg: "That category already exists." };
-    const next = { slug, name: c.name.trim(), tag: c.tag || "", blurb: c.blurb || "" };
+    const imgUrl = c.imageUrl || (typeof c.image === "string" ? c.image : c.image?.url || "");
+    const next = {
+      slug,
+      name: c.name.trim(),
+      tag: c.tag || "",
+      blurb: c.blurb || "",
+      imageUrl: imgUrl,
+      image: imgUrl ? { url: imgUrl } : null,
+    };
     setCatBase((l) => [...l, next]);
-    api.post("/categories", next).catch(refresh);
-    return { ok: true };
+    try {
+      await api.post("/categories", next);
+      await refresh();
+      return { ok: true, category: next };
+    } catch (err) {
+      refresh();
+      return { ok: false, msg: err?.message || "Failed to add category." };
+    }
   };
-  const updateCategory = (slug, patch) => {
-    setCatBase((l) => l.map((c) => (c.slug === slug ? { ...c, ...patch } : c)));
-    api.put(`/categories/${slug}`, patch).catch(refresh);
+
+  const updateCategory = async (slug, patch) => {
+    const imgUrl = patch.imageUrl !== undefined ? patch.imageUrl : (typeof patch.image === "string" ? patch.image : patch.image?.url || "");
+    const nextPatch = {
+      ...patch,
+      imageUrl: imgUrl,
+      image: imgUrl ? { url: imgUrl } : undefined,
+    };
+    setCatBase((l) => l.map((c) => (c.slug === slug ? { ...c, ...nextPatch } : c)));
+    try {
+      await api.put(`/categories/${slug}`, nextPatch);
+      await refresh();
+      return { ok: true };
+    } catch (err) {
+      refresh();
+      return { ok: false, msg: err?.message || "Failed to update category." };
+    }
   };
-  const deleteCategory = (slug) => {
+
+  const deleteCategory = async (slug) => {
     setCatBase((l) => l.filter((c) => c.slug !== slug));
-    api.del(`/categories/${slug}`).catch(refresh);
+    try {
+      await api.del(`/categories/${slug}`);
+      await refresh();
+      return { ok: true };
+    } catch (err) {
+      refresh();
+      return { ok: false, msg: err?.message || "Failed to delete category." };
+    }
   };
 
   const value = useMemo(() => ({

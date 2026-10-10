@@ -52,8 +52,8 @@ export function Modal({ close, children, wide }) {
   return (
     <div className="fixed inset-0 z-[70] grid place-items-center overflow-auto p-4">
       <div className="absolute inset-0 bg-black/55" onClick={close} />
-      <div className={`popup-in relative my-8 w-full ${wide ? "max-w-3xl" : "max-w-xl"} border-2 border-ink bg-white shadow-2xl`}>
-        <button onClick={close} aria-label="Close" className="absolute right-3 top-3 text-faint hover:text-ink"><X size={20} /></button>
+      <div className={`popup-in relative my-8 w-full ${wide ? "max-w-4xl" : "max-w-xl"} rounded-xl border border-line-dark bg-white shadow-2xl`}>
+        <button onClick={close} aria-label="Close" className="absolute right-4 top-4 z-10 text-faint hover:text-ink"><X size={20} /></button>
         <div className="p-5 md:p-6">{children}</div>
       </div>
     </div>
@@ -142,13 +142,14 @@ export default function AdminLayout() {
     </nav>
   );
   return (
-    <div className="min-h-screen bg-mist lg:grid lg:grid-cols-[260px_minmax(0,1fr)]">
-      <aside className="hidden bg-ink text-white lg:flex lg:flex-col">
-        <div className="border-b border-white/10 p-4">
+    <div className="min-h-screen bg-mist flex flex-col lg:flex-row">
+      {/* Desktop Sticky Sidebar */}
+      <aside className="hidden bg-ink text-white lg:flex lg:flex-col lg:w-64 lg:shrink-0 lg:sticky lg:top-0 lg:h-screen lg:z-40">
+        <div className="border-b border-white/10 p-4 shrink-0">
           <Link to="/admin" className="inline-block rounded bg-white px-2 py-1"><img src="/logo.jpeg" alt="Aurex staff console" className="h-8 w-auto" /></Link>
         </div>
-        <div className="flex-1 overflow-auto p-2">{nav}</div>
-        <div className="border-t border-white/10 p-4 text-sm">
+        <div className="flex-1 overflow-y-auto p-2 min-h-0">{nav}</div>
+        <div className="border-t border-white/10 p-4 text-sm shrink-0">
           <p className="truncate font-bold text-white">{user.name}</p>
           <p className="truncate font-mono text-[11px] text-gray-400">{user.email}</p>
           <button
@@ -159,7 +160,7 @@ export default function AdminLayout() {
           </button>
         </div>
       </aside>
-      <div className="min-w-0 flex flex-col">
+      <div className="min-w-0 flex-1 flex flex-col">
         {/* Top header bar for desktop & mobile */}
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-white px-4 py-3 shadow-xs md:px-6">
           <div className="flex items-center gap-3">
@@ -185,7 +186,7 @@ export default function AdminLayout() {
           </div>
         </header>
         {open && <div className="border-b border-line bg-ink p-2 text-white lg:hidden">{nav}</div>}
-        <div className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6"><Outlet /></div>
+        <main className="w-full max-w-7xl px-4 py-6 md:px-6 mx-auto"><Outlet /></main>
       </div>
     </div>
   );
