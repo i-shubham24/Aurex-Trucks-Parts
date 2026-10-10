@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   CheckCircle2,
   CreditCard,
   Edit2,
   Landmark,
+  Loader2,
   Lock,
   Minus,
   Plus,
+  ShieldCheck,
   Truck,
   Wallet,
 } from "lucide-react";
@@ -40,6 +42,7 @@ export default function Checkout() {
   const { settings } = useSite();
   const { notify } = useNotification();
   const go = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const SHIP = [
     {
@@ -73,13 +76,41 @@ export default function Checkout() {
     notes: "",
   });
   const [ship, setShip] = useState(SHIP[0].id);
-  const [pay, setPay] = useState("Bank transfer");
+  const [pay, setPay] = useState("Card");
   const [placing, setPlacing] = useState(false);
   const [err, setErr] = useState("");
   const [fieldErrs, setFieldErrs] = useState({});
   const [isEditingAddress, setIsEditingAddress] = useState(false);
 
   const set = (k) => (e) => setForm((prev) => ({ ...prev, [k]: e.target.value }));
+
+  // Handle returning from Stripe if user canceled payment
+  useEffect(() => {
+    const isCanceled = searchParams.get("payment_canceled");
+    const canceledOrder = searchParams.get("orderNumber");
+    if (isCanceled === "true") {
+      if (canceledOrder && API_ON) {
+        api.post("/payments/cancel-order", { orderNumber: canceledOrder }).catch(() => {});
+      }
+      try {
+        const stored = JSON.parse(localStorage.getItem("aurex_orders") || "[]");
+        const updated = stored.map((o) =>
+          o.orderNumber === canceledOrder || o.id === canceledOrder
+            ? { ...o, status: "Payment failed", paymentStatus: "CANCELLED" }
+            : o
+        );
+        localStorage.setItem("aurex_orders", JSON.stringify(updated));
+      } catch {}
+
+      notify.info({
+        kicker: "PAYMENT INCOMPLETE",
+        title: "Payment Was Not Completed",
+        message: "Your items remain safely in your cart. You can review your details and try again.",
+        duration: 6000,
+      });
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams, notify]);
 
   // Query saved addresses from the profile API when user is logged in
   const { data: addressData } = useQuery({
@@ -249,49 +280,61 @@ export default function Checkout() {
       console.warn("Could not save address to profile:", saveErr);
     }
 
+    const shipOpt = SHIP.find((s) => s.id === ship) || SHIP[0];
+    const shipFee = shipOpt.fee(total);
+    const grand = Math.round((total + shipFee) * 100) / 100;
+
     const order = await placeOrder({
       items: lines.map((l) => ({ sku: l.sku, name: l.name, price: l.price, qty: l.qty })),
       subtotal: total,
       discount: 0,
       promoCode: null,
-      shipping: "Standard road",
-      shippingFee: 0,
-      payment: "Bank transfer",
-      total: total,
+      shipping: shipOpt.id,
+      shippingFee: shipFee,
+      payment: "Card",
+      total: grand,
       address: { ...form },
     });
-    setPlacing(false);
-    if (!order) return;
 
-    const charged = order.total ?? total;
+    if (!order) {
+      setPlacing(false);
+      return;
+    }
 
-    if (API_ON && order.payment === "Card") {
+    if (API_ON) {
       try {
-        const { url } = await api.post("/payments/create-checkout-session", { ref: order.id });
-        if (url) {
-          clear();
-          window.location.href = url;
+        const orderRef = order.orderNumber || order.ref || order.id;
+        const res = await api.post("/payments/create-checkout-session", { ref: orderRef });
+        if (res?.url) {
+          // Keep cart intact so if user cancels or navigates back, their cart is NOT empty!
+          // The cart will be cleared on OrderSuccess only when payment is confirmed.
+          window.location.href = res.url;
           return;
         }
-      } catch {
-        /* fallback to standard order confirmation */
+      } catch (stripeErr) {
+        console.error("Stripe session error:", stripeErr);
+        notify.info({
+          kicker: "STRIPE PAYMENT",
+          title: "Payment Error",
+          message: stripeErr?.message || "Could not initialize Stripe Checkout. Please try again.",
+        });
+        setPlacing(false);
+        return;
       }
     }
 
+    const charged = order.total ?? total;
     notify.success({
       kicker: "ORDER RECEIVED",
       title: "Order Placed Successfully!",
-      message: `Order #${order.id} for ${formatAUD(charged)}. ${
-        order.paymentStatus === "PENDING"
-          ? "Payment details are on your confirmation."
-          : "Preparing for dispatch from Campbellfield VIC."
-      }`,
+      message: `Order #${order.id} for ${formatAUD(charged)}. Preparing for dispatch from Campbellfield VIC.`,
       icon: "order",
       action: { label: "Track Order", url: `/track?id=${order.id}` },
       duration: 5000,
       sound: true,
     });
     clear();
+    setPlacing(false);
     go(`/order-success/${order.id}`);
   };
 
@@ -551,24 +594,44 @@ export default function Checkout() {
               <span>Subtotal</span>
               <span className="tabular font-bold text-ink">{formatAUD(total)}</span>
             </p>
+            <p className="flex justify-between text-steel">
+              <span>Freight ({shipOpt.name})</span>
+              <span className="tabular font-bold text-ink">{shipFee === 0 ? "FREE" : formatAUD(shipFee)}</span>
+            </p>
             <p className="tabular flex justify-between pt-1 text-lg font-extrabold">
               <span>
                 Total <span className="text-[11px] font-semibold text-faint">inc. GST</span>
               </span>
-              <span>{formatAUD(total)}</span>
+              <span>{formatAUD(grand)}</span>
             </p>
           </div>
 
           {/* ACTION BUTTON: If LOGGED IN -> Place Order. If NOT LOGGED IN -> Login to Checkout */}
           {user ? (
-            <button
-              type="submit"
-              disabled={placing}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded bg-gold py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white disabled:cursor-wait disabled:opacity-60"
-            >
-              <CheckCircle2 size={16} />
-              {placing ? "Placing order…" : "Place Order"}
-            </button>
+            <div className="space-y-2">
+              <button
+                type="submit"
+                disabled={placing}
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded bg-gold py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white disabled:cursor-wait disabled:opacity-60 cursor-pointer shadow-md"
+              >
+                {placing ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin text-ink" />
+                    <span>Redirecting to Stripe…</span>
+                  </>
+                ) : (
+                  <>
+                    <CreditCard size={16} />
+                    <span>Place Order</span>
+                  </>
+                )}
+              </button>
+
+              <div className="flex items-center justify-center gap-1.5 text-[11px] font-medium text-steel">
+                <ShieldCheck size={14} className="text-emerald-600" />
+                <span>Secure card payment powered by <strong>Stripe</strong></span>
+              </div>
+            </div>
           ) : (
             <div>
               <button

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState, useRef } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { useNotification } from "./notification";
 import { useAuth } from "./auth";
 import {
@@ -234,7 +234,7 @@ export function CartProvider({ children }) {
   };
 
   // Clear cart: local for guests, API for logged-in users
-  const clear = async () => {
+  const clear = useCallback(async () => {
     setLines([]);
     setServerCart(null);
     try {
@@ -250,7 +250,7 @@ export function CartProvider({ children }) {
     } catch (err) {
       console.error("[cart] clearCartApi error:", err);
     }
-  };
+  }, [user]);
 
   // Compare functions preserved
   const toggleCompare = (sku) => {

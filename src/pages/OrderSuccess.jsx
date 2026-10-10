@@ -1,49 +1,110 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Printer, Truck, Loader2 } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { useCompany } from "../store/site";
 import { findOrder } from "../utils/orders";
 import { useSite } from "../store/site";
+import { useCart } from "../store/cart";
 import { api, API_ON, normaliseOrder } from "../lib/api";
 import { apiClient } from "../api/client";
 
 export default function OrderSuccess() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get("session_id");
   const { settings } = useSite();
   const COMPANY = useCompany();
+  const { clear } = useCart();
   const [order, setOrder] = useState(() => findOrder(id));
   const [loading, setLoading] = useState(!order);
+  const clearedRef = useRef(false);
+
+  useEffect(() => {
+    // Clear cart once on confirmation
+    if (!clearedRef.current) {
+      clearedRef.current = true;
+      clear();
+    }
+  }, [clear]);
 
   useEffect(() => {
     let active = true;
-    if (!order && id && API_ON) {
-      setLoading(true);
-      (async () => {
+
+    async function initOrder() {
+      let resolvedOrder = null;
+
+      if (sessionId && API_ON) {
         try {
-          const res = await api.get(`/orders/track/${encodeURIComponent(id)}`);
+          const verifyRes = await api.get(`/payments/verify-session?sessionId=${encodeURIComponent(sessionId)}`);
+          if (active && verifyRes?.paid) {
+            resolvedOrder = verifyRes.order
+              ? normaliseOrder(verifyRes.order)
+              : { paymentStatus: "PAID", status: "Packed in Campbellfield VIC" };
+
+            setOrder((prev) => (prev ? { ...prev, ...resolvedOrder, paymentStatus: "PAID", status: "Packed in Campbellfield VIC" } : resolvedOrder));
+
+            // Sync updated PAID status to local storage
+            try {
+              const raw = localStorage.getItem("aurex_orders");
+              if (raw) {
+                const list = JSON.parse(raw);
+                const targetId = id || verifyRes.orderNumber;
+                const idx = list.findIndex((o) => (o.id || o.ref || o.orderNumber) === targetId);
+                if (idx !== -1) {
+                  list[idx] = { ...list[idx], paymentStatus: "PAID", status: "Packed in Campbellfield VIC" };
+                  localStorage.setItem("aurex_orders", JSON.stringify(list));
+                }
+              }
+            } catch {}
+          }
+        } catch {}
+      }
+
+      if (id && API_ON) {
+        setLoading(true);
+        try {
+          const res = await api.get(`/orders/${encodeURIComponent(id)}`);
           const live = res?.order || res?.data?.order;
           if (live && active) {
-            setOrder(normaliseOrder(live));
+            const normalised = normaliseOrder(live);
+            setOrder((prev) => ({
+              ...normalised,
+              // If already marked PAID via session verify, preserve PAID
+              paymentStatus: prev?.paymentStatus === "PAID" ? "PAID" : normalised.paymentStatus,
+              status: prev?.status === "Packed in Campbellfield VIC" ? "Packed in Campbellfield VIC" : normalised.status
+            }));
+            setLoading(false);
+            return;
           }
         } catch {
           try {
-            const res2 = await api.get(`/orders/${encodeURIComponent(id)}`);
+            const res2 = await api.get(`/orders/track/${encodeURIComponent(id)}`);
             const live2 = res2?.order || res2?.data?.order;
             if (live2 && active) {
-              setOrder(normaliseOrder(live2));
+              const normalised2 = normaliseOrder(live2);
+              setOrder((prev) => ({
+                ...prev,
+                ...normalised2,
+                paymentStatus: prev?.paymentStatus || normalised2.paymentStatus,
+                status: prev?.status || normalised2.status
+              }));
             }
           } catch {}
         } finally {
           if (active) setLoading(false);
         }
-      })();
-    } else {
-      setLoading(false);
+      } else {
+        setLoading(false);
+      }
     }
-    return () => { active = false; };
-  }, [id]);
+
+    initOrder();
+    return () => {
+      active = false;
+    };
+  }, [id, sessionId]);
   // An order is only "paid" once staff or the card gateway say so.
   const paid = ["PAID", "AUTHORIZED"].includes(order?.paymentStatus);
   const awaitingPayment = Boolean(order) && !paid;

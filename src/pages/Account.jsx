@@ -18,7 +18,7 @@ import {
   Truck,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { listOrders, orderStatus } from "../utils/orders";
+import { listOrders, orderStatus, isFailedOrder } from "../utils/orders";
 import { formatAUD } from "../data/products";
 import { imgFor } from "../data/images";
 import SafeImage from "../components/SafeImage";
@@ -40,6 +40,15 @@ export function useReorder() {
 }
 
 function StatusPill({ order }) {
+  const isFailed = isFailedOrder(order);
+  if (isFailed) {
+    return (
+      <span className="rounded bg-red-50 border border-red-200 px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-red-700">
+        Payment Failed
+      </span>
+    );
+  }
+
   const { idx, live, cancelled } = orderStatus(order);
   const label = cancelled ? "Cancelled" : ["Order placed", "Confirmed", "Dispatched", "Delivered"][idx];
   const cls = cancelled ? "text-red-700" : idx >= 3 ? "text-green-700" : "text-steel";
@@ -53,11 +62,17 @@ function StatusPill({ order }) {
 
 function InlineTrack({ order }) {
   const { steps, idx, cancelled } = orderStatus(order);
+  const isCardUnpaid = /card/i.test(order?.payment || "") && order?.paymentStatus !== "PAID" && order?.paymentStatus !== "AUTHORIZED";
+  const failed = cancelled || isCardUnpaid;
   return (
     <div className="mt-3 rounded-xl bg-mist p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-[12px] font-extrabold uppercase tracking-[0.14em] text-steel">Live tracking</p>
-        {order.status && <p className={`text-[12px] font-bold ${cancelled ? "text-red-600" : "text-green-700"}`}>{order.status}</p>}
+        {order.status && (
+          <p className={`text-[12px] font-bold ${failed ? "text-red-600" : "text-green-700"}`}>
+            {failed ? "Payment incomplete · Order cancelled" : order.status}
+          </p>
+        )}
       </div>
       <ol className="mt-3">
         {steps.map((s, k) => (
@@ -92,6 +107,7 @@ function InlineTrack({ order }) {
 
 function OrderCard({ order, onReorder }) {
   const [open, setOpen] = useState(false);
+  const isFailed = isFailedOrder(order);
   const lines = order.items || order.lines || [];
   const qty = lines.reduce((s, l) => s + (l.qty || 0), 0);
   const shown = open ? lines : lines.slice(0, 3);
@@ -126,18 +142,46 @@ function OrderCard({ order, onReorder }) {
             {open ? "Show fewer lines" : `+ ${lines.length - 3} more lines`} <ChevronDown size={14} className={`transition-transform ${open ? "rotate-180" : ""}`} />
           </button>
         )}
-        {open && <InlineTrack order={order} />}
-        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
-          <button onClick={() => setOpen(!open)} className={`flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-extrabold transition ${open ? "bg-navy text-white" : "bg-gold text-ink hover:bg-navy hover:text-white"}`}>
-            <Truck size={16} /> {open ? "Hide tracking" : "Track"}
-          </button>
-          <Link to={`/track?id=${order.id}`} className="flex items-center justify-center gap-1 rounded-lg border border-ink py-2.5 text-sm font-extrabold transition hover:bg-ink hover:text-white">
-            Details <ArrowRight size={15} />
-          </Link>
-          <button onClick={() => onReorder(order)} className="flex items-center justify-center gap-2 rounded-lg border border-line-dark bg-mist py-2.5 text-sm font-extrabold transition hover:border-navy hover:text-navy">
-            <RotateCcw size={15} /> Reorder
-          </button>
-        </div>
+        {!isFailed && open && <InlineTrack order={order} />}
+        {isFailed ? (
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <Link
+              to={`/track?id=${order.id}`}
+              className="flex items-center justify-center gap-1 rounded-lg border border-ink py-2.5 text-sm font-extrabold transition hover:bg-ink hover:text-white"
+            >
+              Details <ArrowRight size={15} />
+            </Link>
+            <button
+              onClick={() => onReorder(order)}
+              className="flex items-center justify-center gap-2 rounded-lg border border-line-dark bg-mist py-2.5 text-sm font-extrabold transition hover:border-navy hover:text-navy cursor-pointer"
+            >
+              <RotateCcw size={15} /> Reorder
+            </button>
+          </div>
+        ) : (
+          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <button
+              onClick={() => setOpen(!open)}
+              className={`flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-extrabold transition ${
+                open ? "bg-navy text-white" : "bg-gold text-ink hover:bg-navy hover:text-white"
+              }`}
+            >
+              <Truck size={16} /> {open ? "Hide tracking" : "Track"}
+            </button>
+            <Link
+              to={`/track?id=${order.id}`}
+              className="flex items-center justify-center gap-1 rounded-lg border border-ink py-2.5 text-sm font-extrabold transition hover:bg-ink hover:text-white"
+            >
+              Details <ArrowRight size={15} />
+            </Link>
+            <button
+              onClick={() => onReorder(order)}
+              className="flex items-center justify-center gap-2 rounded-lg border border-line-dark bg-mist py-2.5 text-sm font-extrabold transition hover:border-navy hover:text-navy cursor-pointer"
+            >
+              <RotateCcw size={15} /> Reorder
+            </button>
+          </div>
+        )}
       </div>
     </article>
   );
@@ -162,16 +206,18 @@ function OrdersToolbar({ q, setQ, status, setStatus, count }) {
 
 export default function Orders() {
   const all = listOrders();
+  const validOrders = useMemo(() => all.filter((o) => !isFailedOrder(o)), [all]);
   const reorder = useReorder();
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("All");
   const orders = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return all.filter((o) => {
+      const isFailed = isFailedOrder(o);
       const st = orderStatus(o);
-      if (status === "Active" && (st.cancelled || st.idx >= 3)) return false;
-      if (status === "Delivered" && (st.cancelled || st.idx < 3)) return false;
-      if (status === "Cancelled" && !st.cancelled) return false;
+      if (status === "Active" && (st.cancelled || isFailed || st.idx >= 3)) return false;
+      if (status === "Delivered" && (st.cancelled || isFailed || st.idx < 3)) return false;
+      if (status === "Cancelled" && !st.cancelled && !isFailed) return false;
       if (!needle) return true;
       const hay = `${o.id} ${(o.items || o.lines || []).map((l) => `${l.sku} ${l.name}`).join(" ")}`.toLowerCase();
       return hay.includes(needle);
@@ -189,7 +235,7 @@ export default function Orders() {
               <h1 className="mt-1 text-3xl font-extrabold tracking-tight">My Orders</h1>
               <p className="mt-1 text-[13px] text-steel">Every order carries an inline <span className="font-bold text-ink">Track</span> button. No need to leave this list.</p>
             </div>
-            <OrdersToolbar q={q} setQ={setQ} status={status} setStatus={setStatus} count={orders.length} />
+            <OrdersToolbar q={q} setQ={setQ} status={status} setStatus={setStatus} count={validOrders.length} />
             <div className="flex flex-wrap gap-2 text-[13px] font-bold">
               <Link to="/track" className="flex-1 whitespace-nowrap rounded-lg border border-ink bg-white px-4 py-2.5 text-center transition hover:bg-ink hover:text-white">Track by ID</Link>
               <Link to="/policies?tab=returns" className="flex-1 whitespace-nowrap rounded-lg border border-line-dark bg-white px-4 py-2.5 text-center transition hover:border-navy hover:text-navy">Returns</Link>
@@ -553,6 +599,7 @@ function SavedAddressSection({ user, updateProfile }) {
 export function ProfileBody() {
   const { user, logout, openAuthModal, updateProfile } = useAuth();
   const all = listOrders();
+  const validOrders = useMemo(() => all.filter((o) => !isFailedOrder(o)), [all]);
   const reorder = useReorder();
   const [q, setQ] = useState("");
   const orders = useMemo(() => {
@@ -571,7 +618,9 @@ export function ProfileBody() {
               <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-navy text-2xl font-extrabold text-white">{(user?.name || "G")[0].toUpperCase()}</span>
               <h1 className="mt-2 truncate text-xl font-extrabold tracking-tight text-ink">{user ? user.name : "Guest Trader"}</h1>
               <p className="truncate text-[13px] text-steel">{user?.email || "Log in for trade pricing and order history."}{user?.company ? ` · ${user.company}` : ""}</p>
-              <span className="mt-2 inline-block text-xs font-extrabold text-primary">{all.length} ORDERS</span>
+              <span className="mt-2 inline-block text-xs font-extrabold text-primary">
+                {validOrders.length} {validOrders.length === 1 ? "ORDER" : "ORDERS"}
+              </span>
               {user && <button onClick={logout} className="mt-3 w-full rounded-lg border border-line-dark py-2 text-sm font-bold text-steel transition hover:border-navy hover:text-navy">Logout</button>}
             </div>
 

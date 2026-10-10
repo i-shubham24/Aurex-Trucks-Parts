@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useNotification } from "./notification";
-import { api, setToken, tryRefresh, normaliseOrder } from "../lib/api";
+import { api, setToken, getToken, tryRefresh, normaliseOrder } from "../lib/api";
 import { loginApi, registerApi, logoutApi } from "../api/endpoints/auth.api";
 import { setAuthToken } from "../api/client";
 
@@ -13,6 +13,7 @@ export const ADMIN_EMAIL = "admin@aurex.com.au";
 const read = (k, fb) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } };
 const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode */ } };
 const TEMP_SESSION_KEY = "aurex_session_temp";
+const USER_KEY = "aurex_user";
 
 /* ───────────────────────── API-backed provider ─────────────────────────
    Active when VITE_API_URL is set. Mirrors orders into the `orders` state,
@@ -20,7 +21,7 @@ const TEMP_SESSION_KEY = "aurex_session_temp";
    OrderSuccess (which read via utils/orders.js) keep working unchanged. */
 function ApiAuthProvider({ children }) {
   const { notify } = useNotification();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => read(USER_KEY, null));
   const [users, setUsers] = useState([]);
   const [orders, setOrders] = useState(() => read(ORDERS_KEY, []));
 
@@ -37,26 +38,53 @@ function ApiAuthProvider({ children }) {
     } catch { /* not logged in / none */ }
   };
 
-  // Restore an existing session on load via secure httpOnly refresh cookie.
+  // Restore an existing session on load or after external payment redirect
   useEffect(() => {
     (async () => {
-      // Security: Clean up any legacy token stored in web storage
-      try {
-        localStorage.removeItem("aurex_access_token");
-        sessionStorage.removeItem("aurex_access_token");
-      } catch { /* noop */ }
-
       let hinted = true;
-      try { hinted = Boolean(localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(TEMP_SESSION_KEY)); } catch { /* private mode: just try */ }
-      if (hinted && (await tryRefresh())) {
-        try {
-          const res = await api.get("/auth/me");
-          const me = res?.user || res?.data?.user || res?.data;
-          if (me) {
-            setUser({ ...me, isAdmin: me.role === "SUPER_ADMIN" || me.role === "ADMIN" || me.role === "admin" || me.email === ADMIN_EMAIL || !!me.isAdmin });
-            await loadMyOrders();
+      try {
+        hinted = Boolean(
+          localStorage.getItem("aurex_access_token") ||
+          localStorage.getItem(SESSION_KEY) ||
+          localStorage.getItem(USER_KEY) ||
+          sessionStorage.getItem(TEMP_SESSION_KEY)
+        );
+      } catch { /* private mode */ }
+
+      if (hinted) {
+        const token = getToken();
+        if (token || (await tryRefresh())) {
+          try {
+            const res = await api.get("/auth/me");
+            const me = res?.user || res?.data?.user || res?.data;
+            if (me) {
+              const fullUser = {
+                ...me,
+                isAdmin: me.role === "SUPER_ADMIN" || me.role === "ADMIN" || me.role === "admin" || me.email === ADMIN_EMAIL || !!me.isAdmin,
+              };
+              setUser(fullUser);
+              write(USER_KEY, fullUser);
+              await loadMyOrders();
+            }
+          } catch {
+            // If token rejected, try refreshing once
+            if (await tryRefresh()) {
+              try {
+                const res2 = await api.get("/auth/me");
+                const me2 = res2?.user || res2?.data?.user || res2?.data;
+                if (me2) {
+                  const fullUser2 = {
+                    ...me2,
+                    isAdmin: me2.role === "SUPER_ADMIN" || me2.role === "ADMIN" || me2.role === "admin" || me2.email === ADMIN_EMAIL || !!me2.isAdmin,
+                  };
+                  setUser(fullUser2);
+                  write(USER_KEY, fullUser2);
+                  await loadMyOrders();
+                }
+              } catch {}
+            }
           }
-        } catch { /* ignore */ }
+        }
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -77,14 +105,20 @@ function ApiAuthProvider({ children }) {
       const res = await registerApi({ name, email, password, phone, company });
       const createdUser = res.user;
       const accessToken = res.accessToken;
+      const refreshToken = res.refreshToken;
       if (accessToken) {
-        setToken(accessToken);
+        setToken(accessToken, refreshToken);
         setAuthToken(accessToken);
       }
       try { localStorage.setItem(SESSION_KEY, JSON.stringify(createdUser?.email || email)); } catch { /* private mode */ }
-      setUser({ ...createdUser, isAdmin: createdUser?.isAdmin || createdUser?.role === "SUPER_ADMIN" || createdUser?.role === "ADMIN" || createdUser?.role === "admin" || createdUser?.email === ADMIN_EMAIL });
+      const fullUser = {
+        ...createdUser,
+        isAdmin: createdUser?.isAdmin || createdUser?.role === "SUPER_ADMIN" || createdUser?.role === "ADMIN" || createdUser?.role === "admin" || createdUser?.email === ADMIN_EMAIL,
+      };
+      setUser(fullUser);
+      write(USER_KEY, fullUser);
       await loadMyOrders();
-      return { ok: true, user: createdUser };
+      return { ok: true, user: fullUser };
     } catch (e) {
       return { ok: false, msg: getErrorMessage(e, "Could not create account.") };
     }
@@ -95,8 +129,9 @@ function ApiAuthProvider({ children }) {
       const res = await loginApi({ email, password });
       const loggedUser = res.user;
       const accessToken = res.accessToken;
+      const refreshToken = res.refreshToken;
       if (accessToken) {
-        setToken(accessToken);
+        setToken(accessToken, refreshToken);
         setAuthToken(accessToken);
         if (remember) {
           localStorage.setItem(SESSION_KEY, JSON.stringify(email));
@@ -104,9 +139,14 @@ function ApiAuthProvider({ children }) {
           sessionStorage.setItem(TEMP_SESSION_KEY, JSON.stringify(email));
         }
       }
-      setUser({ ...loggedUser, isAdmin: loggedUser?.isAdmin || loggedUser?.role === "SUPER_ADMIN" || loggedUser?.role === "ADMIN" || loggedUser?.role === "admin" || loggedUser?.email === ADMIN_EMAIL });
+      const fullUser = {
+        ...loggedUser,
+        isAdmin: loggedUser?.isAdmin || loggedUser?.role === "SUPER_ADMIN" || loggedUser?.role === "ADMIN" || loggedUser?.role === "admin" || loggedUser?.email === ADMIN_EMAIL,
+      };
+      setUser(fullUser);
+      write(USER_KEY, fullUser);
       await loadMyOrders();
-      return { ok: true, user: loggedUser };
+      return { ok: true, user: fullUser };
     } catch (e) {
       return { ok: false, msg: getErrorMessage(e, "Email or password did not match.") };
     }
@@ -114,12 +154,14 @@ function ApiAuthProvider({ children }) {
 
   const logout = () => {
     logoutApi().catch(() => {});
-    setToken(null);
+    setToken(null, null);
     setAuthToken(null);
     setUser(null);
     setOrders([]);
     try {
       localStorage.removeItem("aurex_access_token");
+      localStorage.removeItem("aurex_refresh_token");
+      localStorage.removeItem(USER_KEY);
       localStorage.removeItem(SESSION_KEY);
       sessionStorage.removeItem("aurex_access_token");
       sessionStorage.removeItem(TEMP_SESSION_KEY);
@@ -172,7 +214,11 @@ function ApiAuthProvider({ children }) {
       const res = await apiClient.put("/auth/profile", profileData);
       const updatedUser = res?.data?.user || res?.user;
       if (updatedUser) {
-        setUser((prev) => ({ ...prev, ...updatedUser }));
+        setUser((prev) => {
+          const next = { ...prev, ...updatedUser };
+          write(USER_KEY, next);
+          return next;
+        });
       }
       return { ok: true, user: updatedUser };
     } catch (e) {

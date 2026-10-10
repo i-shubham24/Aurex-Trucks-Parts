@@ -6,10 +6,23 @@ export const BASE_API_URL =
     ? '/api/v1'
     : 'http://localhost:5001/api/v1');
 
-let activeToken = null;
+let activeToken = (() => {
+  try {
+    return localStorage.getItem('aurex_access_token') || null;
+  } catch {
+    return null;
+  }
+})();
 
 export const setAuthToken = (token) => {
   activeToken = token || null;
+  try {
+    if (token) {
+      localStorage.setItem('aurex_access_token', token);
+    } else {
+      localStorage.removeItem('aurex_access_token');
+    }
+  } catch {}
 };
 
 export const getAuthToken = () => activeToken;

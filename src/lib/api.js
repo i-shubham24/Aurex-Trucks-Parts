@@ -13,20 +13,40 @@ export const API_URL =
     : 'http://localhost:5001/api/v1');
 export const API_ON = true;
 
-// Security: Auth tokens stored in-memory only, preventing XSS credential theft.
-// Session persistence is secured via httpOnly, SameSite cookies.
-try { localStorage.removeItem("aurex_access"); } catch { /* noop */ }
+const TOKEN_KEY = "aurex_access_token";
+const REFRESH_KEY = "aurex_refresh_token";
 
-let accessToken = null;
+let accessToken = (() => {
+  try {
+    return localStorage.getItem(TOKEN_KEY) || null;
+  } catch {
+    return null;
+  }
+})();
 
-export function setToken(t) {
+export function setToken(t, r) {
   accessToken = t || null;
+  try {
+    if (t) {
+      localStorage.setItem(TOKEN_KEY, t);
+    } else {
+      localStorage.removeItem(TOKEN_KEY);
+    }
+    if (r) {
+      localStorage.setItem(REFRESH_KEY, r);
+    } else if (r === null) {
+      localStorage.removeItem(REFRESH_KEY);
+    }
+  } catch {}
 }
 export const getToken = () => accessToken;
 
 async function request(path, { method = "GET", body, auth = true, _retry = false } = {}) {
   const headers = { "Content-Type": "application/json" };
-  if (auth && accessToken) headers.Authorization = `Bearer ${accessToken}`;
+  const currentToken = accessToken || (() => {
+    try { return localStorage.getItem(TOKEN_KEY) || null; } catch { return null; }
+  })();
+  if (auth && currentToken) headers.Authorization = `Bearer ${currentToken}`;
 
   const res = await fetch(API_URL + path, {
     method,
@@ -59,10 +79,28 @@ async function request(path, { method = "GET", body, auth = true, _retry = false
 
 export async function tryRefresh() {
   try {
-    const res = await fetch(API_URL + "/auth/refresh", { method: "POST", credentials: "include" });
+    const refreshToken = (() => {
+      try {
+        return localStorage.getItem(REFRESH_KEY) || "";
+      } catch {
+        return "";
+      }
+    })();
+
+    const res = await fetch(API_URL + "/auth/refresh", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(refreshToken ? { refreshToken } : {}),
+    });
     if (!res.ok) return false;
     const data = await res.json();
-    if (data.accessToken) { setToken(data.accessToken); return true; }
+    const newAccess = data.accessToken || data.data?.accessToken;
+    const newRefresh = data.refreshToken || data.data?.refreshToken;
+    if (newAccess) {
+      setToken(newAccess, newRefresh);
+      return true;
+    }
     return false;
   } catch {
     return false;

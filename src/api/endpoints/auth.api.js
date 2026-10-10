@@ -11,16 +11,16 @@ export async function loginApi({ email, password }) {
 
   const user = response?.data?.user || response?.user;
   const accessToken = response?.data?.accessToken || response?.accessToken;
+  const refreshToken = response?.data?.refreshToken || response?.refreshToken;
 
   if (accessToken) {
     setAuthToken(accessToken);
-    // Security: tokens kept in-memory only, not written to localStorage
-    try { localStorage.removeItem('aurex_access_token'); } catch (e) {}
   }
 
   return {
     user,
     accessToken,
+    refreshToken,
   };
 }
 
@@ -39,16 +39,16 @@ export async function registerApi({ name, email, password, phone, company }) {
 
   const user = response?.data?.user || response?.user;
   const accessToken = response?.data?.accessToken || response?.accessToken;
+  const refreshToken = response?.data?.refreshToken || response?.refreshToken;
 
   if (accessToken) {
     setAuthToken(accessToken);
-    // Security: tokens kept in-memory only, not written to localStorage
-    try { localStorage.removeItem('aurex_access_token'); } catch (e) {}
   }
 
   return {
     user,
     accessToken,
+    refreshToken,
   };
 }
 
