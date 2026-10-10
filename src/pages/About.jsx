@@ -24,7 +24,7 @@ export default function About() {
             </div>
           </div>
           <div className="card-zoom relative overflow-hidden rounded-md border border-line">
-            <img src={PHOTO.tradeCounter} alt="Aurex trade counter and warehouse racking in Campbellfield" loading="lazy" decoding="async" className="aspect-[16/10] w-full object-cover" />
+            <img src={PHOTO.tradeCounter} alt="Aurex trade counter and warehouse racking in Campbellfield" fetchPriority="high" decoding="async" className="aspect-[16/10] w-full object-cover" />
             <span className="block px-3 py-2 text-xs font-bold uppercase tracking-wide text-primary">Campbellfield VIC</span>
           </div>
         </div>

@@ -13,8 +13,8 @@ export const CAROUSEL_QUERY_KEYS = {
 export function useCarousel(options = {}) {
   return useQuery({
     queryKey: CAROUSEL_QUERY_KEYS.slides(),
-    queryFn: () => getCarouselSlidesApi().then(remember('aurex_cache_carousel')),
-    ...persisted('aurex_cache_carousel'),
+    queryFn: () => getCarouselSlidesApi().then(remember('aurex_cache_carousel_v2')),
+    ...persisted('aurex_cache_carousel_v2'),
     staleTime: 1000 * 60 * 5, // 5 mins cache
     ...options,
   });

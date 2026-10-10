@@ -4,10 +4,10 @@ export const imgFor = (sku) => (sku ? `/images/products/${sku}.jpg` : null);
 
 /* Editorial photos (web-sized). */
 export const PHOTO = {
-  tradeCounter: "/images/web/campbellfield-trade-counter.webp",
-  tailLift: "/images/web/hero-tail-lift-yellow.webp",
+  tradeCounter: "/images/web/aurex-trade-counter.webp",
+  tailLift: "/images/web/aurex-tail-lift.webp",
   trailerBuild: "/images/web/hero-trailer-parts-yellow.webp",
-  fleetAccessories: "/images/web/hero-fleet-accessories-yellow.webp",
+  fleetAccessories: "/images/web/aurex-fleet-accessories.webp",
 };
 
 /* Article covers: a scene that matches the story rather than a product cut-out.

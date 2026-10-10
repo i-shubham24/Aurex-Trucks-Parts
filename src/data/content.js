@@ -2,7 +2,7 @@
 // Staged for the coming optimization round (guides hub, news, testimonials).
 export const NEWS = [
   {
-    title: "New Aurex range: tail lifts land in VIC", date: "02 Sep 2026", tag: "Tail Lifts", img: "/images/web/hero-tail-lift-yellow.webp",
+    title: "New Aurex range: tail lifts land in VIC", date: "02 Sep 2026", tag: "Tail Lifts", img: "/images/web/aurex-tail-lift.webp",
     slug: "tail-lifts-land-in-vic", excerpt: "1.5T aluminium to 3T steel tail lifts with full fitting kits, stocked in Campbellfield and VIN-matched before dispatch.",
     body: [
       { p: "Our new tail lift range has landed in Campbellfield VIC: 1.5-tonne aluminium lifts for vans and light rigids, 2-tonne aluminium and steel lifts for general rigid work, and 3-tonne steel lifts for heavy pallet and fleet bodies. Every lift ships as a complete kit with platform, arms, powerpack, controls, lights and fasteners, so nothing holds up the fit-off." },
@@ -13,7 +13,7 @@ export const NEWS = [
     ],
   },
   {
-    title: "Toolbox and door hardware refresh", date: "21 Aug 2026", tag: "Tool Boxes", img: "/images/web/hero-fleet-accessories-yellow.webp",
+    title: "Toolbox and door hardware refresh", date: "21 Aug 2026", tag: "Tool Boxes", img: "/images/web/aurex-fleet-accessories.webp",
     slug: "toolbox-door-hardware-refresh", excerpt: "Steel toolboxes, paddle latches, cam locks and door locking gear refreshed, with matched sets invoiced together and freighted daily.",
     body: [
       { p: "The toolbox and door hardware shelves have been refreshed: steel toolboxes in the popular 1200mm footprint, stainless paddle latches, cam locks with dust covers, and complete door locking gear sets with keepers. Order the box, latch and lock together and they arrive on one invoice, keyed and checked as a set." },
@@ -34,7 +34,7 @@ export const NEWS = [
     ],
   },
   {
-    title: "New stock: stainless hinges and paddle latches", date: "28 Jul 2026", tag: "Accessories", img: "/images/web/campbellfield-trade-counter.webp",
+    title: "New stock: stainless hinges and paddle latches", date: "28 Jul 2026", tag: "Accessories", img: "/images/web/aurex-trade-counter.webp",
     slug: "stainless-hinges-paddle-latches", excerpt: "Stainless hinges, paddle latches and keepers now stocked in depth: corrosion-proof hardware for doors, toolboxes and bodies.",
     body: [
       { p: "Fresh stock has landed across stainless hinges, paddle latches, keepers and associated fasteners. If your doors live outdoors, near the coast or through washdown bays, stainless hardware pays for itself in avoided call-outs and seized fittings." },

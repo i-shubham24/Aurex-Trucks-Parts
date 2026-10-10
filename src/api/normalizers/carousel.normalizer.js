@@ -1,10 +1,21 @@
+import { PHOTO } from '../../data/images';
+
+/* Slides whose photo has been replaced by an Aurex-branded one shipped with the site.
+   The catalogue still holds the earlier shots for these; once a slide's image is updated
+   there, delete its line here and the catalogue image is used again. */
+const SLIDE_PHOTO = {
+  '/shop/tail-lifts': PHOTO.tailLift,
+  '/shop/accessories': PHOTO.fleetAccessories,
+};
+
 /**
  * Normalizes backend carousel slide payload into a consistent frontend entity
  */
 export function normalizeCarouselSlide(slide) {
   if (!slide) return null;
 
-  const imageUrl = slide.image?.url || slide.img || '';
+  const link = slide.buttonLink || slide.href || '/shop';
+  const imageUrl = SLIDE_PHOTO[link] || slide.image?.url || slide.img || '';
 
   return {
     id: slide._id || slide.id || '',
