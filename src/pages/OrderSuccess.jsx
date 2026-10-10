@@ -41,9 +41,9 @@ export default function OrderSuccess() {
           if (active && verifyRes?.paid) {
             resolvedOrder = verifyRes.order
               ? normaliseOrder(verifyRes.order)
-              : { paymentStatus: "PAID", status: "Packed in Campbellfield VIC" };
+              : { paymentStatus: "PAID", status: "Confirmed" };
 
-            setOrder((prev) => (prev ? { ...prev, ...resolvedOrder, paymentStatus: "PAID", status: "Packed in Campbellfield VIC" } : resolvedOrder));
+            setOrder((prev) => (prev ? { ...prev, ...resolvedOrder, paymentStatus: "PAID", status: "Confirmed" } : resolvedOrder));
 
             // Sync updated PAID status to local storage
             try {
@@ -53,7 +53,7 @@ export default function OrderSuccess() {
                 const targetId = id || verifyRes.orderNumber;
                 const idx = list.findIndex((o) => (o.id || o.ref || o.orderNumber) === targetId);
                 if (idx !== -1) {
-                  list[idx] = { ...list[idx], paymentStatus: "PAID", status: "Packed in Campbellfield VIC" };
+                  list[idx] = { ...list[idx], paymentStatus: "PAID", status: "Confirmed" };
                   localStorage.setItem("aurex_orders", JSON.stringify(list));
                 }
               }
@@ -73,7 +73,7 @@ export default function OrderSuccess() {
               ...normalised,
               // If already marked PAID via session verify, preserve PAID
               paymentStatus: prev?.paymentStatus === "PAID" ? "PAID" : normalised.paymentStatus,
-              status: prev?.status === "Packed in Campbellfield VIC" ? "Packed in Campbellfield VIC" : normalised.status
+              status: prev?.status === "Confirmed" ? "Confirmed" : normalised.status
             }));
             setLoading(false);
             return;
@@ -125,7 +125,7 @@ export default function OrderSuccess() {
         <p className="mt-1 text-sm text-steel">
           {byTransfer ? "We pack and dispatch as soon as your transfer lands. Keep your order ID for tracking."
             : awaitingPayment ? "Pay when you collect from the Campbellfield counter. Keep your order ID for tracking."
-            : "Packed in Campbellfield VIC. Keep your order ID for tracking."}
+            : "Order confirmed. Allocated for warehouse packing."}
         </p>
         <p className="mt-3 font-mono text-xl font-extrabold text-navy">{id}</p>
         <div className="mt-5 flex flex-wrap justify-center gap-2.5">

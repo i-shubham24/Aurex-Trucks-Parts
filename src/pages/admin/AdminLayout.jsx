@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Menu, Package, ShoppingCart, Tags, Users, MailQuestion, Megaphone, Settings, X, LogOut } from "lucide-react";
+import { LayoutDashboard, Menu, Package, ShoppingCart, Tags, Users, MailQuestion, Settings, X, LogOut } from "lucide-react";
 import { useAuth, ADMIN_EMAIL } from "../../store/auth";
 
 const GROUPS = [
@@ -18,7 +18,6 @@ const GROUPS = [
     links: [
       { to: "/admin/products", label: "Products", Icon: Package },
       { to: "/admin/categories", label: "Categories", Icon: Tags },
-      { to: "/admin/marketing", label: "Marketing", Icon: Megaphone },
     ],
   },
   { label: "System", links: [{ to: "/admin/settings", label: "Settings", Icon: Settings }] },
@@ -102,6 +101,16 @@ function StaffLogin() {
             </label>
             {err && <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-[13px] font-semibold text-red-300">{err}</p>}
             <button className="rounded-lg bg-gold py-3 text-sm font-extrabold text-ink transition hover:bg-white">Unlock console →</button>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("admin@aurex.com.au");
+                setPassword("Admin123!");
+              }}
+              className="mt-1 w-full rounded border border-white/20 bg-white/5 py-2 text-xs font-semibold text-gray-300 transition hover:bg-white/10 hover:text-white"
+            >
+              Fill Demo Credentials (admin@aurex.com.au / Admin123!)
+            </button>
           </form>
           <p className="mt-4 text-center text-[12px] text-gray-500">Separate staff URL. It is never linked from the public shop header, footer or account screens.</p>
         </div>
@@ -137,7 +146,6 @@ export default function AdminLayout() {
       <aside className="hidden bg-ink text-white lg:flex lg:flex-col">
         <div className="border-b border-white/10 p-4">
           <Link to="/admin" className="inline-block rounded bg-white px-2 py-1"><img src="/logo.jpeg" alt="Aurex staff console" className="h-8 w-auto" /></Link>
-          <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.2em] text-gold">Staff Console · Separate</p>
         </div>
         <div className="flex-1 overflow-auto p-2">{nav}</div>
         <div className="border-t border-white/10 p-4 text-sm">

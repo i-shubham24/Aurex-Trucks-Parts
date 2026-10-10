@@ -33,10 +33,19 @@ function ApiAuthProvider({ children }) {
       const res = await api.get("/orders/mine");
       const items = res?.items || res?.data?.items || res?.data || [];
       if (Array.isArray(items)) {
-        setOrders(items.map(normaliseOrder));
+        const normalised = items.map(normaliseOrder);
+        setOrders(normalised);
+        write(ORDERS_KEY, normalised);
+        return normalised;
       }
     } catch { /* not logged in / none */ }
   };
+
+  useEffect(() => {
+    if (user) {
+      loadMyOrders();
+    }
+  }, [user]);
 
   // Restore an existing session on load or after external payment redirect
   useEffect(() => {
@@ -255,6 +264,8 @@ function ApiAuthProvider({ children }) {
         orders,
         setOrders,
         myOrders,
+        loadMyOrders,
+        refreshOrders: loadMyOrders,
         placeOrder,
         openAuthModal,
         closeAuthModal,

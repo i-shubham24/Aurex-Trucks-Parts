@@ -27,7 +27,14 @@ function Timeline({ order }) {
           <span className="pb-5">
             <span className={`block text-[15px] font-extrabold ${k <= idx && !cancelled ? "text-ink" : "text-faint"}`}>{s}</span>
             {k === 0 && <span className="block text-[13px] text-faint">{new Date(order.placedAt).toLocaleString("en-AU")}</span>}
-            {k === idx && !cancelled && k > 0 && <span className="block text-[13px] font-semibold text-green-700">Latest update from the courier network.</span>}
+            {k === idx && !cancelled && k > 0 && (
+              <span className="block text-[13px] font-semibold text-green-700">
+                {k === 1 && "Payment confirmed. Allocated for warehouse packing."}
+                {k === 2 && "Packed in Campbellfield VIC. Ready for courier pickup."}
+                {k === 3 && (order.shipping?.trackingNumber ? `Dispatched with ${order.shipping.carrier || "Courier"}. Consignment #${order.shipping.trackingNumber}` : "In transit to destination.")}
+                {k === 4 && "Delivered to destination address."}
+              </span>
+            )}
           </span>
         </li>
       ))}
@@ -47,16 +54,16 @@ export default function Track() {
     const clean = String(searchId || '').trim();
     if (!clean) { setOrder(null); setMiss(false); return null; }
     let found = findOrder(clean);
-    if (!found && API_ON) {
+    if (API_ON) {
       try {
         const res = await api.get(`/orders/track/${encodeURIComponent(clean)}`);
         const liveOrder = res?.order || res?.data?.order;
-        if (liveOrder) found = normaliseOrder(liveOrder);
+        if (liveOrder) found = { ...(found || {}), ...normaliseOrder(liveOrder) };
       } catch {
         try {
           const res2 = await api.get(`/orders/${encodeURIComponent(clean)}`);
           const liveOrder2 = res2?.order || res2?.data?.order;
-          if (liveOrder2) found = normaliseOrder(liveOrder2);
+          if (liveOrder2) found = { ...(found || {}), ...normaliseOrder(liveOrder2) };
         } catch {}
       }
     }
@@ -114,15 +121,15 @@ export default function Track() {
           <div className="mt-4 overflow-hidden rounded-2xl border border-line bg-white shadow-[0_16px_40px_rgba(0,32,73,0.10)]">
             <div className="flex flex-wrap items-center gap-2 border-b border-line bg-mist px-5 py-4">
               <p className="font-mono text-[17px] font-extrabold text-navy">{order.id}</p>
-              <span className={`text-[11px] font-extrabold uppercase tracking-wide ${st.cancelled ? "text-red-700" : st.idx >= 3 ? "text-green-700" : "text-steel"}`}>
-                {st.cancelled ? "Cancelled" : ["Order placed", "Confirmed", "Dispatched", "Delivered"][st.idx]}
+              <span className={`text-[11px] font-extrabold uppercase tracking-wide ${st.cancelled ? "text-red-700" : st.idx >= 4 ? "text-green-700" : "text-steel"}`}>
+                {st.cancelled ? "Cancelled" : st.steps[st.idx] || "Order placed"}
               </span>
               {order.total != null && <p className="tabular ml-auto text-[17px] font-extrabold text-ink">{formatAUD(order.total)}</p>}
             </div>
             <div className="p-5">
               {order.status && (
                 <p className={`flex items-center gap-1.5 text-[13px] font-bold ${st.cancelled ? "text-red-700" : "text-green-700"}`}>
-                  <Truck size={15} /> Live status: {order.status}
+                  <Truck size={15} /> Live status: {order.status === "Packed in Campbellfield VIC" ? "Packed" : order.status}
                 </p>
               )}
               <Timeline order={order} />

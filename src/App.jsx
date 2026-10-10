@@ -39,7 +39,6 @@ const AdminProducts = lazy(() => import("./pages/admin/Products"));
 const AdminCategories = lazy(() => import("./pages/admin/Categories"));
 const AdminCustomers = lazy(() => import("./pages/admin/Customers"));
 const AdminEnquiries = lazy(() => import("./pages/admin/Enquiries"));
-const AdminMarketing = lazy(() => import("./pages/admin/Marketing"));
 const AdminSettings = lazy(() => import("./pages/admin/Settings"));
 
 const PageFallback = () => <div className="min-h-[60vh]" aria-busy="true" />;
@@ -91,7 +90,7 @@ function Shell() {
             <Route path="customers" element={<AdminCustomers />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="categories" element={<AdminCategories />} />
-            <Route path="marketing" element={<AdminMarketing />} />
+            <Route path="marketing" element={<Navigate to="/admin" replace />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Routes>

@@ -49,13 +49,12 @@ function StatusPill({ order }) {
     );
   }
 
-  const { idx, live, cancelled } = orderStatus(order);
-  const label = cancelled ? "Cancelled" : ["Order placed", "Confirmed", "Dispatched", "Delivered"][idx];
-  const cls = cancelled ? "text-red-700" : idx >= 3 ? "text-green-700" : "text-steel";
+  const { steps, idx, live, cancelled } = orderStatus(order);
+  const label = cancelled ? "Cancelled" : steps[idx] || "Order placed";
+  const cls = cancelled ? "text-red-700" : idx >= 4 ? "text-green-700" : "text-steel";
   return (
     <span className={`text-[11px] font-extrabold uppercase tracking-wide ${cls}`}>
       {label}
-      {live && !cancelled && order.status ? ` · ${order.status}` : ""}
     </span>
   );
 }
@@ -70,7 +69,7 @@ function InlineTrack({ order }) {
         <p className="text-[12px] font-extrabold uppercase tracking-[0.14em] text-steel">Live tracking</p>
         {order.status && (
           <p className={`text-[12px] font-bold ${failed ? "text-red-600" : "text-green-700"}`}>
-            {failed ? "Payment incomplete · Order cancelled" : order.status}
+            {failed ? "Payment incomplete · Order cancelled" : order.status === "Packed in Campbellfield VIC" ? "Packed" : (order.status || steps[idx])}
           </p>
         )}
       </div>
@@ -87,7 +86,12 @@ function InlineTrack({ order }) {
               <span className={`block text-[13px] font-extrabold ${k <= idx && !cancelled ? "text-ink" : "text-faint"}`}>{s}</span>
               {k === 0 && <span className="block text-[12px] text-faint">{new Date(order.placedAt).toLocaleString("en-AU")}</span>}
               {k === idx && !cancelled && (
-                <span className="mt-0.5 block text-[12px] font-semibold text-green-700">Packed in Campbellfield VIC. Courier updates appear here.</span>
+                <span className="mt-0.5 block text-[12px] font-semibold text-green-700">
+                  {k === 1 && "Order confirmed. Allocated for warehouse packing."}
+                  {k === 2 && "Packed in Campbellfield VIC. Courier updates appear here."}
+                  {k === 3 && (order.shipping?.trackingNumber ? `Dispatched via ${order.shipping.carrier || "Courier"}. Tracking #${order.shipping.trackingNumber}` : "Dispatched. In transit to destination.")}
+                  {k === 4 && "Delivered to destination address."}
+                </span>
               )}
             </span>
           </li>
@@ -205,7 +209,27 @@ function OrdersToolbar({ q, setQ, status, setStatus, count }) {
 }
 
 export default function Orders() {
-  const all = listOrders();
+  const { orders: ctxOrders, loadMyOrders } = useAuth();
+
+  useEffect(() => {
+    loadMyOrders?.();
+    const onFocus = () => loadMyOrders?.();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [loadMyOrders]);
+
+  const all = useMemo(() => {
+    const local = listOrders();
+    if (!ctxOrders || ctxOrders.length === 0) return local;
+    const map = new Map();
+    ctxOrders.forEach((o) => map.set(o.id || o.ref || o.orderNumber, o));
+    local.forEach((o) => {
+      const key = o.id || o.ref || o.orderNumber;
+      if (!map.has(key)) map.set(key, o);
+    });
+    return Array.from(map.values());
+  }, [ctxOrders]);
+
   const validOrders = useMemo(() => all.filter((o) => !isFailedOrder(o)), [all]);
   const reorder = useReorder();
   const [q, setQ] = useState("");
@@ -597,8 +621,27 @@ function SavedAddressSection({ user, updateProfile }) {
 }
 
 export function ProfileBody() {
-  const { user, logout, openAuthModal, updateProfile } = useAuth();
-  const all = listOrders();
+  const { user, logout, openAuthModal, updateProfile, orders: ctxOrders, loadMyOrders } = useAuth();
+
+  useEffect(() => {
+    loadMyOrders?.();
+    const onFocus = () => loadMyOrders?.();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [loadMyOrders]);
+
+  const all = useMemo(() => {
+    const local = listOrders();
+    if (!ctxOrders || ctxOrders.length === 0) return local;
+    const map = new Map();
+    ctxOrders.forEach((o) => map.set(o.id || o.ref || o.orderNumber, o));
+    local.forEach((o) => {
+      const key = o.id || o.ref || o.orderNumber;
+      if (!map.has(key)) map.set(key, o);
+    });
+    return Array.from(map.values());
+  }, [ctxOrders]);
+
   const validOrders = useMemo(() => all.filter((o) => !isFailedOrder(o)), [all]);
   const reorder = useReorder();
   const [q, setQ] = useState("");

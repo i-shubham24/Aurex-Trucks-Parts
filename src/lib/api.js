@@ -119,7 +119,17 @@ export const api = {
  *  (it keys everything off `id`, matching the old localStorage orders). */
 export function normaliseOrder(o) {
   if (!o) return o;
-  return { ...o, id: o.ref || o.id };
+  const rawStatus = o.orderStatus || o.status || "";
+  const cleanStatus = rawStatus === "Packed in Campbellfield VIC" ? "Confirmed" : rawStatus;
+  const orderId = o.orderNumber || o.ref || o.id;
+  return {
+    ...o,
+    id: orderId,
+    ref: orderId,
+    orderNumber: orderId,
+    status: cleanStatus || o.status || "Pending payment",
+    orderStatus: cleanStatus || o.orderStatus || "Pending payment",
+  };
 }
 
 export default api;

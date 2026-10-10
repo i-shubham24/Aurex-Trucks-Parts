@@ -1,128 +1,253 @@
-import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Download, RefreshCw } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Download, RefreshCw, ShoppingCart, Package, Users, DollarSign, AlertTriangle, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { formatAUD } from "../../data/products";
-import { imgFor } from "../../data/images";
-import SafeImage from "../../components/SafeImage";
-import { useAuth } from "../../store/auth";
-import { useCatalog } from "../../store/catalog";
-import { useSite } from "../../store/site";
 import { AdminTitle, Stat, td, th } from "./AdminLayout";
-import { api, API_ON, normaliseOrder } from "../../lib/api";
+import { getAdminDashboardStatsApi } from "../../api/endpoints/admin.api";
+import { useNotification } from "../../store/notification";
 
 export default function Dashboard() {
-  const { users, orders, setOrders, setUsers } = useAuth();
-  const { products } = useCatalog();
-  const { enquiries, promos, setEnquiries } = useSite();
-  const [tick, setTick] = useState(0);
+  const { notify } = useNotification();
+  const [stats, setStats] = useState({
+    revenue: 0,
+    orders: 0,
+    products: 0,
+    customers: 0,
+    tradeCustomers: 0,
+    openQuotes: 0,
+    lowStockProducts: 0,
+    recentOrders: [],
+    recentQuotes: [],
+  });
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadStats = async (isManual = false) => {
+    if (isManual) setRefreshing(true);
+    try {
+      const data = await getAdminDashboardStatsApi();
+      setStats(data);
+      if (isManual) {
+        notify.success({
+          title: "Dashboard Refreshed",
+          message: "Live sales and catalogue metrics updated.",
+        });
+      }
+    } catch (err) {
+      console.error("[admin-dashboard] Error loading stats:", err);
+      if (isManual) {
+        notify.error({
+          title: "Refresh Failed",
+          message: err.message || "Could not retrieve live dashboard stats.",
+        });
+      }
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    if (API_ON) {
-      api.get("/orders").then((res) => {
-        const items = res?.items || res?.data?.items || res?.data?.orders || [];
-        if (Array.isArray(items) && setOrders) setOrders(items.map(normaliseOrder));
-      }).catch(() => {});
+    loadStats();
+  }, []);
 
-      api.get("/admin/customers").then((res) => {
-        const items = res?.items || res?.data?.items || res?.data || [];
-        if (Array.isArray(items) && setUsers) setUsers(items);
-      }).catch(() => {});
-
-      api.get("/enquiries").then((res) => {
-        const items = res?.items || res?.data?.items || [];
-        if (Array.isArray(items) && setEnquiries) setEnquiries(items.map((e) => ({ ...e, id: e.ref || e.id, at: e.createdAt })));
-      }).catch(() => {});
-    }
-  }, [tick]);
-
-  const revenue = orders.reduce((s, o) => s + (Number(o.total) || 0), 0);
-  const freshEnquiries = enquiries.filter((e) => e.status === "New");
-  const attention = products.filter((p) => p.status === "Built to order").slice(0, 5);
-  const top = [...products].sort((a, b) => (b.reviews || 0) - (a.reviews || 0)).slice(0, 5);
-  const latest = orders.slice(0, 6);
-
-  const csvCell = (v) => {
-    const s = String(v ?? "");
-    return `"${s.replace(/"/g, '""')}"`;
-  };
-  const csv = () => {
-    const rows = [["Order ID", "Customer Email", "Items", "Total", "Status"],
-      ...orders.map((o) => [o.id, o.email || "guest", (o.items || o.lines || []).reduce((s, l) => s + (l.qty || 0), 0), o.total, o.status || ""])];
+  const csvCell = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const exportCsv = () => {
+    const rows = [
+      ["Order ID", "Customer Email", "Placed At", "Total", "Status"],
+      ...stats.recentOrders.map((o) => [
+        o.id || o.ref,
+        o.email || "guest",
+        new Date(o.placedAt).toLocaleString("en-AU"),
+        o.total,
+        o.status || o.orderStatus || "",
+      ]),
+    ];
     const blob = new Blob([rows.map((r) => r.map(csvCell).join(",")).join("\n")], { type: "text/csv" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "aurex_orders_export.csv";
+    a.download = `aurex_orders_${Date.now()}.csv`;
     a.click();
     URL.revokeObjectURL(a.href);
   };
 
   return (
-    <div key={tick}>
-      <AdminTitle kicker="Overview" title="Dashboard" right={
-        <div className="flex gap-2">
-          <button onClick={() => setTick((t) => t + 1)} className="flex items-center gap-1.5 rounded border border-line-dark px-4 py-2 text-[13px] font-bold transition-colors hover:border-navy hover:text-navy"><RefreshCw size={14} /> Refresh</button>
-          <button onClick={csv} className="flex items-center gap-1.5 rounded bg-ink px-4 py-2 text-[13px] font-bold text-white transition-colors hover:bg-navy"><Download size={14} /> Export CSV</button>
-        </div>
-      } />
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Stat label="Total Revenue" value={formatAUD(revenue)} sub={`${orders.length} orders`} />
-        <Stat label="Total Orders" value={orders.length} sub={`${freshEnquiries.length} new enquiries`} />
-        <Stat label="Customers" value={users.length} sub="Registered accounts" />
-        <Stat label="Live SKUs" value={products.length} sub={`${promos.filter((p) => p.active).length} active promos`} />
-      </div>
-      <div className="mt-4 grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <div className="border-2 border-ink bg-white">
-          <p className="border-b-2 border-ink px-4 py-2.5 text-sm font-extrabold">Top products by reviews</p>
-          {top.map((p) => (
-            <div key={p.sku} className="flex items-center gap-3 border-b border-line px-4 py-2.5 last:border-b-0">
-              <span className="h-10 w-10 shrink-0 overflow-hidden rounded bg-mist"><SafeImage src={imgFor(p.sku)} alt="" className="h-full w-full object-cover" fallbackIconSize={16} /></span>
-              <span className="min-w-0 flex-1"><span className="block truncate text-[13px] font-bold">{p.name}</span><span className="font-mono text-[11px] text-faint">{p.sku} · {p.reviews || 0} reviews</span></span>
-              <span className="tabular text-[13px] font-extrabold text-primary">{p.price == null ? "POA" : formatAUD(p.price)}</span>
-            </div>
-          ))}
-        </div>
-        <div className="border-2 border-ink bg-white">
-          <p className="border-b-2 border-ink px-4 py-2.5 text-sm font-extrabold">Action required</p>
-          {attention.length === 0 && freshEnquiries.length === 0 && <p className="p-4 text-sm text-steel">Nothing waiting. All lines live, no new enquiries.</p>}
-          {attention.map((p) => (
-            <div key={p.sku} className="flex items-center justify-between gap-3 border-b border-line px-4 py-2.5 last:border-b-0">
-              <span className="truncate text-[13px]"><span className="font-bold">{p.sku}</span> <span className="text-steel">built to order, check lead time</span></span>
-              <Link to="/admin/products" className="shrink-0 text-[13px] font-bold text-navy underline">Restock →</Link>
-            </div>
-          ))}
-          {freshEnquiries.map((e) => (
-            <div key={e.id} className="flex items-center justify-between gap-3 border-b border-line px-4 py-2.5 last:border-b-0">
-              <span className="truncate text-[13px]"><span className="font-bold">{e.id}</span> <span className="text-steel">{e.name} · {e.topic}</span></span>
-              <Link to="/admin/enquiries" className="shrink-0 text-[13px] font-bold text-navy underline">Review →</Link>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="mt-4 border-2 border-ink bg-white">
-        <div className="flex items-center justify-between border-b-2 border-ink px-4 py-2.5">
-          <p className="text-sm font-extrabold">Latest orders</p>
-          <Link to="/admin/orders" className="text-[13px] font-bold text-navy underline">All orders →</Link>
-        </div>
-        {latest.length === 0 ? <p className="p-4 text-sm text-steel">No orders yet. Checkout creates one you can track.</p> : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] border-collapse">
-              <thead><tr><th className={th}>Order</th><th className={th}>Customer</th><th className={th}>Lines</th><th className={th}>Total</th><th className={th}>Status</th></tr></thead>
-              <tbody>
-                {latest.map((o) => (
-                  <tr key={o.id}>
-                    <td className={td}><span className="font-mono font-bold">{o.id}</span><br /><span className="font-mono text-[11px] text-faint">{new Date(o.placedAt).toLocaleDateString("en-AU")}</span></td>
-                    <td className={td}>{o.email || "guest"}</td>
-                    <td className={td}>{(o.items || o.lines || []).reduce((s, l) => s + (l.qty || 0), 0)}</td>
-                    <td className={td}><span className="tabular font-bold">{formatAUD(o.total)}</span></td>
-                    <td className={td}>{o.status || "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+    <div>
+      <AdminTitle
+        kicker="Executive Overview"
+        title="Operations Dashboard"
+        right={
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => loadStats(true)}
+              disabled={refreshing}
+              className="flex items-center gap-1.5 rounded-lg border border-line-dark bg-white px-3.5 py-2 text-xs font-bold text-steel transition hover:border-navy hover:text-navy disabled:opacity-50"
+            >
+              <RefreshCw size={14} className={refreshing ? "animate-spin text-navy" : ""} />
+              <span>{refreshing ? "Updating…" : "Refresh"}</span>
+            </button>
+            <button
+              onClick={exportCsv}
+              className="flex items-center gap-1.5 rounded-lg bg-ink px-4 py-2 text-xs font-bold text-white transition hover:bg-navy"
+            >
+              <Download size={14} />
+              <span>Export CSV</span>
+            </button>
+            <Link
+              to="/admin/products"
+              className="rounded-lg bg-gold px-4 py-2 text-xs font-bold text-ink transition hover:bg-navy hover:text-white"
+            >
+              + Add Product
+            </Link>
           </div>
-        )}
-      </div>
+        }
+      />
+
+      {loading ? (
+        <div className="flex min-h-[40vh] items-center justify-center gap-2 rounded-2xl border border-line bg-white p-12 text-sm font-semibold text-steel">
+          <Loader2 className="animate-spin text-navy" size={20} />
+          <span>Loading live management analytics…</span>
+        </div>
+      ) : (
+        <>
+          {/* Top Key Metrics */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="rounded-xl border border-line bg-white p-5 shadow-xs">
+              <div className="flex items-center justify-between text-steel">
+                <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-faint">Total Revenue</span>
+                <span className="rounded-md bg-green-50 p-2 text-green-700"><DollarSign size={16} /></span>
+              </div>
+              <p className="tabular mt-2 text-3xl font-extrabold text-ink">{formatAUD(stats.revenue)}</p>
+              <p className="mt-1 text-xs text-steel">Across all completed orders</p>
+            </div>
+
+            <div className="rounded-xl border border-line bg-white p-5 shadow-xs">
+              <div className="flex items-center justify-between text-steel">
+                <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-faint">Total Orders</span>
+                <span className="rounded-md bg-blue-50 p-2 text-blue-700"><ShoppingCart size={16} /></span>
+              </div>
+              <p className="tabular mt-2 text-3xl font-extrabold text-ink">{stats.orders}</p>
+              <p className="mt-1 flex items-center gap-1 text-xs text-steel">
+                <Link to="/admin/orders" className="font-bold text-navy underline hover:text-primary">
+                  View order pipeline →
+                </Link>
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-line bg-white p-5 shadow-xs">
+              <div className="flex items-center justify-between text-steel">
+                <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-faint">Live SKUs</span>
+                <span className="rounded-md bg-amber-50 p-2 text-amber-700"><Package size={16} /></span>
+              </div>
+              <p className="tabular mt-2 text-3xl font-extrabold text-ink">{stats.products}</p>
+              <p className="mt-1 text-xs text-steel">
+                {stats.lowStockProducts > 0 ? (
+                  <span className="flex items-center gap-1 text-amber-700 font-semibold">
+                    <AlertTriangle size={12} /> {stats.lowStockProducts} parts low on stock
+                  </span>
+                ) : (
+                  "All published catalog lines"
+                )}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-line bg-white p-5 shadow-xs">
+              <div className="flex items-center justify-between text-steel">
+                <span className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-faint">Customers</span>
+                <span className="rounded-md bg-purple-50 p-2 text-purple-700"><Users size={16} /></span>
+              </div>
+              <p className="tabular mt-2 text-3xl font-extrabold text-ink">{stats.customers}</p>
+              <p className="mt-1 text-xs text-steel">{stats.tradeCustomers} approved trade accounts</p>
+            </div>
+          </div>
+
+          {/* Recent Orders Section */}
+          <div className="mt-6 rounded-2xl border border-line bg-white shadow-xs overflow-hidden">
+            <div className="flex items-center justify-between border-b border-line px-5 py-4">
+              <div>
+                <h2 className="text-base font-extrabold text-ink">Recent Customer Orders</h2>
+                <p className="text-xs text-steel">Latest incoming orders from the online storefront and trade portal</p>
+              </div>
+              <Link
+                to="/admin/orders"
+                className="flex items-center gap-1 text-xs font-bold text-navy hover:underline"
+              >
+                <span>View all orders</span>
+                <ArrowRight size={13} />
+              </Link>
+            </div>
+
+            {stats.recentOrders.length === 0 ? (
+              <div className="p-8 text-center text-sm text-steel">
+                No orders placed yet. Orders created via the storefront checkout will populate here.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[700px] border-collapse text-left">
+                  <thead>
+                    <tr className="border-b border-line bg-mist text-[11px] font-extrabold uppercase tracking-wider text-steel">
+                      <th className="px-5 py-3">Order #</th>
+                      <th className="px-5 py-3">Customer</th>
+                      <th className="px-5 py-3">Placed At</th>
+                      <th className="px-5 py-3">Total Amount</th>
+                      <th className="px-5 py-3">Status</th>
+                      <th className="px-5 py-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-line text-[13px]">
+                    {stats.recentOrders.slice(0, 8).map((order) => {
+                      const isPaid = /paid/i.test(order.paymentStatus || order.status || "");
+                      const isFailed = /cancel|fail/i.test(order.paymentStatus || order.status || "");
+                      return (
+                        <tr key={order.id || order.ref} className="hover:bg-mist/50 transition-colors">
+                          <td className="px-5 py-3.5 font-mono font-bold text-navy">
+                            {order.id || order.ref}
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <span className="block font-semibold text-ink">{order.address?.name || "Customer"}</span>
+                            <span className="block font-mono text-[11px] text-steel truncate max-w-[200px]">{order.email || "—"}</span>
+                          </td>
+                          <td className="px-5 py-3.5 font-mono text-xs text-steel">
+                            {new Date(order.placedAt).toLocaleString("en-AU", { dateStyle: "short", timeStyle: "short" })}
+                          </td>
+                          <td className="px-5 py-3.5 tabular font-bold text-ink">
+                            {formatAUD(order.total)}
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <span
+                              className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-bold ${
+                                isFailed
+                                  ? "bg-red-50 text-red-700 ring-1 ring-red-200"
+                                  : isPaid
+                                  ? "bg-green-50 text-green-700 ring-1 ring-green-200"
+                                  : "bg-gold/20 text-ink ring-1 ring-gold/40"
+                              }`}
+                            >
+                              {order.status === "Packed in Campbellfield VIC"
+                                ? "Confirmed"
+                                : order.status === "Courier booked" || order.status === "In transit"
+                                ? "Dispatched"
+                                : order.status || order.orderStatus || "Pending"}
+                            </span>
+                          </td>
+                          <td className="px-5 py-3.5 text-right">
+                            <Link
+                              to="/admin/orders"
+                              className="rounded-md border border-line-dark px-3 py-1.5 text-xs font-bold text-steel hover:border-navy hover:text-navy"
+                            >
+                              Manage →
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 }
-

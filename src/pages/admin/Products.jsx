@@ -1,155 +1,500 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { Plus, Search, Trash2, Edit3, Loader2, Package, RefreshCw, X, AlertCircle } from "lucide-react";
 import { formatAUD } from "../../data/products";
 import { imgFor } from "../../data/images";
 import SafeImage from "../../components/SafeImage";
-import { useCatalog } from "../../store/catalog";
-import { AdminTitle, Empty, Modal, td, th } from "./AdminLayout";
+import { AdminTitle, Empty, Modal } from "./AdminLayout";
+import {
+  getAdminProductsApi,
+  createAdminProductApi,
+  updateAdminProductApi,
+  deleteAdminProductApi,
+} from "../../api/endpoints/admin.api";
+import { useCategories } from "../../hooks/api/useCategories";
+import { useNotification } from "../../store/notification";
 
-const STATUSES = ["In stock VIC", "Built to order", "Enquire"];
-const blankForm = { sku: "", name: "", price: "", category: "accessories", sub: "", brand: "", fit: "", oem: "", status: "In stock VIC", lead: "", rating: "4.6", reviews: "12", badge: "", desc: "", specs: "" };
+const STATUSES = ["In stock VIC", "Built to order", "Enquiry"];
 
-function specsToText(specs) {
-  if (!specs) return "";
-  return Object.entries(specs).map(([k, v]) => `${k}: ${v}`).join("\n");
-}
-function textToSpecs(text) {
-  const out = {};
-  text.split("\n").forEach((line) => {
-    const i = line.indexOf(":");
-    if (i > 0) out[line.slice(0, i).trim()] = line.slice(i + 1).trim();
-  });
-  return out;
-}
+const blankForm = {
+  sku: "",
+  name: "",
+  price: "",
+  category: "trailer-parts",
+  sub: "",
+  brand: "Aurex",
+  fit: "",
+  oem: "",
+  status: "In stock VIC",
+  stock: "15",
+  lead: "Ships in 24 hrs",
+  badge: "",
+  desc: "",
+};
 
 export default function Products() {
-  const { products, categories, addProduct, updateProduct, deleteProduct, resetCatalog } = useCatalog();
+  const { notify } = useNotification();
+  const { data: categories = [] } = useCategories();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
-  const [cat, setCat] = useState("All");
+  const [selectedCat, setSelectedCat] = useState("All");
   const [modal, setModal] = useState(null); // null | "add" | sku-being-edited
   const [form, setForm] = useState(blankForm);
-  const [err, setErr] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState("");
 
-  const query = q.toLowerCase().trim();
-  const list = products.filter((p) => {
-    if (cat !== "All" && p.category !== cat) return false;
-    if (!query) return true;
-    return `${p.sku} ${p.name} ${p.brand || ""}`.toLowerCase().includes(query);
-  });
+  const loadProducts = async () => {
+    setLoading(true);
+    try {
+      const data = await getAdminProductsApi();
+      setProducts(data.products || []);
+    } catch (err) {
+      console.error("[admin-products] Error loading products:", err);
+      notify.error({
+        title: "Could not load products",
+        message: err.message || "Failed to fetch catalogue from backend.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const openAdd = () => { setForm({ ...blankForm, category: categories[0]?.slug || "accessories" }); setErr(""); setModal("add"); };
+  useEffect(() => {
+    loadProducts();
+  }, []);
+
+  const filtered = useMemo(() => {
+    const needle = q.toLowerCase().trim();
+    return products.filter((p) => {
+      if (selectedCat !== "All" && p.category !== selectedCat) return false;
+      if (!needle) return true;
+      const haystack = `${p.sku || ""} ${p.name || ""} ${p.brand || ""} ${p.oem || ""} ${p.sub || ""}`.toLowerCase();
+      return haystack.includes(needle);
+    });
+  }, [products, q, selectedCat]);
+
+  const openAdd = () => {
+    setForm({
+      ...blankForm,
+      category: categories[0]?.slug || "trailer-parts",
+    });
+    setFormError("");
+    setModal("add");
+  };
+
   const openEdit = (p) => {
     setForm({
-      sku: p.sku, name: p.name, price: p.price == null ? "" : String(p.price),
-      category: p.category, sub: p.sub || "", brand: p.brand || "", fit: p.fit || "",
-      oem: p.oem || "", status: p.price == null ? "Enquire" : (p.status || "In stock VIC"),
-      lead: p.lead || "", rating: String(p.rating || 4.6), reviews: String(p.reviews || 12),
-      badge: p.badge || "", desc: p.desc || "", specs: specsToText(p.specs),
+      sku: p.sku || "",
+      name: p.name || "",
+      price: p.price == null ? "" : String(p.price),
+      category: p.category || (categories[0]?.slug || "trailer-parts"),
+      sub: p.sub || "",
+      brand: p.brand || "Aurex",
+      fit: p.fit || "",
+      oem: p.oem || "",
+      status: p.status || "In stock VIC",
+      stock: String(p.inventory?.stock ?? 15),
+      lead: p.lead || "",
+      badge: p.badge || "",
+      desc: p.desc || "",
     });
-    setErr("");
+    setFormError("");
     setModal(p.sku);
   };
 
-  const save = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const patch = {
+    setFormError("");
+
+    if (!form.sku.trim()) {
+      setFormError("Product SKU is required (e.g. ATP-TP-99).");
+      return;
+    }
+    if (!form.name.trim()) {
+      setFormError("Product Name is required.");
+      return;
+    }
+
+    const payload = {
+      sku: form.sku.trim().toUpperCase(),
       name: form.name.trim(),
       price: form.price === "" ? null : Number(form.price),
       category: form.category,
       sub: form.sub.trim(),
-      brand: form.brand.trim(),
+      brand: form.brand.trim() || "Aurex",
       fit: form.fit.trim(),
       oem: form.oem.trim(),
-      status: form.price === "" ? "Enquire" : form.status,
+      status: form.status,
+      stock: Number(form.stock) || 0,
       lead: form.lead.trim(),
-      rating: Number(form.rating) || 4.6,
-      reviews: Number(form.reviews) || 0,
       badge: form.badge.trim(),
       desc: form.desc.trim(),
-      specs: textToSpecs(form.specs),
     };
-    if (!patch.name) { setErr("Name is required."); return; }
-    if (form.price !== "" && !(patch.price > 0)) { setErr("Price must be above 0, or blank for enquiry-only."); return; }
-    let r;
-    if (modal === "add") r = addProduct({ sku: form.sku, ...patch });
-    else { updateProduct(modal, patch); r = { ok: true }; }
-    if (!r.ok) { setErr(r.msg); return; }
-    setModal(null);
+
+    setSubmitting(true);
+    try {
+      if (modal === "add") {
+        const created = await createAdminProductApi(payload);
+        setProducts((prev) => [created, ...prev]);
+        notify.success({
+          title: "Product Added",
+          message: `${created.name} (${created.sku}) added to live catalogue.`,
+        });
+      } else {
+        const updated = await updateAdminProductApi(modal, payload);
+        setProducts((prev) =>
+          prev.map((p) => (p.sku === modal ? { ...p, ...updated } : p))
+        );
+        notify.success({
+          title: "Product Updated",
+          message: `Saved changes to ${payload.sku}.`,
+        });
+      }
+      setModal(null);
+    } catch (err) {
+      console.error("[admin-products] Save error:", err);
+      setFormError(err.message || "Failed to save product to database.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const input = "h-11 w-full rounded-md border border-line-dark bg-white px-3 text-sm outline-none placeholder:text-faint focus:border-gold";
-  const label = "mb-1 block text-xs font-bold";
+  const handleDelete = async (sku, name) => {
+    if (!window.confirm(`Are you sure you want to delete ${sku} - "${name}"?`)) return;
+    try {
+      await deleteAdminProductApi(sku);
+      setProducts((prev) => prev.filter((p) => p.sku !== sku));
+      notify.success({
+        title: "Product Deleted",
+        message: `${sku} has been removed from the database.`,
+      });
+    } catch (err) {
+      notify.error({
+        title: "Could Not Delete",
+        message: err.message || "Failed to delete product.",
+      });
+    }
+  };
+
+  const inputClass =
+    "h-10 w-full rounded-lg border border-line-dark bg-white px-3 text-xs outline-none placeholder:text-faint focus:border-navy focus:ring-1 focus:ring-navy";
+
   return (
     <div>
-      <AdminTitle kicker="Catalog" title={`Products (${products.length})`} right={
-        <div className="flex gap-2">
-          <button onClick={() => { if (window.confirm("Reset catalogue to seed data? Admin edits will be lost.")) resetCatalog(); }} className="rounded border border-line-dark px-4 py-2 text-[13px] font-bold transition-colors hover:border-navy hover:text-navy">Reset</button>
-          <button onClick={openAdd} className="rounded bg-gold px-4 py-2 text-[13px] font-bold text-ink transition-colors hover:bg-navy hover:text-white">+ Add Product</button>
+      <AdminTitle
+        kicker="Catalogue Management"
+        title={`Products & Parts (${products.length})`}
+        right={
+          <div className="flex items-center gap-2">
+            <button
+              onClick={loadProducts}
+              disabled={loading}
+              className="flex items-center gap-1.5 rounded-lg border border-line-dark bg-white px-3.5 py-2 text-xs font-bold text-steel hover:border-navy hover:text-navy disabled:opacity-50"
+            >
+              <RefreshCw size={14} className={loading ? "animate-spin text-navy" : ""} />
+              <span>Refresh</span>
+            </button>
+            <button
+              onClick={openAdd}
+              className="flex items-center gap-1.5 rounded-lg bg-gold px-4 py-2 text-xs font-bold text-ink shadow-sm transition hover:bg-navy hover:text-white"
+            >
+              <Plus size={15} />
+              <span>Add New Product</span>
+            </button>
+          </div>
+        }
+      />
+
+      {/* Filter and Search Toolbar */}
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <div className="relative min-w-[240px] flex-1">
+          <Search size={15} className="absolute left-3 top-2.5 text-steel" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search by SKU, Part Name, Brand or OEM…"
+            className="h-10 w-full rounded-lg border border-line-dark bg-white pl-9 pr-3 text-xs outline-none focus:border-navy"
+          />
         </div>
-      } />
-      <div className="mb-3 flex flex-wrap gap-2">
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search name, SKU, brand…" className={`${input} min-w-52 flex-1`} />
-        <select value={cat} onChange={(e) => setCat(e.target.value)} className={input} aria-label="Category">
-          <option>All</option>
-          {categories.map((c) => <option key={c.slug} value={c.slug}>{c.name}</option>)}
+        <select
+          value={selectedCat}
+          onChange={(e) => setSelectedCat(e.target.value)}
+          aria-label="Filter Category"
+          className="h-10 rounded-lg border border-line-dark bg-white px-3 text-xs font-semibold text-steel outline-none focus:border-navy"
+        >
+          <option value="All">All Categories</option>
+          {categories.map((c) => (
+            <option key={c.slug || c.id} value={c.slug}>
+              {c.name}
+            </option>
+          ))}
         </select>
+        <span className="font-mono text-xs text-faint">
+          Showing {filtered.length} of {products.length}
+        </span>
       </div>
-      {list.length === 0 ? <Empty text="No products match." /> : (
-        <div className="overflow-x-auto border-2 border-ink bg-white">
-          <table className="w-full min-w-[820px] border-collapse">
-            <thead><tr><th className={th}>Product</th><th className={th}>Cat</th><th className={th}>Price</th><th className={th}>Status</th><th className={th}>Rating</th><th className={th}>Actions</th></tr></thead>
-            <tbody>
-              {list.map((p) => (
-                <tr key={p.sku}>
-                  <td className={td}>
-                    <span className="flex items-center gap-2.5">
-                      <span className="h-10 w-10 shrink-0 overflow-hidden rounded bg-mist"><SafeImage src={imgFor(p.sku)} alt="" className="h-full w-full object-cover" fallbackIconSize={16} /></span>
-                      <span><span className="block font-bold">{p.name}</span><span className="font-mono text-[11px] text-faint">{p.sku}{p.brand ? ` · ${p.brand}` : ""}</span></span>
-                    </span>
-                  </td>
-                  <td className={td}>{p.category}</td>
-                  <td className={td}><span className="tabular font-bold">{p.price == null ? "POA" : formatAUD(p.price)}</span></td>
-                  <td className={td}>{p.price == null ? "Enquire" : p.status}</td>
-                  <td className={td}>★ {p.rating} ({p.reviews})</td>
-                  <td className={td}>
-                    <span className="flex gap-2">
-                      <button onClick={() => openEdit(p)} className="font-bold text-navy underline">Edit</button>
-                      <button onClick={() => { if (window.confirm(`Delete ${p.sku}?`)) deleteProduct(p.sku); }} className="font-bold text-red-600 underline">Delete</button>
-                    </span>
-                  </td>
+
+      {loading ? (
+        <div className="flex min-h-[40vh] items-center justify-center gap-2 rounded-2xl border border-line bg-white p-12 text-sm font-semibold text-steel">
+          <Loader2 className="animate-spin text-navy" size={20} />
+          <span>Retrieving warehouse catalogue…</span>
+        </div>
+      ) : filtered.length === 0 ? (
+        <Empty text="No products match your search or filter. Click '+ Add New Product' to add one." />
+      ) : (
+        <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-xs">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[850px] border-collapse text-left">
+              <thead>
+                <tr className="border-b border-line bg-mist text-[11px] font-extrabold uppercase tracking-wider text-steel">
+                  <th className="px-4 py-3">Product Part</th>
+                  <th className="px-4 py-3">Category</th>
+                  <th className="px-4 py-3">Selling Price</th>
+                  <th className="px-4 py-3">Stock / Status</th>
+                  <th className="px-4 py-3">OEM Cross</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-line text-[13px]">
+                {filtered.map((p) => {
+                  return (
+                    <tr key={p.sku || p.id} className="hover:bg-mist/40 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <span className="h-11 w-11 shrink-0 overflow-hidden rounded-md border border-line bg-mist">
+                            <SafeImage
+                              src={imgFor(p.sku)}
+                              alt=""
+                              className="h-full w-full object-cover"
+                              fallbackIconSize={16}
+                            />
+                          </span>
+                          <div className="min-w-0">
+                            <p className="font-bold text-ink truncate max-w-xs">{p.name}</p>
+                            <p className="font-mono text-[11px] font-bold text-navy">
+                              {p.sku} {p.brand ? `· ${p.brand}` : ""}
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="inline-block rounded-md bg-mist px-2.5 py-1 text-xs font-semibold text-steel">
+                          {p.category}
+                        </span>
+                        {p.sub && <p className="text-[11px] text-faint mt-0.5">{p.sub}</p>}
+                      </td>
+                      <td className="px-4 py-3 tabular font-bold text-ink">
+                        {p.price == null ? (
+                          <span className="text-navy">POA (Enquiry)</span>
+                        ) : (
+                          formatAUD(p.price)
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-bold ${
+                            p.status === "In stock VIC"
+                              ? "bg-green-50 text-green-700 ring-1 ring-green-200"
+                              : p.status === "Built to order"
+                              ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
+                              : "bg-mist text-steel"
+                          }`}
+                        >
+                          {p.status || "In stock VIC"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 font-mono text-xs text-steel">
+                        {p.oem || "—"}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => openEdit(p)}
+                            className="rounded p-1.5 text-steel hover:bg-mist hover:text-navy"
+                            title="Edit Product"
+                          >
+                            <Edit3 size={15} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(p.sku, p.name)}
+                            className="rounded p-1.5 text-steel hover:bg-red-50 hover:text-red-600"
+                            title="Delete Product"
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
-      <p className="mt-2 font-mono text-[11px] text-faint">PRODUCT IMAGES RESOLVE BY SKU — DROP A FILE AT PUBLIC/IMAGES/PRODUCTS/&lt;SKU&gt;.JPG TO CHANGE THE PHOTO.</p>
+
+      {/* Add / Edit Product Modal */}
       {modal && (
         <Modal close={() => setModal(null)} wide>
-          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-faint">{modal === "add" ? "Add product" : `Edit ${modal}`}</p>
-          <form onSubmit={save} className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <label className="block"><span className={label}>SKU *</span><input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value.toUpperCase() })} disabled={modal !== "add"} placeholder="ATP-ACC-00" className={`${input} disabled:bg-mist`} /></label>
-            <label className="block"><span className={label}>Category</span>
-              <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className={input}>
-                {categories.map((c) => <option key={c.slug} value={c.slug}>{c.name}</option>)}
+          <div className="flex items-center justify-between border-b border-line pb-3">
+            <div>
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-faint">
+                {modal === "add" ? "Inventory Management" : `SKU #${modal}`}
+              </p>
+              <h2 className="text-xl font-extrabold text-ink">
+                {modal === "add" ? "Add New Truck Part" : "Edit Part Details"}
+              </h2>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <label className="block">
+              <span className="mb-1 block text-xs font-bold text-steel">SKU Part Number *</span>
+              <input
+                value={form.sku}
+                onChange={(e) => setForm({ ...form, sku: e.target.value.toUpperCase() })}
+                disabled={modal !== "add"}
+                placeholder="ATP-TL-88"
+                className={`${inputClass} disabled:bg-mist`}
+              />
+            </label>
+
+            <label className="block">
+              <span className="mb-1 block text-xs font-bold text-steel">Category</span>
+              <select
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                className={inputClass}
+              >
+                {categories.map((c) => (
+                  <option key={c.slug || c.id} value={c.slug}>
+                    {c.name}
+                  </option>
+                ))}
               </select>
             </label>
-            <label className="block sm:col-span-2"><span className={label}>Name *</span><input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Product name" className={input} /></label>
-            <label className="block"><span className={label}>Price (blank = enquiry only)</span><input value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value.replace(/[^\d.]/g, "") })} inputMode="decimal" placeholder="e.g. 293" className={input} /></label>
-            <label className="block"><span className={label}>Status</span>
-              <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })} className={input}>{STATUSES.map((s) => <option key={s}>{s}</option>)}</select>
+
+            <label className="block sm:col-span-2">
+              <span className="mb-1 block text-xs font-bold text-steel">Part Name *</span>
+              <input
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="e.g. 2T Aluminium Tail Lift Power Pack"
+                className={inputClass}
+              />
             </label>
-            <label className="block"><span className={label}>Sub line</span><input value={form.sub} onChange={(e) => setForm({ ...form, sub: e.target.value })} placeholder="e.g. Tail Lifts" className={input} /></label>
-            <label className="block"><span className={label}>Brand</span><input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} placeholder="e.g. Aurex" className={input} /></label>
-            <label className="block sm:col-span-2"><span className={label}>Fitment</span><input value={form.fit} onChange={(e) => setForm({ ...form, fit: e.target.value })} placeholder="Suits…" className={input} /></label>
-            <label className="block"><span className={label}>OEM cross</span><input value={form.oem} onChange={(e) => setForm({ ...form, oem: e.target.value })} className={input} /></label>
-            <label className="block"><span className={label}>Lead time</span><input value={form.lead} onChange={(e) => setForm({ ...form, lead: e.target.value })} placeholder="e.g. Ships in 24 hrs" className={input} /></label>
-            <label className="block"><span className={label}>Rating (1 to 5)</span><input value={form.rating} onChange={(e) => setForm({ ...form, rating: e.target.value.replace(/[^\d.]/g, "").slice(0, 3) })} inputMode="decimal" className={input} /></label>
-            <label className="block"><span className={label}>Reviews count</span><input value={form.reviews} onChange={(e) => setForm({ ...form, reviews: e.target.value.replace(/\D/g, "") })} inputMode="numeric" className={input} /></label>
-            <label className="block"><span className={label}>Badge</span><input value={form.badge} onChange={(e) => setForm({ ...form, badge: e.target.value })} placeholder="e.g. 2T Aluminium" className={input} /></label>
-            <label className="block"><span className={label}>Description</span><textarea value={form.desc} onChange={(e) => setForm({ ...form, desc: e.target.value })} rows={2} className="w-full rounded-md border border-line-dark bg-white px-3 py-2.5 text-sm outline-none placeholder:text-faint focus:border-gold" /></label>
-            <label className="block sm:col-span-2"><span className={label}>Specs (one Key: value per line)</span><textarea value={form.specs} onChange={(e) => setForm({ ...form, specs: e.target.value })} rows={3} placeholder={"Capacity: 2000 kg\nPower: 24V"} className="w-full rounded-md border border-line-dark bg-white px-3 py-2.5 font-mono text-[13px] outline-none placeholder:text-faint focus:border-gold" /></label>
-            {err && <p className="text-sm font-semibold text-red-600 sm:col-span-2">{err}</p>}
-            <button className="rounded bg-gold py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white sm:col-span-2">{modal === "add" ? "Add Product" : "Save Changes"}</button>
+
+            <label className="block">
+              <span className="mb-1 block text-xs font-bold text-steel">Price (AUD) — leave blank for POA</span>
+              <input
+                value={form.price}
+                onChange={(e) => setForm({ ...form, price: e.target.value.replace(/[^\d.]/g, "") })}
+                placeholder="e.g. 350.00"
+                className={inputClass}
+              />
+            </label>
+
+            <label className="block">
+              <span className="mb-1 block text-xs font-bold text-steel">Stock Status</span>
+              <select
+                value={form.status}
+                onChange={(e) => setForm({ ...form, status: e.target.value })}
+                className={inputClass}
+              >
+                {STATUSES.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="block">
+              <span className="mb-1 block text-xs font-bold text-steel">Sub-Line</span>
+              <input
+                value={form.sub}
+                onChange={(e) => setForm({ ...form, sub: e.target.value })}
+                placeholder="e.g. Tail Lifts, Door Gear"
+                className={inputClass}
+              />
+            </label>
+
+            <label className="block">
+              <span className="mb-1 block text-xs font-bold text-steel">Brand</span>
+              <input
+                value={form.brand}
+                onChange={(e) => setForm({ ...form, brand: e.target.value })}
+                placeholder="e.g. Aurex"
+                className={inputClass}
+              />
+            </label>
+
+            <label className="block">
+              <span className="mb-1 block text-xs font-bold text-steel">OEM Part Cross-Reference</span>
+              <input
+                value={form.oem}
+                onChange={(e) => setForm({ ...form, oem: e.target.value })}
+                placeholder="e.g. OEM-4095-A"
+                className={inputClass}
+              />
+            </label>
+
+            <label className="block">
+              <span className="mb-1 block text-xs font-bold text-steel">Warehouse Stock Quantity</span>
+              <input
+                type="number"
+                value={form.stock}
+                onChange={(e) => setForm({ ...form, stock: e.target.value })}
+                placeholder="10"
+                className={inputClass}
+              />
+            </label>
+
+            <label className="block sm:col-span-2">
+              <span className="mb-1 block text-xs font-bold text-steel">Vehicle / Trailer Fitment</span>
+              <input
+                value={form.fit}
+                onChange={(e) => setForm({ ...form, fit: e.target.value })}
+                placeholder="Suits commercial refrigerated trailers, dry freight vans"
+                className={inputClass}
+              />
+            </label>
+
+            <label className="block sm:col-span-2">
+              <span className="mb-1 block text-xs font-bold text-steel">Description</span>
+              <textarea
+                value={form.desc}
+                onChange={(e) => setForm({ ...form, desc: e.target.value })}
+                rows={3}
+                placeholder="Heavy-duty commercial grade part..."
+                className="w-full rounded-lg border border-line-dark bg-white p-3 text-xs outline-none focus:border-navy focus:ring-1 focus:ring-navy"
+              />
+            </label>
+
+            {formError && (
+              <div className="sm:col-span-2 flex items-center gap-2 rounded-lg bg-red-50 p-3 text-xs font-semibold text-red-700 border border-red-200">
+                <AlertCircle size={15} />
+                <span>{formError}</span>
+              </div>
+            )}
+
+            <div className="sm:col-span-2 mt-2 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setModal(null)}
+                className="rounded-lg border border-line-dark px-4 py-2.5 text-xs font-bold text-steel hover:bg-mist"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="flex items-center gap-1.5 rounded-lg bg-gold px-6 py-2.5 text-xs font-extrabold text-ink hover:bg-navy hover:text-white transition disabled:opacity-50"
+              >
+                {submitting && <Loader2 size={14} className="animate-spin" />}
+                <span>{modal === "add" ? "Create Product" : "Save Changes"}</span>
+              </button>
+            </div>
           </form>
         </Modal>
       )}
