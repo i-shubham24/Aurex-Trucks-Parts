@@ -39,14 +39,43 @@ function ApiSiteProvider({ children }) {
   // Resolves to the reference staff will see for this enquiry. Rejects if it did not reach
   // us, so a form can say so instead of showing a success screen.
   const addEnquiry = async (e) => {
-    const res = await api.post("/enquiries", {
-      name: e.name, customerName: e.name, companyName: e.companyName || "",
-      phone: e.phone || "", email: e.email, topic: e.topic, message: e.message, sku: e.sku || null,
+    const isTailLift =
+      e.enquiryType === "TAIL_LIFT" ||
+      e.isTailLift ||
+      (e.sku && /^ATP-TL/i.test(e.sku)) ||
+      (e.topic && /tail\s*lift/i.test(e.topic));
+
+    const endpoint = isTailLift ? "/enquiries/tail-lift" : "/enquiries";
+
+    const res = await api.post(endpoint, {
+      name: e.name,
+      customerName: e.name,
+      companyName: e.companyName || e.company || "",
+      phone: e.phone || "",
+      email: e.email,
+      topic: e.topic,
+      message: e.message,
+      sku: e.sku || null,
+      enquiryType: isTailLift ? "TAIL_LIFT" : (e.enquiryType || "GENERAL"),
+      state: e.state || "VIC",
+      preferredContact: e.preferredContact || "Phone Call",
+      vehicleMakeModel: e.vehicleMakeModel || e.truckDetails?.makeModel || "",
+      bodyType: e.bodyType || e.truckDetails?.bodyType || "",
+      voltage: e.voltage || e.truckDetails?.voltage || "",
+      bedHeight: e.bedHeight || e.truckDetails?.bedHeight || "",
+      bodyWidth: e.bodyWidth || e.truckDetails?.bodyWidth || "",
+      liftCapacity: e.liftCapacity || e.partDetails?.capacity || "",
+      platformMaterial: e.platformMaterial || e.partDetails?.material || "",
+      platformHeight: e.platformHeight || e.partDetails?.platformHeight || "",
+      serviceType: e.serviceType || e.partDetails?.serviceType || "",
+      options: e.options || {},
+      vinOrNotes: e.vinOrNotes || "",
       ...(e.truckDetails ? { truckDetails: e.truckDetails } : {}),
       ...(e.partDetails ? { partDetails: e.partDetails } : {}),
+      ...(e.tailLiftDetails ? { tailLiftDetails: e.tailLiftDetails } : {}),
     });
     const enquiry = res?.enquiry || res?.data?.enquiry || {};
-    return enquiry.ref || enquiry.enquiryNumber || null;
+    return enquiry.ref || enquiry.enquiryNumber || res?.ref || res?.enquiryNumber || null;
   };
   const setEnquiryStatus = (id, status) => {
     setEnquiries((l) => l.map((x) => (x.id === id ? { ...x, status } : x)));

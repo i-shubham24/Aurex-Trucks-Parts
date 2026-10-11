@@ -97,6 +97,24 @@ export function CartProvider({ children }) {
     const sku = (product?.sku || "").toUpperCase();
     if (!sku) return;
 
+    // Tail lift products cannot be bought directly online - enquiry required
+    const isTailLift =
+      product?.category === "tail-lifts" ||
+      product?.categorySlug === "tail-lifts" ||
+      sku.startsWith("ATP-TL") ||
+      product?.isBuyable === false ||
+      product?.pricing?.isPOA === true;
+
+    if (isTailLift) {
+      notify.error({
+        kicker: "ENQUIRY REQUIRED",
+        title: "Tail Lift Quotation Required",
+        message: `${product.name || sku} requires custom engineering specifications. Please submit an enquiry first.`,
+        duration: 5000,
+      });
+      return;
+    }
+
     const previousLines = [...lines];
 
     // Local state update

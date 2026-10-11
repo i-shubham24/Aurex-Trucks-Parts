@@ -104,12 +104,12 @@ function StaffLogin() {
             <button
               type="button"
               onClick={() => {
-                setEmail("admin@aurex.com.au");
-                setPassword("Admin123!");
+                setEmail("aurexparts@yopmail.com");
+                setPassword("aurex@123");
               }}
               className="mt-1 w-full rounded border border-white/20 bg-white/5 py-2 text-xs font-semibold text-gray-300 transition hover:bg-white/10 hover:text-white"
             >
-              Fill Demo Credentials (admin@aurex.com.au / Admin123!)
+              Fill Demo Credentials (aurexparts@yopmail.com / aurex@123)
             </button>
           </form>
           <p className="mt-4 text-center text-[12px] text-gray-500">Separate staff URL. It is never linked from the public shop header, footer or account screens.</p>

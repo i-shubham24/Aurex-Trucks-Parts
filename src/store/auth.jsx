@@ -8,7 +8,7 @@ const AuthCtx = createContext(null);
 const SESSION_KEY = "aurex_session";
 const ORDERS_KEY = "aurex_orders";
 
-export const ADMIN_EMAIL = "admin@aurex.com.au";
+export const ADMIN_EMAIL = "aurexparts@yopmail.com";
 
 const read = (k, fb) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch { return fb; } };
 const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode */ } };
