@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import EmailLink from "../components/EmailLink";
 import { Link, useSearchParams } from "react-router-dom";
-import { CheckCircle2, Clock, Mail, MapPin, Phone, Send, ArrowRight } from "lucide-react";
+import { CheckCircle2, Clock, Mail, MapPin, Phone, Send, ArrowRight, Lock } from "lucide-react";
 import { useCompany } from "../store/site";
 import { useSite } from "../store/site";
+import { useAuth } from "../store/auth";
 import { useNotification } from "../store/notification";
 import ThemeSelect from "../components/ThemeSelect";
 
@@ -11,6 +12,7 @@ export default function Contact() {
   const [searchParams] = useSearchParams();
   const initialTopic = searchParams.get("topic") || "Tail Lifts";
   const { addEnquiry } = useSite();
+  const { user, openAuthModal } = useAuth();
   const { notify } = useNotification();
   const COMPANY = useCompany();
   const [sent, setSent] = useState(false);
@@ -18,10 +20,33 @@ export default function Contact() {
   const [form, setForm] = useState({ name: "", phone: "", email: "", topic: initialTopic, msg: "" });
   const [errs, setErrs] = useState({});
   const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setForm((f) => ({
+        ...f,
+        name: f.name || [user.firstName, user.lastName].filter(Boolean).join(" ") || user.name || "",
+        email: f.email || user.email || "",
+        phone: f.phone || user.phone || "",
+      }));
+    }
+  }, [user]);
+
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
   const input = (bad) => `h-11 w-full rounded-md border bg-white px-3 text-sm outline-none placeholder:text-faint focus:border-gold ${bad ? "border-red-500" : "border-line-dark"}`;
+  
   const send = async (e) => {
     e.preventDefault();
+    if (!user) {
+      notify.warning({
+        kicker: "LOGIN REQUIRED",
+        title: "Sign In Required",
+        message: "Please sign in or create an account to submit an enquiry.",
+      });
+      openAuthModal({ mode: "login" });
+      return;
+    }
+
     const fe = {};
     if (form.name.trim().length < 2) fe.name = "Enter your full name.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) fe.email = "Enter a valid email address.";
@@ -151,6 +176,28 @@ export default function Contact() {
           <form className="rounded-md border border-line bg-mist p-5 md:p-7" onSubmit={send}>
             <p className="text-lg font-extrabold">Request a Quote</p>
             <p className="mt-1 text-[13px] text-steel">For trailer parts, photos and measurements get you an exact price fastest.</p>
+            
+            {!user ? (
+              <div className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-amber-300 bg-amber-50 p-3.5 text-xs text-amber-900">
+                <div className="flex items-center gap-2 font-medium">
+                  <Lock size={15} className="shrink-0 text-amber-700" />
+                  <span>Account sign-in is required to submit an enquiry.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => openAuthModal({ mode: "login" })}
+                  className="shrink-0 rounded bg-navy px-3 py-1.5 font-bold text-white transition-colors hover:bg-gold hover:text-ink cursor-pointer"
+                >
+                  Sign In →
+                </button>
+              </div>
+            ) : (
+              <div className="mt-4 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-2.5 text-xs font-semibold text-green-900">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-600 text-[10px] text-white">✓</span>
+                <span>Signed in as {[user.firstName, user.lastName].filter(Boolean).join(" ") || user.name || user.email}</span>
+              </div>
+            )}
+
             <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <label className="block"><span className="mb-1 block text-xs font-bold">Full name *</span><input required value={form.name} onChange={set("name")} placeholder="Jane Citizen" maxLength={80} className={input(errs.name)} />{err("name")}</label>
               <label className="block"><span className="mb-1 block text-xs font-bold">Phone *</span><input required value={form.phone} onChange={set("phone")} placeholder="04XX XXX XXX" maxLength={20} inputMode="tel" className={input(errs.phone)} />{err("phone")}</label>
@@ -161,7 +208,24 @@ export default function Contact() {
             </label>
             <label className="mt-3 block"><span className="mb-1 block text-xs font-bold">What do you need? *</span><textarea required value={form.msg} onChange={set("msg")} rows={5} maxLength={2000} placeholder="Body type, SKU, sizes, VIN if critical" className={`w-full rounded-md border bg-white px-3 py-2.5 text-sm outline-none placeholder:text-faint focus:border-gold ${errs.msg ? "border-red-500" : "border-line-dark"}`} />{err("msg")}</label>
             {errs.form && <p role="alert" className="mt-3 text-[13px] font-semibold text-red-600">{errs.form}</p>}
-            <button disabled={sending} className="mt-4 flex items-center gap-2 rounded bg-gold px-6 py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white disabled:cursor-wait disabled:opacity-60"><Send size={15} /> {sending ? "Sending…" : "Send Enquiry"}</button>
+            
+            {!user ? (
+              <button
+                type="button"
+                onClick={() => openAuthModal({ mode: "login" })}
+                className="mt-4 flex items-center gap-2 rounded bg-navy px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-gold hover:text-ink cursor-pointer"
+              >
+                <Lock size={15} /> Sign In to Send Enquiry
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={sending}
+                className="mt-4 flex items-center gap-2 rounded bg-gold px-6 py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white disabled:cursor-wait disabled:opacity-60 cursor-pointer"
+              >
+                <Send size={15} /> {sending ? "Sending…" : "Send Enquiry"}
+              </button>
+            )}
           </form>
         )}
 

@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   CheckCircle2,
   Clock,
   Phone,
   Send,
+  Lock,
+  UserCheck,
 } from "lucide-react";
 import { useCompany, useSite } from "../store/site";
+import { useAuth } from "../store/auth";
 import { useNotification } from "../store/notification";
 import { imgFor } from "../data/images";
 import ThemeSelect from "../components/ThemeSelect";
@@ -18,6 +21,7 @@ export default function TailLiftEnquiry() {
   const { data: productsData } = useProducts({ category: "tail-lifts", limit: 50 });
   const tailLiftProducts = productsData?.products || [];
   const { addEnquiry } = useSite();
+  const { user, openAuthModal } = useAuth();
   const { notify } = useNotification();
   const COMPANY = useCompany();
 
@@ -52,6 +56,19 @@ export default function TailLiftEnquiry() {
     serviceType: "Supply Only (Freighted to Workshop)",
     vinOrNotes: "",
   });
+
+  // Pre-fill user profile if authenticated
+  useEffect(() => {
+    if (user) {
+      setForm((prev) => ({
+        ...prev,
+        name: prev.name || [user.firstName, user.lastName].filter(Boolean).join(" ") || user.name || "",
+        email: prev.email || user.email || "",
+        phone: prev.phone || user.phone || "",
+        company: prev.company || user.companyName || user.company || "",
+      }));
+    }
+  }, [user]);
 
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -89,6 +106,18 @@ export default function TailLiftEnquiry() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!user) {
+      notify.warning({
+        kicker: "LOGIN REQUIRED",
+        title: "Account Sign-In Required",
+        message: "You must be signed in to submit a tail lift quotation enquiry. Please sign in or create an account to proceed.",
+        duration: 6000,
+      });
+      openAuthModal({ mode: "login" });
+      return;
+    }
+
     const fe = {};
 
     if (!form.name.trim() || form.name.trim().length < 2) fe.name = "Enter your full name.";
@@ -338,6 +367,49 @@ Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
         ) : (
           /* ── Main Enquiry Form Layout ── */
           <div className="mx-auto max-w-4xl">
+            {/* Login Requirement Banner */}
+            {!user ? (
+              <div className="mb-6 rounded-xl border border-amber-300 bg-gradient-to-r from-amber-50 to-orange-50 p-5 shadow-sm">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-amber-500/15 text-amber-900">
+                      <Lock size={20} />
+                    </div>
+                    <div>
+                      <p className="text-sm font-extrabold text-amber-950">
+                        Account Sign-In Required To Request Tail Lift Quotations
+                      </p>
+                      <p className="mt-0.5 text-xs text-amber-800">
+                        Please sign in or register an account before submitting. Your technical quotation will be verified and linked to your account for fast pricing, invoice matching, and engineering dispatch.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => openAuthModal({ mode: "login" })}
+                    className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-navy px-4 py-2.5 text-xs font-bold text-white shadow transition-all hover:bg-gold hover:text-ink cursor-pointer"
+                  >
+                    <Lock size={13} />
+                    Sign In / Register →
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="mb-6 rounded-xl border border-green-200 bg-green-50/70 p-4 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5 text-xs">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-600 text-[11px] font-black text-white">✓</span>
+                    <span className="font-bold text-green-950">
+                      Signed in as <span className="underline">{[user.firstName, user.lastName].filter(Boolean).join(" ") || user.name || user.email}</span> ({user.email})
+                    </span>
+                    {user.companyName && <span className="text-green-800">· {user.companyName}</span>}
+                    {user.isTradeApproved && <span className="rounded bg-green-600 px-1.5 py-0.5 text-[10px] font-extrabold uppercase text-white">Trade Approved</span>}
+                  </div>
+                  <span className="text-[11px] font-semibold text-green-700">Engineering quote will be saved to your Aurex account</span>
+                </div>
+              </div>
+            )}
+
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-8 rounded-xl border border-line bg-white p-6 shadow-sm md:p-8">
               {/* Step 1: Tail Lift Model Selection */}
@@ -654,16 +726,29 @@ Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
               {/* Submit CTA */}
               <div className="border-t border-line pt-6">
                 {errors.form && <p role="alert" className="mb-3 text-center text-[13px] font-semibold text-red-600">{errors.form}</p>}
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="flex w-full items-center justify-center gap-2 rounded-md bg-gold py-4 text-center text-sm font-extrabold text-ink shadow-md transition-all hover:bg-navy hover:text-white disabled:opacity-50"
-                >
-                  <Send size={16} />
-                  {submitting ? "Submitting Specification..." : "Submit Tail Lift Quotation Enquiry →"}
-                </button>
+                {!user ? (
+                  <button
+                    type="button"
+                    onClick={() => openAuthModal({ mode: "login" })}
+                    className="flex w-full items-center justify-center gap-2 rounded-md bg-navy py-4 text-center text-sm font-extrabold text-white shadow-md transition-all hover:bg-gold hover:text-ink cursor-pointer"
+                  >
+                    <Lock size={16} />
+                    Sign In to Request Tail Lift Quotation →
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex w-full items-center justify-center gap-2 rounded-md bg-gold py-4 text-center text-sm font-extrabold text-ink shadow-md transition-all hover:bg-navy hover:text-white disabled:opacity-50 cursor-pointer"
+                  >
+                    <Send size={16} />
+                    {submitting ? "Submitting Specification..." : "Submit Tail Lift Quotation Enquiry →"}
+                  </button>
+                )}
                 <p className="mt-2.5 text-center text-xs text-steel">
-                  Our Melbourne engineering desk will review your chassis specifications and issue a formal quote within 4 business hours.
+                  {!user
+                    ? "Login is required to submit tail lift enquiries so we can provide tailored fleet pricing."
+                    : "Our Melbourne engineering desk will review your chassis specifications and issue a formal quote within 4 business hours."}
                 </p>
               </div>
             </form>

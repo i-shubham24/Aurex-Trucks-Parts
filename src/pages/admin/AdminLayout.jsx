@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Menu, Package, ShoppingCart, Tags, Users, MailQuestion, Settings, X, LogOut } from "lucide-react";
+import { LayoutDashboard, Menu, Package, ShoppingCart, Tags, Users, MailQuestion, Settings, X, LogOut, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useAuth, ADMIN_EMAIL } from "../../store/auth";
 
 const GROUPS = [
@@ -68,52 +68,100 @@ function StaffLogin() {
   const { login } = useAuth();
   const [email, setEmail] = useState(ADMIN_EMAIL);
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [err, setErr] = useState("");
-  const input = "h-12 w-full rounded-lg border border-white/15 bg-white/5 px-4 text-[15px] text-white outline-none placeholder:text-gray-500 focus:border-gold focus:ring-2 focus:ring-gold/30";
+  const [loading, setLoading] = useState(false);
+
   const go = async (e) => {
     e.preventDefault();
     setErr("");
-    const r = await login({ email, password });
-    if (!r?.ok) setErr(r?.msg || "Login failed. Check your email and password.");
+    setLoading(true);
+    try {
+      const r = await login({ email, password });
+      if (!r?.ok) setErr(r?.msg || "Login failed. Check your email and password.");
+    } catch {
+      setErr("Connection error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
+
   return (
-    <main className="grid min-h-screen place-items-center bg-[#0b0e14] px-4 py-10">
-      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-[#12161f] shadow-2xl">
-        <div className="flex items-center gap-3 border-b border-white/10 bg-ink px-6 py-4">
-          <span className="grid h-10 w-10 place-items-center rounded-full bg-gold font-mono text-[12px] font-extrabold text-ink">AX</span>
+    <main className="flex min-h-screen flex-col items-center justify-center bg-[#0d1117] px-4 py-12">
+      {/* Title above center card */}
+      <div className="mb-6 flex flex-col items-center text-center">
+        <div className="mb-2.5 flex items-center justify-center gap-2.5">
+          <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
+            Aurex Truck Parts Admin Panel
+          </h1>
+        </div>
+        <p className="text-sm text-gray-400">
+          Sign in to manage your inventory, orders & enquiries
+        </p>
+      </div>
+
+      {/* Center Card */}
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-[#161b26] p-7 shadow-2xl sm:p-8">
+        <form onSubmit={go} className="space-y-4">
+          {err && (
+            <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-300">
+              {err}
+            </div>
+          )}
+
           <div>
-            <p className="text-[15px] font-extrabold leading-none text-white">Aurex Staff Console</p>
-            <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.22em] text-gold">Separate system · Restricted</p>
+            <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-gray-300">
+              Email
+            </label>
+            <div className="relative">
+              <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="aurexparts@yopmail.com"
+                className="h-12 w-full rounded-xl border border-white/15 bg-white/5 pl-11 pr-4 text-sm font-medium text-white placeholder-gray-500 outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/20"
+                autoComplete="username"
+              />
+            </div>
           </div>
-          <span className="ml-auto rounded-full bg-red-500/15 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest text-red-300 ring-1 ring-red-500/30">Staff only</span>
-        </div>
-        <div className="p-6 sm:p-7">
-          <h1 className="text-[22px] font-extrabold tracking-tight text-white">Staff login</h1>
-          <p className="mt-1 text-[13px] text-gray-400">This console is isolated from the public storefront. Customer logins do not work here.</p>
-          <form onSubmit={go} className="mt-5 grid gap-3">
-            <label className="block">
-              <span className="mb-1.5 block text-[11px] font-extrabold uppercase tracking-[0.14em] text-gray-400">Staff email</span>
-              <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="staff@aurex.com.au" className={input} autoComplete="username" />
+
+          <div>
+            <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-gray-300">
+              Password
             </label>
-            <label className="block">
-              <span className="mb-1.5 block text-[11px] font-extrabold uppercase tracking-[0.14em] text-gray-400">Password</span>
-              <input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="••••••••" className={input} autoComplete="current-password" />
-            </label>
-            {err && <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-[13px] font-semibold text-red-300">{err}</p>}
-            <button className="rounded-lg bg-gold py-3 text-sm font-extrabold text-ink transition hover:bg-white">Unlock console →</button>
-            <button
-              type="button"
-              onClick={() => {
-                setEmail("aurexparts@yopmail.com");
-                setPassword("aurex@123");
-              }}
-              className="mt-1 w-full rounded border border-white/20 bg-white/5 py-2 text-xs font-semibold text-gray-300 transition hover:bg-white/10 hover:text-white"
-            >
-              Fill Demo Credentials (aurexparts@yopmail.com / aurex@123)
-            </button>
-          </form>
-          <p className="mt-4 text-center text-[12px] text-gray-500">Separate staff URL. It is never linked from the public shop header, footer or account screens.</p>
-        </div>
+            <div className="relative">
+              <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+              <input
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="h-12 w-full rounded-xl border border-white/15 bg-white/5 pl-11 pr-11 text-sm font-medium text-white placeholder-gray-500 outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/20"
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 transition hover:text-white"
+                tabIndex={-1}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-gold font-bold text-ink transition hover:bg-gold-light hover:shadow-lg disabled:opacity-60"
+          >
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
+        </form>
       </div>
     </main>
   );
@@ -165,8 +213,6 @@ export default function AdminLayout() {
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-white px-4 py-3 shadow-xs md:px-6">
           <div className="flex items-center gap-3">
             <button onClick={() => setOpen(!open)} aria-label="Menu" className="grid h-9 w-9 place-items-center rounded border border-line-dark lg:hidden">{open ? <X size={18} /> : <Menu size={18} />}</button>
-            <span className="inline-block h-2.5 w-2.5 rounded-full bg-green-500 animate-pulse" />
-            <p className="text-sm font-extrabold text-ink">Staff Console <span className="hidden sm:inline font-mono text-xs font-normal text-faint">· Internal Management</span></p>
           </div>
           <div className="flex items-center gap-3 sm:gap-4">
             <Link to="/" target="_blank" className="hidden text-xs font-bold text-steel hover:text-navy underline sm:inline-flex">Storefront ↗</Link>
