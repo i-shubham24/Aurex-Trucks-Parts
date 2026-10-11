@@ -12,7 +12,6 @@ import PageMeta from "./components/PageMeta";
 import ErrorBoundary from "./components/ErrorBoundary";
 import CartDrawer from "./components/CartDrawer";
 import CompareTray from "./components/CompareTray";
-import PromoPopup from "./components/PromoPopup";
 import AuthModal from "./components/AuthModal";
 import Home from "./pages/Home";
 
@@ -122,7 +121,6 @@ function Shell() {
       <Header />
       <CartDrawer />
       <CompareTray />
-      <PromoPopup />
       <Suspense fallback={<PageFallback />}>
       <Routes>
         <Route path="/" element={<Home />} />
