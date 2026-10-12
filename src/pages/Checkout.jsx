@@ -291,7 +291,7 @@ export default function Checkout() {
       promoCode: null,
       shipping: shipOpt.id,
       shippingFee: shipFee,
-      payment: "Card",
+      payment: payId,
       total: grand,
       address: { ...form },
     });
@@ -301,7 +301,7 @@ export default function Checkout() {
       return;
     }
 
-    if (API_ON) {
+    if (API_ON && payId === "Card") {
       try {
         const orderRef = order.orderNumber || order.ref || order.id;
         const res = await api.post("/payments/create-checkout-session", { ref: orderRef });
@@ -617,19 +617,45 @@ export default function Checkout() {
                 {placing ? (
                   <>
                     <Loader2 size={16} className="animate-spin text-ink" />
-                    <span>Redirecting to Stripe…</span>
+                    <span>
+                      {payId === "Card"
+                        ? "Redirecting to Stripe…"
+                        : payId === "Pay on pickup"
+                        ? "Confirming pickup…"
+                        : "Placing order…"}
+                    </span>
                   </>
                 ) : (
                   <>
-                    <CreditCard size={16} />
-                    <span>Place Order</span>
+                    {payId === "Card" ? (
+                      <CreditCard size={16} />
+                    ) : (
+                      <CheckCircle2 size={16} />
+                    )}
+                    <span>
+                      {payId === "Card"
+                        ? "Place Order & Pay with Card"
+                        : payId === "Pay on pickup"
+                        ? "Confirm Click & Collect Order"
+                        : payId === "30 day fleet terms"
+                        ? "Place on Trade Account"
+                        : "Place Order (Bank Transfer)"}
+                    </span>
                   </>
                 )}
               </button>
 
               <div className="flex items-center justify-center gap-1.5 text-[11px] font-medium text-steel">
                 <ShieldCheck size={14} className="text-emerald-600" />
-                <span>Secure card payment powered by <strong>Stripe</strong></span>
+                {payId === "Card" ? (
+                  <span>Secure card payment powered by <strong>Stripe</strong></span>
+                ) : payId === "Pay on pickup" ? (
+                  <span>Pay upon counter collection at Campbellfield VIC</span>
+                ) : payId === "30 day fleet terms" ? (
+                  <span>Commercial 30-day terms invoice issued upon dispatch</span>
+                ) : (
+                  <span>Direct EFT tax invoice details provided upon confirmation</span>
+                )}
               </div>
             </div>
           ) : (

@@ -213,6 +213,7 @@ export default function AdminLayout() {
         <header className="sticky top-0 z-30 flex items-center justify-between border-b border-line bg-white px-4 py-3 shadow-xs md:px-6">
           <div className="flex items-center gap-3">
             <button onClick={() => setOpen(!open)} aria-label="Menu" className="grid h-9 w-9 place-items-center rounded border border-line-dark lg:hidden">{open ? <X size={18} /> : <Menu size={18} />}</button>
+            <p className="text-sm font-extrabold text-ink">Staff Console <span className="hidden sm:inline font-mono text-xs font-normal text-faint">· Internal Management</span></p>
           </div>
           <div className="flex items-center gap-3 sm:gap-4">
             <Link to="/" target="_blank" className="hidden text-xs font-bold text-steel hover:text-navy underline sm:inline-flex">Storefront ↗</Link>

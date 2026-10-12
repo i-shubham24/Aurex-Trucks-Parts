@@ -86,7 +86,7 @@ export default function Enquiries() {
 
   useEffect(() => {
     fetchEnquiries();
-  }, [siteEnquiries]);
+  }, []);
 
   const setStatus = (id, s) => {
     setList((l) => l.map((x) => (x.id === id ? { ...x, status: s } : x)));

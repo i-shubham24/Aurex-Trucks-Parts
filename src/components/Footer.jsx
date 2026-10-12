@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { useCompany, useSite } from "../store/site";
+import { useAuth } from "../store/auth";
 import EmailLink from "./EmailLink";
 import { useNotification } from "../store/notification";
 
 export default function Footer() {
   const COMPANY = useCompany();
+  const { user } = useAuth();
   const { notify } = useNotification();
   const [email, setEmail] = useState("");
   const [done, setDone] = useState(false);
@@ -29,7 +31,29 @@ export default function Footer() {
             setBusy(true);
             setFailed(false);
             try {
-              await addEnquiry({ name: "Newsletter subscriber", email: email.trim().toLowerCase(), topic: "Newsletter sign-up", message: "Please add me to stock and price updates." });
+              if (user) {
+                await addEnquiry({
+                  name: user.name || "Newsletter subscriber",
+                  email: email.trim().toLowerCase(),
+                  topic: "Newsletter sign-up",
+                  message: "Please add me to stock and price updates.",
+                });
+              } else {
+                try {
+                  await addEnquiry({
+                    name: "Newsletter subscriber",
+                    email: email.trim().toLowerCase(),
+                    topic: "Newsletter sign-up",
+                    message: "Please add me to stock and price updates.",
+                  });
+                } catch {
+                  // Resilient fallback for guest visitors
+                  const raw = localStorage.getItem("aurex_newsletter_subscribers") || "[]";
+                  const subs = JSON.parse(raw);
+                  subs.push({ email: email.trim().toLowerCase(), subscribedAt: new Date().toISOString() });
+                  localStorage.setItem("aurex_newsletter_subscribers", JSON.stringify(subs));
+                }
+              }
             } catch {
               setBusy(false);
               setFailed(true);
@@ -83,7 +107,17 @@ export default function Footer() {
       <div className="bg-gold text-ink">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-3 text-xs font-medium sm:flex-row">
           <p>Copyright © 2026 {COMPANY.name}. All Rights Reserved.</p>
-          <p>Visa . Mastercard . PayPal . Afterpay . Bank Transfer</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] font-bold text-ink sm:justify-end">
+            <span>Visa</span>
+            <span className="text-ink/40">·</span>
+            <span>Mastercard</span>
+            <span className="text-ink/40">·</span>
+            <span>Bank Transfer (EFT)</span>
+            <span className="text-ink/40">·</span>
+            <span>Pay on Pickup</span>
+            <span className="text-ink/40">·</span>
+            <span>30-Day Fleet Terms</span>
+          </div>
         </div>
       </div>
     </footer>

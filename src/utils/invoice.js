@@ -19,11 +19,12 @@ export function generateInvoiceHtml(order) {
   const address = order.address || order.shippingAddress || {};
   const customerName = address.name || address.fullName || "Customer";
   const company = address.company || address.companyName || "";
-  const street = address.address || address.addressLine1 || "Warehouse Pickup";
+  const isPickupOrder = order.shipping === "Click and Collect VIC" || /pickup|collect/i.test(freight || "");
+  const street = address.address || address.addressLine1 || (isPickupOrder ? "Aurex Campbellfield Depot - Customer Collection" : "Warehouse Pickup");
   const street2 = address.addressLine2 || "";
-  const suburb = address.suburb || address.suburbOrCity || "";
+  const suburb = address.suburb || address.suburbOrCity || (isPickupOrder ? "Campbellfield" : "");
   const state = address.state || "VIC";
-  const postcode = address.postcode || address.postalCode || "";
+  const postcode = address.postcode || address.postalCode || (isPickupOrder ? "3061" : "");
   const phone = address.phone || order.phone || "";
   const email = address.email || order.email || order.guestEmail || "";
   const notes = address.notes || address.deliveryInstructions || order.customerNotes || "";

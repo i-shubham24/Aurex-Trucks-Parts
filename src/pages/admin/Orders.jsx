@@ -239,7 +239,7 @@ export default function Orders() {
                         <span className="block font-mono text-[11px] text-steel truncate max-w-[200px]">{o.email || "—"}</span>
                       </td>
                       <td className="px-5 py-3.5 font-mono text-xs text-steel">
-                        {new Date(o.placedAt).toLocaleString("en-AU", { dateStyle: "short", timeStyle: "short" })}
+                        {new Date(o.placedAt || o.createdAt || Date.now()).toLocaleString("en-AU", { dateStyle: "short", timeStyle: "short" })}
                       </td>
                       <td className="px-5 py-3.5 tabular font-bold text-ink">
                         {formatAUD(o.total)}
@@ -314,7 +314,7 @@ export default function Orders() {
                   {selectedOrder.id || selectedOrder.ref}
                 </h2>
                 <p className="text-xs text-steel mt-0.5">
-                  Placed on {new Date(selectedOrder.placedAt).toLocaleString("en-AU")}
+                  Placed on {new Date(selectedOrder.placedAt || selectedOrder.createdAt || Date.now()).toLocaleString("en-AU")}
                 </p>
               </div>
               <div className="flex flex-col items-end gap-2 text-right">
