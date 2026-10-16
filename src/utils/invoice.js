@@ -19,7 +19,10 @@ export function generateInvoiceHtml(order) {
   const address = order.address || order.shippingAddress || {};
   const customerName = address.name || address.fullName || "Customer";
   const company = address.company || address.companyName || "";
-  const isPickupOrder = order.shipping === "Click and Collect VIC" || /pickup|collect/i.test(freight || "");
+  const freight = order.shipping || order.shippingMethod || "Standard road freight";
+  const carrier = order.shipping?.carrier || order.carrier || "Standard Road";
+  const trackingNumber = order.shipping?.trackingNumber || order.trackingNumber || "Assigned at dispatch";
+  const isPickupOrder = order.shipping === "Click and Collect VIC" || /pickup|collect/i.test(String(freight || ""));
   const street = address.address || address.addressLine1 || (isPickupOrder ? "Aurex Campbellfield Depot - Customer Collection" : "Warehouse Pickup");
   const street2 = address.addressLine2 || "";
   const suburb = address.suburb || address.suburbOrCity || (isPickupOrder ? "Campbellfield" : "");
@@ -28,10 +31,6 @@ export function generateInvoiceHtml(order) {
   const phone = address.phone || order.phone || "";
   const email = address.email || order.email || order.guestEmail || "";
   const notes = address.notes || address.deliveryInstructions || order.customerNotes || "";
-  
-  const freight = order.shipping || order.shippingMethod || "Standard road freight";
-  const carrier = order.shipping?.carrier || order.carrier || "Standard Road";
-  const trackingNumber = order.shipping?.trackingNumber || order.trackingNumber || "Assigned at dispatch";
   
   const items = order.items || order.lines || [];
   const grandTotal = Number(order.total || order.grandTotal || 0);
@@ -315,10 +314,10 @@ export function generateInvoiceHtml(order) {
           <div class="logo-text">Aurex Trucks Parts</div>
           <div class="logo-sub">Commercial Vehicle Body & Chassis Equipment</div>
           <div class="company-details">
-            <strong>Aurex Commercial Equipment Pty Ltd</strong><br>
-            ABN: 43 658 921 445<br>
-            41 Halley Court, Campbellfield VIC 3061 Australia<br>
-            Phone: (03) 9357 8899 · Email: dispatch@aurex.com.au
+            <strong>Aurex Panels Pty Limited</strong><br>
+            ABN: 47 670 781 254 · ACN: 670 781 254<br>
+            77 Capital Link Drive, Campbellfield VIC 3061 Australia<br>
+            Phone: +61 414 730 467 · Email: info@aurextruckparts.com.au
           </div>
         </td>
         <td style="vertical-align: top;" class="invoice-title-block">
@@ -418,7 +417,7 @@ export function generateInvoiceHtml(order) {
     </div>
 
     <div class="footer-note">
-      Thank you for your business. Aurex Commercial Equipment Pty Ltd · 41 Halley Court, Campbellfield VIC 3061 · (03) 9357 8899 · dispatch@aurex.com.au
+      Thank you for your business. Aurex Panels Pty Limited · 77 Capital Link Drive, Campbellfield VIC 3061 · +61 414 730 467 · info@aurextruckparts.com.au
     </div>
   </div>
 

@@ -6,6 +6,7 @@ const Ctx = createContext(null);
 
 const DEFAULT_SETTINGS = {
   storeName: "Aurex Truck Parts Australia",
+  legalName: "Aurex Panels Pty Limited",
   phone: COMPANY.phone,
   email: COMPANY.email,
   address: COMPANY.address,
@@ -13,7 +14,8 @@ const DEFAULT_SETTINGS = {
   freeFreightOver: 500,
   standardFee: 24,
   expressFee: 39,
-  abn: "ABN 12 345 678 901",
+  abn: "ABN 47 670 781 254",
+  acn: "670 781 254",
   announcement: "",
 };
 const DEFAULT_PROMOS = []; // promo codes only ever come from the API
@@ -107,12 +109,15 @@ export { DEFAULT_SETTINGS };
 export const useCompany = () => {
   const { settings } = useSite();
   return useMemo(() => ({
-    name: settings.storeName,
+    name: settings.storeName || COMPANY.name,
+    legalName: settings.legalName || COMPANY.legalName || "Aurex Panels Pty Limited",
     short: "Aurex",
-    phone: settings.phone,
-    phoneHref: "tel:" + (String(settings.phone || "").startsWith("+") ? "+" : "") + String(settings.phone || "").replace(/\D/g, ""),
-    email: settings.email,
-    address: settings.address,
-    hours: settings.hours,
+    abn: settings.abn || COMPANY.abn || "47 670 781 254",
+    acn: settings.acn || COMPANY.acn || "670 781 254",
+    phone: settings.phone || COMPANY.phone,
+    phoneHref: "tel:" + (String(settings.phone || COMPANY.phone || "").startsWith("+") ? "+" : "") + String(settings.phone || COMPANY.phone || "").replace(/\D/g, ""),
+    email: settings.email || COMPANY.email,
+    address: settings.address || COMPANY.address,
+    hours: settings.hours || COMPANY.hours,
   }), [settings]);
 };

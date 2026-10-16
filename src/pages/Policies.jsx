@@ -11,7 +11,9 @@ function buildPolicies({ company, settings }) {
   const freeOver = formatAUD(settings.freeFreightOver || 500);
   const standard = formatAUD(settings.standardFee || 0);
   const express = formatAUD(settings.expressFee || 0);
-  const { name, phone, email, address, hours } = company;
+  const { name, phone, email, address, hours, legalName, abn, acn } = company;
+  const canonicalEntity = legalName || "Aurex Panels Pty Limited";
+  const canonicalAbn = abn || settings.abn || "ABN 47 670 781 254";
 
   return [
     {
@@ -83,7 +85,7 @@ function buildPolicies({ company, settings }) {
     },
     {
       id: "warranty", label: "Warranty", title: "Warranty",
-      intro: `This warranty is given by ${name}, ${address}. Phone ${phone}, email ${email}.`,
+      intro: `This warranty is given by ${canonicalEntity} (${canonicalAbn}), trading as ${name}, ${address}. Phone ${phone}, email ${email}.`,
       body: [
         ["What is covered", [
           "Parts we sell are warranted against defects in materials and workmanship for 12 months from the date of delivery or collection. Where a manufacturer offers a longer warranty on a product, the longer period applies and is stated on the product page or your quote.",
@@ -108,7 +110,7 @@ function buildPolicies({ company, settings }) {
     },
     {
       id: "terms", label: "Terms", title: "Terms of sale",
-      intro: `These terms apply to every order placed with ${name}${settings.abn ? ` (${/abn/i.test(settings.abn) ? settings.abn : `ABN ${settings.abn}`})` : ""} through this website, by phone or at the counter.`,
+      intro: `These terms apply to every order placed with ${canonicalEntity} (${canonicalAbn}), trading as ${name}, through this website, by phone or at the counter.`,
       body: [
         ["Prices", [
           "All prices are in Australian dollars and include GST. The GST amount is itemised on your tax invoice.",
@@ -148,7 +150,7 @@ function buildPolicies({ company, settings }) {
     },
     {
       id: "privacy", label: "Privacy", title: "Privacy",
-      intro: `${name} handles personal information in line with the Privacy Act 1988 (Cth) and the Australian Privacy Principles.`,
+      intro: `${canonicalEntity} (trading as ${name}) handles personal information in line with the Privacy Act 1988 (Cth) and the Australian Privacy Principles.`,
       body: [
         ["What we collect", [
           "Account details: your name, email address, phone number and, if you give it, your company name. Passwords are stored in hashed form; we cannot see them.",

@@ -106,7 +106,7 @@ export default function Footer() {
       </div>
       <div className="bg-gold text-ink">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-3 text-xs font-medium sm:flex-row">
-          <p>Copyright © 2026 {COMPANY.name}. All Rights Reserved.</p>
+          <p>Copyright © 2026 {COMPANY.legalName || "Aurex Panels Pty Limited"} (ABN {COMPANY.abn || "47 670 781 254"}). Trading as {COMPANY.name}. All Rights Reserved.</p>
           <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[11px] font-bold text-ink sm:justify-end">
             <span>Visa</span>
             <span className="text-ink/40">·</span>

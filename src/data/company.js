@@ -1,10 +1,13 @@
 export const COMPANY = {
   name: "Aurex Truck Parts Australia",
+  legalName: "Aurex Panels Pty Limited",
   short: "Aurex",
-  address: "41 Halley Court, Campbellfield VIC 3061",
+  abn: "47 670 781 254",
+  acn: "670 781 254",
+  address: "77 Capital Link Drive, Campbellfield VIC 3061",
   phone: "+61 414 730 467",
   phoneHref: "tel:+61414730467",
-  email: "sales@aurextruckparts.com.au",
+  email: "info@aurextruckparts.com.au",
   hours: "Mon – Fri: 9:00 AM – 5:00 PM | Sat: 9:00 AM – 12:00 PM",
   tradingHours: [
     { label: "Monday – Friday", time: "9:00 AM – 5:00 PM" },

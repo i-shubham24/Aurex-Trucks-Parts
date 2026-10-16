@@ -116,7 +116,12 @@ export default function OrderSuccess() {
     staleTime: 5 * 60 * 1000,
     enabled: byTransfer,
   });
-  const bank = payConfig?.directBankTransfer;
+  const bank = payConfig?.directBankTransfer || {
+    bankName: "NAB Australia Ltd",
+    accountName: "Aurex Panels Pty Limited",
+    bsbOrRouting: "083-419",
+    accountNumber: "90-287-1454"
+  };
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
@@ -166,7 +171,7 @@ export default function OrderSuccess() {
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-faint">Tax Invoice</p>
               <p className="mt-1 text-lg font-extrabold">Aurex Truck Parts Australia</p>
-              <p className="font-mono text-[11px] text-faint">{settings.abn}</p>
+              <p className="font-mono text-[11px] text-faint">{settings.legalName || COMPANY.legalName || "Aurex Panels Pty Limited"} · {settings.abn || COMPANY.abn || "ABN 47 670 781 254"}</p>
             </div>
             <div className="text-right text-[13px] text-steel">
               <p className="font-mono font-bold text-ink">{order.id}</p>
