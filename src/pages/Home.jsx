@@ -60,21 +60,13 @@ function Hero() {
     return null;
   }
 
-const getHeroSquareImg = (src) => {
-  if (!src || typeof src !== "string") return src;
-  if (src.includes("aurex-tail-lift")) return "/images/web/aurex-tail-lift-square.webp";
-  if (src.includes("hero-trailer-parts-yellow") || src.includes("trailer-parts")) return "/images/web/hero-trailer-parts-yellow-square.webp";
-  if (src.includes("aurex-fleet-accessories") || src.includes("fleet-accessories")) return "/images/web/aurex-fleet-accessories-square.webp";
-  return src;
-};
-
   const s = slides[i] || slides[0];
 
   return (
     <section className="mx-auto max-w-7xl px-4 pt-4">
       <div className="relative grid grid-cols-1 overflow-hidden rounded-lg bg-mist md:grid-cols-2 md:items-center">
-        <div className="px-6 py-8 sm:px-8 sm:py-12 md:px-12 md:py-16" key={`t-${i}-${s.id || s.title}`}>
-          <h1 className="text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-4xl md:text-[56px]">{s.title}</h1>
+        <div className="px-6 py-12 md:px-12 md:py-16" key={`t-${i}-${s.id || s.title}`}>
+          <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight md:text-[56px]">{s.title}</h1>
           <p className="mt-3 max-w-sm text-[15px] leading-6 text-steel">{s.subtitle || s.sub}</p>
           <div className="mt-6 flex gap-2.5 sm:gap-3">
             <Link
@@ -122,33 +114,25 @@ const getHeroSquareImg = (src) => {
             </div>
           </div>
         </div>
-        <div className="relative aspect-square sm:aspect-[4/3] md:aspect-auto md:min-h-[380px] md:h-full md:self-stretch">
-          <div className="hero-slide absolute hidden md:block inset-y-4 right-6 left-24 rounded-md bg-gold/50 blur-[1px]" />
+        <div className="relative min-h-[260px] md:min-h-[380px]">
+          <div className="hero-slide absolute inset-y-4 right-6 left-16 rounded-md bg-gold/50 blur-[1px] md:left-24" />
           {slides.map((slide, idx) => {
             const isCurrent = idx === i;
             const src = slide.image?.url || slide.img;
             if (!src) return null;
-            const squareSrc = getHeroSquareImg(src);
 
             return (
-              <picture
+              <img
                 key={slide.id || slide.title || idx}
-                className={`hero-slide absolute inset-0 h-full w-full transition-opacity duration-700 ease-in-out ${
+                src={cld(src, 1400)}
+                alt={slide.title}
+                loading={idx === 0 ? "eager" : "lazy"}
+                fetchPriority={idx === 0 ? "high" : "auto"}
+                decoding={idx === 0 ? "sync" : "async"}
+                className={`hero-slide absolute inset-0 h-full w-full rounded-r-lg object-cover [clip-path:polygon(12%_0,100%_0,100%_100%,0_100%)] transition-opacity duration-700 ease-in-out ${
                   isCurrent ? "opacity-100 z-10" : "opacity-0 pointer-events-none z-0"
                 }`}
-              >
-                {/* Mobile screens (< 768px): load squared hero without slanting */}
-                <source media="(max-width: 767px)" srcSet={cld(squareSrc, 800)} />
-                {/* Broader screens (>= 768px): load widescreen version with desktop slant */}
-                <img
-                  src={cld(src, 1400)}
-                  alt={slide.title}
-                  loading={idx === 0 ? "eager" : "lazy"}
-                  fetchPriority={idx === 0 ? "high" : "auto"}
-                  decoding={idx === 0 ? "sync" : "async"}
-                  className="h-full w-full object-cover rounded-b-lg md:rounded-b-none md:rounded-r-lg [clip-path:none] md:[clip-path:polygon(12%_0,100%_0,100%_100%,0_100%)]"
-                />
-              </picture>
+              />
             );
           })}
         </div>
