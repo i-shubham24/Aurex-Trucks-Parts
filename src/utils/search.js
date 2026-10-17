@@ -5,9 +5,18 @@ const escapeRegExp = (text) => String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&
 export function makeMatcher(term) {
   const t = String(term || "").trim().toLowerCase();
   if (!t) return () => true;
-  const body = escapeRegExp(t);
-  const rx = t.length < 4 ? new RegExp(`(^|[^a-z0-9])${body}`, "i") : new RegExp(body, "i");
-  return (text) => rx.test(String(text || ""));
+  const words = t.split(/[\s,*]+/).filter(Boolean);
+  if (words.length === 0) return () => true;
+
+  const matchers = words.map((w) => {
+    const body = escapeRegExp(w);
+    return w.length < 3 ? new RegExp(`(^|[^a-z0-9])${body}`, "i") : new RegExp(body, "i");
+  });
+
+  return (text) => {
+    const s = String(text || "");
+    return matchers.every((rx) => rx.test(s));
+  };
 }
 
 export default makeMatcher;

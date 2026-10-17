@@ -24,10 +24,11 @@ export function normalizeProduct(p) {
     categoryName: typeof p.category === 'object' ? p.category?.name : '',
     sub: p.sub || p.subCategory || '',
     price: sellingPrice,
-    pricing: p.pricing || {
-      mrp: sellingPrice || 0,
-      sellingPrice: sellingPrice || 0,
-      tradePrice: p.pricing?.tradePrice || 0,
+    pricing: {
+      ...(p.pricing || {}),
+      mrp: isEnquiry ? null : (p.pricing?.mrp ?? sellingPrice ?? 0),
+      sellingPrice: isEnquiry ? null : (p.pricing?.sellingPrice ?? sellingPrice ?? 0),
+      tradePrice: isEnquiry ? null : (p.pricing?.tradePrice || 0),
       isPOA: isEnquiry,
     },
     brand: typeof p.brand === 'object' ? p.brand?.name : (p.brandName || p.brand || 'Aurex'),

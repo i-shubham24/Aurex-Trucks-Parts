@@ -1,13 +1,21 @@
 // Local product shots live at public/images/products/<ATP part number>.jpg or .webp
 export const imgFor = (sku) => {
   if (!sku) return null;
-  if (sku.startsWith('ATP-BP-')) return `/images/products/${sku}.webp`;
   if (sku === 'ATP-TP-14') return '/images/products/ATP-TP-14-handle.jpg';
   return `/images/products/${sku}.jpg`;
 };
 
+export const MULTI_IMAGES = {
+  'ATP-TP-83': ['/images/products/ATP-TP-83.jpg', '/images/products/ATP-TP-83-bar.jpg'],
+  'ATP-TP-69': ['/images/products/ATP-TP-69.jpg', '/images/products/ATP-TP-69-back.jpg'],
+  'ATP-TP-84': ['/images/products/ATP-TP-84.jpg', '/images/products/ATP-TP-84-back.jpg'],
+  'ATP-TP-85': ['/images/products/ATP-TP-85.jpg', '/images/products/ATP-TP-85-back.jpg'],
+  'ATP-TP-86': ['/images/products/ATP-TP-86.jpg', '/images/products/ATP-TP-86-back.jpg'],
+};
+
 export const imagesFor = (sku) => {
   if (!sku) return [];
+  if (MULTI_IMAGES[sku]) return MULTI_IMAGES[sku];
   const primary = imgFor(sku);
   return primary ? [primary] : [];
 };

@@ -6,11 +6,28 @@ import SafeImage from "./SafeImage";
 import { useCart } from "../store/cart";
 
 export function PartVisual({ p }) {
-  const img = p.images?.[0]?.url || p.imageUrl || imgFor(p.sku);
+  const img = imgFor(p.sku) || p.images?.[0]?.url || p.imageUrl;
   if (img) {
     const isTailLift = p.category === "tail-lifts" || p.categorySlug === "tail-lifts";
-    // Tail lifts are landscape yard photos — use full object-cover without padding so they aren't shrunken
-    if (isTailLift) {
+    const isPhotoCover = isTailLift || ['ATP-TP-87', 'ATP-TP-91'].includes(p.sku);
+    const isReducedProfile = ['ATP-TP-88', 'ATP-TP-89', 'ATP-TP-90'].includes(p.sku);
+
+    if (isReducedProfile) {
+      return (
+        <div className="flex h-full w-full items-center justify-center bg-white p-2 sm:p-2.5">
+          <SafeImage
+            alt={p.name}
+            loading="lazy"
+            src={img}
+            cdnWidth={480}
+            className="max-h-full max-w-full rounded-[3px] object-contain transition-transform duration-300 group-hover:scale-105"
+          />
+        </div>
+      );
+    }
+
+    // Tail lifts & landscape profile photos — use full object-cover without padding so they aren't shrunken or letterboxed
+    if (isPhotoCover) {
       return (
         <SafeImage
           alt={p.name}
@@ -102,11 +119,9 @@ function CompareBtn({ p }) {
 export default function ProductCard({ p, joined }) {
   const { add } = useCart();
   const navigate = useNavigate();
-  const isTailLift = p.category === "tail-lifts" || p.categorySlug === "tail-lifts";
-  const isBodyPanel = p.category === "body-panels" || p.categorySlug === "body-panels" || (p.sku && p.sku.startsWith("ATP-BP-"));
-  const enquiry = p.price === null || p.pricing?.isPOA === true || p.isPOA === true || p.status === "Enquiry only" || isTailLift || isBodyPanel;
+  const isTailLift = p.category === "tail-lifts" || p.categorySlug === "tail-lifts" || (p.sku && p.sku.startsWith("ATP-TL-"));
+  const enquiry = p.price === null || p.pricing?.isPOA === true || p.isPOA === true || p.status === "Enquiry only" || isTailLift;
   const targetUrl = `/product/${p.sku}`;
-  const mailtoBodyPanel = `mailto:info@aurextruckparts.com.au?subject=Quotation%20Enquiry%20-%20${encodeURIComponent(p.sku)}%20${encodeURIComponent(p.name)}&body=Hi%20Aurex%20Truck%20Parts%20Team,%0D%0A%0D%0AI%20would%20like%20to%20request%20a%20commercial%20fleet%20quote%20for:%0D%0APart%20Number:%20${encodeURIComponent(p.sku)}%0D%0AProduct:%20${encodeURIComponent(p.name)}%0D%0AQuantity%20Required:%20%0D%0ACompany%20Name:%20%0D%0AContact%20Phone:%20%0D%0ADelivery%20Location:%20%0D%0A%0D%0AThank%20you!`;
   const enquiryUrl = isTailLift
     ? `/tail-lift-enquiry?sku=${p.sku}`
     : `/contact?topic=${encodeURIComponent(p.name)}&sku=${p.sku}`;
@@ -114,11 +129,7 @@ export default function ProductCard({ p, joined }) {
   const handleEnquiryClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (isBodyPanel) {
-      window.location.href = mailtoBodyPanel;
-    } else {
-      navigate(enquiryUrl);
-    }
+    navigate(enquiryUrl);
   };
 
   return (
@@ -129,7 +140,7 @@ export default function ProductCard({ p, joined }) {
     >
       <Link
         to={targetUrl}
-        className={`relative block aspect-[4/3] overflow-hidden bg-mist ${
+        className={`relative block aspect-[4/3] overflow-hidden bg-white ${
           joined ? "" : "rounded-t-[5px]"
         }`}
       >
@@ -165,7 +176,7 @@ export default function ProductCard({ p, joined }) {
         ) : (
           <span className="absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-between gap-2 bg-navy px-3 py-1.5 transition-transform duration-200 group-hover:translate-y-0 group-focus-within:translate-y-0">
             <span className="text-[12px] font-bold text-white underline underline-offset-4 transition-colors hover:text-gold">
-              {isBodyPanel ? "Email Quote →" : "View Specifications →"}
+              View Specifications →
             </span>
             <button
               type="button"
@@ -198,19 +209,21 @@ export default function ProductCard({ p, joined }) {
           </span>
           {enquiry ? (
             <div className="ml-auto text-right">
-              {p.pricing?.sellingPrice > 0 && isBodyPanel && (
-                <span className="block text-[11px] font-semibold text-steel">
-                  From {formatAUD(p.pricing.sellingPrice)}
-                </span>
-              )}
               <span className="text-[14px] font-extrabold text-primary">
                 Enquire Price
               </span>
             </div>
           ) : (
-            <span className="ml-auto tabular text-[20px] font-extrabold text-primary">
-              {formatAUD(p.price)}
-            </span>
+            <div className="ml-auto text-right">
+              {p.pricing?.mrp > p.price && (
+                <span className="block text-[11px] font-semibold text-steel line-through">
+                  {formatAUD(p.pricing.mrp)}
+                </span>
+              )}
+              <span className="tabular text-[20px] font-extrabold text-primary">
+                {formatAUD(p.price)}
+              </span>
+            </div>
           )}
         </div>
       </div>

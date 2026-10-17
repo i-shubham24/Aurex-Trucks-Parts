@@ -29,7 +29,7 @@ function ProductImageZoom({ src, alt, isTailLift }) {
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setIsHovered(false)}
       className={`group/zoom relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden cursor-crosshair ${
-        isTailLift ? "p-0" : "p-6 bg-white"
+        isTailLift ? "p-0" : "p-2 sm:p-3 bg-white"
       }`}
     >
       <SafeImage
@@ -149,31 +149,40 @@ const SIZE_FAMILIES = [
   },
   // 5. Honeycomb 20mm Door Panels
   {
-    skus: ['ATP-BP-03', 'ATP-BP-04', 'ATP-BP-05'],
+    skus: ['ATP-ACC-08', 'ATP-ACC-09', 'ATP-ACC-10'],
     label: 'Available Panel Sizes',
     options: [
-      { sku: 'ATP-BP-03', name: '2400 x 1200mm (20mm)', price: '$238' },
-      { sku: 'ATP-BP-04', name: '2800 x 1200mm (20mm)', price: '$278' },
-      { sku: 'ATP-BP-05', name: '3200 x 1200mm (20mm)', price: '$317' },
+      { sku: 'ATP-ACC-08', name: '2400 x 1200mm (20mm)', price: '$354.00' },
+      { sku: 'ATP-ACC-09', name: '2800 x 1200mm (20mm)', price: '$412.00' },
+      { sku: 'ATP-ACC-10', name: '3200 x 1200mm (20mm)', price: '$470.00' },
     ]
   },
-  // 6. Honeycomb 30mm Panels
+  // 6. Plywood 20mm Door Panels
   {
-    skus: ['ATP-BP-06', 'ATP-BP-07'],
-    label: 'Available Panel Sizes',
+    skus: ['ATP-ACC-11', 'ATP-ACC-12', 'ATP-ACC-13'],
+    label: 'Available Plywood Core Sizes',
     options: [
-      { sku: 'ATP-BP-06', name: '2800 x 1200mm (30mm)', price: '$357' },
-      { sku: 'ATP-BP-07', name: '3200 x 1200mm (30mm)', price: '$407' },
+      { sku: 'ATP-ACC-11', name: '2400 x 1200mm (20mm)', price: '$377.00' },
+      { sku: 'ATP-ACC-12', name: '2800 x 1200mm (20mm)', price: '$436.00' },
+      { sku: 'ATP-ACC-13', name: '3200 x 1200mm (20mm)', price: '$499.00' },
     ]
   },
-  // 7. Plywood 20mm Panels
+  // 7. Insulated XPS 30mm Panels
   {
-    skus: ['ATP-BP-08', 'ATP-BP-09', 'ATP-BP-10'],
-    label: 'Available Panel Sizes',
+    skus: ['ATP-ACC-14', 'ATP-ACC-15'],
+    label: 'Available Insulated XPS Sizes',
     options: [
-      { sku: 'ATP-BP-08', name: '2400 x 1200mm (20mm)', price: '$258' },
-      { sku: 'ATP-BP-09', name: '2800 x 1200mm (20mm)', price: '$301' },
-      { sku: 'ATP-BP-10', name: '3200 x 1200mm (20mm)', price: '$344' },
+      { sku: 'ATP-ACC-14', name: '2800 x 1200mm (30mm)', price: '$446.00' },
+      { sku: 'ATP-ACC-15', name: '3200 x 1200mm (30mm)', price: '$509.00' },
+    ]
+  },
+  // 8. 20mm Door Seals
+  {
+    skus: ['ATP-ACC-17', 'ATP-ACC-18'],
+    label: 'Available Seal Profile Material',
+    options: [
+      { sku: 'ATP-ACC-17', name: 'EPDM Rubber 20mm (5M)', price: '$57.50' },
+      { sku: 'ATP-ACC-18', name: 'PVC Polymer 20mm (5M)', price: '$47.00' },
     ]
   },
   // 8. Beauway Cantilever Tail Lifts
@@ -257,20 +266,22 @@ export default function ProductDetail() {
     );
   }
 
-  const BAD_IMAGE_SUBSTRINGS = ['-gl11113', '-schematic', '-strap.png', '-strap.jpg', '-paddle.png'];
+  const BAD_IMAGE_SUBSTRINGS = ['-gl11113', '-schematic', '-strap.png', '-strap.jpg', '-paddle.png', '-cad', 'cad.', '-drawing', '-blueprint'];
   const isCleanImage = (url) => {
     if (!url || typeof url !== 'string') return false;
-    return !BAD_IMAGE_SUBSTRINGS.some((bad) => url.includes(bad));
+    return !BAD_IMAGE_SUBSTRINGS.some((bad) => url.toLowerCase().includes(bad));
   };
 
   const cleanLocal = imgFor(p.sku);
-  const fallbackImages = imagesFor(p.sku).filter(isCleanImage);
+  const localImages = imagesFor(p.sku).filter(isCleanImage);
   const backendImages = Array.isArray(p.images) && p.images.length > 0 
     ? p.images.map((img) => (typeof img === "string" ? img : img.url)).filter(isCleanImage)
     : [];
 
-  // For products with curated clean studio packshots, prioritize local images so stale CDN caches don't show bad photos
-  const rawList = cleanLocal ? [cleanLocal] : (backendImages.length > 0 ? backendImages : fallbackImages);
+  // Prioritize curated multi-image views (front, back, CAD, detail) and studio packshots
+  const rawList = localImages.length > 0 
+    ? localImages 
+    : (cleanLocal ? [cleanLocal] : (backendImages.length > 0 ? backendImages : []));
   const imagesList = Array.from(new Set(rawList.filter(Boolean)));
   if (imagesList.length === 0) {
     const single = cleanLocal || `/images/products/${p.sku}.jpg`;
@@ -278,9 +289,8 @@ export default function ProductDetail() {
   }
 
   const primaryImage = imagesList[activeImgIdx] || imagesList[0] || cleanLocal || `/images/products/${p.sku}.jpg`;
-  const isTailLift = p.category === "tail-lifts" || p.categorySlug === "tail-lifts";
-  const isBodyPanel = p.category === "body-panels" || p.categorySlug === "body-panels" || (p.sku && p.sku.startsWith("ATP-BP-"));
-  const enquiry = p.price === null || p.pricing?.isPOA === true || p.isPOA === true || p.status === "Enquiry only" || isTailLift || isBodyPanel;
+  const isTailLift = p.category === "tail-lifts" || p.categorySlug === "tail-lifts" || (p.sku && p.sku.startsWith("ATP-TL-"));
+  const enquiry = p.price === null || p.pricing?.isPOA === true || p.isPOA === true || p.status === "Enquiry only" || isTailLift;
   const inCompare = compare.includes(p.sku);
 
   const sizeFamily = SIZE_FAMILIES.find((f) => f.skus.includes(p.sku));
@@ -347,7 +357,7 @@ export default function ProductDetail() {
               <ProductImageZoom
                 src={primaryImage}
                 alt={p.name}
-                isTailLift={p.category === "tail-lifts"}
+                isTailLift={p.category === "tail-lifts" || ['ATP-TP-87', 'ATP-TP-91'].includes(p.sku)}
               />
             ) : (
               <div className="flex aspect-[4/3] w-full items-center justify-center p-6 bg-white">
@@ -470,7 +480,7 @@ export default function ProductDetail() {
                       }`}
                     >
                       <span className="font-extrabold">{opt.name}</span>
-                      {opt.price && (
+                      {!enquiry && opt.price && (
                         <span className={`font-mono text-[11px] font-bold ${isCurrent ? 'text-gold' : 'text-primary'}`}>
                           {opt.price}
                         </span>
@@ -503,34 +513,17 @@ export default function ProductDetail() {
                     >
                       Request Tail Lift Quotation Enquiry →
                     </Link>
-                  ) : isBodyPanel ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const subject = `Quotation Enquiry - ${p.sku} ${p.name}`;
-                        const emailBody = `Hi Aurex Truck Parts Team,\n\nI would like to request a commercial fleet quotation for:\nPart Number: ${p.sku}\nProduct: ${p.name}\nQuantity Required: \nCompany Name: \nContact Phone: \nDelivery Location / Postcode: \n\nPlease provide pricing and freight availability.\n\nThank you!`;
-                        try {
-                          window.location.href = `mailto:info@aurextruckparts.com.au?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
-                        } catch (e) {}
-                        setQuoteModalOpen(true);
-                      }}
-                      className="flex items-center justify-center gap-2 rounded bg-gold py-3 text-center text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white sm:col-span-2 shadow-xs cursor-pointer"
-                    >
-                      <Mail size={16} /> Request Quote →
-                    </button>
                   ) : (
                     <Link
                       to={`/contact?topic=${encodeURIComponent(p.name)}&sku=${p.sku}`}
-                      className="rounded border border-ink bg-white py-3 text-center text-sm font-bold transition-colors hover:bg-ink hover:text-white"
+                      className="rounded border border-ink bg-white py-3 text-center text-sm font-bold transition-colors hover:bg-ink hover:text-white sm:col-span-2"
                     >
                       Send Enquiry
                     </Link>
                   )}
                   <a
                     href={COMPANY.phoneHref}
-                    className={`flex items-center justify-center gap-2 rounded bg-ink py-3 text-sm font-bold text-white transition-colors hover:bg-navy ${
-                      isTailLift || isBodyPanel ? "sm:col-span-2" : ""
-                    }`}
+                    className="flex items-center justify-center gap-2 rounded bg-ink py-3 text-sm font-bold text-white transition-colors hover:bg-navy sm:col-span-2"
                   >
                     <Phone size={16} /> Call {COMPANY.phone}
                   </a>
@@ -539,8 +532,20 @@ export default function ProductDetail() {
               </>
             ) : (
               <><div className="flex flex-wrap items-baseline justify-between gap-2">
-                <p className="tabular text-5xl font-extrabold text-primary">{formatAUD(p.price)}</p>
-                <p className="text-right font-mono text-[11px] leading-4 text-faint">{p.status.toUpperCase()}<br />{p.lead.toUpperCase()}</p>
+                <div>
+                  {p.pricing?.mrp > p.price && (
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className="text-base font-semibold text-steel line-through">
+                        {formatAUD(p.pricing.mrp)}
+                      </span>
+                      <span className="rounded bg-rose-50 px-2 py-0.5 text-xs font-bold text-rose-700 border border-rose-200">
+                        3% Below Market Competitor
+                      </span>
+                    </div>
+                  )}
+                  <p className="tabular text-5xl font-extrabold text-primary">{formatAUD(p.price)}</p>
+                </div>
+                <p className="text-right font-mono text-[11px] leading-4 text-faint">{(p.status || "In stock VIC").toUpperCase()}<br />{(p.lead || "Ships in 24 hrs").toUpperCase()}</p>
               </div>
               <p className="mt-1.5 flex items-center gap-1.5 text-[13px] text-steel"><Truck size={14} className="text-green-600" /> Order by 2pm, dispatched today ex Campbellfield.</p>
               {inCart ? (

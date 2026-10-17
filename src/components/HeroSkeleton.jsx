@@ -22,7 +22,7 @@ export function HeroSkeleton() {
         </div>
 
         {/* Right image box skeleton */}
-        <div className="shimmer relative min-h-[260px] md:min-h-[380px] h-full w-full rounded-r-lg bg-line/50" />
+        <div className="shimmer relative aspect-square sm:aspect-[4/3] md:aspect-auto md:min-h-[380px] h-full w-full rounded-b-lg md:rounded-b-none md:rounded-r-lg bg-line/50" />
       </div>
     </section>
   );

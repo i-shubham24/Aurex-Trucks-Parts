@@ -115,7 +115,7 @@ function SearchBox({ onDone, autoFocus = false }) {
                   <span className="font-mono text-[11px] text-faint">{p.sku}</span>
                 </span>
                 <span className="tabular shrink-0 text-[13px] font-extrabold text-primary">
-                  {p.price === null ? "POA" : formatAUD(p.price)}
+                  {(p.price === null || p.price === 0 || p.isPOA || p.pricing?.isPOA) ? "Enquire Price" : formatAUD(p.price)}
                 </span>
               </button>
             );

@@ -67,10 +67,10 @@ export default function Shop({ preset }) {
     let list = rawProducts.filter((p) => sub === "All" || p.sub === sub);
     if (avail === "stock") list = list.filter((p) => String(p.status).toLowerCase().includes("in stock") || p.inventory?.stock > 0);
     if (avail === "order") list = list.filter((p) => String(p.status).toLowerCase().includes("order"));
-    if (avail === "enquiry") list = list.filter((p) => p.price === null);
+    if (avail === "enquiry") list = list.filter((p) => p.price === null || p.price === 0 || p.isPOA || p.pricing?.isPOA);
     if (query) {
       const matches = makeMatcher(query);
-      list = list.filter((p) => matches(`${p.sku} ${p.name} ${p.sub}`));
+      list = list.filter((p) => matches(`${p.sku} ${p.name} ${p.sub || ''} ${p.fit || ''} ${p.oem || ''} ${p.shortDescription || ''} ${(p.alternatePartNumbers || []).join(' ')}`));
     }
     if (sort === "sku") list = [...list].sort(bySku);
     if (sort === "low") list = [...list].sort((a, b) => (a.price ?? 1e12) - (b.price ?? 1e12));
