@@ -188,11 +188,11 @@ const SIZE_FAMILIES = [
     label: 'Available Tail Lift Capacities & Sizes',
     sub: '24V DC electro-hydraulic system',
     options: [
-      { sku: 'ATP-TL-04', name: '1.5T Aluminium', note: '2450 x 2400mm', price: 'POA' },
-      { sku: 'ATP-TL-02', name: '2.0T Aluminium', note: '2450 x 2200mm', price: 'POA' },
-      { sku: 'ATP-TL-01', name: '2.0T Aluminium', note: '2450 x 2400mm', price: 'POA' },
-      { sku: 'ATP-TL-03', name: '2.0T Aluminium', note: '2450 x 2600mm', price: 'POA' },
-      { sku: 'ATP-TL-05', name: '3.0T High-Tensile Steel', note: '2450 x 2600mm', price: 'POA' },
+      { sku: 'ATP-TL-04', name: '1.5T Aluminium (2450 x 2400mm)', note: '2450 x 2400mm', price: 'POA' },
+      { sku: 'ATP-TL-02', name: '2.0T Aluminium (2450 x 2200mm)', note: '2450 x 2200mm', price: 'POA' },
+      { sku: 'ATP-TL-01', name: '2.0T Aluminium (2450 x 2400mm)', note: '2450 x 2400mm', price: 'POA' },
+      { sku: 'ATP-TL-03', name: '2.0T Aluminium (2450 x 2600mm)', note: '2450 x 2600mm', price: 'POA' },
+      { sku: 'ATP-TL-05', name: '3.0T High-Tensile Steel (2450 x 2600mm)', note: '2450 x 2600mm', price: 'POA' },
     ]
   }
 ];
@@ -522,24 +522,17 @@ export default function ProductDetail() {
                   <p className="text-2xl font-extrabold">
                     Enquire Price <span className="text-sm font-semibold text-steel">for your fleet</span>
                   </p>
-                  {isBodyPanel && p.pricing?.sellingPrice > 0 && (
-                    <span className="inline-flex items-center gap-1.5 rounded bg-navy/10 px-2.5 py-1 text-xs font-bold text-navy">
-                      <span>Target Fleet Price: <strong className="font-extrabold text-navy">{formatAUD(p.pricing.sellingPrice)}</strong> (ex GST)</span>
-                    </span>
-                  )}
                 </div>
                 <p className="mt-1 text-[13px] text-steel">
                   {isTailLift
                     ? "Custom sized to your truck chassis and body dimensions. Engineering review in 4 hours."
-                    : isBodyPanel
-                    ? "Commercial FRP composite panels & seals. Direct email enquiry to info@aurextruckparts.com.au."
-                    : "Priced to your drawing or sample. Back within 4 business hours."}
+                    : "Priced to your fleet requirements. Fast quote back within 4 business hours."}
                 </p>
                 <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {isTailLift ? (
                     <Link
                       to={`/tail-lift-enquiry?sku=${p.sku}`}
-                      className="flex items-center justify-center gap-2 rounded bg-gold py-3 text-center text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white sm:col-span-2"
+                      className="flex items-center justify-center gap-2 rounded bg-gold py-3 text-center text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white sm:col-span-2 shadow-xs"
                     >
                       Request Tail Lift Quotation Enquiry →
                     </Link>
@@ -548,7 +541,7 @@ export default function ProductDetail() {
                       href={`mailto:info@aurextruckparts.com.au?subject=Quotation%20Enquiry%20-%20${encodeURIComponent(p.sku)}%20${encodeURIComponent(p.name)}&body=Hi%20Aurex%20Truck%20Parts%20Team,%0D%0A%0D%0AI%20would%20like%20to%20request%20a%20commercial%20fleet%20quotation%20for:%0D%0APart%20Number:%20${encodeURIComponent(p.sku)}%0D%0AProduct:%20${encodeURIComponent(p.name)}%0D%0AQuantity%20Required:%20%0D%0ACompany%20Name:%20%0D%0AContact%20Phone:%20%0D%0ADelivery%20Location%20/%20Postcode:%20%0D%0A%0D%0APlease%20provide%20pricing%20and%20freight%20availability.%0D%0A%0D%0AThank%20you!`}
                       className="flex items-center justify-center gap-2 rounded bg-gold py-3 text-center text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white sm:col-span-2 shadow-xs"
                     >
-                      <Mail size={16} /> Request Quote (Email info@aurextruckparts.com.au) →
+                      <Mail size={16} /> Request Quote →
                     </a>
                   ) : (
                     <Link
