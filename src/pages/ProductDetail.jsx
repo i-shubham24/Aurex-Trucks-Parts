@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
-import { CheckCircle2, Minus, Phone, Plus, ShieldCheck, Truck, ShoppingCart, ZoomIn } from "lucide-react";
+import { Award, CheckCircle2, Minus, Phone, Plus, Ruler, ShieldCheck, Truck, ShoppingCart, ZoomIn } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { useCompany, useSite } from "../store/site";
 import { imgFor } from "../data/images";
@@ -172,6 +172,14 @@ export default function ProductDetail() {
           <h1 className="mt-1 text-3xl font-extrabold leading-tight tracking-tight md:text-4xl">{p.name}</h1>
           <p className="mt-1.5 text-sm text-steel">{p.fit}</p>
           <div className="mt-2 flex items-center gap-1.5 text-[13px]"><span className="text-gold">{"★★★★★"}</span><span className="font-bold">{p.rating}</span><span className="text-faint">({p.reviews} reviews)</span></div>
+          {(p.specs?.Certification || p.specs?.['Australian Standard']) && (
+            <div className="mt-2.5 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-300 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-900 shadow-xs">
+                <ShieldCheck size={15} className="shrink-0 text-emerald-600" />
+                <span>Aus Standard Approved Certification: <span className="font-extrabold text-emerald-950">{p.specs['Australian Standard'] || p.specs.Certification.split(';')[0]}</span></span>
+              </span>
+            </div>
+          )}
           <div className="mt-4 rounded-md border border-line bg-mist p-4">
             {enquiry ? (
               <>
@@ -284,10 +292,101 @@ export default function ProductDetail() {
         </div>
         <div className="bg-white p-5">
           {tab === "specs" && (
-            <div className="space-y-4">
-              <table className="w-full text-sm">
-                <tbody>{Object.entries(p.specs || {}).map(([k, v], i) => (<tr key={k} className={i % 2 ? "bg-white" : "bg-mist"}><td className="w-2/5 px-3 py-2.5 font-semibold text-steel">{k}</td><td className="px-3 py-2.5 font-medium">{v}</td></tr>))}</tbody>
-              </table>
+            <div className="space-y-5">
+              {(p.specs?.Certification || p.specs?.['Australian Standard']) && (
+                <div className="rounded-lg border border-navy/20 bg-gradient-to-r from-navy/[0.04] to-mist/60 p-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-navy text-gold shadow-xs">
+                      <ShieldCheck size={22} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-xs font-extrabold uppercase tracking-wider text-navy">
+                          Australian Standard Approved Certification
+                        </p>
+                        <span className="inline-flex items-center gap-1 rounded bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800">
+                          <CheckCircle2 size={12} className="text-emerald-700" />
+                          Aus Standard Approved
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm font-extrabold text-ink">
+                        {p.specs.Certification || p.specs['Australian Standard']}
+                      </p>
+                      <p className="mt-0.5 text-xs text-steel">
+                        Engineered and certified in compliance with Australian Heavy Vehicle National Regulations (NHVR), ADR mandates, and Standards Australia commercial guidelines.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {(p.specs?.Dimensions || p.specs?.['Product Parameter']) && (
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {p.specs?.Dimensions && (
+                    <div className="rounded-lg border border-line bg-mist/40 p-4">
+                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-steel">
+                        <Ruler size={15} className="text-navy" />
+                        <span>Catalogue Dimensions</span>
+                      </div>
+                      <p className="mt-2 font-mono text-base font-extrabold text-ink">
+                        {p.specs.Dimensions}
+                      </p>
+                      <p className="mt-1 text-[11px] text-faint">
+                        Official catalogue profile dimensions & sizing specification.
+                      </p>
+                    </div>
+                  )}
+
+                  {p.specs?.['Product Parameter'] && (
+                    <div className="rounded-lg border border-line bg-mist/40 p-4">
+                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-steel">
+                        <Award size={15} className="text-navy" />
+                        <span>Product Parameter</span>
+                      </div>
+                      <p className="mt-2 text-xs font-semibold leading-relaxed text-ink">
+                        {p.specs['Product Parameter']}
+                      </p>
+                      <p className="mt-1 text-[11px] text-faint">
+                        Materials, construction, corrosion resistance, and load profile.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {p.specs?.['Technical Specification'] && (
+                <div className="rounded-lg border border-line bg-white p-3.5 shadow-xs">
+                  <p className="text-xs font-bold uppercase tracking-wider text-navy">
+                    Technical Specification & Fleet Application
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-steel">
+                    {p.specs['Technical Specification']}
+                  </p>
+                </div>
+              )}
+
+              <div>
+                <p className="mb-2 text-xs font-bold uppercase tracking-wider text-steel">
+                  All Product Specifications & Parameters
+                </p>
+                <div className="overflow-hidden rounded-md border border-line">
+                  <table className="w-full text-sm">
+                    <tbody>
+                      {Object.entries(p.specs || {}).map(([k, v], i) => (
+                        <tr key={k} className={i % 2 ? "bg-white" : "bg-mist/60"}>
+                          <td className="w-2/5 px-3.5 py-2.5 font-bold text-steel border-r border-line/60">
+                            {k}
+                          </td>
+                          <td className="px-3.5 py-2.5 font-medium text-ink">
+                            {v}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
               {p.category === "tail-lifts" && (
                 <div className="mt-4 flex items-center justify-between rounded-md border border-gold/40 bg-gold/10 p-3.5 text-xs text-ink">
                   <div>
@@ -315,8 +414,25 @@ export default function ProductDetail() {
             </div>
           )}
           {tab === "fitment" && (
-            <div className="space-y-2 text-sm leading-6 text-steel">
+            <div className="space-y-4 text-sm leading-6 text-steel">
               <p>Designed for Australian fleet conditions, this {p.category.replace("-", " ")} line suits {p.fit.charAt(0).toLowerCase() + p.fit.slice(1)}.</p>
+
+              {(p.specs?.Certification || p.specs?.['Australian Standard']) && (
+                <div className="rounded-md border border-line bg-mist/60 p-4">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck size={18} className="text-emerald-700" />
+                    <p className="font-bold text-ink">Australian Fleet Standards & Compliance:</p>
+                  </div>
+                  <p className="mt-1.5 text-xs leading-relaxed text-steel">
+                    <strong className="text-ink">Certified to: </strong>
+                    {p.specs.Certification || p.specs['Australian Standard']}
+                  </p>
+                  <p className="mt-1 text-xs text-faint">
+                    Complies with National Heavy Vehicle Regulator (NHVR) safety rules, ADR standards, and workshop replacement guidelines across Australia.
+                  </p>
+                </div>
+              )}
+
               {p.category === "tail-lifts" && (
                 <div className="rounded-md bg-mist p-3 text-xs leading-relaxed">
                   <p className="font-bold text-ink">ADR 84/00 & AS/NZS 1418.8 Fleet Check:</p>
