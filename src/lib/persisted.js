@@ -1,9 +1,23 @@
 /* Tiny stale-while-revalidate cache for the few queries that decide first paint
    (hero slides, categories). A returning visitor sees last visit's data at once
    while React Query refetches in the background. */
+const CACHE_VERSION = 'v4';
+
 const read = (key) => {
   try {
-    const hit = JSON.parse(localStorage.getItem(key));
+    const raw = localStorage.getItem(`${CACHE_VERSION}_${key}`);
+    if (!raw) {
+      // Purge old stale cache keys from previous versions
+      try {
+        Object.keys(localStorage).forEach((k) => {
+          if (k.startsWith('aurex_cache_') && !k.startsWith(`${CACHE_VERSION}_`)) {
+            localStorage.removeItem(k);
+          }
+        });
+      } catch {}
+      return null;
+    }
+    const hit = JSON.parse(raw);
     if (!hit || !hit.data) return null;
     if (Array.isArray(hit.data) && hit.data.length) return hit;
     if (typeof hit.data === "object" && hit.data !== null) return hit;
@@ -24,9 +38,9 @@ export const remember = (key) => (data) => {
   try {
     if (data) {
       if (Array.isArray(data) && data.length) {
-        localStorage.setItem(key, JSON.stringify({ at: Date.now(), data }));
+        localStorage.setItem(`${CACHE_VERSION}_${key}`, JSON.stringify({ at: Date.now(), data }));
       } else if (typeof data === "object" && Object.keys(data).length) {
-        localStorage.setItem(key, JSON.stringify({ at: Date.now(), data }));
+        localStorage.setItem(`${CACHE_VERSION}_${key}`, JSON.stringify({ at: Date.now(), data }));
       }
     }
   } catch { /* private mode / quota */ }

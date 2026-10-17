@@ -88,9 +88,7 @@ export function useProduct(sku, options = {}) {
     },
     enabled: Boolean(normalizedSku),
     placeholderData: () => getCachedProduct(),
-    initialData: () => getCachedProduct(),
-    initialDataUpdatedAt: persistedData.initialDataUpdatedAt,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 30, // 30s fresh window while still refreshing
     retry: (failures, err) => err?.status !== 404 && failures < 2,
     retryDelay: (attempt) => 600 * (attempt + 1),
     ...options,
