@@ -4,7 +4,7 @@ import {
   ArrowRight, ChevronDown, ClipboardList, LogIn, LogOut, Menu,
   PackageSearch, Phone, Search, ShoppingCart, User, UserPlus, X,
 } from "lucide-react";
-import { useCompany } from "../store/site";
+import { useCompany, useSite } from "../store/site";
 import { useCart } from "../store/cart";
 import { useAuth } from "../store/auth";
 import { formatAUD } from "../data/products";
@@ -139,6 +139,7 @@ export default function Header() {
   const { user, logout, openAuthModal } = useAuth();
   const { data: categories = [] } = useCategories();
   const COMPANY = useCompany();
+  const { settings } = useSite();
   const loc = useLocation();
 
   const [open, setOpen] = useState(null); // dropdown: "categories" | "account" | null
@@ -214,6 +215,14 @@ export default function Header() {
 
   return (
     <>
+      {settings?.announcement && (
+        <div className="relative z-50 bg-[#001738] border-b border-gold/30 px-4 py-2 text-center text-xs font-bold text-white shadow-xs">
+          <div className="mx-auto flex max-w-7xl items-center justify-center gap-2">
+            <span className="inline-block h-2 w-2 rounded-full bg-gold animate-pulse shrink-0" />
+            <span className="truncate tracking-wide">{settings.announcement}</span>
+          </div>
+        </div>
+      )}
 
       <header
         ref={headerRef}

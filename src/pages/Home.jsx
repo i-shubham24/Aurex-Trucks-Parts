@@ -18,6 +18,7 @@ import { HeroSkeleton } from "../components/HeroSkeleton";
 import { useProducts } from "../hooks/api/useProducts";
 import { ProductGridSkeleton } from "../components/ProductCardSkeleton";
 import { useBlogs } from "../hooks/api/useBlogs";
+import { useTestimonials } from "../hooks/api/useReviews";
 
 
 function SecHead({ title, link, linkLabel }) {
@@ -527,7 +528,8 @@ function Trust() {
 }
 
 function Reviews() {
-  const items = TESTIMONIALS;
+  const { data: dbTestimonials } = useTestimonials();
+  const items = (dbTestimonials && dbTestimonials.length > 0) ? dbTestimonials : TESTIMONIALS;
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
   useEffect(() => {
@@ -535,8 +537,8 @@ function Reviews() {
     const id = setInterval(() => setI((v) => (v + 1) % items.length), 7000);
     return () => clearInterval(id);
   }, [paused, items.length]);
-  const r = items[i];
-  const initials = r.name.split(" ").map((w) => w[0]).slice(0, 2).join("");
+  const r = items[i] || items[0];
+  const initials = (r?.name || 'Aurex').split(" ").map((w) => w[0]).slice(0, 2).join("");
   return (
     <section id="reviews" className="mt-12 scroll-mt-24 overflow-hidden bg-ink py-14 text-white">
       <div className="mx-auto max-w-4xl px-4 text-center" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
@@ -546,7 +548,11 @@ function Reviews() {
         <div key={i} className="mt-6">
           <p className="font-serif text-6xl leading-none text-gold">“</p>
           <blockquote className="-mt-4 text-xl font-medium leading-8 text-white md:text-2xl md:leading-10">{r.quote}</blockquote>
-          <div className="mt-5 flex items-center justify-center gap-1 text-gold">{"★★★★★"}</div>
+          <div className="mt-5 flex items-center justify-center gap-1 text-gold">
+            {Array.from({ length: r.rating || 5 }).map((_, idx) => (
+              <span key={idx}>★</span>
+            ))}
+          </div>
           <p className="mt-3 flex items-center justify-center gap-2.5">
             <span className="relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-md bg-gold text-sm font-extrabold text-ink ring-2 ring-gold/60">
               {initials}
@@ -558,7 +564,7 @@ function Reviews() {
         <div className="mt-7 flex items-center justify-center gap-4">
           <button onClick={() => setI((i + items.length - 1) % items.length)} aria-label="Previous review" className="grid h-8 w-8 place-items-center rounded-md border border-gray-600 text-white transition-colors hover:border-gold hover:text-gold">←</button>
           <div className="flex gap-1.5">
-            {items.map((x, k) => <button key={x.name} onClick={() => setI(k)} aria-label={`Review ${k + 1}`} aria-current={k === i} className="group/dot flex h-8 items-center px-0.5"><span className={`block h-1.5 rounded-sm transition-all ${k === i ? "w-8 bg-gold" : "w-2.5 bg-gray-600 group-hover/dot:bg-gray-400"}`} /></button>)}
+            {items.map((x, k) => <button key={x.id || x.name || k} onClick={() => setI(k)} aria-label={`Review ${k + 1}`} aria-current={k === i} className="group/dot flex h-8 items-center px-0.5"><span className={`block h-1.5 rounded-sm transition-all ${k === i ? "w-8 bg-gold" : "w-2.5 bg-gray-600 group-hover/dot:bg-gray-400"}`} /></button>)}
           </div>
           <button onClick={() => setI((i + 1) % items.length)} aria-label="Next review" className="grid h-8 w-8 place-items-center rounded-md bg-gold font-bold text-ink transition-colors hover:bg-white">→</button>
         </div>

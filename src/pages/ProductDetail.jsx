@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
-import { Award, CheckCircle2, Minus, Phone, Plus, Ruler, ShieldCheck, Truck, ShoppingCart, ZoomIn } from "lucide-react";
+import { Award, CheckCircle2, Minus, Phone, Plus, Ruler, ShieldCheck, Truck, ShoppingCart, ZoomIn, Star } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { useCompany, useSite } from "../store/site";
 import { imgFor } from "../data/images";
@@ -8,6 +8,7 @@ import SafeImage from "../components/SafeImage";
 import { useCart } from "../store/cart";
 import ProductCard from "../components/ProductCard";
 import { useProduct } from "../hooks/api/useProducts";
+import { useProductReviews } from "../hooks/api/useReviews";
 import ProductDetailSkeleton from "../components/ProductDetailSkeleton";
 
 function ProductImageZoom({ src, alt, isTailLift }) {
@@ -116,6 +117,9 @@ export default function ProductDetail() {
   const p = data?.product;
   const related = data?.relatedProducts || [];
 
+  const { data: reviewsData } = useProductReviews(sku);
+  const reviewsList = reviewsData?.reviews || [];
+
   const { lines, add, setQty: setCartQty, setOpen, compare, toggleCompare } = useCart();
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState("specs");
@@ -221,8 +225,20 @@ export default function ProductDetail() {
         <div>
           <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-faint">{p.sub} . {p.sku}</p>
           <h1 className="mt-1 text-3xl font-extrabold leading-tight tracking-tight md:text-4xl">{p.name}</h1>
-          <p className="mt-1.5 text-sm text-steel">{p.fit}</p>
-          <div className="mt-2 flex items-center gap-1.5 text-[13px]"><span className="text-gold">{"★★★★★"}</span><span className="font-bold">{p.rating}</span><span className="text-faint">({p.reviews} reviews)</span></div>
+          <button 
+            type="button"
+            onClick={() => {
+              setTab("reviews");
+              const el = document.getElementById("product-detail-tabs");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }}
+            className="mt-2 flex items-center gap-1.5 text-[13px] hover:opacity-80 transition-opacity text-left"
+            aria-label="View customer reviews"
+          >
+            <span className="text-gold">{"★★★★★"}</span>
+            <span className="font-bold">{p.rating}</span>
+            <span className="text-faint underline decoration-line/80 underline-offset-2">({reviewsList.length || p.reviews} reviews)</span>
+          </button>
           {(p.specs?.Certification || p.specs?.['Australian Standard']) && (
             <div className="mt-2.5 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-300 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-900 shadow-xs">
@@ -330,13 +346,14 @@ export default function ProductDetail() {
           </div>
         </div>
       </div>
-      <div className="mt-8 overflow-hidden rounded-md border border-line">
-        <div className="flex border-b border-line bg-mist">
+      <div id="product-detail-tabs" className="mt-8 overflow-hidden rounded-md border border-line">
+        <div className="flex flex-wrap border-b border-line bg-mist">
           {[
             ["specs", "Technical Specs"],
             ...(p.dhollandiaSpecs ? [["characteristics", "Characteristics & Architecture"]] : []),
             ["fitment", "Fitment & Standards"],
             ["freight", "Freight & Delivery"],
+            ["reviews", `Customer Reviews (${reviewsList.length || p.reviews || 0})`],
           ].map(([t, label]) => (
             <button key={t} onClick={() => setTab(t)} className={`px-5 py-3 text-sm font-bold transition-colors ${tab === t ? "bg-white text-navy shadow-[inset_0_2px_0_#002049]" : "text-steel hover:text-ink"}`}>{label}</button>
           ))}
@@ -487,6 +504,88 @@ export default function ProductDetail() {
             </div>
           )}
           {tab === "freight" && <p className="max-w-3xl text-sm leading-6 text-steel">Order by 2pm for same day dispatch ex Campbellfield. Free road freight over {freeOver}. Unused parts in original packaging can be returned within 30 days, see our <Link className="font-bold text-navy underline" to="/policies?tab=returns">returns policy</Link>.</p>}
+          {tab === "reviews" && (
+            <div className="space-y-6">
+              {/* Ratings Summary Bar */}
+              <div className="flex flex-col gap-6 rounded-lg border border-line bg-mist/40 p-6 md:flex-row md:items-center md:justify-between">
+                <div className="flex items-center gap-5">
+                  <div className="text-center">
+                    <span className="text-4xl font-extrabold text-ink">{p.rating}</span>
+                    <span className="block text-xs font-semibold text-faint">out of 5</span>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1 text-gold text-lg">
+                      {"★★★★★"}
+                    </div>
+                    <p className="mt-1 text-xs text-steel">
+                      Based on <strong className="text-ink">{reviewsList.length || p.reviews || 0} genuine reviews</strong> from verified Australian fleets & workshops
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 rounded-md bg-white border border-line p-3 text-xs text-steel max-w-sm">
+                  <ShieldCheck size={18} className="shrink-0 text-emerald-600" />
+                  <span>
+                    <strong>Genuine Verified Purchase:</strong> Ratings are verified and submitted by account holders after orders are successfully delivered.
+                  </span>
+                </div>
+              </div>
+
+              {/* Reviews List */}
+              {reviewsList.length > 0 ? (
+                <div className="space-y-4">
+                  {reviewsList.map((rev) => (
+                    <div key={rev._id} className="rounded-lg border border-line bg-white p-5 shadow-xs">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-ink text-sm">{rev.reviewerName}</span>
+                          {rev.isVerifiedPurchase && (
+                            <span className="inline-flex items-center gap-1 rounded bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                              <CheckCircle2 size={11} /> Verified Buyer
+                            </span>
+                          )}
+                          {rev.reviewerRole && (
+                            <span className="text-xs text-faint hidden sm:inline">• {rev.reviewerRole}</span>
+                          )}
+                        </div>
+                        <span className="text-xs text-faint">
+                          {rev.createdAt ? new Date(rev.createdAt).toLocaleDateString('en-AU', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
+                        </span>
+                      </div>
+
+                      <div className="mt-2 flex items-center gap-2">
+                        <div className="flex text-gold text-xs">
+                          {Array.from({ length: rev.rating || 5 }).map((_, idx) => (
+                            <span key={idx}>★</span>
+                          ))}
+                        </div>
+                        {rev.truckModelReviewed && (
+                          <span className="rounded bg-mist px-2 py-0.5 text-[11px] font-semibold text-steel">
+                            Fitted on: {rev.truckModelReviewed}
+                          </span>
+                        )}
+                      </div>
+
+                      {rev.title && (
+                        <h4 className="mt-2 text-sm font-bold text-ink">{rev.title}</h4>
+                      )}
+
+                      {rev.comment && (
+                        <p className="mt-1 text-xs leading-relaxed text-steel">{rev.comment}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-lg border border-dashed border-line p-8 text-center">
+                  <p className="text-sm font-bold text-ink">No reviews written yet for this part</p>
+                  <p className="mt-1 text-xs text-steel max-w-md mx-auto">
+                    Have you fitted this part? Log into your account once it is delivered to submit genuine fitment and durability ratings.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
       <div className="mt-8 flex items-center gap-2 rounded-md bg-ink p-4 text-white">

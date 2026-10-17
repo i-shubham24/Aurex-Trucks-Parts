@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, Phone } from "lucide-react";
 import { NEWS } from "../data/content";
 import { useCompany } from "../store/site";
 import ProductCard from "../components/ProductCard";
+import SafeImage from "../components/SafeImage";
 import { useBlog, useBlogs } from "../hooks/api/useBlogs";
 import { useProducts } from "../hooks/api/useProducts";
 
@@ -93,7 +94,7 @@ export default function Article() {
         <p className="mt-2 text-[15px] leading-7 text-steel">{post.excerpt}</p>
         {imageSrc && (
           <div className="card-zoom mt-5 overflow-hidden rounded-md border border-line">
-            <img src={imageSrc} alt={post.title} className="aspect-[16/8] w-full object-cover" />
+            <SafeImage src={imageSrc} alt={post.title} className="aspect-[16/8] w-full object-cover" />
           </div>
         )}
         <div className="mt-6 space-y-5">

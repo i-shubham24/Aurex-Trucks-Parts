@@ -27,5 +27,12 @@ const BLOG_BY_TAG = {
   "Tool Boxes": PHOTO.fleetAccessories,
 };
 
-export const blogImage = (post) =>
-  BLOG_BY_SLUG[post?.slug] || post?.coverImage || post?.img || BLOG_BY_TAG[post?.tag] || PHOTO.tradeCounter;
+export const blogImage = (post) => {
+  const backendImg =
+    (typeof post?.coverImage === "string" && post.coverImage) ||
+    post?.coverImage?.url ||
+    (typeof post?.img === "string" && post.img) ||
+    post?.img?.url;
+
+  return backendImg || BLOG_BY_SLUG[post?.slug] || BLOG_BY_TAG[post?.tag] || PHOTO.tradeCounter;
+};

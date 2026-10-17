@@ -22,7 +22,7 @@ export const setAuthToken = (token) => {
     } else {
       localStorage.removeItem('aurex_access_token');
     }
-  } catch {}
+  } catch { }
 };
 
 export const getAuthToken = () => activeToken;
@@ -64,8 +64,14 @@ export const setCartSessionId = (id) => {
 // Request Interceptor: Attach bearer token and session id
 apiClient.interceptors.request.use(
   (config) => {
-    if (activeToken) {
-      config.headers.Authorization = `Bearer ${activeToken}`;
+    let token = activeToken;
+    if (!token) {
+      try {
+        token = localStorage.getItem('aurex_access_token');
+      } catch { }
+    }
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     if (config.url && (config.url.includes('/cart') || config.url.includes('/checkout'))) {
       const sessionId = getCartSessionId();

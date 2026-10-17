@@ -1,41 +1,91 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { COMPANY } from "../data/company";
 import { api } from "../lib/api";
+import { getSettingsApi, updateSettingsApi, resetSettingsApi } from "../api/endpoints/settings.api";
 
 const Ctx = createContext(null);
 
 const DEFAULT_SETTINGS = {
-  storeName: "Aurex Truck Parts Australia",
+  storeName: "Aurex Truck Parts",
   legalName: "Aurex Panels Pty Limited",
   phone: COMPANY.phone,
   email: COMPANY.email,
   address: COMPANY.address,
   hours: COMPANY.hours,
-  freeFreightOver: 500,
-  standardFee: 24,
-  expressFee: 39,
+  freeFreightOver: 1500,
+  standardFee: 45,
+  expressFee: 95,
   abn: "47 670 781 254",
   acn: "670 781 254",
   announcement: "",
 };
 const DEFAULT_PROMOS = []; // promo codes only ever come from the API
 
+const SETTINGS_STORAGE_KEY = "aurex_site_settings";
 
 /* ─────────────── API-backed provider ───────────────
-   Seeded from defaults (no flash), then settings + active promos are pulled
-   from the backend. Enquiries submit to the API; the admin enquiry list loads
-   when the viewer is an admin. NOTE: in-app admin settings/promo edits persist
-   through the dedicated truck-parts-admin app — use that for admin in API mode. */
+   Seeded from cached settings / defaults, then live settings + active promos are pulled
+   from the backend. Updates persist to database and propagate live across the application. */
 function ApiSiteProvider({ children }) {
-  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState(() => {
+    try {
+      const cached = localStorage.getItem(SETTINGS_STORAGE_KEY);
+      return cached ? { ...DEFAULT_SETTINGS, ...JSON.parse(cached) } : DEFAULT_SETTINGS;
+    } catch {
+      return DEFAULT_SETTINGS;
+    }
+  });
   const [promos, setPromos] = useState(DEFAULT_PROMOS);
   const [enquiries, setEnquiries] = useState([]);
 
   useEffect(() => {
-    (async () => {
-      try { const { settings } = await api.get("/settings"); if (settings) setSettings((s) => ({ ...s, ...settings })); } catch { /* keep defaults */ }
-      try { const { items } = await api.get("/promos/active"); if (items) setPromos(items); } catch { /* keep defaults */ }
-    })();
+    const fetchLive = async () => {
+      try {
+        const live = await getSettingsApi();
+        if (live && typeof live === "object") {
+          setSettings((prev) => {
+            const next = { ...prev, ...live };
+            try { localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(next)); } catch {}
+            return next;
+          });
+        }
+      } catch {
+        /* keep cached / defaults */
+      }
+      try {
+        const { items } = await api.get("/promos/active");
+        if (items) setPromos(items);
+      } catch {
+        /* keep defaults */
+      }
+    };
+
+    fetchLive();
+
+    const onSettingsUpdated = (e) => {
+      if (e.detail) {
+        setSettings((prev) => {
+          const next = { ...prev, ...e.detail };
+          try { localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(next)); } catch {}
+          return next;
+        });
+      }
+    };
+    window.addEventListener("aurex:settings-updated", onSettingsUpdated);
+
+    const onStorage = (e) => {
+      if (e.key === SETTINGS_STORAGE_KEY && e.newValue) {
+        try {
+          setSettings((prev) => ({ ...prev, ...JSON.parse(e.newValue) }));
+        } catch {}
+      }
+    };
+    window.addEventListener("storage", onStorage);
+
+    return () => {
+      window.removeEventListener("aurex:settings-updated", onSettingsUpdated);
+      window.removeEventListener("storage", onStorage);
+    };
   }, []);
 
   // Resolves to the reference staff will see for this enquiry. Rejects if it did not reach
@@ -84,9 +134,37 @@ function ApiSiteProvider({ children }) {
     api.patch(`/enquiries/${id}/status`, { status }).catch(() => {});
   };
 
+  const updateLiveSettings = async (newFields) => {
+    const updated = await updateSettingsApi(newFields);
+    const merged = { ...settings, ...newFields, ...(updated || {}) };
+    setSettings(merged);
+    try { localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(merged)); } catch {}
+    window.dispatchEvent(new CustomEvent("aurex:settings-updated", { detail: merged }));
+    return merged;
+  };
+
+  const resetLiveSettings = async () => {
+    try {
+      await resetSettingsApi();
+    } catch {}
+    setSettings(DEFAULT_SETTINGS);
+    try { localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(DEFAULT_SETTINGS)); } catch {}
+    window.dispatchEvent(new CustomEvent("aurex:settings-updated", { detail: DEFAULT_SETTINGS }));
+    return DEFAULT_SETTINGS;
+  };
+
   const value = useMemo(() => ({
-    settings, setSettings, promos, setPromos, enquiries, setEnquiries, addEnquiry, setEnquiryStatus,
-    resetSite: () => { setSettings(DEFAULT_SETTINGS); setPromos(DEFAULT_PROMOS); },
+    settings,
+    setSettings,
+    updateLiveSettings,
+    resetLiveSettings,
+    promos,
+    setPromos,
+    enquiries,
+    setEnquiries,
+    addEnquiry,
+    setEnquiryStatus,
+    resetSite: resetLiveSettings,
   }), [settings, promos, enquiries]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

@@ -16,6 +16,7 @@ import {
   Plus,
   RotateCcw,
   Truck,
+  Star,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { listOrders, orderStatus, isFailedOrder } from "../utils/orders";
@@ -27,6 +28,8 @@ import { useAuth } from "../store/auth";
 import { useNotification } from "../store/notification";
 import { apiClient } from "../api/client";
 import ThemeSelect from "../components/ThemeSelect";
+import { openRatingModal } from "../utils/ratingModal";
+import { useMyReviews } from "../hooks/api/useReviews";
 
 const STATES = ["VIC", "NSW", "QLD", "SA", "WA", "TAS", "NT", "ACT"];
 const digits = (v) => (v || "").replace(/\D/g, "");
@@ -175,10 +178,41 @@ function InlineTrack({ order }) {
 
 function OrderCard({ order, onReorder }) {
   const [open, setOpen] = useState(false);
+  const { user } = useAuth();
+  const hasToken = typeof window !== "undefined" && Boolean(localStorage.getItem("aurex_access_token") || localStorage.getItem("aurex_user"));
+  const { data: myReviewsData } = useMyReviews(Boolean(user || hasToken));
+  const myReviews = myReviewsData?.reviews || [];
+
   const isFailed = isFailedOrder(order);
   const lines = order.items || order.lines || [];
   const qty = lines.reduce((s, l) => s + (l.qty || 0), 0);
   const shown = open ? lines : lines.slice(0, 3);
+
+  const apiStatus = order?.status || order?.orderStatus || order?.shipping?.status || "";
+  const isDelivered = /^delivered$/i.test(apiStatus) || /^delivered$/i.test(order?.shipping?.status || "");
+
+  const orderIdStr = String(order._id || order.id || order.orderNumber || "").toLowerCase();
+  const orderNumberStr = String(order.orderNumber || order.id || "").toLowerCase();
+
+  const existingReview = myReviews.find((r) => {
+    const rOrder = String(r.order?._id || r.order || "").toLowerCase();
+    const rOrderNum = String(r.orderNumber || "").toLowerCase();
+    const matchOrder =
+      (rOrder && (rOrder === orderIdStr || rOrder === orderNumberStr)) ||
+      (rOrderNum && (rOrderNum === orderNumberStr || rOrderNum === orderIdStr));
+    if (matchOrder) return true;
+
+    return lines.some((l) => {
+      const prodId = String(l.productId || l.product?._id || l.product || l._id || "").toLowerCase();
+      const sku = String(l.sku || "").toLowerCase();
+      const rProdId = String(r.product?._id || r.product || "").toLowerCase();
+      const rSku = String(r.product?.sku || r.sku || "").toLowerCase();
+      return (rProdId && prodId && rProdId === prodId) || (rSku && sku && rSku === sku);
+    });
+  });
+
+  const isAlreadyRated = Boolean(existingReview);
+
   return (
     <article className="overflow-hidden rounded-2xl border border-line bg-white shadow-[0_10px_30px_rgba(0,32,73,0.07)] transition hover:shadow-[0_16px_40px_rgba(0,32,73,0.12)]">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-line bg-mist px-4 py-3 sm:px-5">
@@ -193,15 +227,21 @@ function OrderCard({ order, onReorder }) {
         </div>
         <ul className="mt-3 divide-y divide-line rounded-xl border border-line">
           {shown.map((l) => (
-            <li key={l.sku} className="flex items-center gap-3 px-3 py-2.5">
-              <span className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-mist ring-1 ring-line">
-                <SafeImage src={imgFor(l.sku)} alt={l.name || ""} className="h-full w-full object-cover" fallbackIconSize={16} />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate text-[13px] font-bold">{l.qty} × {l.name}</span>
-                <span className="font-mono text-[11px] text-faint">{l.sku}</span>
-              </span>
-              <span className="tabular shrink-0 text-[13px] font-extrabold">{formatAUD(l.price * l.qty)}</span>
+            <li key={l.sku}>
+              <Link
+                to={l.sku ? `/product/${encodeURIComponent(l.sku)}` : "#"}
+                className="group flex items-center gap-3 px-3 py-2.5 transition hover:bg-mist/70"
+                title={`View ${l.name || l.sku}`}
+              >
+                <span className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-mist ring-1 ring-line transition group-hover:ring-navy">
+                  <SafeImage src={imgFor(l.sku)} alt={l.name || ""} className="h-full w-full object-cover transition-transform group-hover:scale-105" fallbackIconSize={16} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[13px] font-bold text-ink transition-colors group-hover:text-navy group-hover:underline">{l.qty} × {l.name}</span>
+                  <span className="font-mono text-[11px] text-faint transition-colors group-hover:text-steel">{l.sku}</span>
+                </span>
+                <span className="tabular shrink-0 text-[13px] font-extrabold">{formatAUD(l.price * l.qty)}</span>
+              </Link>
             </li>
           ))}
         </ul>
@@ -212,14 +252,66 @@ function OrderCard({ order, onReorder }) {
         )}
         {open && <InlineTrack order={order} />}
         <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
-          <button
-            onClick={() => setOpen(!open)}
-            className={`flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-extrabold transition ${
-              open ? "bg-navy text-white" : "bg-gold text-ink hover:bg-navy hover:text-white"
-            }`}
-          >
-            <Truck size={16} /> {open ? "Hide tracking" : "Track"}
-          </button>
+          {isDelivered ? (
+            !isAlreadyRated ? (
+              <button
+                type="button"
+                onClick={() => {
+                  const itemsToRate = lines.map((l) => ({
+                    orderId: order._id || order.id,
+                    orderNumber: order.orderNumber || order.id,
+                    productId: l.productId || l.product?._id || l.product || l._id,
+                    sku: l.sku,
+                    name: l.name,
+                    image: l.image || imgFor(l.sku),
+                    unitPrice: l.unitPrice || l.price,
+                  }));
+                  openRatingModal({
+                    orderId: order._id || order.id,
+                    orderNumber: order.orderNumber || order.id,
+                    items: itemsToRate,
+                  });
+                }}
+                className="flex items-center justify-center gap-2 rounded-lg bg-gold py-2.5 text-sm font-extrabold text-ink transition hover:bg-navy hover:text-white shadow-xs cursor-pointer"
+              >
+                <Star size={16} className="fill-ink text-ink group-hover:fill-white group-hover:text-white" /> Give Rating
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  const itemsToRate = lines.map((l) => ({
+                    orderId: order._id || order.id,
+                    orderNumber: order.orderNumber || order.id,
+                    productId: l.productId || l.product?._id || l.product || l._id,
+                    sku: l.sku,
+                    name: l.name,
+                    image: l.image || imgFor(l.sku),
+                    unitPrice: l.unitPrice || l.price,
+                  }));
+                  openRatingModal({
+                    orderId: order._id || order.id,
+                    orderNumber: order.orderNumber || order.id,
+                    items: itemsToRate,
+                  });
+                }}
+                className="flex items-center justify-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 py-2.5 text-sm font-extrabold text-emerald-800 transition hover:bg-emerald-100 shadow-xs cursor-pointer"
+                title="Click to view or edit your rating"
+              >
+                <CheckCircle2 size={16} className="text-emerald-600" /> Rated {existingReview.rating}★
+              </button>
+            )
+          ) : (
+            <button
+              type="button"
+              onClick={() => setOpen(!open)}
+              className={`flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-extrabold transition ${
+                open ? "bg-navy text-white" : "bg-gold text-ink hover:bg-navy hover:text-white"
+              }`}
+            >
+              <Truck size={16} /> {open ? "Hide tracking" : "Track"}
+            </button>
+          )}
           <Link
             to={`/track?id=${order.id}`}
             className="flex items-center justify-center gap-1 rounded-lg border border-ink py-2.5 text-sm font-extrabold transition hover:bg-ink hover:text-white"
@@ -227,6 +319,7 @@ function OrderCard({ order, onReorder }) {
             Details <ArrowRight size={15} />
           </Link>
           <button
+            type="button"
             onClick={() => onReorder(order)}
             className="flex items-center justify-center gap-2 rounded-lg border border-line-dark bg-mist py-2.5 text-sm font-extrabold transition hover:border-navy hover:text-navy cursor-pointer"
           >
@@ -237,6 +330,7 @@ function OrderCard({ order, onReorder }) {
     </article>
   );
 }
+
 
 function OrdersToolbar({ q, setQ, status, setStatus, count }) {
   return (

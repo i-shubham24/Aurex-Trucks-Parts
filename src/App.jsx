@@ -13,6 +13,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import CartDrawer from "./components/CartDrawer";
 import CompareTray from "./components/CompareTray";
 import AuthModal from "./components/AuthModal";
+import RatingPromptModal from "./components/RatingPromptModal";
 import Home from "./pages/Home";
 
 /* Everything except the landing page loads on demand. */
@@ -36,6 +37,9 @@ const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminOrders = lazy(() => import("./pages/admin/Orders"));
 const AdminProducts = lazy(() => import("./pages/admin/Products"));
 const AdminCategories = lazy(() => import("./pages/admin/Categories"));
+const AdminBlogs = lazy(() => import("./pages/admin/Blogs"));
+const AdminBlogEditor = lazy(() => import("./pages/admin/BlogEditor"));
+const AdminReviews = lazy(() => import("./pages/admin/Reviews"));
 const AdminCustomers = lazy(() => import("./pages/admin/Customers"));
 const AdminEnquiries = lazy(() => import("./pages/admin/Enquiries"));
 const AdminSettings = lazy(() => import("./pages/admin/Settings"));
@@ -89,6 +93,10 @@ function Shell() {
             <Route path="customers" element={<AdminCustomers />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="categories" element={<AdminCategories />} />
+            <Route path="blogs" element={<AdminBlogs />} />
+            <Route path="blogs/new" element={<AdminBlogEditor />} />
+            <Route path="blogs/edit/:id" element={<AdminBlogEditor />} />
+            <Route path="reviews" element={<AdminReviews />} />
             <Route path="marketing" element={<Navigate to="/admin" replace />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
@@ -150,6 +158,7 @@ function Shell() {
         initialMode={authModal.mode}
         onComplete={authModal.onComplete}
       />
+      <RatingPromptModal />
     </>
   );
 }

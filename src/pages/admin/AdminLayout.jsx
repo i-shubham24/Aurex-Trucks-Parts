@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Menu, Package, ShoppingCart, Tags, Users, MailQuestion, Settings, X, LogOut, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { LayoutDashboard, Menu, Package, ShoppingCart, Tags, Users, MailQuestion, Settings, X, LogOut, Mail, Lock, Eye, EyeOff, Newspaper, Star } from "lucide-react";
 import { useAuth, ADMIN_EMAIL } from "../../store/auth";
 
 const GROUPS = [
@@ -18,6 +18,13 @@ const GROUPS = [
     links: [
       { to: "/admin/products", label: "Products", Icon: Package },
       { to: "/admin/categories", label: "Categories", Icon: Tags },
+    ],
+  },
+  {
+    label: "Content",
+    links: [
+      { to: "/admin/blogs", label: "Blogs & News", Icon: Newspaper },
+      { to: "/admin/reviews", label: "Customer Reviews", Icon: Star },
     ],
   },
   { label: "System", links: [{ to: "/admin/settings", label: "Settings", Icon: Settings }] },

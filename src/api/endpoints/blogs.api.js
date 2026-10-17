@@ -15,8 +15,8 @@ export async function getBlogsApi(params = {}) {
       excerpt: b.summary || b.excerpt || '',
       content: b.content || '',
       body: b.body || [],
-      coverImage: b.coverImage?.url || b.img || '',
-      img: b.coverImage?.url || b.img || '',
+      coverImage: (typeof b.coverImage === 'string' ? b.coverImage : b.coverImage?.url) || b.img || '',
+      img: (typeof b.coverImage === 'string' ? b.coverImage : b.coverImage?.url) || b.img || '',
       tag: Array.isArray(b.tags) && b.tags[0] ? b.tags[0] : (b.category || 'Workshop News'),
       tags: b.tags || [],
       category: b.category || 'Workshop News',
@@ -46,8 +46,8 @@ export async function getBlogBySlugApi(slug) {
       excerpt: b.summary || b.excerpt || '',
       content: b.content || '',
       body: b.body || [],
-      coverImage: b.coverImage?.url || b.img || '',
-      img: b.coverImage?.url || b.img || '',
+      coverImage: (typeof b.coverImage === 'string' ? b.coverImage : b.coverImage?.url) || b.img || '',
+      img: (typeof b.coverImage === 'string' ? b.coverImage : b.coverImage?.url) || b.img || '',
       tag: Array.isArray(b.tags) && b.tags[0] ? b.tags[0] : (b.category || 'Workshop News'),
       tags: b.tags || [],
       category: b.category || 'Workshop News',
@@ -64,13 +64,98 @@ function rawBlogsMap(list = []) {
     id: b._id || b.id || b.slug,
     slug: b.slug,
     title: b.title,
-    coverImage: b.coverImage?.url || b.img || '',
-    img: b.coverImage?.url || b.img || '',
+    coverImage: (typeof b.coverImage === 'string' ? b.coverImage : b.coverImage?.url) || b.img || '',
+    img: (typeof b.coverImage === 'string' ? b.coverImage : b.coverImage?.url) || b.img || '',
     date: b.publishedAt ? new Date(b.publishedAt).toLocaleDateString('en-AU', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent',
   }));
+}
+
+export async function getAdminBlogsApi() {
+  const response = await apiClient.get('/admin/blogs');
+  const rawBlogs = response?.data?.blogs || response?.blogs || [];
+  return {
+    blogs: rawBlogs.map((b) => ({
+      id: b._id || b.id || b.slug,
+      _id: b._id || b.id || b.slug,
+      slug: b.slug,
+      title: b.title,
+      summary: b.summary || b.excerpt || '',
+      excerpt: b.summary || b.excerpt || '',
+      content: b.content || '',
+      body: b.body || [],
+      coverImage: (typeof b.coverImage === 'string' ? b.coverImage : b.coverImage?.url) || b.img || '',
+      img: (typeof b.coverImage === 'string' ? b.coverImage : b.coverImage?.url) || b.img || '',
+      coverImageObj: b.coverImage,
+      tag: Array.isArray(b.tags) && b.tags[0] ? b.tags[0] : (b.tag || b.category || 'Workshop News'),
+      tags: b.tags || (b.tag ? [b.tag] : []),
+      category: b.category || 'Workshop News',
+      type: b.type || 'NEWS',
+      author: b.author?.name || b.author || 'Aurex Heavy Duty Tech Team',
+      authorObj: b.author,
+      isPublished: b.isPublished !== false,
+      viewsCount: b.viewsCount || 0,
+      readTimeMinutes: b.readTimeMinutes || 4,
+      publishedAt: b.publishedAt || b.createdAt || new Date().toISOString(),
+      createdAt: b.createdAt || new Date().toISOString(),
+      date: b.publishedAt ? new Date(b.publishedAt).toLocaleDateString('en-AU', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent',
+    })),
+    count: rawBlogs.length,
+  };
+}
+
+export async function getAdminBlogByIdApi(id) {
+  if (!id) throw new Error('Blog ID or slug is required');
+  const response = await apiClient.get(`/admin/blogs/${encodeURIComponent(id)}`);
+  const b = response?.data?.blog || response?.blog;
+  if (!b) return null;
+  return {
+    id: b._id || b.id || b.slug,
+    _id: b._id || b.id || b.slug,
+    slug: b.slug,
+    title: b.title,
+    summary: b.summary || b.excerpt || '',
+    excerpt: b.summary || b.excerpt || '',
+    content: b.content || '',
+    body: b.body || [],
+    coverImage: (typeof b.coverImage === 'string' ? b.coverImage : b.coverImage?.url) || b.img || '',
+    img: (typeof b.coverImage === 'string' ? b.coverImage : b.coverImage?.url) || b.img || '',
+    coverImageObj: b.coverImage,
+    tag: Array.isArray(b.tags) && b.tags[0] ? b.tags[0] : (b.tag || b.category || 'Workshop News'),
+    tags: b.tags || (b.tag ? [b.tag] : []),
+    category: b.category || 'Workshop News',
+    type: b.type || 'NEWS',
+    author: b.author?.name || b.author || 'Aurex Heavy Duty Tech Team',
+    authorObj: b.author,
+    isPublished: b.isPublished !== false,
+    viewsCount: b.viewsCount || 0,
+    readTimeMinutes: b.readTimeMinutes || 4,
+    publishedAt: b.publishedAt || b.createdAt || new Date().toISOString(),
+    createdAt: b.createdAt || new Date().toISOString(),
+    date: b.publishedAt ? new Date(b.publishedAt).toLocaleDateString('en-AU', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Recent',
+  };
+}
+
+export async function createAdminBlogApi(payload) {
+  const response = await apiClient.post('/admin/blogs', payload);
+  return response?.data?.blog || response?.blog || response;
+}
+
+export async function updateAdminBlogApi(id, payload) {
+  const response = await apiClient.put(`/admin/blogs/${encodeURIComponent(id)}`, payload);
+  return response?.data?.blog || response?.blog || response;
+}
+
+export async function deleteAdminBlogApi(id) {
+  const response = await apiClient.delete(`/admin/blogs/${encodeURIComponent(id)}`);
+  return response?.data || response;
 }
 
 export default {
   getBlogsApi,
   getBlogBySlugApi,
+  getAdminBlogsApi,
+  getAdminBlogByIdApi,
+  createAdminBlogApi,
+  updateAdminBlogApi,
+  deleteAdminBlogApi,
 };
