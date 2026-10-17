@@ -24,10 +24,10 @@ export const DEFAULT_CATEGORIES = [
     id: 'trailer-parts',
     name: 'Trailer Parts',
     slug: 'trailer-parts',
-    count: 107,
-    productCount: 107,
+    count: 138,
+    productCount: 138,
     tag: 'From $3.40',
-    blurb: 'Door gear, hinges, tracks, seals, latches and heavy hardware for Aussie trailers.',
+    blurb: 'Door gear, hinges, tracks, seals, latches, safety signs and heavy hardware for Aussie trailers.',
     imageUrl: '/images/web/trailer-parts-category.webp',
     image: { url: '/images/web/trailer-parts-category.webp' }
   },
@@ -35,10 +35,10 @@ export const DEFAULT_CATEGORIES = [
     id: 'accessories',
     name: 'Accessories',
     slug: 'accessories',
-    count: 36,
-    productCount: 36,
+    count: 5,
+    productCount: 5,
     tag: 'From $3.90',
-    blurb: 'Bars, buffers, bolts, boxes, handles, safety signs and fittings for bodies and trailers.',
+    blurb: 'Rubber buffers, steel toolboxes, chrome wheel nut covers and vehicle accessories.',
     imageUrl: 'https://res.cloudinary.com/yltvvyl6/image/upload/v1791476759/aurex_truck_parts/categories/ACCESSORIES-CAT.jpg',
     image: { url: 'https://res.cloudinary.com/yltvvyl6/image/upload/v1791476759/aurex_truck_parts/categories/ACCESSORIES-CAT.jpg' }
   }
@@ -52,9 +52,8 @@ export function useCategories(options = {}) {
   return useQuery({
     queryKey: CATEGORY_QUERY_KEYS.lists(),
     queryFn: () => getCategoriesApi().then(remember('aurex_cache_categories')),
-    initialData: persistedData.initialData || DEFAULT_CATEGORIES,
-    initialDataUpdatedAt: persistedData.initialDataUpdatedAt,
-    staleTime: 1000 * 60 * 5, // 5 mins fresh
+    placeholderData: persistedData.initialData || DEFAULT_CATEGORIES,
+    staleTime: 1000 * 30, // 30s fresh window while ensuring fast synchronization
     ...options,
   });
 }

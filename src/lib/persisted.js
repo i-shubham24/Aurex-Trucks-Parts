@@ -1,22 +1,30 @@
 /* Tiny stale-while-revalidate cache for the few queries that decide first paint
    (hero slides, categories). A returning visitor sees last visit's data at once
    while React Query refetches in the background. */
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
+
+// Immediate aggressive purge of all stale cache keys from previous versions (v1, v2, v3, v4, etc.)
+try {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    const staleKeys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && (key.includes('aurex_cache') || key.startsWith('v')) && !key.startsWith(`${CACHE_VERSION}_`)) {
+        staleKeys.push(key);
+      }
+    }
+    staleKeys.forEach((k) => {
+      try {
+        localStorage.removeItem(k);
+      } catch {}
+    });
+  }
+} catch {}
 
 const read = (key) => {
   try {
     const raw = localStorage.getItem(`${CACHE_VERSION}_${key}`);
-    if (!raw) {
-      // Purge old stale cache keys from previous versions
-      try {
-        Object.keys(localStorage).forEach((k) => {
-          if (k.startsWith('aurex_cache_') && !k.startsWith(`${CACHE_VERSION}_`)) {
-            localStorage.removeItem(k);
-          }
-        });
-      } catch {}
-      return null;
-    }
+    if (!raw) return null;
     const hit = JSON.parse(raw);
     if (!hit || !hit.data) return null;
     if (Array.isArray(hit.data) && hit.data.length) return hit;
@@ -27,7 +35,7 @@ const read = (key) => {
   }
 };
 
-/** Spread into useQuery options. */
+/** Spread into useQuery options or use as placeholder provider. */
 export const persisted = (key) => {
   const hit = read(key);
   return hit ? { initialData: hit.data, initialDataUpdatedAt: hit.at } : {};

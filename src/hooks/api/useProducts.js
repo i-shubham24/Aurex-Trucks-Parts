@@ -38,10 +38,8 @@ export function useProducts(params = {}, options = {}) {
       const promise = getProductsApi(params);
       return cacheKey ? promise.then(remember(cacheKey)) : promise;
     },
-    initialData: persistedData.initialData,
-    initialDataUpdatedAt: persistedData.initialDataUpdatedAt,
-    placeholderData: (prev) => prev,
-    staleTime: 1000 * 60 * 5, // 5 mins cache
+    placeholderData: (prev) => prev || persistedData.initialData,
+    staleTime: 1000 * 15, // 15s fresh window while still refreshing on category switches
     ...options,
   });
 }

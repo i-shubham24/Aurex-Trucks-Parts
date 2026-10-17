@@ -54,9 +54,8 @@ export function useCarousel(options = {}) {
   return useQuery({
     queryKey: CAROUSEL_QUERY_KEYS.slides(),
     queryFn: () => getCarouselSlidesApi().then(remember('aurex_cache_carousel_v2')),
-    initialData: persistedData.initialData || DEFAULT_CAROUSEL_SLIDES,
-    initialDataUpdatedAt: persistedData.initialDataUpdatedAt,
-    staleTime: 1000 * 60 * 5, // 5 mins cache
+    placeholderData: persistedData.initialData || DEFAULT_CAROUSEL_SLIDES,
+    staleTime: 1000 * 60, // 1 min cache
     ...options,
   });
 }
