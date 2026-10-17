@@ -5,6 +5,7 @@ import { PHOTO } from '../../data/images';
    there, delete its line here and the catalogue image is used again. */
 const SLIDE_PHOTO = {
   '/shop/tail-lifts': PHOTO.tailLift,
+  '/shop/trailer-parts': PHOTO.trailerBuild,
   '/shop/accessories': PHOTO.fleetAccessories,
 };
 

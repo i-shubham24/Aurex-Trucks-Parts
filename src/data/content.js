@@ -23,7 +23,7 @@ export const NEWS = [
     ],
   },
   {
-    title: "Tracks, caps and fittings explained", date: "09 Aug 2026", tag: "Trailer Parts", img: "/images/web/hero-trailer-parts-yellow.webp",
+    title: "Tracks, caps and fittings explained", date: "09 Aug 2026", tag: "Trailer Parts", img: "/images/web/trailer-parts-category.webp",
     slug: "tracks-caps-fittings-explained", excerpt: "Q-track vs F-track, lengths, materials and end fittings: how to spec restraint track for tautliners and flat tops.",
     body: [
       { p: "Restraint track looks simple until you try to order it: Q-track and F-track profiles are not interchangeable, lengths run to 3050mm and beyond, and end caps, joiners and fasteners differ by system. This guide covers how our counter specs track for tautliner curtains, flat-top decks and fit-outs." },

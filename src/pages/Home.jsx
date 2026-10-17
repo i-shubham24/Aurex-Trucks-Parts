@@ -51,7 +51,7 @@ function Hero() {
     return () => clearInterval(id);
   }, [slides]);
 
-  if (isLoading) {
+  if (slides.length === 0 && isLoading) {
     return <HeroSkeleton />;
   }
 
@@ -60,7 +60,6 @@ function Hero() {
   }
 
   const s = slides[i] || slides[0];
-  const imageSrc = s.image?.url || s.img;
 
   return (
     <section className="mx-auto max-w-7xl px-4 pt-4">
@@ -114,16 +113,26 @@ function Hero() {
             </div>
           </div>
         </div>
-        <div className="relative min-h-[260px] md:min-h-[380px]" key={`i-${i}-${s.id || s.title}`}>
+        <div className="relative min-h-[260px] md:min-h-[380px]">
           <div className="hero-slide absolute inset-y-4 right-6 left-16 rounded-md bg-gold/50 blur-[1px] md:left-24" />
-          {imageSrc && (
-            <img
-              src={cld(imageSrc, 1400)}
-              alt={s.title}
-              fetchPriority="high"
-              className="hero-slide absolute inset-0 h-full w-full rounded-r-lg object-cover [clip-path:polygon(12%_0,100%_0,100%_100%,0_100%)]"
-            />
-          )}
+          {slides.map((slide, idx) => {
+            const isCurrent = idx === i;
+            const src = slide.image?.url || slide.img;
+            if (!src) return null;
+            return (
+              <img
+                key={slide.id || slide.title || idx}
+                src={cld(src, 1400)}
+                alt={slide.title}
+                loading={idx === 0 ? "eager" : "lazy"}
+                fetchPriority={idx === 0 ? "high" : "auto"}
+                decoding={idx === 0 ? "sync" : "async"}
+                className={`hero-slide absolute inset-0 h-full w-full rounded-r-lg object-cover [clip-path:polygon(12%_0,100%_0,100%_100%,0_100%)] transition-opacity duration-700 ease-in-out ${
+                  isCurrent ? "opacity-100 z-10" : "opacity-0 pointer-events-none z-0"
+                }`}
+              />
+            );
+          })}
         </div>
       </div>
     </section>
@@ -221,10 +230,10 @@ function Arrivals() {
         </div>
       </div>
 
-      {isLoading ? (
+      {isLoading && items.length === 0 ? (
         <ProductGridSkeleton count={10} />
       ) : items.length > 0 ? (
-        <div className="cap-6 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">
+        <div className={`cap-6 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5 transition-opacity duration-200 ${isLoading ? "opacity-75" : "opacity-100"}`}>
           {items.map((p) => (
             <ProductCard key={p.sku || p.id} p={p} bare joined badges={false} />
           ))}

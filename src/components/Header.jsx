@@ -30,16 +30,33 @@ function Tip({ children }) {
 }
 
 function SearchBox({ onDone, autoFocus = false }) {
-  const [q, setQ] = useState("");
+  const loc = useLocation();
+  const go = useNavigate();
+  const urlQ = loc.pathname === "/shop" ? new URLSearchParams(loc.search).get("q") || "" : "";
+  const [q, setQ] = useState(urlQ);
   const [term, setTerm] = useState("");
   const [focus, setFocus] = useState(false);
-  const go = useNavigate();
 
-  // Debounced so a fast typist doesn't fire one catalogue request per keystroke.
   useEffect(() => {
-    const id = setTimeout(() => setTerm(q.trim()), 220);
+    if (loc.pathname === "/shop") {
+      setQ(new URLSearchParams(loc.search).get("q") || "");
+    }
+  }, [loc.pathname, loc.search]);
+
+  // Debounced search term and live URL update if already on /shop
+  useEffect(() => {
+    const id = setTimeout(() => {
+      const trimmed = q.trim();
+      setTerm(trimmed);
+      if (loc.pathname === "/shop") {
+        const currentUrlQ = new URLSearchParams(loc.search).get("q") || "";
+        if (trimmed !== currentUrlQ) {
+          go(trimmed ? `/shop?q=${encodeURIComponent(trimmed)}` : "/shop", { replace: true });
+        }
+      }
+    }, 220);
     return () => clearTimeout(id);
-  }, [q]);
+  }, [q, loc.pathname, loc.search, go]);
 
   const { data } = useProducts({ search: term, limit: 6 }, { enabled: term.length > 1 });
   const matches = term.length > 1 ? data?.products || [] : [];

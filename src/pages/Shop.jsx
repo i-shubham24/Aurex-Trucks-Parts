@@ -15,7 +15,7 @@ const bySku = (a, b) => String(a.sku).localeCompare(String(b.sku), "en", { numer
 export default function Shop({ preset }) {
   const COMPANY = useCompany();
   const { slug: paramSlug } = useParams();
-  const [params] = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const slug = preset || paramSlug || null;
 
   const { data: categories = [], isLoading: catsLoading } = useCategories();
@@ -27,11 +27,27 @@ export default function Shop({ preset }) {
   const [avail, setAvail] = useState("All");
   const [sort, setSort] = useState("sku");
 
-  // Keep the filter box in sync when arriving via header search (?q=) while already on /shop.
+  // Keep the filter box in sync when arriving via header search (?q=) or URL change.
   useEffect(() => {
     setQ(urlQ);
+  }, [urlQ]);
+
+  useEffect(() => {
     setSub("All");
-  }, [urlQ, slug]);
+  }, [slug]);
+
+  const handleQueryChange = (val) => {
+    setQ(val);
+    setParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (val.trim()) {
+        next.set("q", val.trim());
+      } else {
+        next.delete("q");
+      }
+      return next;
+    }, { replace: true });
+  };
 
   const queryParams = {
     category: slug || undefined,
@@ -47,7 +63,7 @@ export default function Shop({ preset }) {
   );
 
   const items = useMemo(() => {
-    const query = (params.get("q") || q).toLowerCase().trim();
+    const query = q.toLowerCase().trim();
     let list = rawProducts.filter((p) => sub === "All" || p.sub === sub);
     if (avail === "stock") list = list.filter((p) => String(p.status).toLowerCase().includes("in stock") || p.inventory?.stock > 0);
     if (avail === "order") list = list.filter((p) => String(p.status).toLowerCase().includes("order"));
@@ -60,7 +76,7 @@ export default function Shop({ preset }) {
     if (sort === "low") list = [...list].sort((a, b) => (a.price ?? 1e12) - (b.price ?? 1e12));
     if (sort === "high") list = [...list].sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
     return list;
-  }, [rawProducts, sub, avail, sort, q, params]);
+  }, [rawProducts, sub, avail, sort, q]);
 
   const isLoading = catsLoading || prodsLoading;
 
@@ -129,7 +145,7 @@ export default function Shop({ preset }) {
           <Search size={15} className="shrink-0 text-faint" />
           <input
             value={q}
-            onChange={(e) => setQ(e.target.value)}
+            onChange={(e) => handleQueryChange(e.target.value)}
             placeholder="Filter by SKU or keyword"
             aria-label="Filter by SKU or keyword"
             className="h-full w-full bg-transparent text-[13px] outline-none"

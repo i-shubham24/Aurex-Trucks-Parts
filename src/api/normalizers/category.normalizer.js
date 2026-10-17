@@ -1,3 +1,9 @@
+const CANONICAL_CATEGORY_IMAGES = {
+  'trailer-parts': '/images/web/trailer-parts-category.webp',
+  'tail-lifts': '/images/web/aurex-tail-lift.webp',
+  'accessories': '/images/web/aurex-fleet-accessories.webp',
+};
+
 /**
  * Normalizes backend category payload into a consistent frontend entity
  */
@@ -5,7 +11,15 @@ export function normalizeCategory(cat) {
   if (!cat) return null;
 
   const slug = cat.slug || '';
-  const imageUrl = (typeof cat.image === 'string' ? cat.image : cat.image?.url) || cat.imageUrl || '';
+  const rawUrl = (typeof cat.image === 'string' ? cat.image : cat.image?.url) || cat.imageUrl || '';
+  
+  // Ensure trailer-parts always displays the new clean trailer rear door image
+  let imageUrl = rawUrl;
+  if (slug === 'trailer-parts' && (!rawUrl || rawUrl.includes('TRAILER-PARTS-CAT'))) {
+    imageUrl = CANONICAL_CATEGORY_IMAGES['trailer-parts'];
+  } else if (!imageUrl && CANONICAL_CATEGORY_IMAGES[slug]) {
+    imageUrl = CANONICAL_CATEGORY_IMAGES[slug];
+  }
 
   return {
     id: cat._id || cat.id || slug,
@@ -18,7 +32,7 @@ export function normalizeCategory(cat) {
     productCount: cat.productCount !== undefined ? cat.productCount : (cat.count || 0),
     image: {
       url: imageUrl,
-      publicId: cat.image?.publicId || '',
+      publicId: cat.image?.publicId || slug,
     },
     imageUrl: imageUrl,
     sortOrder: cat.sortOrder || 0,

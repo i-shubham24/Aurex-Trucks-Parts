@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getProductsApi, getProductBySkuApi } from '../../api/endpoints/products.api';
+import { persisted, remember } from '../../lib/persisted';
 
 export const PRODUCT_QUERY_KEYS = {
   all: ['products'],
@@ -9,13 +10,37 @@ export const PRODUCT_QUERY_KEYS = {
   detail: (sku) => [...PRODUCT_QUERY_KEYS.details(), sku],
 };
 
+function getCacheKey(params) {
+  try {
+    const sorted = Object.keys(params || {})
+      .sort()
+      .reduce((acc, k) => {
+        if (params[k] !== undefined) acc[k] = params[k];
+        return acc;
+      }, {});
+    return `aurex_cache_prods_${JSON.stringify(sorted)}`;
+  } catch {
+    return 'aurex_cache_prods_default';
+  }
+}
+
 /**
  * Custom TanStack Query hook to fetch products list with filters and caching
  */
 export function useProducts(params = {}, options = {}) {
+  const isSearch = Boolean(params.search && params.search.length > 0);
+  const cacheKey = !isSearch ? getCacheKey(params) : null;
+  const persistedData = cacheKey ? persisted(cacheKey) : {};
+
   return useQuery({
     queryKey: PRODUCT_QUERY_KEYS.list(params),
-    queryFn: () => getProductsApi(params),
+    queryFn: () => {
+      const promise = getProductsApi(params);
+      return cacheKey ? promise.then(remember(cacheKey)) : promise;
+    },
+    initialData: persistedData.initialData,
+    initialDataUpdatedAt: persistedData.initialDataUpdatedAt,
+    placeholderData: (prev) => prev,
     staleTime: 1000 * 60 * 5, // 5 mins cache
     ...options,
   });

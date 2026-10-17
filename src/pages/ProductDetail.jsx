@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
-import { CheckCircle2, Minus, Phone, Plus, ShieldCheck, Truck, ShoppingCart } from "lucide-react";
+import { CheckCircle2, Minus, Phone, Plus, ShieldCheck, Truck, ShoppingCart, ZoomIn } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { useCompany, useSite } from "../store/site";
 import { imgFor } from "../data/images";
@@ -9,6 +9,51 @@ import { useCart } from "../store/cart";
 import ProductCard from "../components/ProductCard";
 import { useProduct } from "../hooks/api/useProducts";
 import ProductDetailSkeleton from "../components/ProductDetailSkeleton";
+
+function ProductImageZoom({ src, alt, isTailLift }) {
+  const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = Math.max(0, Math.min(100, ((e.clientX - left) / width) * 100));
+    const y = Math.max(0, Math.min(100, ((e.clientY - top) / height) * 100));
+    setZoomPos({ x, y });
+  };
+
+  return (
+    <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={() => setIsHovered(false)}
+      className={`group/zoom relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden cursor-crosshair ${
+        isTailLift ? "p-0" : "p-6 bg-white"
+      }`}
+    >
+      <SafeImage
+        src={src}
+        alt={alt}
+        cdnWidth={1400}
+        style={{
+          transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
+          transform: isHovered ? "scale(2.2)" : "scale(1)",
+          transition: isHovered ? "transform 0.08s ease-out" : "transform 0.25s ease-out",
+        }}
+        className={`pointer-events-none select-none will-change-transform ${
+          isTailLift ? "h-full w-full object-cover" : "max-h-full max-w-full object-contain"
+        }`}
+        fallbackIconSize={32}
+      />
+      <span
+        className={`pointer-events-none absolute bottom-3 right-3 hidden items-center gap-1.5 rounded-md border border-line bg-white/95 px-2.5 py-1 text-[11px] font-bold text-steel shadow-xs backdrop-blur-xs transition-opacity duration-200 md:flex ${
+          isHovered ? "opacity-0" : "opacity-100"
+        }`}
+      >
+        <ZoomIn size={13} className="text-navy" /> Hover to zoom
+      </span>
+    </div>
+  );
+}
 
 export default function ProductDetail() {
   const { sku } = useParams();
@@ -83,19 +128,20 @@ export default function ProductDetail() {
       <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-2">
         <div>
           <div className="relative overflow-hidden rounded-md border border-line bg-white shadow-xs">
-            <div className={`flex aspect-[4/3] w-full items-center justify-center ${p.category === "tail-lifts" ? "p-0 overflow-hidden" : "p-6 bg-white"}`}>
-              {primaryImage ? (
-                <SafeImage
-                  src={primaryImage}
-                  alt={p.name}
-                  className={p.category === "tail-lifts" ? "h-full w-full object-cover" : "max-h-full max-w-full object-contain"}
-                  fallbackIconSize={32}
-                />
-              ) : (
+            {primaryImage ? (
+              <ProductImageZoom
+                src={primaryImage}
+                alt={p.name}
+                isTailLift={p.category === "tail-lifts"}
+              />
+            ) : (
+              <div className="flex aspect-[4/3] w-full items-center justify-center p-6 bg-white">
                 <span className="grid h-full w-full place-items-center font-mono text-sm font-bold text-faint">{p.sku}</span>
-              )}
-            </div>
-            <span className={`absolute left-3 top-3 text-[11px] font-extrabold uppercase tracking-wide ${enquiry ? "text-steel" : p.status === "Built to order" ? "text-primary" : "text-green-700"}`}>{enquiry ? "Enquire" : p.status === "Built to order" ? "Built to Order" : "In Stock"}</span>
+              </div>
+            )}
+            <span className={`absolute left-3 top-3 pointer-events-none text-[11px] font-extrabold uppercase tracking-wide ${enquiry ? "text-steel" : p.status === "Built to order" ? "text-primary" : "text-green-700"}`}>
+              {enquiry ? "Enquire" : p.status === "Built to order" ? "Built to Order" : "In Stock"}
+            </span>
           </div>
 
           {/* Image thumbnails if multiple images exist */}

@@ -4,7 +4,10 @@
 const read = (key) => {
   try {
     const hit = JSON.parse(localStorage.getItem(key));
-    return hit && Array.isArray(hit.data) && hit.data.length ? hit : null;
+    if (!hit || !hit.data) return null;
+    if (Array.isArray(hit.data) && hit.data.length) return hit;
+    if (typeof hit.data === "object" && hit.data !== null) return hit;
+    return null;
   } catch {
     return null;
   }
@@ -19,7 +22,14 @@ export const persisted = (key) => {
 /** Use as the tail of a queryFn: stores the result and passes it through. */
 export const remember = (key) => (data) => {
   try {
-    if (Array.isArray(data) && data.length) localStorage.setItem(key, JSON.stringify({ at: Date.now(), data }));
+    if (data) {
+      if (Array.isArray(data) && data.length) {
+        localStorage.setItem(key, JSON.stringify({ at: Date.now(), data }));
+      } else if (typeof data === "object" && Object.keys(data).length) {
+        localStorage.setItem(key, JSON.stringify({ at: Date.now(), data }));
+      }
+    }
   } catch { /* private mode / quota */ }
   return data;
 };
+

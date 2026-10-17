@@ -7,6 +7,7 @@ export const PHOTO = {
   tradeCounter: "/images/web/aurex-trade-counter.webp",
   tailLift: "/images/web/aurex-tail-lift.webp",
   trailerBuild: "/images/web/hero-trailer-parts-yellow.webp",
+  trailerCategory: "/images/web/trailer-parts-category.webp",
   fleetAccessories: "/images/web/aurex-fleet-accessories.webp",
 };
 
@@ -15,13 +16,13 @@ export const PHOTO = {
    to a photo for its topic. Anything else keeps the cover set in the CMS. */
 const BLOG_BY_SLUG = {
   "tail-lifts-land-in-vic": PHOTO.tailLift,
-  "tracks-caps-fittings-explained": PHOTO.trailerBuild,
+  "tracks-caps-fittings-explained": PHOTO.trailerCategory,
   "stainless-hinges-paddle-latches": PHOTO.tradeCounter,
   "toolbox-door-hardware-refresh": PHOTO.fleetAccessories,
 };
 const BLOG_BY_TAG = {
   "Tail Lifts": PHOTO.tailLift,
-  "Trailer Parts": PHOTO.trailerBuild,
+  "Trailer Parts": PHOTO.trailerCategory,
   "Accessories": PHOTO.fleetAccessories,
   "Tool Boxes": PHOTO.fleetAccessories,
 };
