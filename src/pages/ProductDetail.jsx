@@ -55,6 +55,57 @@ function ProductImageZoom({ src, alt, isTailLift }) {
   );
 }
 
+const EXCLUDED_CHART_KEYS = new Set([
+  'Dimensions',
+  'Certification',
+  'Australian Standard',
+  'Technical Specification',
+  'Product Parameter',
+  'id',
+  '_id',
+]);
+
+function getCategorizedSpecs(specs = {}) {
+  const result = [];
+  const seenKeys = new Set();
+
+  // 1. Add existing categorized specs (excluding top-level highlights)
+  for (const [key, val] of Object.entries(specs)) {
+    if (EXCLUDED_CHART_KEYS.has(key)) continue;
+    if (val === undefined || val === null || val === '') continue;
+
+    let cleanVal = String(val);
+    // Eliminate contradictory height for wheel nut covers
+    if (key === 'Overall Height' && specs.Dimensions && specs.Dimensions.includes('50mm')) {
+      cleanVal = '50 mm';
+    }
+
+    seenKeys.add(key.toLowerCase());
+    result.push([key, cleanVal]);
+  }
+
+  // 2. If the product only has pipe-delimited parameters, parse into categorized rows
+  if (result.length < 2 && specs['Product Parameter']) {
+    const parts = specs['Product Parameter'].split('|').map((s) => s.trim()).filter(Boolean);
+    for (const part of parts) {
+      const colonIdx = part.indexOf(':');
+      if (colonIdx > 0) {
+        const k = part.slice(0, colonIdx).trim();
+        const v = part.slice(colonIdx + 1).trim();
+        if (!seenKeys.has(k.toLowerCase()) && !EXCLUDED_CHART_KEYS.has(k)) {
+          seenKeys.add(k.toLowerCase());
+          result.push([k, v]);
+        }
+      } else if (!seenKeys.has(part.toLowerCase())) {
+        seenKeys.add(part.toLowerCase());
+        result.push(['Feature / Construction', part]);
+      }
+    }
+  }
+
+  return result;
+}
+
 export default function ProductDetail() {
   const { sku } = useParams();
   const COMPANY = useCompany();
@@ -320,72 +371,65 @@ export default function ProductDetail() {
                 </div>
               )}
 
-              {(p.specs?.Dimensions || p.specs?.['Product Parameter']) && (
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {p.specs?.Dimensions && (
-                    <div className="rounded-lg border border-line bg-mist/40 p-4">
-                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-steel">
-                        <Ruler size={15} className="text-navy" />
-                        <span>Catalogue Dimensions</span>
-                      </div>
-                      <p className="mt-2 font-mono text-base font-extrabold text-ink">
-                        {p.specs.Dimensions}
-                      </p>
-                      <p className="mt-1 text-[11px] text-faint">
-                        Official catalogue profile dimensions & sizing specification.
-                      </p>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {p.specs?.Dimensions && (
+                  <div className="rounded-lg border border-line bg-mist/40 p-4">
+                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-steel">
+                      <Ruler size={15} className="text-navy" />
+                      <span>Catalogue Dimensions</span>
                     </div>
-                  )}
+                    <p className="mt-2 font-mono text-base font-extrabold text-ink">
+                      {p.specs.Dimensions}
+                    </p>
+                    <p className="mt-1 text-[11px] text-faint">
+                      Official catalogue profile dimensions & sizing specification.
+                    </p>
+                  </div>
+                )}
 
-                  {p.specs?.['Product Parameter'] && (
-                    <div className="rounded-lg border border-line bg-mist/40 p-4">
-                      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-steel">
-                        <Award size={15} className="text-navy" />
-                        <span>Product Parameter</span>
-                      </div>
-                      <p className="mt-2 text-xs font-semibold leading-relaxed text-ink">
-                        {p.specs['Product Parameter']}
-                      </p>
-                      <p className="mt-1 text-[11px] text-faint">
-                        Materials, construction, corrosion resistance, and load profile.
-                      </p>
+                {p.specs?.['Technical Specification'] && (
+                  <div className="rounded-lg border border-line bg-mist/40 p-4">
+                    <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-steel">
+                      <Award size={15} className="text-navy" />
+                      <span>Technical Specification</span>
                     </div>
-                  )}
-                </div>
-              )}
-
-              {p.specs?.['Technical Specification'] && (
-                <div className="rounded-lg border border-line bg-white p-3.5 shadow-xs">
-                  <p className="text-xs font-bold uppercase tracking-wider text-navy">
-                    Technical Specification & Fleet Application
-                  </p>
-                  <p className="mt-1 text-xs leading-relaxed text-steel">
-                    {p.specs['Technical Specification']}
-                  </p>
-                </div>
-              )}
-
-              <div>
-                <p className="mb-2 text-xs font-bold uppercase tracking-wider text-steel">
-                  All Product Specifications & Parameters
-                </p>
-                <div className="overflow-hidden rounded-md border border-line">
-                  <table className="w-full text-sm">
-                    <tbody>
-                      {Object.entries(p.specs || {}).map(([k, v], i) => (
-                        <tr key={k} className={i % 2 ? "bg-white" : "bg-mist/60"}>
-                          <td className="w-2/5 px-3.5 py-2.5 font-bold text-steel border-r border-line/60">
-                            {k}
-                          </td>
-                          <td className="px-3.5 py-2.5 font-medium text-ink">
-                            {v}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                    <p className="mt-2 text-xs font-semibold leading-relaxed text-ink">
+                      {p.specs['Technical Specification']}
+                    </p>
+                    <p className="mt-1 text-[11px] text-faint">
+                      Commercial vehicle fleet application and engineering standard.
+                    </p>
+                  </div>
+                )}
               </div>
+
+              {(() => {
+                const chartSpecs = getCategorizedSpecs(p.specs);
+                if (chartSpecs.length === 0) return null;
+                return (
+                  <div>
+                    <p className="mb-2 text-xs font-bold uppercase tracking-wider text-steel">
+                      Product Parameters & Specifications
+                    </p>
+                    <div className="overflow-hidden rounded-md border border-line">
+                      <table className="w-full text-sm">
+                        <tbody>
+                          {chartSpecs.map(([k, v], i) => (
+                            <tr key={k} className={i % 2 ? "bg-white" : "bg-mist/60"}>
+                              <td className="w-2/5 px-3.5 py-2.5 font-bold text-steel border-r border-line/60">
+                                {k}
+                              </td>
+                              <td className="px-3.5 py-2.5 font-medium text-ink">
+                                {v}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {p.category === "tail-lifts" && (
                 <div className="mt-4 flex items-center justify-between rounded-md border border-gold/40 bg-gold/10 p-3.5 text-xs text-ink">

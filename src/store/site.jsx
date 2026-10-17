@@ -14,7 +14,7 @@ const DEFAULT_SETTINGS = {
   freeFreightOver: 500,
   standardFee: 24,
   expressFee: 39,
-  abn: "ABN 47 670 781 254",
+  abn: "47 670 781 254",
   acn: "670 781 254",
   announcement: "",
 };
