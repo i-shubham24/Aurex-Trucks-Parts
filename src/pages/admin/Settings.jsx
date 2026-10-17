@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import {
   Building2, Phone, Mail, MapPin, Clock, FileText,
   Megaphone, Truck, DollarSign, Zap, CheckCircle2,
-  AlertCircle, RotateCcw, Save, ShieldCheck, Sparkles, ExternalLink
+  AlertCircle, RotateCcw, Save, ShieldCheck, Sparkles, ExternalLink,
+  Eye, EyeOff
 } from "lucide-react";
 import { useSite, DEFAULT_SETTINGS } from "../../store/site";
 import { useNotification } from "../../store/notification";
@@ -16,8 +17,44 @@ export default function Settings() {
   const [form, setForm] = useState(settings);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [togglingAnnouncement, setTogglingAnnouncement] = useState(false);
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState("");
+
+  const handleToggleAnnouncement = async () => {
+    const nextState = !(form.showAnnouncement !== false);
+    setForm((f) => ({ ...f, showAnnouncement: nextState }));
+    setSaved(false);
+    setErr("");
+    setTogglingAnnouncement(true);
+
+    try {
+      const payload = {
+        ...form,
+        showAnnouncement: nextState,
+      };
+      await updateLiveSettings(payload);
+      notify.success({
+        kicker: "STOREFRONT BANNER",
+        title: nextState ? "Banner Visible on Site" : "Banner Hidden from Site",
+        message: nextState
+          ? "Top announcement banner is now live across the customer storefront."
+          : "Top announcement banner is now completely hidden from the storefront.",
+        icon: nextState ? "check" : "eye-off",
+        sound: true,
+      });
+    } catch (e) {
+      setForm((f) => ({ ...f, showAnnouncement: !nextState }));
+      setErr(e.message || "Failed to update banner visibility on the server.");
+      notify.error({
+        kicker: "ERROR",
+        title: "Could Not Update Banner",
+        message: e.message || "Failed to update banner visibility on the server.",
+      });
+    } finally {
+      setTogglingAnnouncement(false);
+    }
+  };
 
   // Load latest settings directly from backend
   useEffect(() => {
@@ -104,6 +141,7 @@ export default function Settings() {
       hours: String(form.hours || "").trim(),
       abn: String(form.abn || "").trim(),
       announcement: String(form.announcement || "").trim(),
+      showAnnouncement: form.showAnnouncement !== false,
       freeFreightOver: Math.max(0, Number(form.freeFreightOver) || 0),
       standardFee: Math.max(0, Number(form.standardFee) || 0),
       expressFee: Math.max(0, Number(form.expressFee) || 0),
@@ -265,7 +303,7 @@ export default function Settings() {
 
         {/* Section 2: Storefront Top Announcement Banner */}
         <div className="rounded-2xl border border-line bg-white shadow-xs overflow-hidden">
-          <div className="border-b border-line bg-mist/60 px-5 py-4 flex items-center justify-between">
+          <div className="border-b border-line bg-mist/60 px-5 py-4 flex flex-wrap items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
                 <Megaphone size={18} className="text-navy" />
@@ -275,13 +313,58 @@ export default function Settings() {
                 Displays as a prominent top banner across every storefront page to broadcast warehouse notices or promotions.
               </p>
             </div>
+
+            {/* Show / Hide Toggle Button */}
+            <div className="flex items-center gap-2.5">
+              <span className="text-xs font-bold text-steel">Banner Status:</span>
+              <button
+                type="button"
+                onClick={handleToggleAnnouncement}
+                disabled={togglingAnnouncement || saving}
+                className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-extrabold transition-all cursor-pointer shadow-xs border disabled:opacity-60 ${
+                  form.showAnnouncement !== false
+                    ? "bg-emerald-600 text-white border-emerald-700 hover:bg-emerald-700"
+                    : "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
+                }`}
+                title="Click to toggle banner visibility immediately on the storefront"
+              >
+                {togglingAnnouncement ? (
+                  <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                ) : form.showAnnouncement !== false ? (
+                  <Eye size={15} />
+                ) : (
+                  <EyeOff size={15} />
+                )}
+                {form.showAnnouncement !== false ? "Visible (Click to Hide)" : "Hidden (Click to Show)"}
+              </button>
+            </div>
           </div>
 
           <div className="p-5 space-y-4">
             <div>
-              <label className="mb-1.5 block text-xs font-bold text-ink">
-                Announcement Message (leave blank to hide banner)
-              </label>
+              <div className="mb-1.5 flex items-center justify-between">
+                <label className="text-xs font-bold text-ink">
+                  Announcement Message
+                </label>
+                <button
+                  type="button"
+                  onClick={handleToggleAnnouncement}
+                  disabled={togglingAnnouncement || saving}
+                  className="text-xs font-bold text-navy hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-60"
+                >
+                  {togglingAnnouncement ? (
+                    <span className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-navy border-t-transparent" />
+                  ) : form.showAnnouncement !== false ? (
+                    <>
+                      <EyeOff size={13} className="text-steel" /> Hide from site
+                    </>
+                  ) : (
+                    <>
+                      <Eye size={13} className="text-emerald-600" /> Show on site
+                    </>
+                  )}
+                </button>
+              </div>
               <input
                 type="text"
                 value={form.announcement || ""}
@@ -297,18 +380,31 @@ export default function Settings() {
                 <span className="text-[11px] font-bold uppercase tracking-wider text-faint flex items-center gap-1.5">
                   <Sparkles size={13} className="text-gold" /> Live Storefront Banner Preview
                 </span>
-                <span className="text-[11px] text-steel">
-                  {form.announcement ? "Banner Active" : "Banner Hidden (Empty)"}
+                <span className="flex items-center gap-1.5 text-[11px] font-bold">
+                  {form.showAnnouncement !== false && form.announcement ? (
+                    <span className="text-emerald-700 flex items-center gap-1">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      Live & Visible
+                    </span>
+                  ) : form.showAnnouncement === false ? (
+                    <span className="text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                      Hidden by Admin
+                    </span>
+                  ) : (
+                    <span className="text-steel">Hidden (Empty Message)</span>
+                  )}
                 </span>
               </div>
-              {form.announcement ? (
+              {form.showAnnouncement !== false && form.announcement ? (
                 <div className="bg-[#001738] border border-gold/30 rounded-lg px-4 py-2.5 text-center text-xs font-bold text-white shadow-xs flex items-center justify-center gap-2">
                   <span className="inline-block h-2 w-2 rounded-full bg-gold animate-pulse shrink-0" />
                   <span className="truncate">{form.announcement}</span>
                 </div>
               ) : (
-                <div className="rounded-lg border border-dashed border-line-dark p-3 text-center text-xs text-faint">
-                  No announcement banner will be shown to visitors.
+                <div className="rounded-lg border border-dashed border-line-dark p-3 text-center text-xs text-steel bg-white/70">
+                  {form.showAnnouncement === false
+                    ? "Banner is currently hidden by admin toggle switch. Click 'Visible (Click to Hide)' or 'Show on site' above to turn it on."
+                    : "No announcement banner will be shown to visitors (message is empty)."}
                 </div>
               )}
             </div>

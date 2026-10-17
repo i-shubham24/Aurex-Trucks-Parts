@@ -18,10 +18,28 @@ const DEFAULT_SETTINGS = {
   abn: "47 670 781 254",
   acn: "670 781 254",
   announcement: "",
+  showAnnouncement: true,
 };
 const DEFAULT_PROMOS = []; // promo codes only ever come from the API
 
 const SETTINGS_STORAGE_KEY = "aurex_site_settings";
+const SETTINGS_SYNC_CHANNEL = "aurex_settings_channel";
+
+function broadcastSettingsChange(nextSettings) {
+  try {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(nextSettings));
+  } catch {}
+  try {
+    window.dispatchEvent(new CustomEvent("aurex:settings-updated", { detail: nextSettings }));
+  } catch {}
+  try {
+    if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+      const bc = new BroadcastChannel(SETTINGS_SYNC_CHANNEL);
+      bc.postMessage({ type: "SETTINGS_UPDATED", settings: nextSettings });
+      bc.close();
+    }
+  } catch {}
+}
 
 /* ─────────────── API-backed provider ───────────────
    Seeded from cached settings / defaults, then live settings + active promos are pulled
@@ -82,9 +100,22 @@ function ApiSiteProvider({ children }) {
     };
     window.addEventListener("storage", onStorage);
 
+    let bc;
+    try {
+      if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+        bc = new BroadcastChannel(SETTINGS_SYNC_CHANNEL);
+        bc.onmessage = (e) => {
+          if (e.data?.type === "SETTINGS_UPDATED" && e.data?.settings) {
+            setSettings((prev) => ({ ...prev, ...e.data.settings }));
+          }
+        };
+      }
+    } catch {}
+
     return () => {
       window.removeEventListener("aurex:settings-updated", onSettingsUpdated);
       window.removeEventListener("storage", onStorage);
+      try { bc?.close(); } catch {}
     };
   }, []);
 
@@ -138,8 +169,7 @@ function ApiSiteProvider({ children }) {
     const updated = await updateSettingsApi(newFields);
     const merged = { ...settings, ...newFields, ...(updated || {}) };
     setSettings(merged);
-    try { localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(merged)); } catch {}
-    window.dispatchEvent(new CustomEvent("aurex:settings-updated", { detail: merged }));
+    broadcastSettingsChange(merged);
     return merged;
   };
 
@@ -148,8 +178,7 @@ function ApiSiteProvider({ children }) {
       await resetSettingsApi();
     } catch {}
     setSettings(DEFAULT_SETTINGS);
-    try { localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(DEFAULT_SETTINGS)); } catch {}
-    window.dispatchEvent(new CustomEvent("aurex:settings-updated", { detail: DEFAULT_SETTINGS }));
+    broadcastSettingsChange(DEFAULT_SETTINGS);
     return DEFAULT_SETTINGS;
   };
 
