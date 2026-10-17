@@ -215,15 +215,6 @@ export default function Header() {
 
   return (
     <>
-      {settings?.showAnnouncement !== false && Boolean(settings?.announcement) && (
-        <div className="relative z-50 bg-[#001738] border-b border-gold/30 px-4 py-2 text-center text-xs font-bold text-white shadow-xs">
-          <div className="mx-auto flex max-w-7xl items-center justify-center gap-2">
-            <span className="inline-block h-2 w-2 rounded-full bg-gold animate-pulse shrink-0" />
-            <span className="truncate tracking-wide">{settings.announcement}</span>
-          </div>
-        </div>
-      )}
-
       <header
         ref={headerRef}
         className={`sticky top-0 z-40 border-b border-line bg-white transition-shadow duration-300 lg:-top-11 ${

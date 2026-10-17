@@ -1,7 +1,7 @@
 /* Tiny stale-while-revalidate cache for the few queries that decide first paint
    (hero slides, categories). A returning visitor sees last visit's data at once
    while React Query refetches in the background. */
-const CACHE_VERSION = 'v5';
+const CACHE_VERSION = 'v7';
 
 // Immediate aggressive purge of all stale cache keys from previous versions (v1, v2, v3, v4, etc.)
 try {

@@ -1,9 +1,9 @@
 import { Link, useParams } from "react-router-dom";
-import { useState } from "react";
-import { Award, CheckCircle2, Minus, Phone, Plus, Ruler, ShieldCheck, Truck, ShoppingCart, ZoomIn, Star } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Award, CheckCircle2, Minus, Phone, Plus, Ruler, ShieldCheck, Truck, ShoppingCart, ZoomIn, Star, Mail, Layers, Check } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { useCompany, useSite } from "../store/site";
-import { imgFor } from "../data/images";
+import { imgFor, imagesFor } from "../data/images";
 import SafeImage from "../components/SafeImage";
 import { useCart } from "../store/cart";
 import ProductCard from "../components/ProductCard";
@@ -107,6 +107,96 @@ function getCategorizedSpecs(specs = {}) {
   return result;
 }
 
+const SIZE_FAMILIES = [
+  // 1. Guangzhou Caiyuan Canvas Stands (CY-20260914-01) - 3 Width Sizes
+  {
+    skus: ['ATP-TP-11', 'ATP-TP-12', 'ATP-TP-13'],
+    label: 'Available Frame Width Sizes',
+    sub: 'Height: 1600mm | 32mm OD Steel Tube',
+    options: [
+      { sku: 'ATP-TP-13', name: '1250mm (W)', note: 'Narrow / Drop-Deck', price: '$145' },
+      { sku: 'ATP-TP-11', name: '1995mm (W)', note: 'Standard Semitrailer', price: '$175' },
+      { sku: 'ATP-TP-12', name: '2045mm (W)', note: 'Wide High-Cube', price: '$185' },
+    ]
+  },
+  // 2. Cam Door Lock Kit Configurations (PI-GLYHM26091414-1)
+  {
+    skus: ['ATP-TP-01', 'ATP-TP-02', 'ATP-TP-03'],
+    label: 'Available Kit Configurations',
+    sub: 'Suits standard 27mm OD pipe',
+    options: [
+      { sku: 'ATP-TP-01', name: 'Steel (With Handle)', note: 'Left & Right Hand Available', price: '$105' },
+      { sku: 'ATP-TP-02', name: 'Steel (Less Handle)', note: 'Without Lower Latch', price: '$89' },
+      { sku: 'ATP-TP-03', name: '304 Stainless Steel', note: 'Food & Coastal Grade', price: '$165' },
+    ]
+  },
+  // 3. Commercial Grab Handles (PI-GLYHM26091414-1)
+  {
+    skus: ['ATP-TP-21', 'ATP-TP-22'],
+    label: 'Available Mounting Styles',
+    sub: '330mm length x 50mm standoff',
+    options: [
+      { sku: 'ATP-TP-22', name: 'Zinc Plated Steel', note: 'Without Mounting Base', price: '$11' },
+      { sku: 'ATP-TP-21', name: '304 Stainless Steel', note: 'With Mounting Flanges', price: '$11' },
+    ]
+  },
+  // 4. Cargo Control End Fittings
+  {
+    skus: ['ATP-TP-16', 'ATP-TP-17'],
+    label: 'Available End Fitting Types',
+    sub: 'Supplied complete with strap / strip',
+    options: [
+      { sku: 'ATP-TP-16', name: 'F-Track Fitting', note: 'With 50mm Webbing Strap Loop', price: '$26' },
+      { sku: 'ATP-TP-17', name: 'E/Q-Track Fitting', note: 'With Webbing Strap & Hook', price: '$24' },
+    ]
+  },
+  // 5. Honeycomb 20mm Door Panels
+  {
+    skus: ['ATP-BP-03', 'ATP-BP-04', 'ATP-BP-05'],
+    label: 'Available Panel Height Sizes',
+    sub: 'Width: 1200mm | Thickness: 20mm',
+    options: [
+      { sku: 'ATP-BP-03', name: '2400 x 1200mm', note: '2.88 m²', price: '$238' },
+      { sku: 'ATP-BP-04', name: '2800 x 1200mm', note: '3.36 m²', price: '$278' },
+      { sku: 'ATP-BP-05', name: '3200 x 1200mm', note: '3.84 m²', price: '$317' },
+    ]
+  },
+  // 6. Honeycomb 30mm Panels
+  {
+    skus: ['ATP-BP-06', 'ATP-BP-07'],
+    label: 'Available 30mm Panel Height Sizes',
+    sub: 'Width: 1200mm | Thickness: 30mm',
+    options: [
+      { sku: 'ATP-BP-06', name: '2800 x 1200mm', note: '3.36 m²', price: '$357' },
+      { sku: 'ATP-BP-07', name: '3200 x 1200mm', note: '3.84 m²', price: '$407' },
+    ]
+  },
+  // 7. Plywood 20mm Panels
+  {
+    skus: ['ATP-BP-08', 'ATP-BP-09', 'ATP-BP-10'],
+    label: 'Available Plywood Panel Sizes',
+    sub: 'Width: 1200mm | Thickness: 20mm',
+    options: [
+      { sku: 'ATP-BP-08', name: '2400 x 1200mm', note: '2.88 m²', price: '$258' },
+      { sku: 'ATP-BP-09', name: '2800 x 1200mm', note: '3.36 m²', price: '$301' },
+      { sku: 'ATP-BP-10', name: '3200 x 1200mm', note: '3.84 m²', price: '$344' },
+    ]
+  },
+  // 8. Beauway Cantilever Tail Lifts
+  {
+    skus: ['ATP-TL-04', 'ATP-TL-02', 'ATP-TL-01', 'ATP-TL-03', 'ATP-TL-05'],
+    label: 'Available Tail Lift Capacities & Sizes',
+    sub: '24V DC electro-hydraulic system',
+    options: [
+      { sku: 'ATP-TL-04', name: '1.5T Aluminium', note: '2450 x 2400mm', price: 'POA' },
+      { sku: 'ATP-TL-02', name: '2.0T Aluminium', note: '2450 x 2200mm', price: 'POA' },
+      { sku: 'ATP-TL-01', name: '2.0T Aluminium', note: '2450 x 2400mm', price: 'POA' },
+      { sku: 'ATP-TL-03', name: '2.0T Aluminium', note: '2450 x 2600mm', price: 'POA' },
+      { sku: 'ATP-TL-05', name: '3.0T High-Tensile Steel', note: '2450 x 2600mm', price: 'POA' },
+    ]
+  }
+];
+
 export default function ProductDetail() {
   const { sku } = useParams();
   const COMPANY = useCompany();
@@ -124,6 +214,10 @@ export default function ProductDetail() {
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState("specs");
   const [activeImgIdx, setActiveImgIdx] = useState(0);
+
+  useEffect(() => {
+    setActiveImgIdx(0);
+  }, [sku]);
 
   const cartItem = lines.find((l) => l.sku === p?.sku);
   const inCart = Boolean(cartItem);
@@ -169,19 +263,89 @@ export default function ProductDetail() {
     );
   }
 
-  const imagesList = Array.isArray(p.images) && p.images.length > 0 
-    ? p.images.map((img) => (typeof img === "string" ? img : img.url)).filter(Boolean)
-    : [p.imageUrl || imgFor(p.sku)].filter(Boolean);
+  const BAD_IMAGE_SUBSTRINGS = ['-gl11113', '-schematic', '-strap.png', '-strap.jpg', '-paddle.png'];
+  const isCleanImage = (url) => {
+    if (!url || typeof url !== 'string') return false;
+    return !BAD_IMAGE_SUBSTRINGS.some((bad) => url.includes(bad));
+  };
 
-  const primaryImage = imagesList[activeImgIdx] || imagesList[0] || imgFor(p.sku);
-  const enquiry = p.price === null;
+  const fallbackImages = imagesFor(p.sku).filter(isCleanImage);
+  const backendImages = Array.isArray(p.images) && p.images.length > 0 
+    ? p.images.map((img) => (typeof img === "string" ? img : img.url)).filter(isCleanImage)
+    : [];
+
+  const rawList = backendImages.length > 0 ? backendImages : fallbackImages;
+  const imagesList = Array.from(new Set(rawList.filter(Boolean)));
+  if (imagesList.length === 0) {
+    const single = imgFor(p.sku) || `/images/products/${p.sku}.jpg`;
+    if (single) imagesList.push(single);
+  }
+
+  const primaryImage = imagesList[activeImgIdx] || imagesList[0] || imgFor(p.sku) || `/images/products/${p.sku}.jpg`;
+  const isTailLift = p.category === "tail-lifts" || p.categorySlug === "tail-lifts";
+  const isBodyPanel = p.category === "body-panels" || p.categorySlug === "body-panels" || (p.sku && p.sku.startsWith("ATP-BP-"));
+  const enquiry = p.price === null || p.pricing?.isPOA === true || p.isPOA === true || p.status === "Enquiry only" || isTailLift || isBodyPanel;
   const inCompare = compare.includes(p.sku);
+
+  const sizeFamily = SIZE_FAMILIES.find((f) => f.skus.includes(p.sku));
+  const remarkCallout = (() => {
+    if (p.sku === 'ATP-TP-14') {
+      return {
+        badge: 'Supplied With Quick-Release Lever Handle',
+        text: 'Equipped with heavy-duty ratcheting lever handle for fast one-person locking & instant release (not bare tube).',
+        tag: 'With Handle'
+      };
+    }
+    if (p.sku === 'ATP-TP-16') {
+      return {
+        badge: 'Supplied With 50mm Webbing Strap Loop',
+        text: 'Includes 50mm heavy-duty high-tensile polyester webbing strap loop for direct tie-down connection.',
+        tag: 'With Strap'
+      };
+    }
+    if (p.sku === 'ATP-TP-17') {
+      return {
+        badge: 'Supplied With Webbing Strap & Forged Hook',
+        text: 'Reinforced webbing strap complete with heavy forged steel clevis snap hook for logistics tracks.',
+        tag: 'With Strap & Hook'
+      };
+    }
+    if (p.sku === 'ATP-TP-01') {
+      return {
+        badge: 'Complete Kit With Lever Handle',
+        text: 'Supplied complete with handle, keepers and cams. Left-Hand (200L) and Right-Hand (200R) available.',
+        tag: 'With Handle'
+      };
+    }
+    if (p.sku === 'ATP-TP-02') {
+      return {
+        badge: 'Cam Gear Sub-Assembly (Less Handle)',
+        text: 'Supplied without lower operating handle/latch for custom workshop handle installations.',
+        tag: 'Without Latch'
+      };
+    }
+    if (p.sku === 'ATP-TP-22') {
+      return {
+        badge: 'Direct Weld-On / Bolt-Through',
+        text: 'Tubular ends designed without separate mounting base plates (L330mm x H50mm).',
+        tag: 'Without Base'
+      };
+    }
+    if (p.sku === 'ATP-TP-19') {
+      return {
+        badge: 'DN16mm Rod Size Specification',
+        text: 'Specifically sized for standard DN16mm diameter locking rods and multi-point linkages.',
+        tag: 'DN16mm'
+      };
+    }
+    return null;
+  })();
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">
       <p className="text-[12px] text-faint"><Link to="/" className="hover:text-navy hover:underline">Home</Link> / <Link to="/shop" className="hover:text-navy hover:underline">Shop</Link> / <span className="font-semibold text-ink">{p.sku}</span></p>
-      <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-2">
-        <div>
+      <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-10">
+        <div className="space-y-3.5 md:sticky md:top-24 self-start">
           <div className="relative overflow-hidden rounded-md border border-line bg-white shadow-xs">
             {primaryImage ? (
               <ProductImageZoom
@@ -201,7 +365,7 @@ export default function ProductDetail() {
 
           {/* Image thumbnails if multiple images exist */}
           {imagesList.length > 1 && (
-            <div className="mt-2.5 flex gap-2 overflow-x-auto pb-1">
+            <div className="flex gap-2 overflow-x-auto pb-1">
               {imagesList.map((imgSrc, idx) => (
                 <button
                   key={idx}
@@ -216,54 +380,176 @@ export default function ProductDetail() {
             </div>
           )}
 
-          <div className="mt-3 grid grid-cols-3 gap-px border border-line bg-line text-center text-[12px] font-semibold">
+          <div className="grid grid-cols-3 gap-px border border-line bg-line text-center text-[12px] font-semibold">
             {[["ADR checked", "Fitment matched"], ["1-2 day dispatch", "Ex Campbellfield"], ["Easy returns", "30 day change of mind"]].map(([t, d]) => (
-              <div key={t} className="bg-white px-2 py-3"><p className="font-bold">{t}</p><p className="mt-0.5 text-faint">{d}</p></div>
+              <div key={t} className="bg-white px-2 py-2.5"><p className="font-bold">{t}</p><p className="mt-0.5 text-faint">{d}</p></div>
             ))}
           </div>
-        </div>
-        <div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-faint">{p.sub} . {p.sku}</p>
-          <h1 className="mt-1 text-3xl font-extrabold leading-tight tracking-tight md:text-4xl">{p.name}</h1>
-          <button 
-            type="button"
-            onClick={() => {
-              setTab("reviews");
-              const el = document.getElementById("product-detail-tabs");
-              if (el) el.scrollIntoView({ behavior: "smooth" });
-            }}
-            className="mt-2 flex items-center gap-1.5 text-[13px] hover:opacity-80 transition-opacity text-left"
-            aria-label="View customer reviews"
-          >
-            <span className="text-gold">{"★★★★★"}</span>
-            <span className="font-bold">{p.rating}</span>
-            <span className="text-faint underline decoration-line/80 underline-offset-2">({reviewsList.length || p.reviews} reviews)</span>
-          </button>
-          {(p.specs?.Certification || p.specs?.['Australian Standard']) && (
-            <div className="mt-2.5 flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-300 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-900 shadow-xs">
-                <ShieldCheck size={15} className="shrink-0 text-emerald-600" />
-                <span>Aus Standard Approved Certification: <span className="font-extrabold text-emerald-950">{p.specs['Australian Standard'] || p.specs.Certification.split(';')[0]}</span></span>
+
+          {/* Dedicated Fleet Logistics & Fitment Summary */}
+          <div className="rounded-md border border-line bg-mist/50 p-3.5 text-xs text-steel">
+            <div className="flex items-center justify-between border-b border-line pb-2">
+              <span className="font-extrabold uppercase tracking-wide text-ink text-[11px] flex items-center gap-1.5">
+                <Truck size={14} className="text-navy" />
+                Fleet Logistics & Direct Dispatch
               </span>
+              <span className="font-mono text-[10px] font-bold text-steel">VIC WAREHOUSE</span>
+            </div>
+            <div className="mt-2.5 grid grid-cols-2 gap-2 text-[11px]">
+              <div>
+                <span className="block text-faint">Part Number:</span>
+                <span className="font-mono font-bold text-ink">{p.sku}</span>
+              </div>
+              <div>
+                <span className="block text-faint">Application:</span>
+                <span className="font-bold text-ink truncate">{p.sub || p.category.replace("-", " ")}</span>
+              </div>
+              <div>
+                <span className="block text-faint">Dispatch Speed:</span>
+                <span className="font-bold text-ink">1–2 Business Days</span>
+              </div>
+              <div>
+                <span className="block text-faint">Commercial Warranty:</span>
+                <span className="font-bold text-ink">12 Months Fleet Cover</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-3.5">
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-faint">{p.sub} . {p.sku}</p>
+            <h1 className="mt-1 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl md:text-4xl">{p.name}</h1>
+            <button 
+              type="button"
+              onClick={() => {
+                setTab("reviews");
+                const el = document.getElementById("product-detail-tabs");
+                if (el) el.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="mt-2 flex items-center gap-1.5 text-[13px] hover:opacity-80 transition-opacity text-left"
+              aria-label="View customer reviews"
+            >
+              <span className="text-gold">{"★★★★★"}</span>
+              <span className="font-bold">{p.rating}</span>
+              <span className="text-faint underline decoration-line/80 underline-offset-2">({reviewsList.length || p.reviews} reviews)</span>
+            </button>
+          </div>
+
+          {(p.specs?.Certification || p.specs?.['Australian Standard']) && (
+            <div className="flex items-center gap-3.5 rounded-lg border border-slate-200/90 bg-white p-3 shadow-xs transition-shadow hover:shadow-sm">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-slate-100 bg-white p-1 shadow-xs">
+                <img
+                  src="/images/badges/australian-standard-certified.png"
+                  alt="Australian Standard Certified Product Mark"
+                  className="h-full w-full object-contain"
+                  loading="eager"
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="font-mono text-[10px] font-black uppercase tracking-wider text-navy">
+                    Australian Standard Certified
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded bg-emerald-50 border border-emerald-200/70 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800">
+                    <CheckCircle2 size={10} className="text-emerald-700" />
+                    Verified Compliance
+                  </span>
+                </div>
+                <p className="mt-0.5 truncate text-xs sm:text-[13px] font-extrabold text-ink">
+                  {p.specs['Australian Standard'] || p.specs.Certification.split(';')[0]}
+                </p>
+                <p className="text-[11px] text-steel">
+                  Heavy Vehicle National Law (NHVR) & ADR Fitment Compliant
+                </p>
+              </div>
             </div>
           )}
-          <div className="mt-4 rounded-md border border-line bg-mist p-4">
+
+          {remarkCallout && (
+            <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50/70 p-2.5 shadow-xs">
+              <span className="mt-0.5 inline-flex items-center justify-center rounded bg-amber-600 px-1.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white">
+                {remarkCallout.tag}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-extrabold text-amber-950">{remarkCallout.badge}</p>
+                <p className="mt-0.5 text-[11px] leading-tight text-amber-800">{remarkCallout.text}</p>
+              </div>
+            </div>
+          )}
+
+          {sizeFamily && (
+            <div className="rounded-lg border border-line bg-white p-3 shadow-xs">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-extrabold uppercase tracking-wide text-ink flex items-center gap-1.5">
+                  <Layers size={13} className="text-primary" />
+                  {sizeFamily.label}:
+                </span>
+                {sizeFamily.sub && (
+                  <span className="font-mono text-[10px] font-bold text-steel">{sizeFamily.sub}</span>
+                )}
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {sizeFamily.options.map((opt) => {
+                  const isCurrent = opt.sku === p.sku;
+                  return (
+                    <Link
+                      key={opt.sku}
+                      to={`/product/${opt.sku}`}
+                      className={`inline-flex items-center gap-2 rounded px-3 py-1.5 text-xs transition-all ${
+                        isCurrent
+                          ? 'border border-navy bg-navy text-white font-bold shadow-xs'
+                          : 'border border-line bg-mist/60 text-ink hover:border-steel hover:bg-mist'
+                      }`}
+                    >
+                      <span className="font-extrabold">{opt.name}</span>
+                      {opt.price && (
+                        <span className={`font-mono text-[11px] font-bold ${isCurrent ? 'text-gold' : 'text-primary'}`}>
+                          {opt.price}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className="rounded-md border border-line bg-mist p-4">
             {enquiry ? (
               <>
-                <p className="text-2xl font-extrabold">Enquire Price <span className="text-sm font-semibold text-steel">for your fleet</span></p>
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="text-2xl font-extrabold">
+                    Enquire Price <span className="text-sm font-semibold text-steel">for your fleet</span>
+                  </p>
+                  {isBodyPanel && p.pricing?.sellingPrice > 0 && (
+                    <span className="inline-flex items-center gap-1.5 rounded bg-navy/10 px-2.5 py-1 text-xs font-bold text-navy">
+                      <span>Target Fleet Price: <strong className="font-extrabold text-navy">{formatAUD(p.pricing.sellingPrice)}</strong> (ex GST)</span>
+                    </span>
+                  )}
+                </div>
                 <p className="mt-1 text-[13px] text-steel">
-                  {p.category === "tail-lifts"
+                  {isTailLift
                     ? "Custom sized to your truck chassis and body dimensions. Engineering review in 4 hours."
+                    : isBodyPanel
+                    ? "Commercial FRP composite panels & seals. Direct email enquiry to info@aurextruckparts.com.au."
                     : "Priced to your drawing or sample. Back within 4 business hours."}
                 </p>
                 <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  {p.category === "tail-lifts" ? (
+                  {isTailLift ? (
                     <Link
                       to={`/tail-lift-enquiry?sku=${p.sku}`}
                       className="flex items-center justify-center gap-2 rounded bg-gold py-3 text-center text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white sm:col-span-2"
                     >
                       Request Tail Lift Quotation Enquiry →
                     </Link>
+                  ) : isBodyPanel ? (
+                    <a
+                      href={`mailto:info@aurextruckparts.com.au?subject=Quotation%20Enquiry%20-%20${encodeURIComponent(p.sku)}%20${encodeURIComponent(p.name)}&body=Hi%20Aurex%20Truck%20Parts%20Team,%0D%0A%0D%0AI%20would%20like%20to%20request%20a%20commercial%20fleet%20quotation%20for:%0D%0APart%20Number:%20${encodeURIComponent(p.sku)}%0D%0AProduct:%20${encodeURIComponent(p.name)}%0D%0AQuantity%20Required:%20%0D%0ACompany%20Name:%20%0D%0AContact%20Phone:%20%0D%0ADelivery%20Location%20/%20Postcode:%20%0D%0A%0D%0APlease%20provide%20pricing%20and%20freight%20availability.%0D%0A%0D%0AThank%20you!`}
+                      className="flex items-center justify-center gap-2 rounded bg-gold py-3 text-center text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white sm:col-span-2 shadow-xs"
+                    >
+                      <Mail size={16} /> Request Quote (Email info@aurextruckparts.com.au) →
+                    </a>
                   ) : (
                     <Link
                       to={`/contact?topic=${encodeURIComponent(p.name)}&sku=${p.sku}`}
@@ -275,7 +561,7 @@ export default function ProductDetail() {
                   <a
                     href={COMPANY.phoneHref}
                     className={`flex items-center justify-center gap-2 rounded bg-ink py-3 text-sm font-bold text-white transition-colors hover:bg-navy ${
-                      p.category === "tail-lifts" ? "sm:col-span-2" : ""
+                      isTailLift || isBodyPanel ? "sm:col-span-2" : ""
                     }`}
                   >
                     <Phone size={16} /> Call {COMPANY.phone}
@@ -362,17 +648,21 @@ export default function ProductDetail() {
           {tab === "specs" && (
             <div className="space-y-5">
               {(p.specs?.Certification || p.specs?.['Australian Standard']) && (
-                <div className="rounded-lg border border-navy/20 bg-gradient-to-r from-navy/[0.04] to-mist/60 p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-navy text-gold shadow-xs">
-                      <ShieldCheck size={22} />
+                <div className="rounded-lg border border-slate-200 bg-gradient-to-r from-slate-50/70 via-white to-slate-50/30 p-4 shadow-xs">
+                  <div className="flex items-start gap-3.5">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-slate-200/80 bg-white p-1.5 shadow-xs">
+                      <img
+                        src="/images/badges/australian-standard-certified.png"
+                        alt="Australian Standard Certified"
+                        className="h-full w-full object-contain"
+                      />
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center justify-between gap-2">
-                        <p className="text-xs font-extrabold uppercase tracking-wider text-navy">
+                        <p className="text-xs font-black uppercase tracking-wider text-navy">
                           Australian Standard Approved Certification
                         </p>
-                        <span className="inline-flex items-center gap-1 rounded bg-emerald-100 px-2 py-0.5 text-[11px] font-bold text-emerald-800">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200/70 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800">
                           <CheckCircle2 size={12} className="text-emerald-700" />
                           Aus Standard Approved
                         </span>
@@ -380,8 +670,8 @@ export default function ProductDetail() {
                       <p className="mt-1 text-sm font-extrabold text-ink">
                         {p.specs.Certification || p.specs['Australian Standard']}
                       </p>
-                      <p className="mt-0.5 text-xs text-steel">
-                        Engineered and certified in compliance with Australian Heavy Vehicle National Regulations (NHVR), ADR mandates, and Standards Australia commercial guidelines.
+                      <p className="mt-1 text-xs text-steel leading-relaxed">
+                        Engineered and certified in strict compliance with Australian Heavy Vehicle National Regulations (NHVR), ADR mandates, and Standards Australia commercial guidelines.
                       </p>
                     </div>
                   </div>
@@ -479,16 +769,25 @@ export default function ProductDetail() {
               <p>Designed for Australian fleet conditions, this {p.category.replace("-", " ")} line suits {p.fit.charAt(0).toLowerCase() + p.fit.slice(1)}.</p>
 
               {(p.specs?.Certification || p.specs?.['Australian Standard']) && (
-                <div className="rounded-md border border-line bg-mist/60 p-4">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck size={18} className="text-emerald-700" />
-                    <p className="font-bold text-ink">Australian Fleet Standards & Compliance:</p>
+                <div className="rounded-md border border-slate-200 bg-white p-4 shadow-xs">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src="/images/badges/australian-standard-certified.png"
+                      alt="Australian Standard"
+                      className="h-9 w-9 object-contain rounded border border-slate-200/60 p-0.5 bg-white shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-xs font-black uppercase tracking-wide text-navy">Australian Fleet Standards & Compliance</p>
+                        <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                        <span className="text-[10px] font-bold text-emerald-700">Certified</span>
+                      </div>
+                      <p className="mt-0.5 text-xs font-extrabold text-ink">
+                        {p.specs.Certification || p.specs['Australian Standard']}
+                      </p>
+                    </div>
                   </div>
-                  <p className="mt-1.5 text-xs leading-relaxed text-steel">
-                    <strong className="text-ink">Certified to: </strong>
-                    {p.specs.Certification || p.specs['Australian Standard']}
-                  </p>
-                  <p className="mt-1 text-xs text-faint">
+                  <p className="mt-2 text-xs text-steel leading-relaxed">
                     Complies with National Heavy Vehicle Regulator (NHVR) safety rules, ADR standards, and workshop replacement guidelines across Australia.
                   </p>
                 </div>

@@ -1,6 +1,16 @@
-// Local product shots live at public/images/products/<ATP part number>.jpg and are the
-// fallback when a part has no image in the catalogue.
-export const imgFor = (sku) => (sku ? `/images/products/${sku}.jpg` : null);
+// Local product shots live at public/images/products/<ATP part number>.jpg or .webp
+export const imgFor = (sku) => {
+  if (!sku) return null;
+  if (sku.startsWith('ATP-BP-')) return `/images/products/${sku}.webp`;
+  if (sku === 'ATP-TP-14') return '/images/products/ATP-TP-14-handle.jpg';
+  return `/images/products/${sku}.jpg`;
+};
+
+export const imagesFor = (sku) => {
+  if (!sku) return [];
+  const primary = imgFor(sku);
+  return primary ? [primary] : [];
+};
 
 /* Editorial photos (web-sized). */
 export const PHOTO = {

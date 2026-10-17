@@ -152,8 +152,8 @@ function Tiles() {
   }
 
   return (
-    <section id="categories" className="mx-auto grid grid-cols-1 max-w-7xl scroll-mt-24 gap-4 px-4 pt-6 md:grid-cols-3">
-      {categories.slice(0, 3).map((c) => {
+    <section id="categories" className="mx-auto grid grid-cols-1 max-w-7xl scroll-mt-24 gap-4 px-4 pt-6 sm:grid-cols-2 lg:grid-cols-4">
+      {categories.map((c) => {
         const imageSrc = c.image?.url || c.imageUrl;
         const lineCount = c.count ?? c.productCount ?? 0;
         return (

@@ -102,12 +102,24 @@ function CompareBtn({ p }) {
 export default function ProductCard({ p, joined }) {
   const { add } = useCart();
   const navigate = useNavigate();
-  const enquiry = p.price === null;
-  const isTailLift = p.category === "tail-lifts";
+  const isTailLift = p.category === "tail-lifts" || p.categorySlug === "tail-lifts";
+  const isBodyPanel = p.category === "body-panels" || p.categorySlug === "body-panels" || (p.sku && p.sku.startsWith("ATP-BP-"));
+  const enquiry = p.price === null || p.pricing?.isPOA === true || p.isPOA === true || p.status === "Enquiry only" || isTailLift || isBodyPanel;
   const targetUrl = `/product/${p.sku}`;
+  const mailtoBodyPanel = `mailto:info@aurextruckparts.com.au?subject=Quotation%20Enquiry%20-%20${encodeURIComponent(p.sku)}%20${encodeURIComponent(p.name)}&body=Hi%20Aurex%20Truck%20Parts%20Team,%0D%0A%0D%0AI%20would%20like%20to%20request%20a%20commercial%20fleet%20quote%20for:%0D%0APart%20Number:%20${encodeURIComponent(p.sku)}%0D%0AProduct:%20${encodeURIComponent(p.name)}%0D%0AQuantity%20Required:%20%0D%0ACompany%20Name:%20%0D%0AContact%20Phone:%20%0D%0ADelivery%20Location:%20%0D%0A%0D%0AThank%20you!`;
   const enquiryUrl = isTailLift
     ? `/tail-lift-enquiry?sku=${p.sku}`
     : `/contact?topic=${encodeURIComponent(p.name)}&sku=${p.sku}`;
+
+  const handleEnquiryClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isBodyPanel) {
+      window.location.href = mailtoBodyPanel;
+    } else {
+      navigate(enquiryUrl);
+    }
+  };
 
   return (
     <div
@@ -123,7 +135,7 @@ export default function ProductCard({ p, joined }) {
       >
         <PartVisual p={p} />
 
-        {/* hover quick-action bar: the only quick-action bar that hovers out */}
+        {/* hover quick-action bar */}
         {!enquiry ? (
           <span className="absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-between gap-2 bg-navy px-3 py-1.5 transition-transform duration-200 group-hover:translate-y-0 group-focus-within:translate-y-0">
             <span className="text-[12px] font-bold text-white underline underline-offset-4 transition-colors hover:text-gold">
@@ -153,16 +165,12 @@ export default function ProductCard({ p, joined }) {
         ) : (
           <span className="absolute inset-x-0 bottom-0 flex translate-y-full items-center justify-between gap-2 bg-navy px-3 py-1.5 transition-transform duration-200 group-hover:translate-y-0 group-focus-within:translate-y-0">
             <span className="text-[12px] font-bold text-white underline underline-offset-4 transition-colors hover:text-gold">
-              View Specifications →
+              {isBodyPanel ? "Email Quote →" : "View Specifications →"}
             </span>
             <button
               type="button"
               aria-label={`Enquire price for ${p.name}`}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                navigate(enquiryUrl);
-              }}
+              onClick={handleEnquiryClick}
               className="pointer-events-auto grid h-9 w-9 place-items-center rounded-md bg-white text-ink shadow transition-colors hover:bg-gold md:h-7 md:w-7"
             >
               <MessageSquare size={14} />
@@ -189,9 +197,16 @@ export default function ProductCard({ p, joined }) {
             <CompareBtn p={p} />
           </span>
           {enquiry ? (
-            <span className="ml-auto text-[15px] font-extrabold text-primary">
-              Enquire Price
-            </span>
+            <div className="ml-auto text-right">
+              {p.pricing?.sellingPrice > 0 && isBodyPanel && (
+                <span className="block text-[11px] font-semibold text-steel">
+                  From {formatAUD(p.pricing.sellingPrice)}
+                </span>
+              )}
+              <span className="text-[14px] font-extrabold text-primary">
+                Enquire Price
+              </span>
+            </div>
           ) : (
             <span className="ml-auto tabular text-[20px] font-extrabold text-primary">
               {formatAUD(p.price)}

@@ -35,10 +35,10 @@ export const DEFAULT_CATEGORIES = [
     id: 'accessories',
     name: 'Accessories',
     slug: 'accessories',
-    count: 5,
-    productCount: 5,
+    count: 18,
+    productCount: 18,
     tag: 'From $3.90',
-    blurb: 'Rubber buffers, steel toolboxes, chrome wheel nut covers and vehicle accessories.',
+    blurb: 'Rubber buffers, steel toolboxes, chrome wheel nut covers, composite body panels and commercial vehicle accessories.',
     imageUrl: 'https://res.cloudinary.com/yltvvyl6/image/upload/v1791476759/aurex_truck_parts/categories/ACCESSORIES-CAT.jpg',
     image: { url: 'https://res.cloudinary.com/yltvvyl6/image/upload/v1791476759/aurex_truck_parts/categories/ACCESSORIES-CAT.jpg' }
   }
