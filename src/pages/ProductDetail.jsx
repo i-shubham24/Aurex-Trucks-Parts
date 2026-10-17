@@ -10,6 +10,7 @@ import ProductCard from "../components/ProductCard";
 import { useProduct } from "../hooks/api/useProducts";
 import { useProductReviews } from "../hooks/api/useReviews";
 import ProductDetailSkeleton from "../components/ProductDetailSkeleton";
+import QuoteEnquiryModal from "../components/QuoteEnquiryModal";
 
 function ProductImageZoom({ src, alt, isTailLift }) {
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
@@ -112,87 +113,79 @@ const SIZE_FAMILIES = [
   {
     skus: ['ATP-TP-11', 'ATP-TP-12', 'ATP-TP-13'],
     label: 'Available Frame Width Sizes',
-    sub: 'Height: 1600mm | 32mm OD Steel Tube',
     options: [
-      { sku: 'ATP-TP-13', name: '1250mm (W)', note: 'Narrow / Drop-Deck', price: '$145' },
-      { sku: 'ATP-TP-11', name: '1995mm (W)', note: 'Standard Semitrailer', price: '$175' },
-      { sku: 'ATP-TP-12', name: '2045mm (W)', note: 'Wide High-Cube', price: '$185' },
+      { sku: 'ATP-TP-13', name: '1250mm (W)', price: '$145' },
+      { sku: 'ATP-TP-11', name: '1995mm (W)', price: '$175' },
+      { sku: 'ATP-TP-12', name: '2045mm (W)', price: '$185' },
     ]
   },
   // 2. Cam Door Lock Kit Configurations (PI-GLYHM26091414-1)
   {
     skus: ['ATP-TP-01', 'ATP-TP-02', 'ATP-TP-03'],
     label: 'Available Kit Configurations',
-    sub: 'Suits standard 27mm OD pipe',
     options: [
-      { sku: 'ATP-TP-01', name: 'Steel (With Handle)', note: 'Left & Right Hand Available', price: '$105' },
-      { sku: 'ATP-TP-02', name: 'Steel (Less Handle)', note: 'Without Lower Latch', price: '$89' },
-      { sku: 'ATP-TP-03', name: '304 Stainless Steel', note: 'Food & Coastal Grade', price: '$165' },
+      { sku: 'ATP-TP-01', name: 'Steel (With Handle)', price: '$105' },
+      { sku: 'ATP-TP-02', name: 'Steel (Less Handle)', price: '$89' },
+      { sku: 'ATP-TP-03', name: '304 Stainless Steel', price: '$165' },
     ]
   },
   // 3. Commercial Grab Handles (PI-GLYHM26091414-1)
   {
     skus: ['ATP-TP-21', 'ATP-TP-22'],
     label: 'Available Mounting Styles',
-    sub: '330mm length x 50mm standoff',
     options: [
-      { sku: 'ATP-TP-22', name: 'Zinc Plated Steel', note: 'Without Mounting Base', price: '$11' },
-      { sku: 'ATP-TP-21', name: '304 Stainless Steel', note: 'With Mounting Flanges', price: '$11' },
+      { sku: 'ATP-TP-22', name: 'Zinc Plated (No Base)', price: '$11' },
+      { sku: 'ATP-TP-21', name: 'Stainless Steel (With Base)', price: '$11' },
     ]
   },
   // 4. Cargo Control End Fittings
   {
     skus: ['ATP-TP-16', 'ATP-TP-17'],
     label: 'Available End Fitting Types',
-    sub: 'Supplied complete with strap / strip',
     options: [
-      { sku: 'ATP-TP-16', name: 'F-Track Fitting', note: 'With 50mm Webbing Strap Loop', price: '$26' },
-      { sku: 'ATP-TP-17', name: 'E/Q-Track Fitting', note: 'With Webbing Strap & Hook', price: '$24' },
+      { sku: 'ATP-TP-16', name: 'F-Track Fitting', price: '$26' },
+      { sku: 'ATP-TP-17', name: 'E/Q-Track Fitting', price: '$24' },
     ]
   },
   // 5. Honeycomb 20mm Door Panels
   {
     skus: ['ATP-BP-03', 'ATP-BP-04', 'ATP-BP-05'],
-    label: 'Available Panel Height Sizes',
-    sub: 'Width: 1200mm | Thickness: 20mm',
+    label: 'Available Panel Sizes',
     options: [
-      { sku: 'ATP-BP-03', name: '2400 x 1200mm', note: '2.88 m²', price: '$238' },
-      { sku: 'ATP-BP-04', name: '2800 x 1200mm', note: '3.36 m²', price: '$278' },
-      { sku: 'ATP-BP-05', name: '3200 x 1200mm', note: '3.84 m²', price: '$317' },
+      { sku: 'ATP-BP-03', name: '2400 x 1200mm (20mm)', price: '$238' },
+      { sku: 'ATP-BP-04', name: '2800 x 1200mm (20mm)', price: '$278' },
+      { sku: 'ATP-BP-05', name: '3200 x 1200mm (20mm)', price: '$317' },
     ]
   },
   // 6. Honeycomb 30mm Panels
   {
     skus: ['ATP-BP-06', 'ATP-BP-07'],
-    label: 'Available 30mm Panel Height Sizes',
-    sub: 'Width: 1200mm | Thickness: 30mm',
+    label: 'Available Panel Sizes',
     options: [
-      { sku: 'ATP-BP-06', name: '2800 x 1200mm', note: '3.36 m²', price: '$357' },
-      { sku: 'ATP-BP-07', name: '3200 x 1200mm', note: '3.84 m²', price: '$407' },
+      { sku: 'ATP-BP-06', name: '2800 x 1200mm (30mm)', price: '$357' },
+      { sku: 'ATP-BP-07', name: '3200 x 1200mm (30mm)', price: '$407' },
     ]
   },
   // 7. Plywood 20mm Panels
   {
     skus: ['ATP-BP-08', 'ATP-BP-09', 'ATP-BP-10'],
-    label: 'Available Plywood Panel Sizes',
-    sub: 'Width: 1200mm | Thickness: 20mm',
+    label: 'Available Panel Sizes',
     options: [
-      { sku: 'ATP-BP-08', name: '2400 x 1200mm', note: '2.88 m²', price: '$258' },
-      { sku: 'ATP-BP-09', name: '2800 x 1200mm', note: '3.36 m²', price: '$301' },
-      { sku: 'ATP-BP-10', name: '3200 x 1200mm', note: '3.84 m²', price: '$344' },
+      { sku: 'ATP-BP-08', name: '2400 x 1200mm (20mm)', price: '$258' },
+      { sku: 'ATP-BP-09', name: '2800 x 1200mm (20mm)', price: '$301' },
+      { sku: 'ATP-BP-10', name: '3200 x 1200mm (20mm)', price: '$344' },
     ]
   },
   // 8. Beauway Cantilever Tail Lifts
   {
     skus: ['ATP-TL-04', 'ATP-TL-02', 'ATP-TL-01', 'ATP-TL-03', 'ATP-TL-05'],
-    label: 'Available Tail Lift Capacities & Sizes',
-    sub: '24V DC electro-hydraulic system',
+    label: 'Available Capacities & Platform Sizes',
     options: [
-      { sku: 'ATP-TL-04', name: '1.5T Aluminium (2450 x 2400mm)', note: '2450 x 2400mm', price: 'POA' },
-      { sku: 'ATP-TL-02', name: '2.0T Aluminium (2450 x 2200mm)', note: '2450 x 2200mm', price: 'POA' },
-      { sku: 'ATP-TL-01', name: '2.0T Aluminium (2450 x 2400mm)', note: '2450 x 2400mm', price: 'POA' },
-      { sku: 'ATP-TL-03', name: '2.0T Aluminium (2450 x 2600mm)', note: '2450 x 2600mm', price: 'POA' },
-      { sku: 'ATP-TL-05', name: '3.0T High-Tensile Steel (2450 x 2600mm)', note: '2450 x 2600mm', price: 'POA' },
+      { sku: 'ATP-TL-04', name: '1.5T Aluminium (2450 x 2400mm)', price: 'POA' },
+      { sku: 'ATP-TL-02', name: '2.0T Aluminium (2450 x 2200mm)', price: 'POA' },
+      { sku: 'ATP-TL-01', name: '2.0T Aluminium (2450 x 2400mm)', price: 'POA' },
+      { sku: 'ATP-TL-03', name: '2.0T Aluminium (2450 x 2600mm)', price: 'POA' },
+      { sku: 'ATP-TL-05', name: '3.0T High-Tensile Steel (2450 x 2600mm)', price: 'POA' },
     ]
   }
 ];
@@ -214,6 +207,7 @@ export default function ProductDetail() {
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState("specs");
   const [activeImgIdx, setActiveImgIdx] = useState(0);
+  const [quoteModalOpen, setQuoteModalOpen] = useState(false);
 
   useEffect(() => {
     setActiveImgIdx(0);
@@ -269,19 +263,21 @@ export default function ProductDetail() {
     return !BAD_IMAGE_SUBSTRINGS.some((bad) => url.includes(bad));
   };
 
+  const cleanLocal = imgFor(p.sku);
   const fallbackImages = imagesFor(p.sku).filter(isCleanImage);
   const backendImages = Array.isArray(p.images) && p.images.length > 0 
     ? p.images.map((img) => (typeof img === "string" ? img : img.url)).filter(isCleanImage)
     : [];
 
-  const rawList = backendImages.length > 0 ? backendImages : fallbackImages;
+  // For products with curated clean studio packshots, prioritize local images so stale CDN caches don't show bad photos
+  const rawList = cleanLocal ? [cleanLocal] : (backendImages.length > 0 ? backendImages : fallbackImages);
   const imagesList = Array.from(new Set(rawList.filter(Boolean)));
   if (imagesList.length === 0) {
-    const single = imgFor(p.sku) || `/images/products/${p.sku}.jpg`;
+    const single = cleanLocal || `/images/products/${p.sku}.jpg`;
     if (single) imagesList.push(single);
   }
 
-  const primaryImage = imagesList[activeImgIdx] || imagesList[0] || imgFor(p.sku) || `/images/products/${p.sku}.jpg`;
+  const primaryImage = imagesList[activeImgIdx] || imagesList[0] || cleanLocal || `/images/products/${p.sku}.jpg`;
   const isTailLift = p.category === "tail-lifts" || p.categorySlug === "tail-lifts";
   const isBodyPanel = p.category === "body-panels" || p.categorySlug === "body-panels" || (p.sku && p.sku.startsWith("ATP-BP-"));
   const enquiry = p.price === null || p.pricing?.isPOA === true || p.isPOA === true || p.status === "Enquiry only" || isTailLift || isBodyPanel;
@@ -380,39 +376,13 @@ export default function ProductDetail() {
             </div>
           )}
 
-          <div className="grid grid-cols-3 gap-px border border-line bg-line text-center text-[12px] font-semibold">
-            {[["ADR checked", "Fitment matched"], ["1-2 day dispatch", "Ex Campbellfield"], ["Easy returns", "30 day change of mind"]].map(([t, d]) => (
-              <div key={t} className="bg-white px-2 py-2.5"><p className="font-bold">{t}</p><p className="mt-0.5 text-faint">{d}</p></div>
+          <div className="grid grid-cols-3 gap-px overflow-hidden rounded-md border border-line bg-line text-center text-[12px] font-semibold">
+            {[["ADR Checked", "Fitment Matched"], ["Fast Dispatch", "Ex Campbellfield"], ["Fleet Warranty", "12 Mo Commercial"]].map(([t, d]) => (
+              <div key={t} className="bg-white px-2 py-2.5">
+                <p className="font-bold text-ink">{t}</p>
+                <p className="mt-0.5 text-[11px] text-steel">{d}</p>
+              </div>
             ))}
-          </div>
-
-          {/* Dedicated Fleet Logistics & Fitment Summary */}
-          <div className="rounded-md border border-line bg-mist/50 p-3.5 text-xs text-steel">
-            <div className="flex items-center justify-between border-b border-line pb-2">
-              <span className="font-extrabold uppercase tracking-wide text-ink text-[11px] flex items-center gap-1.5">
-                <Truck size={14} className="text-navy" />
-                Fleet Logistics & Direct Dispatch
-              </span>
-              <span className="font-mono text-[10px] font-bold text-steel">VIC WAREHOUSE</span>
-            </div>
-            <div className="mt-2.5 grid grid-cols-2 gap-2 text-[11px]">
-              <div>
-                <span className="block text-faint">Part Number:</span>
-                <span className="font-mono font-bold text-ink">{p.sku}</span>
-              </div>
-              <div>
-                <span className="block text-faint">Application:</span>
-                <span className="font-bold text-ink truncate">{p.sub || p.category.replace("-", " ")}</span>
-              </div>
-              <div>
-                <span className="block text-faint">Dispatch Speed:</span>
-                <span className="font-bold text-ink">1–2 Business Days</span>
-              </div>
-              <div>
-                <span className="block text-faint">Commercial Warranty:</span>
-                <span className="font-bold text-ink">12 Months Fleet Cover</span>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -438,7 +408,7 @@ export default function ProductDetail() {
 
           {(p.specs?.Certification || p.specs?.['Australian Standard']) && (
             <div className="flex items-center gap-3.5 rounded-lg border border-slate-200/90 bg-white p-3 shadow-xs transition-shadow hover:shadow-sm">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-slate-100 bg-white p-1 shadow-xs">
+              <div className="flex h-16 w-16 sm:h-18 sm:w-18 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 shadow-xs">
                 <img
                   src="/images/badges/australian-standard-certified.png"
                   alt="Australian Standard Certified Product Mark"
@@ -485,9 +455,6 @@ export default function ProductDetail() {
                   <Layers size={13} className="text-primary" />
                   {sizeFamily.label}:
                 </span>
-                {sizeFamily.sub && (
-                  <span className="font-mono text-[10px] font-bold text-steel">{sizeFamily.sub}</span>
-                )}
               </div>
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {sizeFamily.options.map((opt) => {
@@ -537,12 +504,20 @@ export default function ProductDetail() {
                       Request Tail Lift Quotation Enquiry →
                     </Link>
                   ) : isBodyPanel ? (
-                    <a
-                      href={`mailto:info@aurextruckparts.com.au?subject=Quotation%20Enquiry%20-%20${encodeURIComponent(p.sku)}%20${encodeURIComponent(p.name)}&body=Hi%20Aurex%20Truck%20Parts%20Team,%0D%0A%0D%0AI%20would%20like%20to%20request%20a%20commercial%20fleet%20quotation%20for:%0D%0APart%20Number:%20${encodeURIComponent(p.sku)}%0D%0AProduct:%20${encodeURIComponent(p.name)}%0D%0AQuantity%20Required:%20%0D%0ACompany%20Name:%20%0D%0AContact%20Phone:%20%0D%0ADelivery%20Location%20/%20Postcode:%20%0D%0A%0D%0APlease%20provide%20pricing%20and%20freight%20availability.%0D%0A%0D%0AThank%20you!`}
-                      className="flex items-center justify-center gap-2 rounded bg-gold py-3 text-center text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white sm:col-span-2 shadow-xs"
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const subject = `Quotation Enquiry - ${p.sku} ${p.name}`;
+                        const emailBody = `Hi Aurex Truck Parts Team,\n\nI would like to request a commercial fleet quotation for:\nPart Number: ${p.sku}\nProduct: ${p.name}\nQuantity Required: \nCompany Name: \nContact Phone: \nDelivery Location / Postcode: \n\nPlease provide pricing and freight availability.\n\nThank you!`;
+                        try {
+                          window.location.href = `mailto:info@aurextruckparts.com.au?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+                        } catch (e) {}
+                        setQuoteModalOpen(true);
+                      }}
+                      className="flex items-center justify-center gap-2 rounded bg-gold py-3 text-center text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white sm:col-span-2 shadow-xs cursor-pointer"
                     >
                       <Mail size={16} /> Request Quote →
-                    </a>
+                    </button>
                   ) : (
                     <Link
                       to={`/contact?topic=${encodeURIComponent(p.name)}&sku=${p.sku}`}
@@ -643,7 +618,7 @@ export default function ProductDetail() {
               {(p.specs?.Certification || p.specs?.['Australian Standard']) && (
                 <div className="rounded-lg border border-slate-200 bg-gradient-to-r from-slate-50/70 via-white to-slate-50/30 p-4 shadow-xs">
                   <div className="flex items-start gap-3.5">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-slate-200/80 bg-white p-1.5 shadow-xs">
+                    <div className="flex h-16 w-16 sm:h-20 sm:w-20 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white p-2 shadow-xs">
                       <img
                         src="/images/badges/australian-standard-certified.png"
                         alt="Australian Standard Certified"
@@ -767,7 +742,7 @@ export default function ProductDetail() {
                     <img
                       src="/images/badges/australian-standard-certified.png"
                       alt="Australian Standard"
-                      className="h-9 w-9 object-contain rounded border border-slate-200/60 p-0.5 bg-white shrink-0"
+                      className="h-14 w-14 object-contain rounded-lg border border-slate-200 p-1 bg-white shrink-0 shadow-xs"
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
@@ -886,6 +861,12 @@ export default function ProductDetail() {
       </div>
       <h2 className="mb-4 mt-10 text-2xl font-extrabold tracking-tight">You May Also Need</h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 lg:gap-4">{related.map((r) => <ProductCard key={r.sku} p={r} badges={false} />)}</div>
+
+      <QuoteEnquiryModal
+        isOpen={quoteModalOpen}
+        onClose={() => setQuoteModalOpen(false)}
+        product={p}
+      />
     </main>
   );
 }
