@@ -13,7 +13,7 @@ const META = [
   [/^\/shop\/tail-lifts$/, ["Heavy Duty Hydraulic Tail Lifts (1.5T - 3T) | " + BASE, "Commercial cantilever hydraulic tail lifts for Australian trucks, rigids and trailers. ADR compliant with technical fitment consultation."]],
   [/^\/shop\/trailer-parts$/, ["Commercial Trailer Parts & Hardware | " + BASE, "Heavy-duty cam locks, door gear, hinges, sliding post bases, coaming rails, and cargo tracks in stock in Campbellfield VIC."]],
   [/^\/shop\/accessories$/, ["Truck & Trailer Fleet Accessories | " + BASE, "Underbody toolboxes, load restraint systems, rubber buffers, safety signs, and workshop fittings in stock for immediate dispatch."]],
-  [/^\/shop(\/|$)/, ["Shop All Commercial Parts | " + BASE, "Shop 149+ commercial lines across tail lifts, trailer parts and accessories with live VIC stock and express Australia-wide freight."]],
+  [/^\/shop(\/|$)/, ["Shop All Commercial Parts | " + BASE, "Shop commercial lines across tail lifts, trailer parts and accessories with live VIC stock and express Australia-wide freight."]],
   [/^\/tail-lift-enquiry$/, ["Tail Lift Quotation & Technical Fitment Enquiry | " + BASE, "Request an engineering-grade quote and fitment consultation for commercial hydraulic tail lifts. Fast response from our Melbourne team within 4 business hours."]],
   [/^\/about$/, ["About Us | " + BASE, "The Campbellfield trade counter behind the catalogue. VIN checks, exact quotes, fast freight across Australia."]],
   [/^\/contact$/, ["Contact the Counter | " + BASE, "Call +61 414 730 467 or send VIN, photos and measurements for an exact price within 4 business hours. Trade desk open Mon-Sat."]],

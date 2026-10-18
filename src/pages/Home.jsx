@@ -313,9 +313,11 @@ function LiftsBand() {
 
 function TrailerBlock() {
   const { data, isLoading } = useProducts({ category: "trailer-parts", limit: 10 });
+  const { data: categories = [] } = useCategories();
+  const trailerCat = categories.find((c) => c.slug === "trailer-parts");
   const COMPANY = useCompany();
   const parts = data?.products || [];
-  const totalCount = data?.pagination?.total || data?.total || 138;
+  const totalCount = trailerCat?.count ?? trailerCat?.productCount ?? data?.pagination?.total ?? (parts.length > 0 ? parts.length : 114);
 
   return (
     <section id="cat-trailer-parts" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-10">
@@ -355,6 +357,9 @@ function TrailerBlock() {
 
 function CounterBand() {
   const COMPANY = useCompany();
+  const { data: categories = [] } = useCategories();
+  const totalLines = categories.reduce((sum, c) => sum + (c.count ?? c.productCount ?? 0), 0) || 136;
+
   return (
     <section className="mt-12 bg-mist border-y border-line">
       <div className="mx-auto max-w-7xl px-4 py-12">
@@ -362,7 +367,7 @@ function CounterBand() {
           <div className="lg:col-span-6">
             <p className="font-mono text-xs font-bold uppercase tracking-wider text-primary">Campbellfield Trade Desk & Warehouse</p>
             <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-ink md:text-4xl">
-              149+ Commercial Lines in Stock. Pick Up Today.
+              {totalLines}+ Commercial Lines in Stock. Pick Up Today.
             </h2>
             <p className="mt-3 text-base leading-relaxed text-steel">
               Our Campbellfield hub holds complete inventory for heavy transport fleets, commercial bodybuilders, and repair workshops. Walk in for trade counter collection or organise same-day dispatch.
@@ -408,7 +413,7 @@ function CounterBand() {
               />
               <p className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-3 font-mono text-xs font-bold uppercase tracking-wider">
                 <span className="text-primary">Melbourne Warehouse · VIC 3061</span>
-                <span className="text-steel">149+ lines in stock</span>
+                <span className="text-steel">{totalLines}+ lines in stock</span>
               </p>
             </div>
           </div>

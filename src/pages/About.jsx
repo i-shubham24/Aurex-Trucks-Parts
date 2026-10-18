@@ -4,11 +4,16 @@ import { useCompany, useSite } from "../store/site";
 import { formatAUD } from "../data/products";
 
 import { PHOTO } from "../data/images";
+import { useCategories } from "../hooks/api/useCategories";
 
 export default function About() {
   const COMPANY = useCompany();
   const { settings } = useSite();
+  const { data: categories = [] } = useCategories();
+  const totalLines = categories.reduce((sum, c) => sum + (c.count ?? c.productCount ?? 0), 0) || 136;
+  const numCats = categories.length || 3;
   const freeOver = formatAUD(settings.freeFreightOver || 500);
+
   return (
     <main>
       <section className="mx-auto max-w-7xl px-4 pt-6">
@@ -32,7 +37,7 @@ export default function About() {
 
       <section className="mt-10 bg-ink py-8 text-white">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 md:grid-cols-4">
-          {[["140+", "Approved lines"], ["3", "Categories"], ["1", "VIC counter"], ["4hr", "Quote turnaround"]].map(([n, l]) => (
+          {[[`${totalLines}+`, "Approved lines"], [String(numCats), "Categories"], ["1", "VIC counter"], ["4hr", "Quote turnaround"]].map(([n, l]) => (
             <div key={l} className="border-l-2 border-gold pl-4">
               <p className="tabular text-3xl font-extrabold md:text-4xl">{n}</p>
               <p className="mt-1 text-[13px] text-gray-300">{l}</p>

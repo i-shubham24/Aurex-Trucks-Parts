@@ -176,13 +176,16 @@ const SIZE_FAMILIES = [
       { sku: 'ATP-ACC-15', name: '3200 x 1200mm (30mm)', price: '$509.00' },
     ]
   },
-  // 8. 20mm Door Seals
+  // 8. Commercial PVC Door Seals
   {
-    skus: ['ATP-ACC-17', 'ATP-ACC-18'],
-    label: 'Available Seal Profile Material',
+    skus: ['ATP-TP-29', 'ATP-TP-30', 'ATP-TP-31', 'ATP-TP-32', 'ATP-TP-33'],
+    label: 'Available Seal Profile Sizes',
     options: [
-      { sku: 'ATP-ACC-17', name: 'EPDM Rubber 20mm (5M)', price: '$57.50' },
-      { sku: 'ATP-ACC-18', name: 'PVC Polymer 20mm (5M)', price: '$47.00' },
+      { sku: 'ATP-TP-29', name: '20mm x 5M', price: '$47.00' },
+      { sku: 'ATP-TP-30', name: '25mm x 5M', price: '$49.00' },
+      { sku: 'ATP-TP-31', name: '30mm x 4M', price: '$49.00' },
+      { sku: 'ATP-TP-32', name: '55mm x 4.2M', price: '$59.00' },
+      { sku: 'ATP-TP-33', name: '85mm x 5M', price: '$75.00' },
     ]
   },
   // 8. Beauway Cantilever Tail Lifts
