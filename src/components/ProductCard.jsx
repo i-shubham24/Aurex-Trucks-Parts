@@ -247,11 +247,6 @@ export default function ProductCard({ p, joined }) {
             </div>
           ) : (
             <div className="ml-auto text-right">
-              {p.pricing?.mrp > p.price && (
-                <span className="block text-[11px] font-semibold text-steel line-through">
-                  {formatAUD(p.pricing.mrp)}
-                </span>
-              )}
               <span className="tabular text-[20px] font-extrabold text-primary">
                 {formatAUD(p.price)}
               </span>

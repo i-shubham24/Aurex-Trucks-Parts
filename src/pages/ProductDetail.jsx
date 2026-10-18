@@ -114,9 +114,9 @@ const SIZE_FAMILIES = [
     skus: ['ATP-TP-11', 'ATP-TP-12', 'ATP-TP-13'],
     label: 'Available Frame Width Sizes',
     options: [
-      { sku: 'ATP-TP-13', name: '1250mm (W)', price: '$145' },
-      { sku: 'ATP-TP-11', name: '1995mm (W)', price: '$175' },
-      { sku: 'ATP-TP-12', name: '2045mm (W)', price: '$185' },
+      { sku: 'ATP-TP-13', name: '1250mm (W)', price: '$141' },
+      { sku: 'ATP-TP-11', name: '1995mm (W)', price: '$170' },
+      { sku: 'ATP-TP-12', name: '2045mm (W)', price: '$179' },
     ]
   },
   // 2. Cam Door Lock Kit Configurations (PI-GLYHM26091414-1)
@@ -124,9 +124,9 @@ const SIZE_FAMILIES = [
     skus: ['ATP-TP-01', 'ATP-TP-02', 'ATP-TP-03'],
     label: 'Available Kit Configurations',
     options: [
-      { sku: 'ATP-TP-01', name: 'Steel (With Handle)', price: '$105' },
-      { sku: 'ATP-TP-02', name: 'Steel (Less Handle)', price: '$89' },
-      { sku: 'ATP-TP-03', name: '304 Stainless Steel', price: '$165' },
+      { sku: 'ATP-TP-01', name: 'Steel (With Handle)', price: '$102' },
+      { sku: 'ATP-TP-02', name: 'Steel (Less Handle)', price: '$86' },
+      { sku: 'ATP-TP-03', name: '304 Stainless Steel', price: '$160' },
     ]
   },
   // 3. Commercial Grab Handles (PI-GLYHM26091414-1)
@@ -134,8 +134,8 @@ const SIZE_FAMILIES = [
     skus: ['ATP-TP-21', 'ATP-TP-22'],
     label: 'Available Mounting Styles',
     options: [
-      { sku: 'ATP-TP-22', name: 'Zinc Plated (No Base)', price: '$11' },
-      { sku: 'ATP-TP-21', name: 'Stainless Steel (With Base)', price: '$11' },
+      { sku: 'ATP-TP-22', name: 'Zinc Plated (No Base)', price: '$10' },
+      { sku: 'ATP-TP-21', name: 'Stainless Steel (With Base)', price: '$10' },
     ]
   },
   // 4. Cargo Control End Fittings
@@ -143,8 +143,8 @@ const SIZE_FAMILIES = [
     skus: ['ATP-TP-16', 'ATP-TP-17'],
     label: 'Available End Fitting Types',
     options: [
-      { sku: 'ATP-TP-16', name: 'F-Track Fitting', price: '$26' },
-      { sku: 'ATP-TP-17', name: 'E/Q-Track Fitting', price: '$24' },
+      { sku: 'ATP-TP-16', name: 'F-Track Fitting', price: '$25' },
+      { sku: 'ATP-TP-17', name: 'E/Q-Track Fitting', price: '$23' },
     ]
   },
   // 5. Honeycomb 20mm Door Panels
@@ -181,11 +181,11 @@ const SIZE_FAMILIES = [
     skus: ['ATP-TP-29', 'ATP-TP-30', 'ATP-TP-31', 'ATP-TP-32', 'ATP-TP-33'],
     label: 'Available Seal Profile Sizes',
     options: [
-      { sku: 'ATP-TP-29', name: '20mm x 5M', price: '$47.00' },
-      { sku: 'ATP-TP-30', name: '25mm x 5M', price: '$49.00' },
-      { sku: 'ATP-TP-31', name: '30mm x 4M', price: '$49.00' },
-      { sku: 'ATP-TP-32', name: '55mm x 4.2M', price: '$59.00' },
-      { sku: 'ATP-TP-33', name: '85mm x 5M', price: '$75.00' },
+      { sku: 'ATP-TP-29', name: '20mm x 5M', price: '$46' },
+      { sku: 'ATP-TP-30', name: '25mm x 5M', price: '$48' },
+      { sku: 'ATP-TP-31', name: '30mm x 4M', price: '$46' },
+      { sku: 'ATP-TP-32', name: '55mm x 4.2M', price: '$60' },
+      { sku: 'ATP-TP-33', name: '85mm x 5M', price: '$70' },
     ]
   },
   // 8. Beauway Cantilever Tail Lifts
@@ -580,16 +580,6 @@ export default function ProductDetail() {
             ) : (
               <><div className="flex flex-wrap items-baseline justify-between gap-2">
                 <div>
-                  {p.pricing?.mrp > p.price && (
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="text-base font-semibold text-steel line-through">
-                        {formatAUD(p.pricing.mrp)}
-                      </span>
-                      <span className="rounded bg-rose-50 px-2 py-0.5 text-xs font-bold text-rose-700 border border-rose-200">
-                        3% Below Market Competitor
-                      </span>
-                    </div>
-                  )}
                   <p className="tabular text-5xl font-extrabold text-primary">{formatAUD(p.price)}</p>
                 </div>
                 <p className="text-right font-mono text-[11px] leading-4 text-faint">{(p.status || "In stock VIC").toUpperCase()}<br />{(p.lead || "Ships in 24 hrs").toUpperCase()}</p>
