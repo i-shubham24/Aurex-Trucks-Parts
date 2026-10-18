@@ -508,37 +508,35 @@ export default function ProductDetail() {
                     ? "Custom sized to your truck chassis and body dimensions. Engineering review in 4 hours."
                     : "Priced to your fleet requirements. Fast quote back within 4 business hours."}
                 </p>
-                <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <div className="mt-3 flex flex-col gap-2">
                   {isTailLift ? (
                     <Link
                       to={`/tail-lift-enquiry?sku=${p.sku}`}
-                      className="flex items-center justify-center gap-2 rounded bg-gold py-3 text-center text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white sm:col-span-2 shadow-xs"
+                      className="flex w-full items-center justify-center gap-2 rounded bg-gold py-3 text-center text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white shadow-xs"
                     >
                       Request Tail Lift Quotation Enquiry →
                     </Link>
                   ) : (
-                    <>
-                      <a
-                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=info@aurextruckparts.com.au&su=${encodeURIComponent(`Price Enquiry: ${p.sku} - ${p.name}`)}&body=${encodeURIComponent(`Hi Aurex Truck Parts Team,\n\nI would like to enquire about trade/fleet pricing and stock availability for:\nPart Number: ${p.sku}\nProduct: ${p.name}\n\nRequired Quantity:\nDelivery Postcode / Location:\nCompany / Account Name:\nContact Phone Number:\n\nThank you!`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-2 rounded bg-gold py-3 text-center text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white sm:col-span-2 shadow-xs cursor-pointer"
-                      >
-                        <Mail size={16} /> Open in Gmail to info@aurextruckparts.com.au →
-                      </a>
-                      <a
-                        href={`mailto:info@aurextruckparts.com.au?subject=${encodeURIComponent(`Price Enquiry: ${p.sku} - ${p.name}`)}&body=${encodeURIComponent(`Hi Aurex Truck Parts Team,\n\nI would like to request price enquiry for ${p.sku} - ${p.name}.\n\nRequired Quantity:\nDelivery Postcode:\nCompany Name:\nContact Phone:\n\nThank you!`)}`}
-                        className="flex items-center justify-center gap-2 rounded border border-ink bg-white py-2.5 text-xs font-bold text-ink transition-colors hover:bg-mist sm:col-span-1"
-                      >
-                        <Mail size={14} className="text-navy" /> Default Mail App (info@)
-                      </a>
-                    </>
+                    <a
+                      href={`mailto:info@aurextruckparts.com.au?subject=${encodeURIComponent(`Price Enquiry: ${p.sku} - ${p.name}`)}&body=${encodeURIComponent(`Hi Aurex Truck Parts Team,\n\nI would like to enquire about trade/fleet pricing and stock availability for:\nPart Number: ${p.sku}\nProduct: ${p.name}\n\nRequired Quantity:\nDelivery Postcode / Location:\nCompany / Account Name:\nContact Phone Number:\n\nThank you!`)}`}
+                      onClick={(e) => {
+                        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=info@aurextruckparts.com.au&su=${encodeURIComponent(`Price Enquiry: ${p.sku} - ${p.name}`)}&body=${encodeURIComponent(`Hi Aurex Truck Parts Team,\n\nI would like to enquire about trade/fleet pricing and stock availability for:\nPart Number: ${p.sku}\nProduct: ${p.name}\n\nRequired Quantity:\nDelivery Postcode / Location:\nCompany / Account Name:\nContact Phone Number:\n\nThank you!`)}`;
+                        const win = window.open(gmailUrl, "_blank", "noopener,noreferrer");
+                        if (!win) {
+                          return true;
+                        }
+                        e.preventDefault();
+                      }}
+                      className="flex w-full items-center justify-center gap-2 rounded bg-gold py-3 text-center text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white shadow-xs cursor-pointer"
+                    >
+                      <Mail size={16} /> Email info@aurextruckparts.com.au →
+                    </a>
                   )}
                   <a
                     href={COMPANY.phoneHref}
-                    className={`flex items-center justify-center gap-2 rounded bg-ink py-2.5 text-xs font-bold text-white transition-colors hover:bg-navy ${isTailLift ? "sm:col-span-2" : "sm:col-span-1"}`}
+                    className="flex w-full items-center justify-center gap-2 rounded bg-ink py-3 text-sm font-bold text-white transition-colors hover:bg-navy"
                   >
-                    <Phone size={14} className="text-gold" /> Call {COMPANY.phone}
+                    <Phone size={16} className="text-gold" /> Call {COMPANY.phone}
                   </a>
                 </div>
                 <p className="mt-2.5 text-center font-mono text-[11px] text-faint">RESPONSE IN 4 BUSINESS HOURS</p>
