@@ -114,8 +114,8 @@ function Hero() {
             </div>
           </div>
         </div>
-        <div className="relative min-h-[260px] md:min-h-[380px]">
-          <div className="hero-slide absolute inset-y-4 right-6 left-16 rounded-md bg-gold/50 blur-[1px] md:left-24" />
+        <div className="relative h-[260px] min-h-[260px] md:h-auto md:min-h-[380px]">
+          <div className="hero-slide absolute inset-y-3 inset-x-4 rounded-md bg-gold/50 blur-[1px] md:inset-y-4 md:right-6 md:left-24" />
           {slides.map((slide, idx) => {
             const isCurrent = idx === i;
             const src = slide.image?.url || slide.img;
@@ -129,7 +129,7 @@ function Hero() {
                 loading={idx === 0 ? "eager" : "lazy"}
                 fetchPriority={idx === 0 ? "high" : "auto"}
                 decoding={idx === 0 ? "sync" : "async"}
-                className={`hero-slide absolute inset-0 h-full w-full rounded-r-lg object-cover [clip-path:polygon(12%_0,100%_0,100%_100%,0_100%)] transition-opacity duration-700 ease-in-out ${
+                className={`hero-slide absolute inset-0 h-full w-full rounded-b-lg object-cover object-center [clip-path:none] md:rounded-bl-none md:rounded-r-lg md:[clip-path:polygon(12%_0,100%_0,100%_100%,0_100%)] transition-opacity duration-700 ease-in-out ${
                   isCurrent ? "opacity-100 z-10" : "opacity-0 pointer-events-none z-0"
                 }`}
               />
