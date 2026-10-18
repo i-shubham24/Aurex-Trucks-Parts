@@ -152,9 +152,9 @@ const SIZE_FAMILIES = [
     skus: ['ATP-ACC-08', 'ATP-ACC-09', 'ATP-ACC-10'],
     label: 'Available Panel Sizes',
     options: [
-      { sku: 'ATP-ACC-08', name: '2400 x 1200mm (20mm)', price: '$354.00' },
-      { sku: 'ATP-ACC-09', name: '2800 x 1200mm (20mm)', price: '$412.00' },
-      { sku: 'ATP-ACC-10', name: '3200 x 1200mm (20mm)', price: '$470.00' },
+      { sku: 'ATP-ACC-08', name: '2400 x 1200mm (20mm)' },
+      { sku: 'ATP-ACC-09', name: '2800 x 1200mm (20mm)' },
+      { sku: 'ATP-ACC-10', name: '3200 x 1200mm (20mm)' },
     ]
   },
   // 6. Plywood 20mm Door Panels
@@ -162,9 +162,9 @@ const SIZE_FAMILIES = [
     skus: ['ATP-ACC-11', 'ATP-ACC-12', 'ATP-ACC-13'],
     label: 'Available Plywood Core Sizes',
     options: [
-      { sku: 'ATP-ACC-11', name: '2400 x 1200mm (20mm)', price: '$377.00' },
-      { sku: 'ATP-ACC-12', name: '2800 x 1200mm (20mm)', price: '$436.00' },
-      { sku: 'ATP-ACC-13', name: '3200 x 1200mm (20mm)', price: '$499.00' },
+      { sku: 'ATP-ACC-11', name: '2400 x 1200mm (20mm)' },
+      { sku: 'ATP-ACC-12', name: '2800 x 1200mm (20mm)' },
+      { sku: 'ATP-ACC-13', name: '3200 x 1200mm (20mm)' },
     ]
   },
   // 7. Insulated XPS 30mm Panels
@@ -172,8 +172,8 @@ const SIZE_FAMILIES = [
     skus: ['ATP-ACC-14', 'ATP-ACC-15'],
     label: 'Available Insulated XPS Sizes',
     options: [
-      { sku: 'ATP-ACC-14', name: '2800 x 1200mm (30mm)', price: '$446.00' },
-      { sku: 'ATP-ACC-15', name: '3200 x 1200mm (30mm)', price: '$509.00' },
+      { sku: 'ATP-ACC-14', name: '2800 x 1200mm (30mm)' },
+      { sku: 'ATP-ACC-15', name: '3200 x 1200mm (30mm)' },
     ]
   },
   // 8. Commercial PVC Door Seals
@@ -517,18 +517,28 @@ export default function ProductDetail() {
                       Request Tail Lift Quotation Enquiry →
                     </Link>
                   ) : (
-                    <Link
-                      to={`/contact?topic=${encodeURIComponent(p.name)}&sku=${p.sku}`}
-                      className="rounded border border-ink bg-white py-3 text-center text-sm font-bold transition-colors hover:bg-ink hover:text-white sm:col-span-2"
-                    >
-                      Send Enquiry
-                    </Link>
+                    <>
+                      <a
+                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=info@aurextruckparts.com.au&su=${encodeURIComponent(`Price Enquiry: ${p.sku} - ${p.name}`)}&body=${encodeURIComponent(`Hi Aurex Truck Parts Team,\n\nI would like to enquire about trade/fleet pricing and stock availability for:\nPart Number: ${p.sku}\nProduct: ${p.name}\n\nRequired Quantity:\nDelivery Postcode / Location:\nCompany / Account Name:\nContact Phone Number:\n\nThank you!`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 rounded bg-gold py-3 text-center text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white sm:col-span-2 shadow-xs cursor-pointer"
+                      >
+                        <Mail size={16} /> Open in Gmail to info@aurextruckparts.com.au →
+                      </a>
+                      <a
+                        href={`mailto:info@aurextruckparts.com.au?subject=${encodeURIComponent(`Price Enquiry: ${p.sku} - ${p.name}`)}&body=${encodeURIComponent(`Hi Aurex Truck Parts Team,\n\nI would like to request price enquiry for ${p.sku} - ${p.name}.\n\nRequired Quantity:\nDelivery Postcode:\nCompany Name:\nContact Phone:\n\nThank you!`)}`}
+                        className="flex items-center justify-center gap-2 rounded border border-ink bg-white py-2.5 text-xs font-bold text-ink transition-colors hover:bg-mist sm:col-span-1"
+                      >
+                        <Mail size={14} className="text-navy" /> Default Mail App (info@)
+                      </a>
+                    </>
                   )}
                   <a
                     href={COMPANY.phoneHref}
-                    className="flex items-center justify-center gap-2 rounded bg-ink py-3 text-sm font-bold text-white transition-colors hover:bg-navy sm:col-span-2"
+                    className={`flex items-center justify-center gap-2 rounded bg-ink py-2.5 text-xs font-bold text-white transition-colors hover:bg-navy ${isTailLift ? "sm:col-span-2" : "sm:col-span-1"}`}
                   >
-                    <Phone size={16} /> Call {COMPANY.phone}
+                    <Phone size={14} className="text-gold" /> Call {COMPANY.phone}
                   </a>
                 </div>
                 <p className="mt-2.5 text-center font-mono text-[11px] text-faint">RESPONSE IN 4 BUSINESS HOURS</p>
@@ -651,6 +661,17 @@ export default function ProductDetail() {
                       </p>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {(p.description || p.desc) && (
+                <div className="rounded-lg border border-line bg-mist/30 p-4">
+                  <p className="text-xs font-bold uppercase tracking-wider text-steel mb-1.5">
+                    Engineering Overview & Fleet Application
+                  </p>
+                  <p className="text-sm leading-relaxed text-ink font-normal">
+                    {p.description || p.desc}
+                  </p>
                 </div>
               )}
 

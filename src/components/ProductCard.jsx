@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { GitCompareArrows, MessageSquare, ShoppingCart, Star } from "lucide-react";
+import { GitCompareArrows, MessageSquare, ShoppingCart, Star, Mail } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { imgFor } from "../data/images";
 import SafeImage from "./SafeImage";
@@ -122,14 +122,18 @@ export default function ProductCard({ p, joined }) {
   const isTailLift = p.category === "tail-lifts" || p.categorySlug === "tail-lifts" || (p.sku && p.sku.startsWith("ATP-TL-"));
   const enquiry = p.price === null || p.pricing?.isPOA === true || p.isPOA === true || p.status === "Enquiry only" || isTailLift;
   const targetUrl = `/product/${p.sku}`;
-  const enquiryUrl = isTailLift
-    ? `/tail-lift-enquiry?sku=${p.sku}`
-    : `/contact?topic=${encodeURIComponent(p.name)}&sku=${p.sku}`;
 
   const handleEnquiryClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    navigate(enquiryUrl);
+    if (isTailLift) {
+      navigate(`/tail-lift-enquiry?sku=${p.sku}`);
+    } else {
+      const subject = `Price Enquiry: ${p.sku} - ${p.name}`;
+      const body = `Hi Aurex Truck Parts Team,\n\nI would like to enquire about trade/fleet pricing and stock availability for:\nPart Number: ${p.sku}\nProduct: ${p.name}\n\nRequired Quantity:\nDelivery Postcode / Location:\nCompany / Account Name:\nContact Phone Number:\n\nThank you!`;
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=info@aurextruckparts.com.au&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.open(gmailUrl, "_blank", "noopener,noreferrer");
+    }
   };
 
   return (
@@ -180,11 +184,12 @@ export default function ProductCard({ p, joined }) {
             </span>
             <button
               type="button"
-              aria-label={`Enquire price for ${p.name}`}
+              aria-label={isTailLift ? `Tail lift enquiry for ${p.name}` : `Direct Gmail enquiry for ${p.name}`}
+              title={isTailLift ? "Open Tail Lift Dedicated Enquiry Form" : "Direct Email Enquiry via Gmail (info@aurextruckparts.com.au)"}
               onClick={handleEnquiryClick}
               className="pointer-events-auto grid h-9 w-9 place-items-center rounded-md bg-white text-ink shadow transition-colors hover:bg-gold md:h-7 md:w-7"
             >
-              <MessageSquare size={14} />
+              {isTailLift ? <MessageSquare size={14} /> : <Mail size={14} />}
             </button>
           </span>
         )}
