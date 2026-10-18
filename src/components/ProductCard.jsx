@@ -130,9 +130,36 @@ export default function ProductCard({ p, joined }) {
       navigate(`/tail-lift-enquiry?sku=${p.sku}`);
     } else {
       const subject = `Price Enquiry: ${p.sku} - ${p.name}`;
-      const body = `Hi Aurex Truck Parts Team,\n\nI would like to enquire about trade/fleet pricing and stock availability for:\nPart Number: ${p.sku}\nProduct: ${p.name}\n\nRequired Quantity:\nDelivery Postcode / Location:\nCompany / Account Name:\nContact Phone Number:\n\nThank you!`;
-      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=info@aurextruckparts.com.au&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      window.open(gmailUrl, "_blank", "noopener,noreferrer");
+      const body = [
+        "Hi Aurex Truck Parts Team,",
+        "",
+        "I would like to enquire about trade/fleet pricing and stock availability for:",
+        `Part Number: ${p.sku}`,
+        `Product: ${p.name}`,
+        "",
+        "Required Quantity: ",
+        "Delivery Postcode / Location: ",
+        "Company / Account Name: ",
+        "Contact Phone Number: ",
+        "",
+        "Thank you!"
+      ].join("\n");
+      const mailtoUrl = `mailto:info@aurextruckparts.com.au?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+      const isMobile = typeof navigator !== "undefined" && (
+        /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        (typeof window !== "undefined" && window.innerWidth < 768)
+      );
+
+      if (isMobile) {
+        window.location.href = mailtoUrl;
+      } else {
+        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=info@aurextruckparts.com.au&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        const win = window.open(gmailUrl, "_blank", "noopener,noreferrer");
+        if (!win) {
+          window.location.href = mailtoUrl;
+        }
+      }
     }
   };
 

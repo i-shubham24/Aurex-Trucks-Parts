@@ -47,14 +47,40 @@ const AdminSettings = lazy(() => import("./pages/admin/Settings"));
 const PageFallback = () => <div className="min-h-[60vh]" aria-busy="true" />;
 
 function ScrollManager() {
-  const { pathname, hash } = useLocation();
+  const { pathname, search, hash } = useLocation();
+
   useEffect(() => {
     if (hash) {
-      const el = document.querySelector(hash);
-      if (el) { el.scrollIntoView({ behavior: "smooth" }); return; }
+      const timer = setTimeout(() => {
+        const el = document.querySelector(hash);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 60);
+      return () => clearTimeout(timer);
     }
-    window.scrollTo(0, 0);
-  }, [pathname, hash]);
+
+    const resetScroll = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      if (document.documentElement) document.documentElement.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    };
+
+    // Immediately reset scroll to the very top on all devices
+    resetScroll();
+
+    // Follow-up frame tick and delayed ticks to counteract post-mount layout shifts from lazy chunks or API fetch
+    const raf = requestAnimationFrame(resetScroll);
+    const t1 = setTimeout(resetScroll, 60);
+    const t2 = setTimeout(resetScroll, 180);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [pathname, search, hash]);
+
   return null;
 }
 

@@ -223,7 +223,18 @@ export default function ProductDetail() {
 
   useEffect(() => {
     setActiveImgIdx(0);
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
   }, [sku]);
+
+  useEffect(() => {
+    if (!isLoading) {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      if (document.documentElement) document.documentElement.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    }
+  }, [isLoading]);
 
   const cartItem = lines.find((l) => l.sku === p?.sku);
   const inCart = Boolean(cartItem);
@@ -295,6 +306,24 @@ export default function ProductDetail() {
   const isTailLift = p.category === "tail-lifts" || p.categorySlug === "tail-lifts" || (p.sku && p.sku.startsWith("ATP-TL-"));
   const enquiry = p.price === null || p.pricing?.isPOA === true || p.isPOA === true || p.status === "Enquiry only" || isTailLift;
   const inCompare = compare.includes(p.sku);
+
+  const emailSubject = `Price Enquiry: ${p.sku} - ${p.name}`;
+  const emailBody = [
+    "Hi Aurex Truck Parts Team,",
+    "",
+    "I would like to enquire about trade/fleet pricing and stock availability for:",
+    `Part Number: ${p.sku}`,
+    `Product: ${p.name}`,
+    "",
+    "Required Quantity: ",
+    "Delivery Postcode / Location: ",
+    "Company / Account Name: ",
+    "Contact Phone Number: ",
+    "",
+    "Thank you!"
+  ].join("\n");
+  const mailtoHref = `mailto:info@aurextruckparts.com.au?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+  const gmailHref = `https://mail.google.com/mail/?view=cm&fs=1&to=info@aurextruckparts.com.au&su=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
   const sizeFamily = SIZE_FAMILIES.find((f) => f.skus.includes(p.sku));
   const remarkCallout = (() => {
@@ -518,16 +547,23 @@ export default function ProductDetail() {
                     </Link>
                   ) : (
                     <a
-                      href={`mailto:info@aurextruckparts.com.au?subject=${encodeURIComponent(`Price Enquiry: ${p.sku} - ${p.name}`)}&body=${encodeURIComponent(`Hi Aurex Truck Parts Team,\n\nI would like to enquire about trade/fleet pricing and stock availability for:\nPart Number: ${p.sku}\nProduct: ${p.name}\n\nRequired Quantity:\nDelivery Postcode / Location:\nCompany / Account Name:\nContact Phone Number:\n\nThank you!`)}`}
+                      href={mailtoHref}
                       onClick={(e) => {
-                        const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=info@aurextruckparts.com.au&su=${encodeURIComponent(`Price Enquiry: ${p.sku} - ${p.name}`)}&body=${encodeURIComponent(`Hi Aurex Truck Parts Team,\n\nI would like to enquire about trade/fleet pricing and stock availability for:\nPart Number: ${p.sku}\nProduct: ${p.name}\n\nRequired Quantity:\nDelivery Postcode / Location:\nCompany / Account Name:\nContact Phone Number:\n\nThank you!`)}`;
-                        const win = window.open(gmailUrl, "_blank", "noopener,noreferrer");
-                        if (!win) {
-                          return true;
+                        const isMobile = typeof navigator !== "undefined" && (
+                          /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                          (typeof window !== "undefined" && window.innerWidth < 768)
+                        );
+                        if (isMobile) {
+                          // On Android and iPhone: follow native mailto directly without window.open or e.preventDefault()
+                          return;
                         }
                         e.preventDefault();
+                        const win = window.open(gmailHref, "_blank", "noopener,noreferrer");
+                        if (!win) {
+                          window.location.href = mailtoHref;
+                        }
                       }}
-                      className="flex w-full items-center justify-center gap-2 rounded bg-gold py-3 text-center text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white shadow-xs cursor-pointer"
+                      className="flex w-full items-center justify-center gap-2 rounded bg-gold py-3 text-center text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white shadow-xs cursor-pointer active:scale-[0.99]"
                     >
                       <Mail size={16} /> Email info@aurextruckparts.com.au →
                     </a>

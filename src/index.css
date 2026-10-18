@@ -18,7 +18,7 @@
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: auto; }
 button, a, summary, select, input[type="checkbox"], label { cursor: pointer; }
 input[type="text"], input[type="email"], input[type="password"], input[type="number"], input:not([type]), textarea { cursor: text; }
 body {
