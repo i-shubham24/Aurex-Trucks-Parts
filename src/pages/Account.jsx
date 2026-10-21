@@ -17,9 +17,11 @@ import {
   RotateCcw,
   Truck,
   Star,
+  Printer,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { listOrders, orderStatus, isFailedOrder } from "../utils/orders";
+import { downloadInvoice } from "../utils/invoice";
 import { formatAUD } from "../data/products";
 import { imgFor } from "../data/images";
 import SafeImage from "../components/SafeImage";
@@ -251,7 +253,7 @@ function OrderCard({ order, onReorder }) {
           </button>
         )}
         {open && <InlineTrack order={order} />}
-        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-4">
           {isDelivered ? (
             !isAlreadyRated ? (
               <button
@@ -324,6 +326,14 @@ function OrderCard({ order, onReorder }) {
             className="flex items-center justify-center gap-2 rounded-lg border border-line-dark bg-mist py-2.5 text-sm font-extrabold transition hover:border-navy hover:text-navy cursor-pointer"
           >
             <RotateCcw size={15} /> Reorder
+          </button>
+          <button
+            type="button"
+            onClick={() => downloadInvoice(order)}
+            title="Print or Download Australian Tax Invoice"
+            className="flex items-center justify-center gap-1.5 rounded-lg border border-line-dark bg-white py-2.5 text-sm font-extrabold text-navy shadow-xs transition hover:border-gold hover:text-ink cursor-pointer"
+          >
+            <Printer size={15} /> Tax Invoice
           </button>
         </div>
       </div>

@@ -12,7 +12,7 @@ const DEFAULT_SETTINGS = {
   email: COMPANY.email,
   address: COMPANY.address,
   hours: COMPANY.hours,
-  freeFreightOver: 1500,
+  freeFreightOver: 200,
   standardFee: 45,
   expressFee: 95,
   abn: "47 670 781 254",

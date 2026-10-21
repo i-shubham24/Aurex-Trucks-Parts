@@ -513,7 +513,7 @@ function Trust() {
   const COMPANY = useCompany();
   const { settings } = useSite();
   const items = [
-    [Truck, "Daily Freight Australia Wide", `Order by 2pm. Free road freight over ${formatAUD(settings.freeFreightOver || 500)}.`],
+    [Truck, "Daily Freight Australia Wide", `Order by 2pm. Free road freight over ${formatAUD(settings.freeFreightOver || 200)}.`],
     [ClipboardCheck, "Quotes in 4 Business Hours", "Send VIN or photos for an exact price."],
     [BadgeCheck, "VIN Matched Catalogue", "Every line crossed to make, model and OEM."],
     [Headset, "Talk to a Specialist", `${COMPANY.phone}. Real advice, no scripts.`],
@@ -583,7 +583,7 @@ function Faq() {
   const [open, setOpen] = useState(0);
   const COMPANY = useCompany();
   const { settings } = useSite();
-  const freeOver = formatAUD(settings.freeFreightOver || 500);
+  const freeOver = formatAUD(settings.freeFreightOver || 200);
   return (
     <section id="faq" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-12">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">

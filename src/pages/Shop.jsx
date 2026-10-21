@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
 import { useCompany } from "../store/site";
@@ -83,6 +83,34 @@ export default function Shop({ preset }) {
     if (sort === "high") list = [...list].sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
     return list;
   }, [rawProducts, sub, avail, sort, q]);
+
+  const PAGE_CHUNK = 24;
+  const [visibleCount, setVisibleCount] = useState(PAGE_CHUNK);
+  const sentinelRef = useRef(null);
+
+  useEffect(() => {
+    setVisibleCount(PAGE_CHUNK);
+  }, [slug, q, sub, avail, sort]);
+
+  useEffect(() => {
+    if (!sentinelRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + PAGE_CHUNK, items.length));
+        }
+      },
+      { rootMargin: "400px" }
+    );
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [items.length]);
+
+  const visibleItems = useMemo(() => {
+    return items.slice(0, visibleCount);
+  }, [items, visibleCount]);
+
+  const hasMore = visibleCount < items.length;
 
   const isLoading = catsLoading || prodsLoading;
 
@@ -191,11 +219,28 @@ export default function Shop({ preset }) {
           .
         </p>
       ) : (
-        <div className="mt-4 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">
-          {items.map((p) => (
-            <ProductCard key={p.sku || p.id} p={p} joined />
-          ))}
-        </div>
+        <>
+          <div className="mt-4 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5">
+            {visibleItems.map((p) => (
+              <ProductCard key={p.sku || p.id} p={p} joined />
+            ))}
+          </div>
+
+          {hasMore && (
+            <div ref={sentinelRef} className="mt-6 flex flex-col items-center justify-center gap-2 py-4">
+              <p className="font-mono text-xs text-faint">
+                Showing {visibleItems.length} of {items.length} lines
+              </p>
+              <button
+                type="button"
+                onClick={() => setVisibleCount((c) => Math.min(c + PAGE_CHUNK, items.length))}
+                className="inline-flex items-center gap-1.5 rounded border border-line-dark bg-white px-5 py-2 text-xs font-bold text-ink shadow-sm transition-colors hover:bg-mist"
+              >
+                Load next {Math.min(PAGE_CHUNK, items.length - visibleCount)} lines
+              </button>
+            </div>
+          )}
+        </>
       )}
     </main>
   );

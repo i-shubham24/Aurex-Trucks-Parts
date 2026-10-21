@@ -39,7 +39,8 @@ export function useProducts(params = {}, options = {}) {
       return cacheKey ? promise.then(remember(cacheKey)) : promise;
     },
     placeholderData: (prev) => prev || persistedData.initialData,
-    staleTime: 1000 * 15, // 15s fresh window while still refreshing on category switches
+    staleTime: 1000 * 60 * 5, // 5 minutes fresh in memory; back navigation is 0ms instant
+    gcTime: 1000 * 60 * 30, // Keep in memory for 30 minutes
     ...options,
   });
 }
@@ -86,7 +87,8 @@ export function useProduct(sku, options = {}) {
     },
     enabled: Boolean(normalizedSku),
     placeholderData: () => getCachedProduct(),
-    staleTime: 1000 * 30, // 30s fresh window while still refreshing
+    staleTime: 1000 * 60 * 5, // 5 minutes fresh
+    gcTime: 1000 * 60 * 30,
     retry: (failures, err) => err?.status !== 404 && failures < 2,
     retryDelay: (attempt) => 600 * (attempt + 1),
     ...options,

@@ -206,7 +206,7 @@ export default function ProductDetail() {
   const { sku } = useParams();
   const COMPANY = useCompany();
   const { settings } = useSite();
-  const freeOver = formatAUD(settings.freeFreightOver || 500);
+  const freeOver = formatAUD(settings.freeFreightOver || 200);
 
   const { data, isLoading, isError, error, refetch, isFetching } = useProduct(sku);
   const p = data?.product;

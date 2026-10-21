@@ -12,7 +12,7 @@ export default function About() {
   const { data: categories = [] } = useCategories();
   const totalLines = categories.reduce((sum, c) => sum + (c.count ?? c.productCount ?? 0), 0) || 136;
   const numCats = categories.length || 3;
-  const freeOver = formatAUD(settings.freeFreightOver || 500);
+  const freeOver = formatAUD(settings.freeFreightOver || 200);
 
   return (
     <main>

@@ -12,7 +12,7 @@ export default function CartDrawer() {
   const { lines, setQty, remove, total, open, setOpen } = useCart();
   const { settings } = useSite();
   useLockBody(open);
-  const FREE_FREIGHT = settings.freeFreightOver || 500;
+  const FREE_FREIGHT = settings.freeFreightOver || 200;
 
   /* Swipe-right to close (mobile back-gesture direction). */
   const [drag, setDrag] = useState(0);

@@ -271,12 +271,24 @@ export default function Orders() {
                         </span>
                       </td>
                       <td className="px-5 py-3.5 text-right">
-                        <button
-                          onClick={() => openManage(o)}
-                          className="rounded-lg bg-mist px-3 py-1.5 text-xs font-bold text-navy hover:bg-navy hover:text-white transition"
-                        >
-                          Manage →
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => downloadInvoice(o)}
+                            title="Print or Download Australian Tax Invoice"
+                            className="inline-flex items-center gap-1 rounded-lg border border-line bg-white px-2.5 py-1.5 text-xs font-bold text-steel hover:border-gold hover:text-ink transition shadow-xs cursor-pointer"
+                          >
+                            <Printer size={13} />
+                            <span>Invoice</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => openManage(o)}
+                            className="rounded-lg bg-mist px-3 py-1.5 text-xs font-bold text-navy hover:bg-navy hover:text-white transition cursor-pointer"
+                          >
+                            Manage →
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );

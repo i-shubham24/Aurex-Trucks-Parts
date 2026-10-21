@@ -434,7 +434,7 @@ export default function Settings() {
                   type="number"
                   min="0"
                   step="1"
-                  value={form.freeFreightOver ?? 1500}
+                  value={form.freeFreightOver ?? 200}
                   onChange={handleChange("freeFreightOver", "number")}
                   className="h-11 w-full rounded-lg border border-line bg-white pl-8 pr-3.5 text-sm font-bold text-ink outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/20"
                 />

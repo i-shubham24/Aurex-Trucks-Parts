@@ -8,7 +8,7 @@ const UPDATED = "9 October 2026";
 /* Policy copy is built from live store settings (freight fees, contact details, ABN)
    so it can never drift from what checkout actually charges or where we really are. */
 function buildPolicies({ company, settings }) {
-  const freeOver = formatAUD(settings.freeFreightOver || 500);
+  const freeOver = formatAUD(settings.freeFreightOver || 200);
   const standard = formatAUD(settings.standardFee || 0);
   const express = formatAUD(settings.expressFee || 0);
   const { name, phone, email, address, hours, legalName, abn, acn } = company;

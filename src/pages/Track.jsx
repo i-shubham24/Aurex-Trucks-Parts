@@ -1,10 +1,11 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { ArrowRight, Check, MapPin, PackageSearch, Truck } from "lucide-react";
+import { ArrowRight, Check, MapPin, PackageSearch, Truck, Printer } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { imgFor } from "../data/images";
 import SafeImage from "../components/SafeImage";
 import { findOrder, orderStatus } from "../utils/orders";
+import { downloadInvoice } from "../utils/invoice";
 import { useNotification } from "../store/notification";
 import { api, API_ON, normaliseOrder } from "../lib/api";
 
@@ -157,6 +158,14 @@ export default function Track() {
                 </p>
               )}
               <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => downloadInvoice(order)}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-line-dark bg-white py-2.5 text-sm font-extrabold text-navy shadow-xs transition hover:border-gold hover:text-ink cursor-pointer"
+                  title="Print or Download Australian Tax Invoice"
+                >
+                  <Printer size={15} /> Download Tax Invoice
+                </button>
                 <Link to="/orders" className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-gold py-2.5 text-sm font-extrabold text-ink transition hover:bg-ink hover:text-white">View all my orders <ArrowRight size={15} /></Link>
                 <Link to="/shop" className="flex-1 rounded-lg border border-ink py-2.5 text-center text-sm font-extrabold transition hover:bg-ink hover:text-white">Keep shopping</Link>
               </div>
