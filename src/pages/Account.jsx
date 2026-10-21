@@ -253,7 +253,7 @@ function OrderCard({ order, onReorder }) {
           </button>
         )}
         {open && <InlineTrack order={order} />}
-        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-4">
+        <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-2.5">
           {isDelivered ? (
             !isAlreadyRated ? (
               <button
@@ -274,9 +274,9 @@ function OrderCard({ order, onReorder }) {
                     items: itemsToRate,
                   });
                 }}
-                className="flex items-center justify-center gap-2 rounded-lg bg-gold py-2.5 text-sm font-extrabold text-ink transition hover:bg-navy hover:text-white shadow-xs cursor-pointer"
+                className="flex items-center justify-center gap-1.5 rounded-lg bg-gold py-2.5 text-xs sm:text-sm font-extrabold text-ink transition hover:bg-navy hover:text-white shadow-xs cursor-pointer whitespace-nowrap"
               >
-                <Star size={16} className="fill-ink text-ink group-hover:fill-white group-hover:text-white" /> Give Rating
+                <Star size={15} className="fill-ink text-ink group-hover:fill-white group-hover:text-white" /> Rate
               </button>
             ) : (
               <button
@@ -297,43 +297,38 @@ function OrderCard({ order, onReorder }) {
                     items: itemsToRate,
                   });
                 }}
-                className="flex items-center justify-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 py-2.5 text-sm font-extrabold text-emerald-800 transition hover:bg-emerald-100 shadow-xs cursor-pointer"
+                className="flex items-center justify-center gap-1 rounded-lg border border-emerald-300 bg-emerald-50 py-2.5 text-xs sm:text-sm font-extrabold text-emerald-800 transition hover:bg-emerald-100 shadow-xs cursor-pointer whitespace-nowrap"
                 title="Click to view or edit your rating"
               >
-                <CheckCircle2 size={16} className="text-emerald-600" /> Rated {existingReview.rating}★
+                <CheckCircle2 size={15} className="text-emerald-600" /> {existingReview.rating}★ Rated
               </button>
             )
           ) : (
             <button
               type="button"
               onClick={() => setOpen(!open)}
-              className={`flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-extrabold transition ${
+              className={`flex items-center justify-center gap-1.5 rounded-lg py-2.5 text-xs sm:text-sm font-extrabold transition whitespace-nowrap shadow-xs cursor-pointer ${
                 open ? "bg-navy text-white" : "bg-gold text-ink hover:bg-navy hover:text-white"
               }`}
             >
-              <Truck size={16} /> {open ? "Hide tracking" : "Track"}
+              <Truck size={15} /> {open ? "Hide" : "Track"}
             </button>
           )}
           <Link
             to={`/track?id=${order.id}`}
-            className="flex items-center justify-center gap-1 rounded-lg border border-ink py-2.5 text-sm font-extrabold transition hover:bg-ink hover:text-white"
+            className="flex items-center justify-center gap-1 rounded-lg border border-line-dark bg-white py-2.5 text-xs sm:text-sm font-extrabold text-ink shadow-xs transition hover:border-navy hover:text-navy hover:bg-mist/50 whitespace-nowrap"
           >
-            Details <ArrowRight size={15} />
+            <span>Details</span>
+            <ArrowRight size={14} />
           </Link>
-          <button
-            type="button"
-            onClick={() => onReorder(order)}
-            className="flex items-center justify-center gap-2 rounded-lg border border-line-dark bg-mist py-2.5 text-sm font-extrabold transition hover:border-navy hover:text-navy cursor-pointer"
-          >
-            <RotateCcw size={15} /> Reorder
-          </button>
           <button
             type="button"
             onClick={() => downloadInvoice(order)}
             title="Print or Download Australian Tax Invoice"
-            className="flex items-center justify-center gap-1.5 rounded-lg border border-line-dark bg-white py-2.5 text-sm font-extrabold text-navy shadow-xs transition hover:border-gold hover:text-ink cursor-pointer"
+            className="flex items-center justify-center gap-1.5 rounded-lg border border-line-dark bg-white py-2.5 text-xs sm:text-sm font-extrabold text-ink shadow-xs transition hover:border-gold hover:text-navy hover:bg-mist/50 cursor-pointer whitespace-nowrap"
           >
-            <Printer size={15} /> Tax Invoice
+            <Printer size={15} />
+            <span>Tax Invoice</span>
           </button>
         </div>
       </div>
