@@ -6,6 +6,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
+    proxy: { '/api': 'http://localhost:5001' },
     watch: {
       ignored: [
         '**/truck-parts-admin/**',

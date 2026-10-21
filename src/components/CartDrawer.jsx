@@ -78,7 +78,7 @@ export default function CartDrawer() {
           <div className="mt-2 h-1.5 rounded-full bg-pale"><div className="h-full rounded-full bg-gold transition-all" style={{ width: `${progress * 100}%` }} /></div>
         </div>
         <div className="flex-1 overflow-auto overscroll-contain px-4 py-3">
-          {lines.length === 0 && <p className="py-6 text-center text-sm text-steel">Your cart is empty.<br />Trailer parts are enquiry only, call us for those.</p>}
+          {lines.length === 0 && <p className="py-6 text-center text-sm text-steel">Your cart is empty.<br />Explore our hardware catalog to add parts.</p>}
           {lines.map((l) => (
             <div key={l.sku} className="mb-3 flex gap-3 rounded-md border border-line p-2.5">
               <span className="h-16 w-16 shrink-0 overflow-hidden rounded bg-mist"><SafeImage src={l.image || imgFor(l.sku)} alt={l.name} className="h-full w-full object-cover" /></span>

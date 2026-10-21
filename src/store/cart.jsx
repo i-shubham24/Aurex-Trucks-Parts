@@ -82,7 +82,9 @@ export function CartProvider({ children }) {
           setLines(remote.lines);
         }
       } catch (err) {
-        console.warn("[cart] Error loading user cart from API:", err);
+        if (err?.status !== 401) {
+          console.warn("[cart] Could not sync user cart from API, maintaining local cart:", err?.message || err);
+        }
       } finally {
         setIsSyncing(false);
         prevUserRef.current = user;

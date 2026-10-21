@@ -643,7 +643,7 @@ export default function ProductDetail() {
         </div>
       </div>
       <div id="product-detail-tabs" className="mt-8 overflow-hidden rounded-md border border-line">
-        <div className="flex flex-wrap border-b border-line bg-mist">
+        <div className="flex border-b border-line bg-mist overflow-x-auto whitespace-nowrap scrollbar-none">
           {[
             ["specs", "Technical Specs"],
             ...(p.dhollandiaSpecs ? [["characteristics", "Characteristics & Architecture"]] : []),
@@ -651,7 +651,7 @@ export default function ProductDetail() {
             ["freight", "Freight & Delivery"],
             ["reviews", `Customer Reviews (${reviewsList.length || p.reviews || 0})`],
           ].map(([t, label]) => (
-            <button key={t} onClick={() => setTab(t)} className={`px-5 py-3 text-sm font-bold transition-colors ${tab === t ? "bg-white text-navy shadow-[inset_0_2px_0_#002049]" : "text-steel hover:text-ink"}`}>{label}</button>
+            <button key={t} onClick={() => setTab(t)} className={`shrink-0 px-4 sm:px-5 py-3 text-xs sm:text-sm font-bold transition-colors ${tab === t ? "bg-white text-navy shadow-[inset_0_2px_0_#002049]" : "text-steel hover:text-ink"}`}>{label}</button>
           ))}
         </div>
         <div className="bg-white p-5">
