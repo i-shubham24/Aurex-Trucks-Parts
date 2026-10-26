@@ -84,6 +84,27 @@ export default function BlogEditor() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [initialLoaded, setInitialLoaded] = useState(!isEdit);
+  // Snapshot of the form as loaded; anything different counts as unsaved changes.
+  const [baseline, setBaseline] = useState(() => JSON.stringify(DEFAULT_FORM));
+  const isDirty = useMemo(() => JSON.stringify(form) !== baseline, [form, baseline]);
+
+  // Warn before a reload / tab close / external navigation drops unsaved edits.
+  // (The app uses <BrowserRouter>, so router-level blocking via useBlocker isn't available.)
+  useEffect(() => {
+    if (!isDirty) return undefined;
+    const onBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [isDirty]);
+
+  const confirmLeave = (e) => {
+    if (isDirty && !window.confirm("You have unsaved changes to this article. Leave without saving?")) {
+      e.preventDefault();
+    }
+  };
 
   // Populate data when editing
   useEffect(() => {
@@ -103,7 +124,7 @@ export default function BlogEditor() {
         ? [{ p: blog.content }]
         : [{ p: "" }];
 
-    setForm({
+    const loadedForm = {
       id: blog._id || blog.id || blog.slug,
       title: blog.title || "",
       slug: blog.slug || "",
@@ -117,7 +138,9 @@ export default function BlogEditor() {
       isPublished: blog.isPublished !== false,
       imageUrl: imgUrl,
       body: bodySections,
-    });
+    };
+    setForm(loadedForm);
+    setBaseline(JSON.stringify(loadedForm));
     setInitialLoaded(true);
   }, [isEdit, blogDetailData]);
 
@@ -369,6 +392,7 @@ export default function BlogEditor() {
         <div className="flex items-center gap-3">
           <Link
             to="/admin/blogs"
+            onClick={confirmLeave}
             className="flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-bold text-steel transition hover:border-gold hover:text-ink"
           >
             <ArrowLeft size={14} /> Back to Articles

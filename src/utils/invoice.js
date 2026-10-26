@@ -3,55 +3,87 @@
  * Formatted for standard Australian A4 printing / PDF download.
  */
 
+/* Every customer- or product-supplied value goes through this before it is put in the
+   invoice HTML, which is written into a window on our own origin (staff open these too). */
+const escapeHtml = (value) =>
+  String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+const money = (n) => (Number.isFinite(n) ? n : 0).toFixed(2);
+
 export function generateInvoiceHtml(order) {
-  const orderId = order.id || order.ref || order.orderNumber || "ATP-ORDER";
+  const orderId = escapeHtml(order.id || order.ref || order.orderNumber || "ATP-ORDER");
   const dateStr = new Date(order.placedAt || order.createdAt || Date.now()).toLocaleString("en-AU", {
     dateStyle: "medium",
     timeStyle: "short",
   });
   
-  const rawStatus = order.status || order.orderStatus || "Confirmed";
-  const status = rawStatus === "Packed in Campbellfield VIC" ? "Confirmed" : rawStatus;
-  
+  const rawStatus = String(order.status || order.orderStatus || "Confirmed");
+  const statusRaw = rawStatus === "Packed in Campbellfield VIC" ? "Confirmed" : rawStatus;
+
   const isPaid = /paid/i.test(order.paymentStatus || "") || order.paymentStatus === "PAID";
-  const paymentMethod = order.payment || order.paymentMethod || "Card";
-  
+  const paymentMethod = String(order.payment || order.paymentMethod || "Card");
+
   const address = order.address || order.shippingAddress || {};
-  const customerName = address.name || address.fullName || "Customer";
-  const company = address.company || address.companyName || "";
-  const freight = order.shipping || order.shippingMethod || "Standard road freight";
-  const carrier = order.shipping?.carrier || order.carrier || "Standard Road";
-  const trackingNumber = order.shipping?.trackingNumber || order.trackingNumber || "Assigned at dispatch";
-  const isPickupOrder = order.shipping === "Click and Collect VIC" || /pickup|collect/i.test(String(freight || ""));
-  const street = address.address || address.addressLine1 || (isPickupOrder ? "Aurex Campbellfield Depot - Customer Collection" : "Warehouse Pickup");
-  const street2 = address.addressLine2 || "";
-  const suburb = address.suburb || address.suburbOrCity || (isPickupOrder ? "Campbellfield" : "");
-  const state = address.state || "VIC";
-  const postcode = address.postcode || address.postalCode || (isPickupOrder ? "3061" : "");
-  const phone = address.phone || order.phone || "";
-  const email = address.email || order.email || order.guestEmail || "";
-  const notes = address.notes || address.deliveryInstructions || order.customerNotes || "";
-  
+  const shippingInfo = order.shipping && typeof order.shipping === "object" ? order.shipping : {};
+  const freightRaw = (typeof order.shipping === "string" ? order.shipping : shippingInfo.shippingMethod) || order.shippingMethod || "Standard road freight";
+  const isPickupOrder = freightRaw === "Click and Collect VIC" || /pickup|collect/i.test(String(freightRaw || ""));
+  const customerName = escapeHtml(address.name || address.fullName || "Customer");
+  const company = escapeHtml(address.company || address.companyName || "");
+  const freight = escapeHtml(freightRaw);
+  // The API returns trackingNumber / carrier at the top level; older payloads nested them under shipping.
+  const carrier = escapeHtml(order.carrier || shippingInfo.carrier || "Standard Road");
+  const trackingNumber = escapeHtml(order.trackingNumber || shippingInfo.trackingNumber || "Assigned at dispatch");
+  const street = escapeHtml(address.address || address.addressLine1 || (isPickupOrder ? "Aurex Campbellfield Depot - Customer Collection" : "Warehouse Pickup"));
+  const street2 = escapeHtml(address.addressLine2 || "");
+  const suburb = escapeHtml(address.suburb || address.suburbOrCity || (isPickupOrder ? "Campbellfield" : ""));
+  const state = escapeHtml(address.state || "VIC");
+  const postcode = escapeHtml(address.postcode || address.postalCode || (isPickupOrder ? "3061" : ""));
+  const phone = escapeHtml(address.phone || order.phone || "");
+  const email = escapeHtml(address.email || order.email || order.guestEmail || "");
+  const notes = escapeHtml(address.notes || address.deliveryInstructions || order.customerNotes || "");
+
   const items = order.items || order.lines || [];
-  const grandTotal = Number(order.total || order.grandTotal || 0);
-  const subtotal = Number(order.subtotal || grandTotal);
-  const shippingFee = Number(order.shippingFee ?? (grandTotal > subtotal ? grandTotal - subtotal : 0));
-  const gstPortion = grandTotal / 11;
+
+  // Use the server's own figures (order.pricing) when we have them; only fall back to the
+  // flattened fields for old locally cached orders.
+  const pricing = order.pricing || {};
+  const num = (...values) => {
+    for (const v of values) {
+      if (v !== undefined && v !== null && v !== "" && Number.isFinite(Number(v))) return Number(v);
+    }
+    return 0;
+  };
+  const grandTotal = num(pricing.grandTotal, order.total, order.grandTotal);
+  const subtotal = num(pricing.subtotal, order.subtotal, grandTotal);
+  const discount = num(pricing.totalDiscount, order.discount);
+  const coreDeposit = num(pricing.totalCoreDeposit, order.totalCoreDeposit);
+  const shippingFee = num(
+    pricing.shippingFee,
+    order.shippingFee,
+    Math.max(0, grandTotal - coreDeposit - (subtotal - discount))
+  );
+  // GST is 1/11th of the taxable amount (goods after discount + freight); core deposits carry none.
+  const gstPortion = num(pricing.tax, order.tax, (grandTotal - coreDeposit) / 11);
 
   const itemsRows = items.map((l, idx) => {
-    const qty = l.qty || l.quantity || 1;
+    const qty = Number(l.qty || l.quantity || 1);
     const price = Number(l.price ?? l.unitPrice ?? 0);
     const lineTotal = Number(l.total ?? (price * qty));
     return `
       <tr style="border-bottom: 1px solid #e2e8f0;">
         <td style="padding: 10px 12px; font-family: ui-monospace, monospace; font-size: 11px; font-weight: 700; color: #1e293b;">${idx + 1}</td>
-        <td style="padding: 10px 12px; font-family: ui-monospace, monospace; font-size: 11px; font-weight: 700; color: #0284c7;">${l.sku || "ATP-PART"}</td>
+        <td style="padding: 10px 12px; font-family: ui-monospace, monospace; font-size: 11px; font-weight: 700; color: #0284c7;">${escapeHtml(l.sku || "ATP-PART")}</td>
         <td style="padding: 10px 12px; font-size: 12px; font-weight: 600; color: #0f172a;">
-          ${l.name || "Truck Replacement Component"}
+          ${escapeHtml(l.name || "Truck Replacement Component")}
         </td>
-        <td style="padding: 10px 12px; font-size: 12px; text-align: center; font-weight: 700; color: #0f172a;">${qty}</td>
-        <td style="padding: 10px 12px; font-size: 12px; text-align: right; color: #334155;">$${price.toFixed(2)}</td>
-        <td style="padding: 10px 12px; font-size: 12px; text-align: right; font-weight: 700; color: #0f172a;">$${lineTotal.toFixed(2)}</td>
+        <td style="padding: 10px 12px; font-size: 12px; text-align: center; font-weight: 700; color: #0f172a;">${escapeHtml(qty)}</td>
+        <td style="padding: 10px 12px; font-size: 12px; text-align: right; color: #334155;">$${money(price)}</td>
+        <td style="padding: 10px 12px; font-size: 12px; text-align: right; font-weight: 700; color: #0f172a;">$${money(lineTotal)}</td>
       </tr>
     `;
   }).join("");
@@ -325,12 +357,12 @@ export function generateInvoiceHtml(order) {
           <div class="order-number">${orderId}</div>
           <div style="font-size: 11px; color: #64748b; margin-top: 3px;">Date: ${dateStr}</div>
           <div>
-            <span class="status-badge ${status === 'Packed' ? 'status-packed' : status === 'Dispatched' ? 'status-dispatched' : status === 'Delivered' ? 'status-delivered' : ''}">
-              CURRENT STATUS: ${status.toUpperCase()}
+            <span class="status-badge ${statusRaw === 'Packed' ? 'status-packed' : statusRaw === 'Dispatched' ? 'status-dispatched' : statusRaw === 'Delivered' ? 'status-delivered' : ''}">
+              CURRENT STATUS: ${escapeHtml(statusRaw.toUpperCase())}
             </span>
           </div>
           <div style="font-size: 11px; font-weight: 700; color: ${isPaid ? '#15803d' : '#b45309'}; margin-top: 4px;">
-            ${isPaid ? 'PAYMENT VERIFIED (PAID)' : 'PAYMENT PENDING'} · ${paymentMethod.toUpperCase()}
+            ${isPaid ? 'PAYMENT VERIFIED (PAID)' : 'PAYMENT PENDING'} · ${escapeHtml(paymentMethod.toUpperCase())}
           </div>
         </td>
       </tr>
@@ -382,20 +414,28 @@ export function generateInvoiceHtml(order) {
 
     <div class="totals-block">
       <div class="totals-row">
-        <span>Subtotal (ex. GST):</span>
-        <span style="font-weight: 600;">$${Math.max(0, grandTotal - gstPortion - shippingFee).toFixed(2)}</span>
+        <span>Subtotal (inc. GST):</span>
+        <span style="font-weight: 600;">$${money(subtotal)}</span>
       </div>
+      ${discount > 0 ? `<div class="totals-row">
+        <span>Discount:</span>
+        <span style="font-weight: 600; color: #15803d;">-$${money(discount)}</span>
+      </div>` : ''}
       <div class="totals-row">
         <span>Freight & Handling:</span>
-        <span style="font-weight: 600;">${shippingFee === 0 ? "FREE" : "$" + shippingFee.toFixed(2)}</span>
+        <span style="font-weight: 600;">${shippingFee === 0 ? "FREE" : "$" + money(shippingFee)}</span>
       </div>
+      ${coreDeposit > 0 ? `<div class="totals-row">
+        <span>Core Deposit (refundable, no GST):</span>
+        <span style="font-weight: 600;">$${money(coreDeposit)}</span>
+      </div>` : ''}
       <div class="totals-row">
         <span>GST Included (10%):</span>
-        <span style="font-weight: 600;">$${gstPortion.toFixed(2)}</span>
+        <span style="font-weight: 600;">$${money(gstPortion)}</span>
       </div>
       <div class="totals-grand">
         <span>Total Amount (AUD):</span>
-        <span>$${grandTotal.toFixed(2)}</span>
+        <span>$${money(grandTotal)}</span>
       </div>
     </div>
 
@@ -440,8 +480,11 @@ export function downloadInvoice(order) {
   if (!order) return;
   const html = generateInvoiceHtml(order);
   const printWindow = window.open("", "_blank", "width=900,height=960,menubar=no,toolbar=no,status=no,resizable=yes,scrollbars=yes");
-  
+
   if (printWindow) {
+    // noopener semantics: we still need the handle to write the page, but the page gets
+    // no reference back to this tab.
+    try { printWindow.opener = null; } catch { /* ignore */ }
     printWindow.document.open();
     printWindow.document.write(html);
     printWindow.document.close();
@@ -456,7 +499,7 @@ export function downloadInvoice(order) {
  */
 export function downloadInvoiceFile(order) {
   if (!order) return;
-  const orderId = order.id || order.ref || order.orderNumber || "ATP-ORDER";
+  const orderId = String(order.id || order.ref || order.orderNumber || "ATP-ORDER").replace(/[^A-Za-z0-9_-]/g, "");
   const html = generateInvoiceHtml(order);
   const blob = new Blob([html], { type: "text/html;charset=utf-8" });
   const url = URL.createObjectURL(blob);

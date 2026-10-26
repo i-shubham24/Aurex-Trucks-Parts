@@ -127,7 +127,7 @@ export default function CompareTray() {
       {open && (
         <div className="fixed inset-0 z-[80] grid place-items-center p-3 sm:p-6">
           <div className="absolute inset-0 bg-ink/70" onClick={() => setOpen(false)} />
-          <div className="relative flex max-h-[88vh] w-full max-w-5xl flex-col overflow-hidden rounded-md bg-white shadow-2xl">
+          <div className="relative flex max-h-[88dvh] w-full max-w-5xl flex-col overflow-hidden rounded-md bg-white shadow-2xl">
             <div className="flex shrink-0 items-start gap-4 bg-ink px-5 py-5 text-white sm:px-7">
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-gold text-ink">
                 <GitCompareArrows size={19} />

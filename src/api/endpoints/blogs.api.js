@@ -1,7 +1,7 @@
-import { apiClient } from '../client';
+import { apiClient, publicGet } from '../client';
 
 export async function getBlogsApi(params = {}) {
-  const response = await apiClient.get('/blogs', { params });
+  const response = await publicGet('/blogs', { params });
   const rawBlogs = response?.data?.blogs || response?.blogs || [];
   const pagination = response?.data?.pagination || response?.pagination || {};
 
@@ -30,7 +30,7 @@ export async function getBlogsApi(params = {}) {
 
 export async function getBlogBySlugApi(slug) {
   if (!slug) throw new Error('Blog slug is required');
-  const response = await apiClient.get(`/blogs/${slug}`);
+  const response = await publicGet(`/blogs/${slug}`);
   const b = response?.data?.blog || response?.blog;
   const rawRelated = response?.data?.related || response?.related || [];
 

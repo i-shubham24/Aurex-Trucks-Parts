@@ -64,29 +64,21 @@ export async function updateAdminProductApi(identifier, productPayload) {
 }
 
 /**
- * Upload a product image to the server/CDN
+ * Upload a product image to the server/CDN.
+ * Throws on failure; callers must surface the error rather than fall back to
+ * a base64 data URL (those would end up stored in the database).
  */
 export async function uploadAdminImageApi(file) {
   const formData = new FormData();
   formData.append('image', file);
-  try {
-    const response = await apiClient.post('/uploads', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    const url = response?.url || response?.data?.url || response?.path;
-    if (url) return url;
-    throw new Error('No URL returned from upload');
-  } catch (err) {
-    console.warn('[uploadAdminImageApi] Backend upload failed, reading as base64 data URL:', err);
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target.result);
-      reader.onerror = () => resolve('');
-      reader.readAsDataURL(file);
-    });
-  }
+  const response = await apiClient.post('/uploads', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  const url = response?.url || response?.data?.url || response?.path;
+  if (!url) throw new Error('No URL returned from upload');
+  return url;
 }
 
 /**

@@ -69,6 +69,7 @@ const blankForm = {
   isBestSeller: false,
   isVisible: true,
   imageUrl: "",
+  galleryImages: [],
   desc: "",
   specsList: [
     { key: "Material", value: "" },
@@ -94,6 +95,9 @@ export default function Products() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [formError, setFormError] = useState("");
   const fileInputRef = useRef(null);
+  // Stock as it was when the edit form opened; stock is only sent if staff change it,
+  // so saving other fields can't overwrite stock taken by orders placed meanwhile.
+  const openedStockRef = useRef(null);
 
   const loadProducts = async () => {
     setLoading(true);
@@ -202,6 +206,7 @@ export default function Products() {
         { key: "Warranty", value: "12-Month Aurex Commercial Warranty" },
       ],
     });
+    openedStockRef.current = null;
     setFormError("");
     setActiveTab("general");
     setModal("add");
@@ -213,13 +218,12 @@ export default function Products() {
       value: String(value),
     }));
 
-    const primaryImg =
-      p.imageUrl ||
-      (Array.isArray(p.images) && p.images[0]
-        ? typeof p.images[0] === "string"
-          ? p.images[0]
-          : p.images[0]?.url
-        : "");
+    const imageUrls = (Array.isArray(p.images) ? p.images : [])
+      .map((img) => (typeof img === "string" ? img : img?.url))
+      .filter(Boolean);
+    const primaryImg = p.imageUrl || imageUrls[0] || "";
+    const stock = String(p.inventory?.stock ?? 15);
+    openedStockRef.current = stock;
 
     setForm({
       sku: p.sku || "",
@@ -234,13 +238,15 @@ export default function Products() {
       fit: p.fit || "",
       oem: p.oem || "",
       status: p.status || "In stock VIC",
-      stock: String(p.inventory?.stock ?? 15),
+      stock,
       lead: p.lead || "Ships in 24 hrs",
       badge: p.badge || "",
       isFeatured: Boolean(p.isFeatured),
       isBestSeller: Boolean(p.isBestSeller),
       isVisible: p.isVisible !== false && p.publicationStatus !== "DRAFT",
-      imageUrl: primaryImg || "",
+      imageUrl: primaryImg,
+      // Additional gallery images are kept as-is; the form only edits the primary image.
+      galleryImages: imageUrls.filter((url) => url !== primaryImg),
       desc: p.desc || p.description || "",
       specsList:
         specsEntries.length > 0
@@ -274,16 +280,10 @@ export default function Products() {
       }
     } catch (err) {
       console.error("[admin-products] Image upload error:", err);
-      // Fallback: read as base64 data URL
-      const reader = new FileReader();
-      reader.onload = (readEvent) => {
-        setForm((prev) => ({ ...prev, imageUrl: readEvent.target.result }));
-        notify.info({
-          title: "Image Attached",
-          message: "Image loaded as local preview.",
-        });
-      };
-      reader.readAsDataURL(file);
+      notify.error({
+        title: "Upload Failed",
+        message: err?.message || "Could not upload the image. Try again or paste an image URL instead.",
+      });
     } finally {
       setUploadingImage(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -312,6 +312,15 @@ export default function Products() {
     }));
   };
 
+  // The API treats the "Enquiry" stock label as POA, so keep the two in step.
+  const setPOA = (checked) => {
+    setForm((prev) => ({
+      ...prev,
+      isPOA: checked,
+      status: !checked && prev.status === "Enquiry" ? "In stock VIC" : prev.status,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFormError("");
@@ -327,8 +336,8 @@ export default function Products() {
       return;
     }
 
-    if (!form.price || isNaN(Number(form.price)) || Number(form.price) <= 0) {
-      setFormError("Selling Price (AUD) is required for customer purchases on the client side.");
+    if (!form.isPOA && (!form.price || isNaN(Number(form.price)) || Number(form.price) <= 0)) {
+      setFormError("Selling Price (AUD) is required unless the part is marked Price on Application (POA).");
       setActiveTab("pricing");
       return;
     }
@@ -346,31 +355,40 @@ export default function Products() {
     const tradePriceNum = form.tradePrice === "" ? 0 : Number(form.tradePrice);
     const mrpNum = form.mrp === "" ? (priceNum || 0) : Number(form.mrp);
 
+    // Images go up as plain URL strings (the API turns them into image objects with a
+    // publicId). The primary comes first, followed by the product's other gallery images.
+    const primaryImage = form.imageUrl.trim();
+    const images = [primaryImage, ...(form.galleryImages || [])].filter(
+      (url, i, all) => url && all.indexOf(url) === i
+    );
+
     const payload = {
       sku: form.sku.trim().toUpperCase(),
       name: form.name.trim(),
-      price: priceNum,
+      price: form.isPOA ? null : priceNum,
       tradePrice: tradePriceNum,
       mrp: mrpNum,
-      isPOA: false,
+      isPOA: Boolean(form.isPOA),
       category: form.category,
       sub: form.sub.trim(),
       brand: form.brand.trim() || "Aurex",
       fit: form.fit.trim(),
       oem: form.oem.trim(),
       status: form.status,
-      stock: Number(form.stock) || 0,
       lead: form.lead.trim(),
       badge: form.badge.trim(),
       isFeatured: Boolean(form.isFeatured),
       isBestSeller: Boolean(form.isBestSeller),
       isVisible: Boolean(form.isVisible),
       isPublished: Boolean(form.isVisible),
-      imageUrl: form.imageUrl.trim(),
-      images: form.imageUrl.trim() ? [{ url: form.imageUrl.trim(), isPrimary: true }] : [],
+      imageUrl: primaryImage,
+      images,
       desc: form.desc.trim(),
       specs: specsObj,
     };
+    if (modal === "add" || form.stock !== openedStockRef.current) {
+      payload.stock = Number(form.stock) || 0;
+    }
 
     setSubmitting(true);
     try {
@@ -974,6 +992,16 @@ export default function Products() {
                     </span>
                   </div>
 
+                  {/* Price on Application toggle */}
+                  <label className="mb-3 flex items-center gap-2 text-xs font-bold text-steel cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={form.isPOA}
+                      onChange={(e) => setPOA(e.target.checked)}
+                      className="h-4 w-4 rounded border-line-dark text-navy focus:ring-navy"
+                    />
+                    <span>Price on Application (POA): hide the price, customers send an enquiry</span>
+                  </label>
 
                   {/* Pricing Inputs Grid */}
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -982,9 +1010,13 @@ export default function Products() {
                       <label className="block">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-xs font-bold text-steel">
-                            Selling Price (AUD) <span className="text-red-500 font-extrabold">*</span>
+                            Selling Price (AUD) {!form.isPOA && <span className="text-red-500 font-extrabold">*</span>}
                           </span>
-                          {form.price && (
+                          {form.isPOA ? (
+                            <span className="text-[11px] font-mono font-bold text-navy">
+                              Client sees: POA (Enquiry)
+                            </span>
+                          ) : form.price && (
                             <span className="text-[11px] font-mono font-bold text-navy">
                               Client sees: {formatAUD(Number(form.price) || 0)}
                             </span>
@@ -997,8 +1029,9 @@ export default function Products() {
                             onChange={(e) =>
                               setForm({ ...form, price: e.target.value.replace(/[^\d.]/g, "") })
                             }
+                            disabled={form.isPOA}
                             placeholder="e.g. 350.00"
-                            className={`${inputClass} pl-7 font-bold bg-white text-ink focus:border-navy`}
+                            className={`${inputClass} pl-7 font-bold bg-white text-ink focus:border-navy disabled:bg-mist disabled:text-faint`}
                           />
                         </div>
                       </label>
@@ -1056,7 +1089,9 @@ export default function Products() {
                       <span className="mb-1 block text-xs font-bold text-steel">Stock Status Badge *</span>
                       <select
                         value={form.status}
-                        onChange={(e) => setForm({ ...form, status: e.target.value })}
+                        onChange={(e) =>
+                          setForm({ ...form, status: e.target.value, isPOA: e.target.value === "Enquiry" || form.isPOA })
+                        }
                         className={inputClass}
                       >
                         {STATUSES.map((s) => (

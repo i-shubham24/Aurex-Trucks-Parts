@@ -6,9 +6,10 @@ export function cld(url, width) {
   if (!url.includes("res.cloudinary.com") || !url.includes("/upload/")) return url;
   if (/\/upload\/[^/]*(f_auto|q_auto|w_\d+)/.test(url)) return url; // already transformed
 
-  // Request high-definition resolution: retina 2x density, best quality tuning, and adaptive edge sharpening
+  // Retina-aware width with Cloudinary's standard automatic quality (q_auto:best + sharpening
+  // made hero images several times heavier on mobile for little visible gain)
   const targetWidth = width ? Math.min(1400, Math.round(width * 1.5)) : 800;
-  return url.replace("/upload/", `/upload/f_auto,q_auto:best,dpr_auto,e_sharpen:60,c_limit,w_${targetWidth}/`);
+  return url.replace("/upload/", `/upload/f_auto,q_auto,dpr_auto,c_limit,w_${targetWidth}/`);
 }
 
 export default cld;

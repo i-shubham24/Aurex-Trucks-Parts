@@ -42,7 +42,7 @@ export default function AuthModal({
       />
 
       {/* Floating Modal Card */}
-      <div className="relative z-10 w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-2xl border border-line bg-white shadow-[0_25px_60px_rgba(0,32,73,0.28)] animate-in zoom-in-95 duration-200">
+      <div className="relative z-10 w-full max-w-4xl max-h-[92dvh] overflow-y-auto rounded-2xl border border-line bg-white shadow-[0_25px_60px_rgba(0,32,73,0.28)] animate-in zoom-in-95 duration-200">
         <button
           type="button"
           onClick={onClose}

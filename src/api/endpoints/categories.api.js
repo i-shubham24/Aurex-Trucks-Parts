@@ -1,11 +1,11 @@
-import { apiClient } from '../client';
+import { publicGet } from '../client';
 import { normalizeCategories, normalizeCategory } from '../normalizers/category.normalizer';
 
 /**
  * Fetch all active categories from backend using Axios
  */
 export async function getCategoriesApi() {
-  const response = await apiClient.get('/categories');
+  const response = await publicGet('/categories');
   const rawList = response?.data?.categories || response?.categories || response?.items || [];
   return normalizeCategories(rawList);
 }
@@ -15,7 +15,7 @@ export async function getCategoriesApi() {
  */
 export async function getCategoryBySlugApi(slug) {
   if (!slug) throw new Error('Category slug is required');
-  const response = await apiClient.get(`/categories/${slug}`);
+  const response = await publicGet(`/categories/${slug}`);
   const rawCategory = response?.data?.category || response?.category;
   return normalizeCategory(rawCategory);
 }

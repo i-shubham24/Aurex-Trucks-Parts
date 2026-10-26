@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useProduct } from "../hooks/api/useProducts";
 import { NEWS } from "../data/content";
-import { imgFor } from "../data/images";
+import { productImage } from "../data/images";
 
 const BASE = "Aurex Truck Parts Australia";
 const SITE = "https://aurextruckparts.com.au";
@@ -30,6 +30,25 @@ const META = [
   [/^\/policies$/, ["Shipping, Returns & Policies | " + BASE, "Plain-English shipping, returns, warranty, terms and privacy policies."]],
 ];
 
+/* Routes the app actually serves (see App.jsx); anything else renders the 404 page. */
+const KNOWN_ROUTES = [
+  /^\/$/, /^\/about$/, /^\/contact$/, /^\/tail-lift-enquiry$/, /^\/enquiry\/tail-lift$/,
+  /^\/shop(\/[^/]+)?$/, /^\/policies$/, /^\/product\/[^/]+$/, /^\/news\/[^/]+$/,
+  /^\/checkout$/, /^\/order-success\/[^/]+$/, /^\/orders$/, /^\/profile$/, /^\/track$/,
+  /^\/login$/, /^\/signup$/, /^\/forgot-password$/, /^\/reset-password$/,
+];
+/* Private and transactional pages stay out of search results. */
+const NOINDEX = /^\/(admin|account|orders|profile|checkout|order-success)(\/|$)/;
+
+/* A malformed escape in the URL (e.g. /product/%E0) must not crash the app. */
+const safeDecode = (value) => {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+};
+
 function setMetaTag(selector, attr, value) {
   let tag = document.querySelector(selector);
   if (!tag && selector.startsWith("meta[")) {
@@ -46,8 +65,9 @@ function setMetaTag(selector, attr, value) {
 export default function PageMeta() {
   const { pathname } = useLocation();
   const skuMatch = pathname.match(/^\/product\/([^/]+)/);
-  const { data: productData } = useProduct(skuMatch ? decodeURIComponent(skuMatch[1]) : null);
+  const { data: productData, error: productError } = useProduct(skuMatch ? safeDecode(skuMatch[1]) : null);
   const metaProduct = productData?.product || null;
+  const productMissing = Boolean(skuMatch) && productError?.status === 404;
 
   useEffect(() => {
     let title = "Shop Truck Parts | " + BASE;
@@ -62,7 +82,7 @@ export default function PageMeta() {
       if (p) {
         title = `${p.name} (${p.sku}) | ${BASE}`;
         desc = `${p.name}, ${p.fit || "Heavy-duty commercial fitment"}. ${p.price == null ? "Technical quote on enquiry" : `Live VIC stock at $${p.price.toFixed(2)} AUD`} at Aurex Truck Parts Campbellfield.`;
-        const pImg = imgFor(p.sku);
+        const pImg = productImage(p);
         if (pImg) {
           pageImage = pImg.startsWith("http") ? pImg : `${SITE}${pImg}`;
         }
@@ -80,20 +100,23 @@ export default function PageMeta() {
             "@type": "Brand",
             "name": "Aurex"
           },
-          "offers": {
+        };
+        // Price-on-application parts have no public price; publishing "0" would be wrong.
+        if (p.price != null) {
+          productSchema.offers = {
             "@type": "Offer",
             "url": `${SITE}${pathname}`,
             "priceCurrency": "AUD",
-            "price": p.price != null ? p.price : "0",
+            "price": p.price,
             "priceValidUntil": "2027-12-31",
             "itemCondition": "https://schema.org/NewCondition",
-            "availability": p.price != null ? "https://schema.org/InStock" : "https://schema.org/PreOrder",
+            "availability": "https://schema.org/InStock",
             "seller": {
               "@type": "AutoPartsStore",
               "name": "Aurex Truck Parts Australia"
             }
-          }
-        };
+          };
+        }
       } else {
         title = "Part Detail | " + BASE;
         desc = "Specifications, fitment, freight and trade pricing for this Aurex line.";
@@ -102,7 +125,7 @@ export default function PageMeta() {
       /* News articles get their real headline + excerpt. */
       const nm = pathname.match(/^\/news\/([^/]+)/);
       if (nm) {
-        const a = NEWS.find((x) => x.slug === decodeURIComponent(nm[1]));
+        const a = NEWS.find((x) => x.slug === safeDecode(nm[1]));
         if (a) {
           title = `${a.title} | ${BASE}`;
           desc = a.excerpt || desc;
@@ -121,6 +144,10 @@ export default function PageMeta() {
     // Title & Description
     document.title = title;
     setMetaTag('meta[name="description"]', "content", desc);
+
+    const path = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+    const notFound = productMissing || !KNOWN_ROUTES.some((rx) => rx.test(path));
+    setMetaTag('meta[name="robots"]', "content", notFound || NOINDEX.test(path) ? "noindex, nofollow" : "index, follow");
 
     // Canonical & Open Graph
     const canonicalUrl = SITE + pathname;
@@ -150,7 +177,7 @@ export default function PageMeta() {
     } else if (scriptTag) {
       scriptTag.remove();
     }
-  }, [pathname, metaProduct]);
+  }, [pathname, metaProduct, productMissing]);
 
   return null;
 }

@@ -45,7 +45,7 @@ export default function PromoPopup() {
   return (
     <div className="fixed inset-0 z-[70] grid place-items-center p-4">
       <div className="absolute inset-0 bg-black/55" onClick={close} />
-      <div className="popup-in relative grid grid-cols-1 max-h-[92vh] w-full max-w-4xl overflow-hidden rounded-md bg-white shadow-2xl sm:grid-cols-[340px_minmax(0,1fr)]">
+      <div className="popup-in relative grid grid-cols-1 max-h-[92dvh] w-full max-w-4xl overflow-hidden rounded-md bg-white shadow-2xl sm:grid-cols-[340px_minmax(0,1fr)]">
         <div className="relative hidden flex-col justify-between overflow-hidden bg-ink p-7 text-white sm:flex">
           <img src="/images/web/hero-roadtrain.jpg" alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-45" />
           <span className="relative grid h-13 w-13 place-items-center rounded-full bg-gold text-ink"><Gift size={22} /></span>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Menu, Package, ShoppingCart, Tags, Users, MailQuestion, Settings, X, LogOut, Mail, Lock, Eye, EyeOff, Newspaper, Star } from "lucide-react";
-import { useAuth, ADMIN_EMAIL } from "../../store/auth";
+import { useAuth } from "../../store/auth";
 
 const GROUPS = [
   { label: "Overview", links: [{ to: "/admin", end: true, label: "Dashboard", Icon: LayoutDashboard }] },
@@ -73,7 +73,7 @@ export function Empty({ text }) {
 
 function StaffLogin() {
   const { login } = useAuth();
-  const [email, setEmail] = useState(ADMIN_EMAIL);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [err, setErr] = useState("");
@@ -127,7 +127,7 @@ function StaffLogin() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="aurexparts@yopmail.com"
+                placeholder="you@aurextruckparts.com.au"
                 className="h-12 w-full rounded-xl border border-white/15 bg-white/5 pl-11 pr-4 text-sm font-medium text-white placeholder-gray-500 outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/20"
                 autoComplete="username"
               />
@@ -178,7 +178,9 @@ export default function AdminLayout() {
   const { user, logout } = useAuth();
   const go = useNavigate();
   const [open, setOpen] = useState(false);
-  if (!user || !user.isAdmin) return <StaffLogin />;
+  // React 19 hoists this into <head>; keeps the staff console (and its login) out of search indexes.
+  const noIndex = <meta name="robots" content="noindex, nofollow" />;
+  if (!user || !user.isAdmin) return <>{noIndex}<StaffLogin /></>;
   const nav = (
     <nav>
       {GROUPS.map((g) => (
@@ -198,6 +200,7 @@ export default function AdminLayout() {
   );
   return (
     <div className="min-h-screen bg-mist flex flex-col lg:flex-row">
+      {noIndex}
       {/* Desktop Sticky Sidebar */}
       <aside className="hidden bg-ink text-white lg:flex lg:flex-col lg:w-64 lg:shrink-0 lg:sticky lg:top-0 lg:h-screen lg:z-40">
         <div className="border-b border-white/10 p-4 shrink-0">

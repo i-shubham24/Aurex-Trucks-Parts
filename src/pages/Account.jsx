@@ -158,7 +158,7 @@ function InlineTrack({ order }) {
                 <span className="mt-0.5 block text-[12px] font-semibold text-green-700">
                   {k === 1 && "Order confirmed. Allocated for warehouse packing."}
                   {k === 2 && "Packed in Campbellfield VIC. Courier updates appear here."}
-                  {k === 3 && (order.shipping?.trackingNumber ? `Dispatched via ${order.shipping.carrier || "Courier"}. Tracking #${order.shipping.trackingNumber}` : "Dispatched. In transit to destination.")}
+                  {k === 3 && ((order.trackingNumber || order.shipping?.trackingNumber) ? `Dispatched via ${order.carrier || order.shipping?.carrier || "Courier"}. Tracking #${order.trackingNumber || order.shipping?.trackingNumber}` : "Dispatched. In transit to destination.")}
                   {k === 4 && "Delivered to destination address."}
                 </span>
               )}

@@ -1,3 +1,5 @@
+import { getAuthToken, setAuthToken, setRefreshToken, refreshSession } from "../api/client";
+
 /**
  * Storefront ↔ backend API client.
  *
@@ -13,39 +15,17 @@ export const API_URL =
     : 'http://localhost:5001/api/v1');
 export const API_ON = true;
 
-const TOKEN_KEY = "aurex_access_token";
-const REFRESH_KEY = "aurex_refresh_token";
-
-let accessToken = (() => {
-  try {
-    return localStorage.getItem(TOKEN_KEY) || null;
-  } catch {
-    return null;
-  }
-})();
-
+/* The token lives in one place (api/client.js) so this client and the axios one
+   always send the same bearer token, including right after a silent refresh. */
 export function setToken(t, r) {
-  accessToken = t || null;
-  try {
-    if (t) {
-      localStorage.setItem(TOKEN_KEY, t);
-    } else {
-      localStorage.removeItem(TOKEN_KEY);
-    }
-    if (r) {
-      localStorage.setItem(REFRESH_KEY, r);
-    } else if (r === null) {
-      localStorage.removeItem(REFRESH_KEY);
-    }
-  } catch {}
+  setAuthToken(t);
+  setRefreshToken(r);
 }
-export const getToken = () => accessToken;
+export const getToken = () => getAuthToken();
 
 async function request(path, { method = "GET", body, auth = true, _retry = false } = {}) {
   const headers = { "Content-Type": "application/json" };
-  const currentToken = accessToken || (() => {
-    try { return localStorage.getItem(TOKEN_KEY) || null; } catch { return null; }
-  })();
+  const currentToken = getAuthToken();
   if (auth && currentToken) headers.Authorization = `Bearer ${currentToken}`;
 
   const res = await fetch(API_URL + path, {
@@ -77,35 +57,9 @@ async function request(path, { method = "GET", body, auth = true, _retry = false
   return data;
 }
 
-export async function tryRefresh() {
-  try {
-    const refreshToken = (() => {
-      try {
-        return localStorage.getItem(REFRESH_KEY) || "";
-      } catch {
-        return "";
-      }
-    })();
-
-    const res = await fetch(API_URL + "/auth/refresh", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(refreshToken ? { refreshToken } : {}),
-    });
-    if (!res.ok) return false;
-    const data = await res.json();
-    const newAccess = data.accessToken || data.data?.accessToken;
-    const newRefresh = data.refreshToken || data.data?.refreshToken;
-    if (newAccess) {
-      setToken(newAccess, newRefresh);
-      return true;
-    }
-    return false;
-  } catch {
-    return false;
-  }
-}
+/* Shared with the axios client: one in-flight refresh, and a rejected refresh token
+   clears the stored session (the auth store hears about it and signs the user out). */
+export const tryRefresh = () => refreshSession();
 
 export const api = {
   get: (p, o) => request(p, { ...o, method: "GET" }),

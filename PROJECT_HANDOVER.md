@@ -80,7 +80,7 @@ npm run dev                   # http://localhost:5173
 ```
 Leave `VITE_API_URL` **unset** to run the storefront in its original localStorage-only mode.
 
-**Default admin login:** `admin@aurex.com.au` / `Admin123!` (change via `.env` before seeding).
+**Admin login:** there are no default credentials. The API seeds a staff account only from its `ADMIN_EMAIL` / `ADMIN_PASSWORD` env vars (password of 12+ characters).
 
 ### Tests
 ```bash

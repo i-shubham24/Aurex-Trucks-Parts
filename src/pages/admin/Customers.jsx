@@ -48,11 +48,8 @@ export default function Customers() {
     try {
       if (API_ON) {
         const identifier = id || _id || email;
-        await api
-          .delete(`/admin/customers/${encodeURIComponent(identifier)}`)
-          .catch((err) => {
-            console.warn("[Customers] Backend delete failed, proceeding with local deletion:", err);
-          });
+        // Let a backend failure fall through to the catch below so the row stays.
+        await api.del(`/admin/customers/${encodeURIComponent(identifier)}`);
       }
 
       setCustomers((all) => all.filter((u) => u.email !== email || u.role === "admin"));

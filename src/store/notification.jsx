@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { isSoundMuted, playSuccessSound, setSoundMuted } from "../utils/audio";
 
 const NotificationCtx = createContext(null);
@@ -84,7 +84,8 @@ export function NotificationProvider({ children }) {
     return id;
   }, [removeToast]);
 
-  const notify = {
+  // Stable across toasts, so every consumer (cart, auth, product grid) doesn't re-render per toast.
+  const notify = useMemo(() => ({
     success: (opts) => addToast({ ...opts, type: "success" }),
     cart: (product, qty = 1, onOpenCart) => {
       const qtyText = qty > 1 ? `${qty} units` : "1 unit";
@@ -119,7 +120,7 @@ export function NotificationProvider({ children }) {
       duration: opts.duration ?? 4500,
       sound: false,
     }),
-  };
+  }), [addToast]);
 
   const clearToasts = useCallback(() => {
     timersRef.current.forEach((t) => clearTimeout(t));
@@ -127,8 +128,13 @@ export function NotificationProvider({ children }) {
     setToasts([]);
   }, []);
 
+  const value = useMemo(
+    () => ({ toasts, addToast, removeToast, clearToasts, notify, muted, toggleMute }),
+    [toasts, addToast, removeToast, clearToasts, notify, muted, toggleMute]
+  );
+
   return (
-    <NotificationCtx.Provider value={{ toasts, addToast, removeToast, clearToasts, notify, muted, toggleMute }}>
+    <NotificationCtx.Provider value={value}>
       {children}
     </NotificationCtx.Provider>
   );

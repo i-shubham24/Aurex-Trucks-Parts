@@ -75,15 +75,10 @@ export default function Categories() {
       }
     } catch (uploadErr) {
       console.error("[admin-categories] Image upload error:", uploadErr);
-      const reader = new FileReader();
-      reader.onload = (readEvent) => {
-        setForm((prev) => ({ ...prev, imageUrl: readEvent.target.result }));
-        notify.info({
-          title: "Image Attached",
-          message: "Image loaded as local preview.",
-        });
-      };
-      reader.readAsDataURL(file);
+      notify.error({
+        title: "Upload Failed",
+        message: uploadErr?.message || "Could not upload the image. Try again or paste an image URL instead.",
+      });
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Building2, Phone, Mail, MapPin, Clock, FileText,
   Megaphone, Truck, DollarSign, Zap, CheckCircle2,
@@ -8,7 +8,9 @@ import {
 import { useSite, DEFAULT_SETTINGS } from "../../store/site";
 import { useNotification } from "../../store/notification";
 import { AdminTitle } from "./AdminLayout";
-import { getSettingsApi } from "../../api/endpoints/settings.api";
+import { getSettingsApi, resetSettingsApi } from "../../api/endpoints/settings.api";
+
+const EMAIL_RX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function Settings() {
   const { settings, updateLiveSettings, resetLiveSettings } = useSite();
@@ -20,6 +22,8 @@ export default function Settings() {
   const [togglingAnnouncement, setTogglingAnnouncement] = useState(false);
   const [saved, setSaved] = useState(false);
   const [err, setErr] = useState("");
+  // True once staff edit a field; incoming settings then no longer overwrite the form.
+  const dirtyRef = useRef(false);
 
   const handleToggleAnnouncement = async () => {
     const nextState = !(form.showAnnouncement !== false);
@@ -29,11 +33,8 @@ export default function Settings() {
     setTogglingAnnouncement(true);
 
     try {
-      const payload = {
-        ...form,
-        showAnnouncement: nextState,
-      };
-      await updateLiveSettings(payload);
+      // Only the banner flag: unsaved (and unvalidated) edits elsewhere in the form stay local.
+      await updateLiveSettings({ showAnnouncement: nextState });
       notify.success({
         kicker: "STOREFRONT BANNER",
         title: nextState ? "Banner Visible on Site" : "Banner Hidden from Site",
@@ -62,7 +63,7 @@ export default function Settings() {
     (async () => {
       try {
         const live = await getSettingsApi();
-        if (active && live && typeof live === "object") {
+        if (active && live && typeof live === "object" && !dirtyRef.current) {
           setForm((prev) => ({ ...prev, ...live }));
         }
       } catch (e) {
@@ -74,16 +75,18 @@ export default function Settings() {
     return () => { active = false; };
   }, []);
 
-  // Keep form in sync if site settings change externally
+  // Keep form in sync if site settings change externally, unless staff are mid-edit
   useEffect(() => {
-    if (!saving) {
+    if (!saving && !dirtyRef.current) {
       setForm((prev) => ({ ...prev, ...settings }));
     }
   }, [settings]);
 
-  const handleChange = (key, type) => (e) => {
-    const val = type === "number" ? Number(e.target.value) : e.target.value;
-    setForm((f) => ({ ...f, [key]: val }));
+  // Number fields keep the raw input string so an emptied field is caught by validation
+  // instead of silently becoming 0.
+  const handleChange = (key) => (e) => {
+    dirtyRef.current = true;
+    setForm((f) => ({ ...f, [key]: e.target.value }));
     setSaved(false);
     setErr("");
   };
@@ -92,7 +95,12 @@ export default function Settings() {
     if (window.confirm("Are you sure you want to restore factory default store settings? This will update the live site and database.")) {
       try {
         setSaving(true);
+        setErr("");
+        // The site store's resetLiveSettings() swallows API errors, so call the API first
+        // and let a failure reach the catch below; then sync the store/cache to defaults.
+        await resetSettingsApi();
         const defaults = await resetLiveSettings();
+        dirtyRef.current = false;
         setForm(defaults);
         setSaved(true);
         notify.success({
@@ -103,7 +111,11 @@ export default function Settings() {
           sound: true,
         });
       } catch (error) {
-        setErr(error.message || "Failed to reset settings.");
+        setErr(error?.message || "Failed to reset settings.");
+        notify.error({
+          title: "Reset Failed",
+          message: error?.message || "Store settings were not reset on the server.",
+        });
       } finally {
         setSaving(false);
       }
@@ -117,7 +129,7 @@ export default function Settings() {
 
     // Validation
     const cleanEmail = String(form.email || "").trim();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+    if (!EMAIL_RX.test(cleanEmail)) {
       setErr("Store email address is invalid.");
       return;
     }
@@ -128,10 +140,25 @@ export default function Settings() {
       return;
     }
 
-    if (Number(form.freeFreightOver) < 0 || Number(form.standardFee) < 0 || Number(form.expressFee) < 0) {
-      setErr("Freight fees and thresholds must be 0 or greater.");
+    // ABN is optional, but if given it must be 11 digits (spaces and an "ABN" prefix allowed).
+    const cleanAbn = String(form.abn || "").trim();
+    if (cleanAbn && !/^\d{11}$/.test(cleanAbn.replace(/^ABN\s*/i, "").replace(/\s/g, ""))) {
+      setErr("ABN must be 11 digits, e.g. 47 670 781 254.");
       return;
     }
+
+    // Same fallbacks the inputs display; an explicit 0 is valid (e.g. free freight on everything).
+    const freightFields = [
+      ["Free freight threshold", form.freeFreightOver ?? 200],
+      ["Standard freight fee", form.standardFee ?? 45],
+      ["Express courier fee", form.expressFee ?? 95],
+    ].map(([label, raw]) => [label, String(raw).trim() === "" ? NaN : Number(raw)]);
+    const badFreight = freightFields.find(([, n]) => !Number.isFinite(n) || n < 0);
+    if (badFreight) {
+      setErr(`${badFreight[0]} must be a number, 0 or greater.`);
+      return;
+    }
+    const [freeFreightOver, standardFee, expressFee] = freightFields.map(([, n]) => n);
 
     const payload = {
       storeName: String(form.storeName || "").trim(),
@@ -139,17 +166,18 @@ export default function Settings() {
       email: cleanEmail,
       address: String(form.address || "").trim(),
       hours: String(form.hours || "").trim(),
-      abn: String(form.abn || "").trim(),
+      abn: cleanAbn,
       announcement: String(form.announcement || "").trim(),
       showAnnouncement: form.showAnnouncement !== false,
-      freeFreightOver: Math.max(0, Number(form.freeFreightOver) || 0),
-      standardFee: Math.max(0, Number(form.standardFee) || 0),
-      expressFee: Math.max(0, Number(form.expressFee) || 0),
+      freeFreightOver,
+      standardFee,
+      expressFee,
     };
 
     setSaving(true);
     try {
       await updateLiveSettings(payload);
+      dirtyRef.current = false;
       setSaved(true);
       notify.success({
         kicker: "SETTINGS UPDATED",

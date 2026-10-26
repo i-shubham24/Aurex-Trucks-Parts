@@ -171,7 +171,9 @@ export default function Header() {
     setDrawer(false);
     setSearching(false);
   };
-  useEffect(closeAll, [loc.pathname, loc.search, loc.hash]);
+  // Not on query-string changes: typing in the search box on /shop rewrites ?q= as you type,
+  // and that must not close the (mobile) search mid-word.
+  useEffect(closeAll, [loc.pathname, loc.hash]);
 
   useEffect(() => {
     if (!open && !searching && !drawer) return;

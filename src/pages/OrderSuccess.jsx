@@ -5,7 +5,7 @@ import { CheckCircle2, Printer, Truck, Loader2 } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { downloadInvoice } from "../utils/invoice";
 import { useCompany } from "../store/site";
-import { findOrder } from "../utils/orders";
+import { findOrder, isFailedOrder } from "../utils/orders";
 import { useSite } from "../store/site";
 import { useCart } from "../store/cart";
 import { api, API_ON, normaliseOrder } from "../lib/api";
@@ -23,12 +23,17 @@ export default function OrderSuccess() {
   const clearedRef = useRef(false);
 
   useEffect(() => {
-    // Clear cart once on confirmation
-    if (!clearedRef.current) {
+    // Clear the cart once the order is real: paid / confirmed, or a method that settles later
+    // (bank transfer, pay on pickup, trade terms). An unpaid card order keeps its cart so the
+    // customer can go back and pay.
+    if (clearedRef.current || !order) return;
+    const confirmed = ["PAID", "AUTHORIZED"].includes(order.paymentStatus) || order.status === "Confirmed";
+    const byCard = /card/i.test(order.payment || "");
+    if (confirmed || (!byCard && !isFailedOrder(order))) {
       clearedRef.current = true;
       clear();
     }
-  }, [clear]);
+  }, [order, clear]);
 
   useEffect(() => {
     let active = true;
@@ -110,18 +115,14 @@ export default function OrderSuccess() {
   const paid = ["PAID", "AUTHORIZED"].includes(order?.paymentStatus);
   const awaitingPayment = Boolean(order) && !paid;
   const byTransfer = awaitingPayment && /bank|transfer/i.test(order.payment || "");
-  const { data: payConfig } = useQuery({
+  const { data: payConfig, isLoading: bankLoading } = useQuery({
     queryKey: ["payment-config"],
     queryFn: () => apiClient.get("/payments/config").then((r) => r?.data || {}),
     staleTime: 5 * 60 * 1000,
     enabled: byTransfer,
   });
-  const bank = payConfig?.directBankTransfer || {
-    bankName: "NAB Australia Ltd",
-    accountName: "Aurex Panels Pty Limited",
-    bsbOrRouting: "083-419",
-    accountNumber: "90-287-1454"
-  };
+  // Only ever show the account the server gives us; never a built-in copy that could be out of date.
+  const bank = payConfig?.directBankTransfer;
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-8">
@@ -154,7 +155,9 @@ export default function OrderSuccess() {
             <p className="mt-1 text-sm text-steel">
               Transfer <strong className="tabular text-ink">{formatAUD(order.total)}</strong> and use your order ID <strong className="font-mono text-ink">{order.id}</strong> as the reference.
             </p>
-            {bank?.accountNumber ? (
+            {bankLoading ? (
+              <p className="mt-2 flex items-center gap-2 text-sm text-steel"><Loader2 className="animate-spin text-navy" size={14} /> Loading our bank details…</p>
+            ) : bank?.accountNumber ? (
               <dl className="tabular mt-3 grid grid-cols-1 gap-x-6 gap-y-1.5 text-sm sm:grid-cols-2">
                 <div className="flex justify-between gap-3 sm:block"><dt className="text-steel">Account name</dt><dd className="font-bold">{bank.accountName}</dd></div>
                 <div className="flex justify-between gap-3 sm:block"><dt className="text-steel">Bank</dt><dd className="font-bold">{bank.bankName}</dd></div>
@@ -202,7 +205,7 @@ export default function OrderSuccess() {
             <p className="flex justify-between text-steel"><span>Subtotal</span><span className="tabular font-bold text-ink">{formatAUD(order.subtotal)}</span></p>
             {order.discount > 0 && <p className="flex justify-between text-green-700"><span>Promo{order.promoCode ? ` (${order.promoCode})` : ""}</span><span className="tabular font-bold">−{formatAUD(order.discount)}</span></p>}
             <p className="flex justify-between text-steel"><span>Freight</span><span className="tabular font-bold text-ink">{order.shippingFee === 0 ? "FREE" : formatAUD(order.shippingFee)}</span></p>
-            <p className="flex justify-between text-steel"><span>GST included (10%)</span><span className="tabular font-bold text-ink">{formatAUD(order.total / 11)}</span></p>
+            <p className="flex justify-between text-steel"><span>GST included (10%)</span><span className="tabular font-bold text-ink">{formatAUD(order.pricing?.tax ?? order.total / 11)}</span></p>
             <p className="tabular flex justify-between pt-1 text-lg font-extrabold"><span>{paid ? "Total paid" : "Total due"}</span><span>{formatAUD(order.total)}</span></p>
           </div>
         </div>

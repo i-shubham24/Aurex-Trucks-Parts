@@ -6,11 +6,14 @@ import { imgFor } from "../data/images";
 import SafeImage from "./SafeImage";
 import { useCart } from "../store/cart";
 import { useSite } from "../store/site";
+import { useAuth } from "../store/auth";
+import { calculateOrderTotals, tradeDiscountFor } from "../utils/pricing";
 import useLockBody from "../utils/useLockBody";
 
 export default function CartDrawer() {
   const { lines, setQty, remove, total, open, setOpen } = useCart();
   const { settings } = useSite();
+  const { user } = useAuth();
   useLockBody(open);
   const FREE_FREIGHT = settings.freeFreightOver || 200;
 
@@ -40,7 +43,11 @@ export default function CartDrawer() {
   }, [open, setOpen]);
 
   if (!open) return null;
-  const progress = Math.min(1, total / FREE_FREIGHT);
+  // Like the server, free freight is judged on the subtotal after any trade discount.
+  const tradePct = tradeDiscountFor(user);
+  const towardsFree = calculateOrderTotals({ lines, tradeDiscountPercent: tradePct, settings }).discountedSubtotal;
+  const progress = Math.min(1, towardsFree / FREE_FREIGHT);
+  const shortBy = tradePct < 100 ? (FREE_FREIGHT - towardsFree) / (1 - tradePct / 100) : 0;
 
   const onTouchStart = (e) => {
     live.current = true;
@@ -72,9 +79,9 @@ export default function CartDrawer() {
           <button onClick={close} aria-label="Close cart" className="transition-colors hover:text-gold"><X size={20} /></button>
         </div>
         <div className="border-b border-line bg-gold/15 px-4 py-3">
-          {total >= FREE_FREIGHT
+          {towardsFree >= FREE_FREIGHT
             ? <p className="text-[13px] font-bold text-green-700">You unlocked FREE road freight.</p>
-            : <p className="text-[13px] text-steel">Add <strong className="tabular">{formatAUD(FREE_FREIGHT - total)}</strong> more for free road freight.</p>}
+            : <p className="text-[13px] text-steel">Add <strong className="tabular">{formatAUD(shortBy)}</strong> more for free road freight.</p>}
           <div className="mt-2 h-1.5 rounded-full bg-pale"><div className="h-full rounded-full bg-gold transition-all" style={{ width: `${progress * 100}%` }} /></div>
         </div>
         <div className="flex-1 overflow-auto overscroll-contain px-4 py-3">

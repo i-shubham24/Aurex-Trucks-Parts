@@ -10,6 +10,7 @@ export default function QuoteEnquiryModal({ isOpen, onClose, product }) {
   const [copied, setCopied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const [form, setForm] = useState({
     name: "",
@@ -66,6 +67,7 @@ Thank you!`;
     }
 
     setSubmitting(true);
+    setSubmitError("");
     try {
       await api.post("/enquiries", {
         customerName: form.name,
@@ -89,8 +91,13 @@ Thank you!`;
         message: `We will contact you shortly regarding ${product.sku}.`
       });
     } catch (err) {
-      // If unauthorized or error, show friendly notice and offer direct mailto/phone
-      setSubmitted(true);
+      // It did not reach us: say so and point at the email / phone options above.
+      const msg = err?.message || "We couldn't send your request.";
+      setSubmitError(`${msg} Please email or call us instead.`);
+      notify.error({
+        title: "Quote request not sent",
+        message: msg,
+      });
     } finally {
       setSubmitting(false);
     }
@@ -121,7 +128,7 @@ Thank you!`;
           </button>
         </div>
 
-        <div className="p-5 max-h-[85vh] overflow-y-auto space-y-4">
+        <div className="p-5 max-h-[85dvh] overflow-y-auto space-y-4">
           {submitted ? (
             <div className="py-6 text-center space-y-3">
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 border border-emerald-200">
@@ -242,6 +249,12 @@ Thank you!`;
                     className="w-28 rounded border border-line px-3 py-1.5 text-xs focus:border-navy focus:outline-hidden"
                   />
                 </div>
+
+                {submitError && (
+                  <p role="alert" className="rounded border border-red-300 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
+                    {submitError}
+                  </p>
+                )}
 
                 <button
                   type="submit"

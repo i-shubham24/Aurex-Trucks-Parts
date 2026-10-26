@@ -41,3 +41,7 @@ truck-parts-api/
 public/images/products_backup/
 *.backup
 test_*.jpg
+
+*.docx
+.env
+.env*.local

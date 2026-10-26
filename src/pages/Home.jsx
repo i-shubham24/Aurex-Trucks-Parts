@@ -11,9 +11,9 @@ import ProductCard from "../components/ProductCard";
 import LazySection from "../components/LazySection";
 import { cld } from "../utils/img";
 import SafeImage from "../components/SafeImage";
-import { useCategories } from "../hooks/api/useCategories";
+import { useCategories, DEFAULT_CATEGORIES } from "../hooks/api/useCategories";
 import { CategoryTilesSkeleton } from "../components/CategorySkeleton";
-import { useCarousel } from "../hooks/api/useCarousel";
+import { useCarousel, DEFAULT_CAROUSEL_SLIDES } from "../hooks/api/useCarousel";
 import { HeroSkeleton } from "../components/HeroSkeleton";
 import { useProducts } from "../hooks/api/useProducts";
 import { ProductGridSkeleton } from "../components/ProductCardSkeleton";
@@ -32,8 +32,12 @@ function SecHead({ title, link, linkLabel }) {
   );
 }
 
+const NO_SLIDES = [];
+
 function Hero() {
-  const { data: slides = [], isLoading, isError } = useCarousel();
+  const { data, isLoading, isError } = useCarousel();
+  // A failed request (rate limit, timeout) shows the built-in slides instead of no hero at all.
+  const slides = data?.length ? data : isError ? DEFAULT_CAROUSEL_SLIDES : data || NO_SLIDES;
   const [i, setI] = useState(0);
 
   const nextSlide = () => {
@@ -56,7 +60,7 @@ function Hero() {
     return <HeroSkeleton />;
   }
 
-  if (isError || !slides || slides.length === 0) {
+  if (!slides || slides.length === 0) {
     return null;
   }
 
@@ -142,13 +146,15 @@ function Hero() {
 }
 
 function Tiles() {
-  const { data: categories = [], isLoading, isError } = useCategories();
+  const { data, isLoading, isError } = useCategories();
+  // Fall back to the built-in categories if the request fails, rather than dropping the section.
+  const categories = data?.length ? data : isError ? DEFAULT_CATEGORIES : data || [];
 
   if (isLoading) {
     return <CategoryTilesSkeleton count={3} />;
   }
 
-  if (isError || !categories || categories.length === 0) {
+  if (!categories || categories.length === 0) {
     return null;
   }
 

@@ -11,6 +11,9 @@ import { api, API_ON, normaliseOrder } from "../lib/api";
 
 function Timeline({ order }) {
   const { steps, idx, cancelled } = orderStatus(order);
+  // The API sends these at the top level (`shipping` is just the method name); older payloads nested them.
+  const trackingNumber = order.trackingNumber || order.shipping?.trackingNumber;
+  const carrier = order.carrier || order.shipping?.carrier;
   return (
     <ol className="mt-5">
       {steps.map((s, k) => (
@@ -32,7 +35,7 @@ function Timeline({ order }) {
               <span className="block text-[13px] font-semibold text-green-700">
                 {k === 1 && "Payment confirmed. Allocated for warehouse packing."}
                 {k === 2 && "Packed in Campbellfield VIC. Ready for courier pickup."}
-                {k === 3 && (order.shipping?.trackingNumber ? `Dispatched with ${order.shipping.carrier || "Courier"}. Consignment #${order.shipping.trackingNumber}` : "In transit to destination.")}
+                {k === 3 && (trackingNumber ? `Dispatched with ${carrier || "Courier"}. Consignment #${trackingNumber}` : "In transit to destination.")}
                 {k === 4 && "Delivered to destination address."}
               </span>
             )}

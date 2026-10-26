@@ -25,6 +25,21 @@ export const getCanonicalStatus = (o) => {
   return raw || "Pending payment";
 };
 
+// Status as preselected in the Manage modal (also what "unchanged" is compared against).
+const manageStatusOf = (order) => {
+  const raw = order.status || order.orderStatus || "Confirmed";
+  if (raw === "Packed in Campbellfield VIC") return "Confirmed";
+  if (raw === "Courier booked" || raw === "In transit") return "Dispatched";
+  return raw;
+};
+
+// The API flattens `shipping` to its method label and returns courier details at the top
+// level; older payloads nested them under `shipping`.
+const carrierOf = (order) => order?.carrier || order?.shipping?.carrier || "";
+const trackingOf = (order) => order?.trackingNumber || order?.shipping?.trackingNumber || "";
+const shippingLabelOf = (order) =>
+  (typeof order?.shipping === "string" ? order.shipping : order?.shipping?.shippingMethod) || "Standard road freight";
+
 export default function Orders() {
   const { notify } = useNotification();
   const [orders, setOrders] = useState([]);
@@ -86,29 +101,52 @@ export default function Orders() {
 
   const openManage = (order) => {
     setSelectedOrder(order);
-    const raw = order.status || order.orderStatus || "Confirmed";
-    const mapped =
-      raw === "Packed in Campbellfield VIC"
-        ? "Confirmed"
-      : raw === "Courier booked" || raw === "In transit"
-      ? "Dispatched"
-      : raw;
-    setTargetStatus(mapped);
-    setCarrier(order.shipping?.carrier || "");
-    setTrackingNumber(order.shipping?.trackingNumber || "");
+    setTargetStatus(manageStatusOf(order));
+    setCarrier(carrierOf(order));
+    setTrackingNumber(trackingOf(order));
     setNote("");
   };
 
   const handleUpdateStatus = async () => {
     if (!selectedOrder) return;
+    // Every status call re-sends the customer's status email, so skip no-op saves and
+    // confirm the ones that would re-send it or cancel the order.
+    const statusChanged = targetStatus !== manageStatusOf(selectedOrder);
+    const detailsChanged =
+      carrier.trim() !== carrierOf(selectedOrder) ||
+      trackingNumber.trim() !== trackingOf(selectedOrder) ||
+      Boolean(note.trim());
+    if (!statusChanged && !detailsChanged) {
+      notify.info({
+        title: "No Changes",
+        message: `Order is already "${targetStatus}". Nothing was sent.`,
+      });
+      return;
+    }
+    if (
+      !statusChanged &&
+      !window.confirm(
+        `The status is still "${targetStatus}". Saving the carrier, tracking or note re-sends this status update, which can email the customer again. Continue?`
+      )
+    ) {
+      return;
+    }
+    if (
+      statusChanged &&
+      targetStatus === "Cancelled" &&
+      !window.confirm(`Change order ${selectedOrder.id || selectedOrder.ref} to Cancelled?`)
+    ) {
+      return;
+    }
+
     setUpdating(true);
     try {
       const orderRef = selectedOrder.id || selectedOrder.ref || selectedOrder.orderNumber;
       const updated = await updateAdminOrderStatusApi(orderRef, {
         status: targetStatus,
-        carrier,
-        trackingNumber,
-        note,
+        carrier: carrier.trim(),
+        trackingNumber: trackingNumber.trim(),
+        note: note.trim() || undefined,
       });
 
       setOrders((prev) =>
@@ -360,12 +398,12 @@ export default function Orders() {
             </div>
             <div>
               <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-faint">Freight Details</p>
-              <p className="mt-1 font-bold text-ink">{selectedOrder.shipping || "Standard road freight"}</p>
-              {selectedOrder.shipping?.carrier && (
-                <p className="text-steel mt-0.5">Carrier: <strong className="text-ink">{selectedOrder.shipping.carrier}</strong></p>
+              <p className="mt-1 font-bold text-ink">{shippingLabelOf(selectedOrder)}</p>
+              {carrierOf(selectedOrder) && (
+                <p className="text-steel mt-0.5">Carrier: <strong className="text-ink">{carrierOf(selectedOrder)}</strong></p>
               )}
-              {selectedOrder.shipping?.trackingNumber && (
-                <p className="text-steel font-mono">Tracking: <strong className="text-ink">{selectedOrder.shipping.trackingNumber}</strong></p>
+              {trackingOf(selectedOrder) && (
+                <p className="text-steel font-mono">Tracking: <strong className="text-ink">{trackingOf(selectedOrder)}</strong></p>
               )}
             </div>
           </div>
@@ -460,6 +498,15 @@ export default function Orders() {
                   onChange={(e) => setTrackingNumber(e.target.value)}
                   placeholder="e.g. TRK-9832749"
                   className="h-9 w-full rounded-md border border-line-dark bg-white px-3 text-xs font-mono outline-none focus:border-navy"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-[11px] font-bold text-steel mb-1">Status Note (Optional)</label>
+                <input
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="Saved to this order's status history"
+                  className="h-9 w-full rounded-md border border-line-dark bg-white px-3 text-xs outline-none focus:border-navy"
                 />
               </div>
             </div>

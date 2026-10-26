@@ -217,7 +217,7 @@ export default function Blogs() {
       {/* Blogs Table */}
       <div className="overflow-hidden rounded-xl border border-line bg-white shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left">
+          <table className="w-full min-w-[820px] border-collapse text-left">
             <thead>
               <tr>
                 <th className={`${th} w-16`}>Cover</th>

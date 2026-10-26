@@ -1,12 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import { GitCompareArrows, MessageSquare, ShoppingCart, Star, Mail } from "lucide-react";
 import { formatAUD } from "../data/products";
-import { imgFor } from "../data/images";
+import { productImage } from "../data/images";
 import SafeImage from "./SafeImage";
-import { useCart } from "../store/cart";
+import { useCart, useCartActions } from "../store/cart";
 
 export function PartVisual({ p }) {
-  const img = imgFor(p.sku) || p.images?.[0]?.url || p.imageUrl;
+  const img = productImage(p);
   if (img) {
     const isTailLift = p.category === "tail-lifts" || p.categorySlug === "tail-lifts";
     const isPhotoCover = isTailLift || ['ATP-TP-87', 'ATP-TP-91'].includes(p.sku);
@@ -117,7 +117,7 @@ function CompareBtn({ p }) {
 }
 
 export default function ProductCard({ p, joined }) {
-  const { add } = useCart();
+  const { add } = useCartActions();
   const navigate = useNavigate();
   const isTailLift = p.category === "tail-lifts" || p.categorySlug === "tail-lifts" || (p.sku && p.sku.startsWith("ATP-TL-"));
   const enquiry = p.price === null || p.pricing?.isPOA === true || p.isPOA === true || p.status === "Enquiry only" || isTailLift;

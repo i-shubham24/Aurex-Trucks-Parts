@@ -38,10 +38,11 @@ export default function Contact() {
   const send = async (e) => {
     e.preventDefault();
     if (!user) {
-      notify.warning({
+      notify.info({
         kicker: "LOGIN REQUIRED",
         title: "Sign In Required",
         message: "Please sign in or create an account to submit an enquiry.",
+        sound: false,
       });
       openAuthModal({ mode: "login" });
       return;

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Award, CheckCircle2, Minus, Phone, Plus, Ruler, ShieldCheck, Truck, ShoppingCart, ZoomIn, Star, Mail, Layers, Check } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { useCompany, useSite } from "../store/site";
-import { imgFor, imagesFor } from "../data/images";
+import { imgFor, productImages } from "../data/images";
 import SafeImage from "../components/SafeImage";
 import { useCart } from "../store/cart";
 import ProductCard from "../components/ProductCard";
@@ -287,15 +287,10 @@ export default function ProductDetail() {
   };
 
   const cleanLocal = imgFor(p.sku);
-  const localImages = imagesFor(p.sku).filter(isCleanImage);
-  const backendImages = Array.isArray(p.images) && p.images.length > 0 
-    ? p.images.map((img) => (typeof img === "string" ? img : img.url)).filter(isCleanImage)
-    : [];
 
-  // Prioritize curated multi-image views (front, back, CAD, detail) and studio packshots
-  const rawList = localImages.length > 0 
-    ? localImages 
-    : (cleanLocal ? [cleanLocal] : (backendImages.length > 0 ? backendImages : []));
+  // Images uploaded in the admin console come first; the curated local views
+  // (front, back, detail) and studio packshots are the fallback.
+  const rawList = productImages(p).filter(isCleanImage);
   const imagesList = Array.from(new Set(rawList.filter(Boolean)));
   if (imagesList.length === 0) {
     const single = cleanLocal || `/images/products/${p.sku}.jpg`;
@@ -407,7 +402,10 @@ export default function ProductDetail() {
               {imagesList.map((imgSrc, idx) => (
                 <button
                   key={idx}
+                  type="button"
                   onClick={() => setActiveImgIdx(idx)}
+                  aria-label={`Show image ${idx + 1} of ${imagesList.length}`}
+                  aria-pressed={idx === activeImgIdx}
                   className={`h-16 w-16 shrink-0 overflow-hidden rounded border p-1 bg-white transition-all ${
                     idx === activeImgIdx ? "border-gold ring-2 ring-gold/50" : "border-line opacity-70 hover:opacity-100"
                   }`}
@@ -636,7 +634,11 @@ export default function ProductDetail() {
             )}
           </div>
           <div className="mt-4 rounded-md border border-line bg-white p-4 text-sm">
-            <p className="flex items-start gap-2"><CheckCircle2 size={16} className="mt-0.5 shrink-0 text-green-600" /> Good match for this line. Add to cart and we double check before dispatch.</p>
+            <p className="flex items-start gap-2"><CheckCircle2 size={16} className="mt-0.5 shrink-0 text-green-600" /> {enquiry
+              ? (isTailLift
+                ? "Send an enquiry with your truck and body details and we confirm fitment before quoting."
+                : "Send an enquiry and we confirm fitment and price before you order.")
+              : "Good match for this line. Add to cart and we double check before dispatch."}</p>
             <p className="mt-2 flex items-start gap-2"><Truck size={16} className="mt-0.5 shrink-0 text-green-600" /> {p.status}. {p.lead}.</p>
             <p className="mt-2 border-t border-line pt-2 text-[13px] text-steel"><Link className="font-bold text-navy underline" to="/policies?tab=shipping">Shipping</Link> . <Link className="font-bold text-navy underline" to="/policies?tab=returns">Returns</Link> . <Link className="font-bold text-navy underline" to="/policies?tab=warranty">Warranty</Link></p>
           </div>

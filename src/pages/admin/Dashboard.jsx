@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Download, RefreshCw, ShoppingCart, Package, Users, DollarSign, AlertTriangle, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { formatAUD } from "../../data/products";
@@ -21,12 +21,16 @@ export default function Dashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadError, setLoadError] = useState("");
+  const hasLoadedRef = useRef(false);
 
   const loadStats = async (isManual = false) => {
     if (isManual) setRefreshing(true);
     try {
       const data = await getAdminDashboardStatsApi();
       setStats(data);
+      hasLoadedRef.current = true;
+      setLoadError("");
       if (isManual) {
         notify.success({
           title: "Dashboard Refreshed",
@@ -35,6 +39,10 @@ export default function Dashboard() {
       }
     } catch (err) {
       console.error("[admin-dashboard] Error loading stats:", err);
+      // Never show zeros as if they were real figures: until one load succeeds, show the error.
+      if (!hasLoadedRef.current) {
+        setLoadError(err?.message || "Could not retrieve live dashboard stats.");
+      }
       if (isManual) {
         notify.error({
           title: "Refresh Failed",
@@ -51,7 +59,12 @@ export default function Dashboard() {
     loadStats();
   }, []);
 
-  const csvCell = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const csvCell = (v) => {
+    const s = String(v ?? "");
+    // Formula-injection guard: spreadsheet apps execute cells starting with = + - @
+    const safe = /^[=+\-@\t\r]/.test(s) ? `'${s}` : s;
+    return `"${safe.replace(/"/g, '""')}"`;
+  };
   const exportCsv = () => {
     const rows = [
       ["Order ID", "Customer Email", "Placed At", "Total", "Status"],
@@ -107,6 +120,22 @@ export default function Dashboard() {
         <div className="flex min-h-[40vh] items-center justify-center gap-2 rounded-2xl border border-line bg-white p-12 text-sm font-semibold text-steel">
           <Loader2 className="animate-spin text-navy" size={20} />
           <span>Loading live management analytics…</span>
+        </div>
+      ) : loadError ? (
+        <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 rounded-2xl border border-red-200 bg-red-50 p-12 text-center">
+          <AlertTriangle className="text-red-600" size={24} />
+          <div>
+            <p className="text-sm font-extrabold text-red-700">Could not load dashboard stats</p>
+            <p className="mt-1 text-xs text-red-700/80">{loadError}</p>
+          </div>
+          <button
+            onClick={() => loadStats(true)}
+            disabled={refreshing}
+            className="flex items-center gap-1.5 rounded-lg border border-red-300 bg-white px-4 py-2 text-xs font-bold text-red-700 transition hover:border-red-500 disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
+            <span>{refreshing ? "Retrying…" : "Retry"}</span>
+          </button>
         </div>
       ) : (
         <>

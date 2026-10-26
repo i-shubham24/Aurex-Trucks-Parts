@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { COMPANY } from "../data/company";
 import { api } from "../lib/api";
 import { getSettingsApi, updateSettingsApi, resetSettingsApi } from "../api/endpoints/settings.api";
+import { publicGet } from "../api/client";
 
 const Ctx = createContext(null);
 
@@ -71,7 +72,7 @@ function ApiSiteProvider({ children }) {
         /* keep cached / defaults */
       }
       try {
-        const { items } = await api.get("/promos/active");
+        const { items } = await publicGet("/promos/active");
         if (items) setPromos(items);
       } catch {
         /* keep defaults */

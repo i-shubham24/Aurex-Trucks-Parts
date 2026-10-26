@@ -108,11 +108,12 @@ export default function TailLiftEnquiry() {
     e.preventDefault();
 
     if (!user) {
-      notify.warning({
+      notify.info({
         kicker: "LOGIN REQUIRED",
         title: "Account Sign-In Required",
         message: "You must be signed in to submit a tail lift quotation enquiry. Please sign in or create an account to proceed.",
         duration: 6000,
+        sound: false,
       });
       openAuthModal({ mode: "login" });
       return;
@@ -717,6 +718,7 @@ Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
                     rows={4}
                     value={form.vinOrNotes}
                     onChange={setField("vinOrNotes")}
+                    aria-label="Additional notes, VIN or workshop directives"
                     placeholder="Enter chassis VIN, required delivery deadline, special chassis overhang considerations, or any custom questions..."
                     className="w-full rounded-md border border-line-dark bg-white p-3 text-sm outline-none placeholder:text-faint focus:border-gold"
                   />

@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 import { useCompany } from "../store/site";
 import ProductCard from "../components/ProductCard";
 import ThemeSelect from "../components/ThemeSelect";
-import { useCategories } from "../hooks/api/useCategories";
+import { useCategories, DEFAULT_CATEGORIES } from "../hooks/api/useCategories";
 import { useProducts } from "../hooks/api/useProducts";
 import { ProductGridSkeleton } from "../components/ProductCardSkeleton";
 import { makeMatcher } from "../utils/search";
@@ -18,7 +18,9 @@ export default function Shop({ preset }) {
   const [params, setParams] = useSearchParams();
   const slug = preset || paramSlug || null;
 
-  const { data: categories = [], isLoading: catsLoading } = useCategories();
+  const { data: catData, isLoading: catsLoading, isError: catsError } = useCategories();
+  // If the category list fails (rate limit, timeout) use the built-in one instead of an empty bar.
+  const categories = catData?.length ? catData : catsError ? DEFAULT_CATEGORIES : catData || [];
   const cat = slug ? categories.find((c) => c.slug === slug) : null;
   const urlQ = params.get("q") || "";
 
@@ -49,6 +51,7 @@ export default function Shop({ preset }) {
     }, { replace: true });
   };
 
+  // Same params as SHOP_CATALOGUE_PARAMS when there is no category, so /shop picks up the boot prefetch.
   const queryParams = {
     category: slug || undefined,
     limit: 500,
@@ -60,7 +63,7 @@ export default function Shop({ preset }) {
     if (document.body) document.body.scrollTop = 0;
   }, [slug]);
 
-  const { data, isLoading: prodsLoading } = useProducts(queryParams);
+  const { data, isLoading: prodsLoading, isError: prodsError, refetch: refetchProducts, isFetching: prodsFetching } = useProducts(queryParams);
   const rawProducts = data?.products || [];
 
   const subs = useMemo(
@@ -114,7 +117,8 @@ export default function Shop({ preset }) {
 
   const isLoading = catsLoading || prodsLoading;
 
-  if (!catsLoading && slug && !cat) {
+  // A failed category request is not proof the shelf doesn't exist.
+  if (!catsLoading && !catsError && slug && !cat) {
     return (
       <main className="mx-auto max-w-7xl px-4 py-16 text-center">
         <h1 className="text-2xl font-extrabold text-ink">Shelf not found</h1>
@@ -199,6 +203,19 @@ export default function Shop({ preset }) {
         <div className="mt-4">
           <ProductGridSkeleton count={10} />
         </div>
+      ) : prodsError && rawProducts.length === 0 ? (
+        <div role="alert" className="mt-8 rounded-md border border-line bg-white p-8 text-center text-sm text-steel">
+          <p className="font-bold text-ink">We couldn't load the catalogue just now.</p>
+          <p className="mt-1">It is usually back in a moment.</p>
+          <button
+            type="button"
+            onClick={() => refetchProducts()}
+            disabled={prodsFetching}
+            className="mt-4 rounded bg-gold px-6 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white disabled:opacity-60"
+          >
+            {prodsFetching ? "Trying again…" : "Try again"}
+          </button>
+        </div>
       ) : items.length === 0 ? (
         <p className="mt-8 rounded-md border border-line bg-white p-8 text-center text-sm text-steel">
           No lines match those filters.{" "}
@@ -248,9 +265,11 @@ export default function Shop({ preset }) {
 
 export function CategoryByParam() {
   const { slug } = useParams();
-  const { data: categories = [], isLoading } = useCategories();
-  
-  if (isLoading) {
+  const { data: categories = [], isLoading, isError, isPlaceholderData } = useCategories();
+  const known = categories.some((c) => c.slug === slug);
+
+  // Placeholder (cached / built-in) categories may not include a newer shelf yet: wait for the real list.
+  if (isLoading || (isPlaceholderData && !known)) {
     return (
       <main className="mx-auto max-w-7xl px-4 py-6">
         <ProductGridSkeleton count={10} />
@@ -258,7 +277,8 @@ export function CategoryByParam() {
     );
   }
 
-  if (categories.some((c) => c.slug === slug)) {
+  // If the list failed to load we can't tell the shelf is missing, so show it and let its products load.
+  if (known || isError) {
     return <Shop key={slug} preset={slug} />;
   }
 

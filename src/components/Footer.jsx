@@ -70,7 +70,7 @@ export default function Footer() {
               sound: true,
             });
           }}>
-            <input value={email} onChange={(e) => setEmail(e.target.value)} required type="email" maxLength={120} placeholder="Enter your email address" className="h-10 w-full rounded-l-md border border-line-dark px-3 text-sm outline-none placeholder:text-faint focus:border-gold" />
+            <input value={email} onChange={(e) => setEmail(e.target.value)} required type="email" maxLength={120} placeholder="Enter your email address" aria-label="Email address for the newsletter" className="h-10 w-full rounded-l-md border border-line-dark px-3 text-sm outline-none placeholder:text-faint focus:border-gold" />
             <button disabled={busy} className="h-10 shrink-0 rounded-r-md bg-gold px-4 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white disabled:opacity-60">{busy ? "Sending…" : "Subscribe"}</button>
           </form>
           {failed ? <p role="alert" className="mt-2 text-[13px] font-semibold text-red-600">That didn't go through. Please try again.</p> : done ? <p className="mt-2 text-[13px] font-semibold">Thanks. You are subscribed.</p> : <p className="mt-2 text-xs text-faint">We never share your email with third parties.</p>}

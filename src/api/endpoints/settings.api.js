@@ -1,10 +1,11 @@
-import { apiClient } from '../client';
+import { apiClient, publicGet } from '../client';
 
 /**
  * Fetch live store settings from the backend
  */
 export async function getSettingsApi() {
-  const response = await apiClient.get('/settings');
+  // Credential-free (CDN-cacheable) on the storefront; the admin console keeps credentials.
+  const response = await publicGet('/settings');
   return response?.data?.settings || response?.settings || {};
 }
 

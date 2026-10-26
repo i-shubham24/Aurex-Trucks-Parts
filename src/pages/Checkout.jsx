@@ -25,6 +25,7 @@ import { useNotification } from "../store/notification";
 import { api, API_ON } from "../lib/api";
 import { apiClient } from "../api/client";
 import ThemeSelect from "../components/ThemeSelect";
+import { calculateOrderTotals, tradeDiscountFor } from "../utils/pricing";
 
 const STATES = ["VIC", "NSW", "QLD", "SA", "WA", "TAS", "NT", "ACT"];
 const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -35,8 +36,16 @@ const PICKUP = "Click and Collect VIC";
 
 const digits = (v) => v.replace(/\D/g, "");
 
+// Accepts spaces, dashes, brackets and a +61 / 61 prefix; returns the 0-leading AU form.
+const normalisePhone = (v) => {
+  const d = String(v || "").replace(/[\s\-().]/g, "");
+  const intl = d.match(/^\+?610?([2-578]\d{8})$/);
+  return intl ? `0${intl[1]}` : d;
+};
+const PHONE_MSG = "Enter an Australian phone number, e.g. 0412 345 678 or +61 412 345 678.";
+
 export default function Checkout() {
-  const { lines, total, clear, setQty, remove } = useCart();
+  const { lines, clear, setQty, remove } = useCart();
   const COMPANY = useCompany();
   const { user, openAuthModal, updateProfile, placeOrder } = useAuth();
   const { settings } = useSite();
@@ -49,19 +58,16 @@ export default function Checkout() {
       id: "Standard road",
       name: "Standard Road",
       desc: `Free over ${formatAUD(settings.freeFreightOver)}, else ${formatAUD(settings.standardFee)}. 1 to 5 days.`,
-      fee: (t) => (t >= settings.freeFreightOver ? 0 : settings.standardFee),
     },
     {
       id: "Express priority",
       name: "Express",
       desc: `${formatAUD(settings.expressFee)} flat. VIC metro next day.`,
-      fee: () => settings.expressFee,
     },
     {
       id: PICKUP,
       name: "Click and Collect",
       desc: "Free. Ready in 4 hours, Campbellfield.",
-      fee: () => 0,
     },
   ];
 
@@ -88,9 +94,11 @@ export default function Checkout() {
   useEffect(() => {
     const isCanceled = searchParams.get("payment_canceled");
     const canceledOrder = searchParams.get("orderNumber");
+    // Signed token from Stripe's cancel URL; the API needs it to cancel a guest's order.
+    const cancelToken = searchParams.get("ct");
     if (isCanceled === "true") {
       if (canceledOrder && API_ON) {
-        api.post("/payments/cancel-order", { orderNumber: canceledOrder }).catch(() => {});
+        api.post("/payments/cancel-order", { orderNumber: canceledOrder, cancelToken: cancelToken || undefined }).catch(() => {});
       }
       try {
         const stored = JSON.parse(localStorage.getItem("aurex_orders") || "[]");
@@ -165,7 +173,8 @@ export default function Checkout() {
         phone: prev.phone || savedAddress.phone,
         address: prev.address || savedAddress.address,
         suburb: prev.suburb || savedAddress.suburb,
-        state: prev.state || savedAddress.state,
+        // state always has a value ("VIC"), so take the saved one whenever the address is filled from it
+        state: prev.address ? prev.state : savedAddress.state || prev.state,
         postcode: prev.postcode || savedAddress.postcode,
         notes: prev.notes || savedAddress.notes,
       }));
@@ -202,8 +211,12 @@ export default function Checkout() {
     );
 
   const shipOpt = SHIP.find((s) => s.id === ship) || SHIP[0];
-  const shipFee = shipOpt.fee(total);
-  const grand = Math.round((total + shipFee) * 100) / 100;
+  // Same rules as the server (trade discount, free freight on the discounted subtotal,
+  // core deposits), so the total shown is the total charged.
+  const tradeDiscountPercent = tradeDiscountFor(user);
+  const totals = calculateOrderTotals({ lines, shippingMethod: shipOpt.id, tradeDiscountPercent, settings });
+  const shipFee = totals.shippingFee;
+  const grand = totals.grandTotal;
 
   const PAYMENTS = [
     cardEnabled && {
@@ -249,21 +262,31 @@ export default function Checkout() {
       return;
     }
 
+    const phone = normalisePhone(form.phone);
     const errs = {};
     if (!form.name.trim()) errs.name = 1;
     if (!emailRx.test(form.email.trim())) errs.email = 1;
-    if (!phoneRx.test(form.phone.replace(/\s/g, ""))) errs.phone = 1;
+    if (!phoneRx.test(phone)) errs.phone = 1;
     if (ship !== PICKUP) {
       if (!form.address.trim()) errs.address = 1;
       if (!form.suburb.trim()) errs.suburb = 1;
       if (!pcRx.test(form.postcode)) errs.postcode = 1;
     }
     setFieldErrs(errs);
-    setErr(Object.keys(errs).length ? "Check the highlighted fields and try again." : "");
+    setErr(
+      Object.keys(errs).length
+        ? errs.phone && Object.keys(errs).length === 1
+          ? PHONE_MSG
+          : `Check the highlighted fields and try again.${errs.phone ? ` ${PHONE_MSG}` : ""}`
+        : ""
+    );
     if (Object.keys(errs).length) {
+      // The saved-address card hides the inputs, so open them to show what needs fixing.
+      setIsEditingAddress(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
+    const details = { ...form, phone };
 
     if (placing) return;
     setPlacing(true);
@@ -272,28 +295,24 @@ export default function Checkout() {
     try {
       if (updateProfile) {
         await updateProfile({
-          address: { ...form },
-          shippingAddress: { ...form },
+          address: { ...details },
+          shippingAddress: { ...details },
         });
       }
     } catch (saveErr) {
       console.warn("Could not save address to profile:", saveErr);
     }
 
-    const shipOpt = SHIP.find((s) => s.id === ship) || SHIP[0];
-    const shipFee = shipOpt.fee(total);
-    const grand = Math.round((total + shipFee) * 100) / 100;
-
     const order = await placeOrder({
       items: lines.map((l) => ({ sku: l.sku, name: l.name, price: l.price, qty: l.qty })),
-      subtotal: total,
-      discount: 0,
+      subtotal: totals.subtotal,
+      discount: totals.totalDiscount,
       promoCode: null,
       shipping: shipOpt.id,
       shippingFee: shipFee,
       payment: payId,
       total: grand,
-      address: { ...form },
+      address: details,
     });
 
     if (!order) {
@@ -323,7 +342,7 @@ export default function Checkout() {
       }
     }
 
-    const charged = order.total ?? total;
+    const charged = order.total ?? grand;
     notify.success({
       kicker: "ORDER RECEIVED",
       title: "Order Placed Successfully!",
@@ -490,6 +509,8 @@ export default function Checkout() {
                         onChange={set("name")}
                         maxLength={80}
                         placeholder="Full name *"
+                        aria-label="Full name"
+                        autoComplete="name"
                         className={input(fieldErrs.name)}
                       />
                       <input
@@ -497,14 +518,23 @@ export default function Checkout() {
                         onChange={set("phone")}
                         maxLength={20}
                         placeholder="Phone (04XX XXX XXX) *"
+                        aria-label="Phone"
+                        aria-invalid={Boolean(fieldErrs.phone)}
+                        type="tel"
+                        autoComplete="tel"
                         className={input(fieldErrs.phone)}
                       />
+                      {fieldErrs.phone && (
+                        <p className="-mt-1 text-xs font-semibold text-red-600 sm:col-span-2" role="alert">{PHONE_MSG}</p>
+                      )}
                       <input
                         value={form.email}
                         onChange={set("email")}
                         type="email"
                         maxLength={120}
                         placeholder="Email for receipt + tracking *"
+                        aria-label="Email for receipt and tracking"
+                        autoComplete="email"
                         className={`sm:col-span-2 ${input(fieldErrs.email)}`}
                       />
                       <input
@@ -512,6 +542,8 @@ export default function Checkout() {
                         onChange={set("address")}
                         maxLength={120}
                         placeholder="Street address *"
+                        aria-label="Street address"
+                        autoComplete="street-address"
                         className={`sm:col-span-2 ${input(fieldErrs.address)}`}
                       />
                       <input
@@ -519,6 +551,7 @@ export default function Checkout() {
                         onChange={set("suburb")}
                         maxLength={60}
                         placeholder="Suburb *"
+                        aria-label="Suburb"
                         className={input(fieldErrs.suburb)}
                       />
                       <div className="grid grid-cols-2 gap-2.5">
@@ -534,7 +567,9 @@ export default function Checkout() {
                             setForm({ ...form, postcode: digits(e.target.value).slice(0, 4) })
                           }
                           placeholder="Postcode *"
+                          aria-label="Postcode"
                           inputMode="numeric"
+                          autoComplete="postal-code"
                           className={`h-11 ${input(fieldErrs.postcode)}`}
                         />
                       </div>
@@ -543,6 +578,7 @@ export default function Checkout() {
                         onChange={set("notes")}
                         maxLength={300}
                         placeholder="Delivery notes, forklift on site or VIN (optional)"
+                        aria-label="Delivery notes (optional)"
                         className={`sm:col-span-2 ${input(false)}`}
                       />
                     </div>
@@ -592,12 +628,24 @@ export default function Checkout() {
           <div className="mt-3 space-y-1 border-t border-line pt-3 text-sm">
             <p className="flex justify-between text-steel">
               <span>Subtotal</span>
-              <span className="tabular font-bold text-ink">{formatAUD(total)}</span>
+              <span className="tabular font-bold text-ink">{formatAUD(totals.subtotal)}</span>
             </p>
+            {totals.tradeDiscountAmount > 0 && (
+              <p className="flex justify-between text-green-700">
+                <span>Trade discount ({tradeDiscountPercent}%)</span>
+                <span className="tabular font-bold">−{formatAUD(totals.tradeDiscountAmount)}</span>
+              </p>
+            )}
             <p className="flex justify-between text-steel">
               <span>Freight ({shipOpt.name})</span>
               <span className="tabular font-bold text-ink">{shipFee === 0 ? "FREE" : formatAUD(shipFee)}</span>
             </p>
+            {totals.totalCoreDeposit > 0 && (
+              <p className="flex justify-between text-steel">
+                <span>Core deposit (refundable)</span>
+                <span className="tabular font-bold text-ink">{formatAUD(totals.totalCoreDeposit)}</span>
+              </p>
+            )}
             <p className="tabular flex justify-between pt-1 text-lg font-extrabold">
               <span>
                 Total <span className="text-[11px] font-semibold text-faint">inc. GST</span>

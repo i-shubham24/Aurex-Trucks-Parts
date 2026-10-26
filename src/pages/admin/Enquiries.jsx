@@ -88,22 +88,35 @@ export default function Enquiries() {
     fetchEnquiries();
   }, []);
 
-  const setStatus = (id, s) => {
-    setList((l) => l.map((x) => (x.id === id ? { ...x, status: s } : x)));
-    if (selectedEnquiry && selectedEnquiry.id === id) {
-      setSelectedEnquiry((prev) => ({ ...prev, status: s }));
+  // The API stores enquiry status as free text ("New" by default) and these labels are what
+  // existing records hold. Its QUOTE_SENT value only triggers the quote email, which needs a
+  // quoted price this screen doesn't collect, so "Quoted" is sent as-is.
+  const setStatus = async (id, s) => {
+    const prevStatus = list.find((x) => x.id === id)?.status;
+    if ((prevStatus || "New") === s) return;
+    const apply = (status) => {
+      setList((l) => l.map((x) => (x.id === id ? { ...x, status } : x)));
+      setSelectedEnquiry((prev) => (prev && prev.id === id ? { ...prev, status } : prev));
+    };
+    apply(s);
+    if (!API_ON) {
+      updateSiteEnquiry(id, s);
+      return;
     }
-    if (API_ON) {
-      api.patch(`/enquiries/${id}/status`, { status: s })
-        .then(() => {
-          notify.success({
-            title: "Status Updated",
-            message: `Enquiry #${id} marked as "${s}".`,
-          });
-        })
-        .catch(() => {});
+    try {
+      await api.patch(`/enquiries/${encodeURIComponent(id)}/status`, { status: s });
+      notify.success({
+        title: "Status Updated",
+        message: `Enquiry #${id} marked as "${s}".`,
+      });
+    } catch (err) {
+      console.error("[admin-enquiries] Status update failed:", err);
+      apply(prevStatus);
+      notify.error({
+        title: "Status Not Saved",
+        message: err?.message || `Could not mark enquiry #${id} as "${s}".`,
+      });
     }
-    updateSiteEnquiry(id, s);
   };
 
   const copyContact = (e) => {

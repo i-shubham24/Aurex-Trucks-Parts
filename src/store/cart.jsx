@@ -10,6 +10,9 @@ import {
 } from "../api/endpoints/cart.api";
 
 const CartCtx = createContext(null);
+// Just the (stable) actions, for components like the product card that only add to cart
+// and shouldn't re-render every time the cart's contents change.
+const CartActionsCtx = createContext(null);
 const CART_KEY = "aurex_cart_v1";
 
 const readCart = () => {
@@ -31,10 +34,14 @@ export function CartProvider({ children }) {
   const [compare, setCompare] = useState([]);
   const { notify } = useNotification();
   const { user } = useAuth();
-  const prevUserRef = useRef(null);
+  const userId = user ? user.id || user._id || user.email || "user" : null;
+  const syncedForRef = useRef(null);
+  const linesRef = useRef(lines);
+  const compareRef = useRef(compare);
 
   // Sync lines to localStorage so private/offline mode and refresh don't drop items
   useEffect(() => {
+    linesRef.current = lines;
     try {
       localStorage.setItem(CART_KEY, JSON.stringify(lines));
     } catch {
@@ -42,13 +49,30 @@ export function CartProvider({ children }) {
     }
   }, [lines]);
 
+  useEffect(() => {
+    compareRef.current = compare;
+  }, [compare]);
+
   // When user logs in or creates account: automatically push local cart to the user's cart in the backend!
   useEffect(() => {
-    if (!user) {
-      prevUserRef.current = null;
+    if (!userId) {
+      // Signed out (or the session ended): those lines belong to that account and stay saved
+      // on the server, so don't hand them to the next person who uses this device.
+      if (syncedForRef.current) {
+        setLines([]);
+        try {
+          localStorage.removeItem(CART_KEY);
+        } catch { /* private mode */ }
+      }
+      syncedForRef.current = null;
       setServerCart(null);
       return;
     }
+
+    // Once per account. Boot restores the user from storage and then again from /auth/me;
+    // two overlapping merges would both push the guest lines and double the quantities.
+    if (syncedForRef.current === userId) return;
+    syncedForRef.current = userId;
 
     const syncUserCart = async () => {
       try {
@@ -87,15 +111,14 @@ export function CartProvider({ children }) {
         }
       } finally {
         setIsSyncing(false);
-        prevUserRef.current = user;
       }
     };
 
     syncUserCart();
-  }, [user]);
+  }, [userId]);
 
   // Add to cart: If guest, stays strictly local in localStorage. If logged in, syncs to backend API.
-  const add = async (product, qty = 1, selectedFitment = null) => {
+  const add = useCallback(async (product, qty = 1, selectedFitment = null) => {
     const sku = (product?.sku || "").toUpperCase();
     if (!sku) return;
 
@@ -117,7 +140,7 @@ export function CartProvider({ children }) {
       return;
     }
 
-    const previousLines = [...lines];
+    const previousLines = [...linesRef.current];
 
     // Local state update
     setLines((prev) => {
@@ -182,11 +205,11 @@ export function CartProvider({ children }) {
     } finally {
       setIsSyncing(false);
     }
-  };
+  }, [user, notify]);
 
   // Set quantity: local for guests, API for logged-in users
-  const setQty = async (skuOrItemId, qty) => {
-    const previousLines = [...lines];
+  const setQty = useCallback(async (skuOrItemId, qty) => {
+    const previousLines = [...linesRef.current];
     const targetSku = String(skuOrItemId).toUpperCase();
 
     setLines((prev) => {
@@ -223,11 +246,11 @@ export function CartProvider({ children }) {
     } finally {
       setIsSyncing(false);
     }
-  };
+  }, [user, notify]);
 
   // Remove item: local for guests, API for logged-in users
-  const remove = async (skuOrItemId) => {
-    const previousLines = [...lines];
+  const remove = useCallback(async (skuOrItemId) => {
+    const previousLines = [...linesRef.current];
     const targetSku = String(skuOrItemId).toUpperCase();
 
     setLines((prev) =>
@@ -251,7 +274,7 @@ export function CartProvider({ children }) {
     } finally {
       setIsSyncing(false);
     }
-  };
+  }, [user]);
 
   // Clear cart: local for guests, API for logged-in users
   const clear = useCallback(async () => {
@@ -273,14 +296,15 @@ export function CartProvider({ children }) {
   }, [user]);
 
   // Compare functions preserved
-  const toggleCompare = (sku) => {
+  const toggleCompare = useCallback((sku) => {
+    const adding = !compareRef.current.includes(sku);
     setCompare((c) => {
       const exists = c.includes(sku);
       if (exists) return c.filter((x) => x !== sku);
       return [...c, sku].slice(-3);
     });
 
-    if (!compare.includes(sku)) {
+    if (adding) {
       notify.success({
         kicker: "COMPARISON UPDATED",
         title: "Added to Compare",
@@ -289,9 +313,9 @@ export function CartProvider({ children }) {
         sound: true,
       });
     }
-  };
+  }, [notify]);
 
-  const clearCompare = () => setCompare([]);
+  const clearCompare = useCallback(() => setCompare([]), []);
 
   const total = useMemo(
     () =>
@@ -309,27 +333,31 @@ export function CartProvider({ children }) {
     [user, serverCart, lines]
   );
 
+  const actions = useMemo(
+    () => ({ add, setQty, remove, clear, setOpen, toggleCompare, clearCompare }),
+    [add, setQty, remove, clear, toggleCompare, clearCompare]
+  );
+
+  const value = useMemo(
+    () => ({
+      lines,
+      ...actions,
+      total,
+      count,
+      open,
+      compare,
+      isSyncing,
+      serverCart,
+    }),
+    [lines, actions, total, count, open, compare, isSyncing, serverCart]
+  );
+
   return (
-    <CartCtx.Provider
-      value={{
-        lines,
-        add,
-        setQty,
-        remove,
-        clear,
-        total,
-        count,
-        open,
-        setOpen,
-        compare,
-        toggleCompare,
-        clearCompare,
-        isSyncing,
-        serverCart,
-      }}
-    >
-      {children}
-    </CartCtx.Provider>
+    <CartActionsCtx.Provider value={actions}>
+      <CartCtx.Provider value={value}>
+        {children}
+      </CartCtx.Provider>
+    </CartActionsCtx.Provider>
   );
 }
 
@@ -355,3 +383,6 @@ export const useCart = () => {
   if (!ctx && import.meta.env?.DEV) console.error("[cart] useCart rendered without CartProvider.");
   return ctx ?? cartFallback;
 };
+
+/* Actions only; the returned object doesn't change when lines, totals or the drawer change. */
+export const useCartActions = () => useContext(CartActionsCtx) ?? cartFallback;

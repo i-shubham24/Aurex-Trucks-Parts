@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { getProductsApi, getProductBySkuApi } from '../../api/endpoints/products.api';
 import { persisted, remember } from '../../lib/persisted';
@@ -24,23 +25,45 @@ function getCacheKey(params) {
   }
 }
 
-/**
- * Custom TanStack Query hook to fetch products list with filters and caching
- */
-export function useProducts(params = {}, options = {}) {
+/* The full shop catalogue (Shop with no category, compare tray). */
+export const SHOP_CATALOGUE_PARAMS = { limit: 500 };
+
+const productsListQuery = (params) => {
   const isSearch = Boolean(params.search && params.search.length > 0);
   const cacheKey = !isSearch ? getCacheKey(params) : null;
-  const persistedData = cacheKey ? persisted(cacheKey) : {};
-
-  return useQuery({
+  return {
+    cacheKey,
     queryKey: PRODUCT_QUERY_KEYS.list(params),
     queryFn: () => {
       const promise = getProductsApi(params);
       return cacheKey ? promise.then(remember(cacheKey)) : promise;
     },
-    placeholderData: (prev) => prev || persistedData.initialData,
     staleTime: 1000 * 60 * 5, // 5 minutes fresh in memory; back navigation is 0ms instant
     gcTime: 1000 * 60 * 30, // Keep in memory for 30 minutes
+  };
+};
+
+/**
+ * Start loading the shop catalogue at app boot, in parallel with the route chunks,
+ * so /shop has its products by the time the page mounts. Same key and fetcher as
+ * useProducts(SHOP_CATALOGUE_PARAMS), so the page just picks the result up.
+ */
+export function prefetchShopCatalogue(queryClient) {
+  const { queryKey, queryFn, staleTime, gcTime } = productsListQuery(SHOP_CATALOGUE_PARAMS);
+  return queryClient.prefetchQuery({ queryKey, queryFn, staleTime, gcTime });
+}
+
+/**
+ * Custom TanStack Query hook to fetch products list with filters and caching
+ */
+export function useProducts(params = {}, options = {}) {
+  const { cacheKey, ...query } = productsListQuery(params);
+  // Parse the stored copy once per key, not on every render (the catalogue is ~500 rows).
+  const persistedData = useMemo(() => (cacheKey ? persisted(cacheKey) : {}), [cacheKey]);
+
+  return useQuery({
+    ...query,
+    placeholderData: (prev) => prev || persistedData.initialData,
     ...options,
   });
 }
@@ -52,7 +75,7 @@ export function useProduct(sku, options = {}) {
   const queryClient = useQueryClient();
   const normalizedSku = (sku || '').toUpperCase();
   const cacheKey = normalizedSku ? `aurex_cache_prod_${normalizedSku.toLowerCase()}` : null;
-  const persistedData = cacheKey ? persisted(cacheKey) : {};
+  const persistedData = useMemo(() => (cacheKey ? persisted(cacheKey) : {}), [cacheKey]);
 
   const getCachedProduct = () => {
     if (!normalizedSku) return undefined;

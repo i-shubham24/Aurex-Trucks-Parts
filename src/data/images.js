@@ -13,6 +13,31 @@ export const MULTI_IMAGES = {
   'ATP-TP-86': ['/images/products/ATP-TP-86.jpg', '/images/products/ATP-TP-86-back.jpg'],
 };
 
+const firstApiImage = (p) => {
+  const first = Array.isArray(p?.images) && p.images.length > 0 ? p.images[0] : null;
+  return (typeof first === 'string' ? first : first?.url) || p?.imageUrl || null;
+};
+
+// The API's default image for a part is the same stock packshot path we keep locally.
+// Anything else was uploaded through the admin console.
+const isStockImage = (url, sku) => url === `/images/products/${sku}.jpg` || url === imgFor(sku);
+
+/* Main image for a product: an admin-uploaded image wins, the local packshot is the fallback. */
+export const productImage = (p) => {
+  const api = firstApiImage(p);
+  if (api && !isStockImage(api, p?.sku)) return api;
+  return imgFor(p?.sku) || api;
+};
+
+/* Gallery for the product page: uploaded images when there are any, else the curated local views. */
+export const productImages = (p) => {
+  const api = (Array.isArray(p?.images) ? p.images : [])
+    .map((img) => (typeof img === 'string' ? img : img?.url))
+    .filter(Boolean);
+  if (api.length > 0 && api.some((url) => !isStockImage(url, p?.sku))) return api;
+  return imagesFor(p?.sku);
+};
+
 export const imagesFor = (sku) => {
   if (!sku) return [];
   if (MULTI_IMAGES[sku]) return MULTI_IMAGES[sku];
