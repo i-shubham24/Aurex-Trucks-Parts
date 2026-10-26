@@ -19,7 +19,7 @@ export function PartVisual({ p }) {
             alt={p.name}
             loading="lazy"
             src={img}
-            cdnWidth={480}
+            cdnWidth={360}
             className="max-h-full max-w-full rounded-[3px] object-contain transition-transform duration-300 group-hover:scale-105"
           />
         </div>
@@ -33,7 +33,7 @@ export function PartVisual({ p }) {
           alt={p.name}
           loading="lazy"
           src={img}
-          cdnWidth={480}
+          cdnWidth={360}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
       );
@@ -45,7 +45,7 @@ export function PartVisual({ p }) {
           alt={p.name}
           loading="lazy"
           src={img}
-          cdnWidth={480}
+          cdnWidth={360}
           className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
         />
       </div>

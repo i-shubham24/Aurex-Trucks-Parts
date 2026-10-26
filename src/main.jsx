@@ -15,7 +15,11 @@ if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
 // Fetch the shop catalogue now, alongside the route chunks, instead of after the page mounts.
 // The staff console has its own product list, so it skips this.
 if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin')) {
-  prefetchShopCatalogue(queryClient);
+  if ('requestIdleCallback' in window) {
+    window.requestIdleCallback(() => prefetchShopCatalogue(queryClient), { timeout: 3000 });
+  } else {
+    setTimeout(() => prefetchShopCatalogue(queryClient), 1200);
+  }
 }
 
 createRoot(document.getElementById('root')).render(

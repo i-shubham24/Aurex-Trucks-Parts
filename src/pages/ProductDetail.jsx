@@ -5,6 +5,7 @@ import { formatAUD } from "../data/products";
 import { useCompany, useSite } from "../store/site";
 import { imgFor, productImages } from "../data/images";
 import SafeImage from "../components/SafeImage";
+import { cld } from "../utils/img";
 import { useCart } from "../store/cart";
 import ProductCard from "../components/ProductCard";
 import { useProduct } from "../hooks/api/useProducts";
@@ -35,7 +36,7 @@ function ProductImageZoom({ src, alt, isTailLift }) {
       <SafeImage
         src={src}
         alt={alt}
-        cdnWidth={1400}
+        cdnWidth={800}
         style={{
           transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
           transform: isHovered ? "scale(2.2)" : "scale(1)",
@@ -410,7 +411,7 @@ export default function ProductDetail() {
                     idx === activeImgIdx ? "border-gold ring-2 ring-gold/50" : "border-line opacity-70 hover:opacity-100"
                   }`}
                 >
-                  <img src={imgSrc} alt="" className="h-full w-full object-contain" />
+                  <img src={cld(imgSrc, 120)} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain" />
                 </button>
               ))}
             </div>
