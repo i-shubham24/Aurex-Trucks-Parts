@@ -5,7 +5,7 @@ import { NEWS } from "../data/content";
 import { productImage } from "../data/images";
 
 const BASE = "Aurex Truck Parts Australia";
-const SITE = "https://aurextruckparts.com.au";
+const SITE = "https://www.aurextruckparts.com.au";
 const DEFAULT_IMAGE = `${SITE}/logo.jpeg`;
 
 const META = [

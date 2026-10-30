@@ -121,8 +121,8 @@ export default function BlogEditor() {
       Array.isArray(blog.body) && blog.body.length > 0
         ? JSON.parse(JSON.stringify(blog.body))
         : blog.content
-        ? [{ p: blog.content }]
-        : [{ p: "" }];
+          ? [{ p: blog.content }]
+          : [{ p: "" }];
 
     const loadedForm = {
       id: blog._id || blog.id || blog.slug,
@@ -406,9 +406,8 @@ export default function BlogEditor() {
                 {isEdit ? "EDITING STORY" : "NEW ARTICLE"}
               </span>
               <span
-                className={`rounded px-1.5 py-0.2 text-[10px] font-bold uppercase ${
-                  form.isPublished ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"
-                }`}
+                className={`rounded px-1.5 py-0.2 text-[10px] font-bold uppercase ${form.isPublished ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-600"
+                  }`}
               >
                 {form.isPublished ? "Published" : "Draft"}
               </span>
@@ -426,18 +425,16 @@ export default function BlogEditor() {
             <button
               type="button"
               onClick={() => setViewTab("editor")}
-              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 transition ${
-                viewTab === "editor" ? "bg-white text-ink shadow-sm" : "text-steel hover:text-ink"
-              }`}
+              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 transition ${viewTab === "editor" ? "bg-white text-ink shadow-sm" : "text-steel hover:text-ink"
+                }`}
             >
               <FileText size={13} /> Story Editor
             </button>
             <button
               type="button"
               onClick={() => setViewTab("preview")}
-              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 transition ${
-                viewTab === "preview" ? "bg-white text-ink shadow-sm" : "text-steel hover:text-ink"
-              }`}
+              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 transition ${viewTab === "preview" ? "bg-white text-ink shadow-sm" : "text-steel hover:text-ink"
+                }`}
             >
               <Eye size={13} /> Live Preview
             </button>
@@ -525,11 +522,10 @@ export default function BlogEditor() {
                   )}
                 </div>
                 <div
-                  className={`flex h-11 w-full overflow-hidden rounded-xl border bg-white transition focus-within:ring-2 ${
-                    isSlugConflict
+                  className={`flex h-11 w-full overflow-hidden rounded-xl border bg-white transition focus-within:ring-2 ${isSlugConflict
                       ? "border-red-400 focus-within:border-red-500 focus-within:ring-red-100"
                       : "border-line focus-within:border-gold focus-within:ring-gold/20"
-                  }`}
+                    }`}
                 >
                   <span className="flex items-center border-r border-line bg-mist px-3.5 font-mono text-xs font-bold text-steel select-none shrink-0">
                     /news/
@@ -549,7 +545,7 @@ export default function BlogEditor() {
                   </p>
                 ) : (
                   <p className="mt-1.5 font-mono text-[11px] text-faint">
-                    Live route: https://aurextruckparts.com.au/news/{form.slug || "article-slug"}
+                    Live route: https://www.aurextruckparts.com.au/news/{form.slug || "article-slug"}
                   </p>
                 )}
               </div>
