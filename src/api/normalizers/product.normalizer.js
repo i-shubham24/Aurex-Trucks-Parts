@@ -33,7 +33,8 @@ export function normalizeProduct(p) {
     },
     brand: typeof p.brand === 'object' ? p.brand?.name : (p.brandName || p.brand || 'Aurex'),
     brandName: typeof p.brand === 'object' ? p.brand?.name : (p.brandName || p.brand || 'Aurex'),
-    rating: p.rating || 4.8,
+    // The API keeps rating/reviewCount in step with approved reviews; never invent a score for an unreviewed part.
+    rating: (p.reviewCount || p.reviews) ? (p.rating || 0) : 0,
     reviews: p.reviewCount || p.reviews || 0,
     reviewCount: p.reviewCount || p.reviews || 0,
     badge: p.badge || (p.badges?.[0]?.label) || (p.isFeatured ? 'Popular' : ''),

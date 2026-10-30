@@ -85,8 +85,7 @@ export default function About() {
             <p className="mt-1 text-sm text-gray-300">{COMPANY.hours}</p>
           </div>
           <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center md:justify-end">
-            <a href={COMPANY.phoneHref} className="inline-flex h-[52px] items-center justify-center rounded bg-gold px-6 text-sm font-bold text-ink transition-colors hover:bg-white">Call {COMPANY.phone}</a>
-            <Link to="/contact" className="inline-flex h-[52px] items-center justify-center rounded border border-gray-500 px-6 text-sm font-bold text-white transition-colors hover:border-gold hover:text-gold">Send an Enquiry</Link>
+            <Link to="/contact" className="inline-flex h-[52px] items-center justify-center rounded bg-gold px-6 text-sm font-bold text-ink transition-colors hover:bg-white">Send an Enquiry</Link>
           </div>
         </div>
       </section>

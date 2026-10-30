@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   ArrowRight,
   Building2,
@@ -35,6 +35,26 @@ import { useMyReviews } from "../hooks/api/useReviews";
 
 const STATES = ["VIC", "NSW", "QLD", "SA", "WA", "TAS", "NT", "ACT"];
 const digits = (v) => (v || "").replace(/\D/g, "");
+
+const isDeliveredOrder = (order) => {
+  const apiStatus = order?.status || order?.orderStatus || order?.shipping?.status || "";
+  return /^delivered$/i.test(apiStatus) || /^delivered$/i.test(order?.shipping?.status || "");
+};
+
+/* What the rating prompt needs for one order: each line with its product, order and price. */
+const ratingPayload = (order) => ({
+  orderId: order._id || order.id,
+  orderNumber: order.orderNumber || order.id,
+  items: (order.items || order.lines || []).map((l) => ({
+    orderId: order._id || order.id,
+    orderNumber: order.orderNumber || order.id,
+    productId: l.productId || l.product?._id || l.product || l._id,
+    sku: l.sku,
+    name: l.name,
+    image: l.image || imgFor(l.sku),
+    unitPrice: l.unitPrice || l.price,
+  })),
+});
 
 export function useReorder() {
   const { add, setOpen } = useCart();
@@ -190,8 +210,7 @@ function OrderCard({ order, onReorder }) {
   const qty = lines.reduce((s, l) => s + (l.qty || 0), 0);
   const shown = open ? lines : lines.slice(0, 3);
 
-  const apiStatus = order?.status || order?.orderStatus || order?.shipping?.status || "";
-  const isDelivered = /^delivered$/i.test(apiStatus) || /^delivered$/i.test(order?.shipping?.status || "");
+  const isDelivered = isDeliveredOrder(order);
 
   const orderIdStr = String(order._id || order.id || order.orderNumber || "").toLowerCase();
   const orderNumberStr = String(order.orderNumber || order.id || "").toLowerCase();
@@ -258,22 +277,7 @@ function OrderCard({ order, onReorder }) {
             !isAlreadyRated ? (
               <button
                 type="button"
-                onClick={() => {
-                  const itemsToRate = lines.map((l) => ({
-                    orderId: order._id || order.id,
-                    orderNumber: order.orderNumber || order.id,
-                    productId: l.productId || l.product?._id || l.product || l._id,
-                    sku: l.sku,
-                    name: l.name,
-                    image: l.image || imgFor(l.sku),
-                    unitPrice: l.unitPrice || l.price,
-                  }));
-                  openRatingModal({
-                    orderId: order._id || order.id,
-                    orderNumber: order.orderNumber || order.id,
-                    items: itemsToRate,
-                  });
-                }}
+                onClick={() => openRatingModal(ratingPayload(order))}
                 className="flex items-center justify-center gap-1.5 rounded-lg bg-gold py-2.5 text-xs sm:text-sm font-extrabold text-ink transition hover:bg-navy hover:text-white shadow-xs cursor-pointer whitespace-nowrap"
               >
                 <Star size={15} className="fill-ink text-ink group-hover:fill-white group-hover:text-white" /> Rate
@@ -281,22 +285,7 @@ function OrderCard({ order, onReorder }) {
             ) : (
               <button
                 type="button"
-                onClick={() => {
-                  const itemsToRate = lines.map((l) => ({
-                    orderId: order._id || order.id,
-                    orderNumber: order.orderNumber || order.id,
-                    productId: l.productId || l.product?._id || l.product || l._id,
-                    sku: l.sku,
-                    name: l.name,
-                    image: l.image || imgFor(l.sku),
-                    unitPrice: l.unitPrice || l.price,
-                  }));
-                  openRatingModal({
-                    orderId: order._id || order.id,
-                    orderNumber: order.orderNumber || order.id,
-                    items: itemsToRate,
-                  });
-                }}
+                onClick={() => openRatingModal(ratingPayload(order))}
                 className="flex items-center justify-center gap-1 rounded-lg border border-emerald-300 bg-emerald-50 py-2.5 text-xs sm:text-sm font-extrabold text-emerald-800 transition hover:bg-emerald-100 shadow-xs cursor-pointer whitespace-nowrap"
                 title="Click to view or edit your rating"
               >
@@ -355,7 +344,10 @@ function OrdersToolbar({ q, setQ, status, setStatus, count }) {
 }
 
 export default function Orders() {
-  const { orders: ctxOrders, loadMyOrders } = useAuth();
+  const { orders: ctxOrders, loadMyOrders, user, openAuthModal } = useAuth();
+  const [searchParams] = useSearchParams();
+  const rateRef = (searchParams.get("rate") || "").toLowerCase();
+  const ratePrompt = useRef({ login: false, reload: false, opened: false });
 
   useEffect(() => {
     loadMyOrders?.();
@@ -375,6 +367,31 @@ export default function Orders() {
     });
     return Array.from(map.values());
   }, [ctxOrders]);
+
+  /* "Rate your parts" links in delivered-order emails land here as /orders?rate=<order number>:
+     open the rating prompt for that order, after a login if needed. */
+  useEffect(() => {
+    const prompt = ratePrompt.current;
+    if (!rateRef || prompt.opened) return;
+    if (!user) {
+      if (!prompt.login) {
+        prompt.login = true;
+        openAuthModal("login");
+      }
+      return;
+    }
+    const order = all.find((o) => [o.orderNumber, o.id, o._id].some((v) => String(v || "").toLowerCase() === rateRef));
+    if (!order) {
+      if (!prompt.reload) {
+        prompt.reload = true;
+        loadMyOrders?.(); // just logged in from the link: fetch the account's orders
+      }
+      return;
+    }
+    if (!isDeliveredOrder(order)) return;
+    prompt.opened = true;
+    openRatingModal(ratingPayload(order));
+  }, [rateRef, user, all, openAuthModal, loadMyOrders]);
 
   const validOrders = useMemo(() => all.filter((o) => !isFailedOrder(o)), [all]);
   const reorder = useReorder();

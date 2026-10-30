@@ -213,7 +213,7 @@ export default function OrderSuccess() {
       ) : (
         <p className="mt-5 rounded-md border border-line bg-mist p-5 text-center text-sm text-steel">Receipt not found on this device, but your order ID above still tracks fine.</p>
       )}
-      <p className="mt-4 text-center text-[13px] text-steel">Questions? <a href={COMPANY.phoneHref} className="font-bold text-navy underline">{COMPANY.phone}</a></p>
+      <p className="mt-4 text-center text-[13px] text-steel">Questions? <Link to="/contact" className="font-bold text-navy underline">Contact the counter</Link></p>
     </main>
   );
 }

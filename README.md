@@ -60,7 +60,9 @@ Staff Console opens on `http://localhost:5173/admin`.
 ```bash
 npm run build
 ```
-Generates an optimized bundle in `dist/`.
+Generates an optimized bundle in `dist/`, then writes crawler-readable HTML snapshots for every product, category, type page, guide, article and static page, plus the homepage (`scripts/prerender.js`). The snapshots read the live API (`PRERENDER_API_URL` overrides it; `PRERENDER=false` skips them). If the API is unreachable the build still succeeds, just without snapshots. Visitors always get the live app. The API redeploys the storefront through a Vercel Deploy Hook when products, categories or articles change (`STOREFRONT_DEPLOY_HOOK_URL`, plus a daily catch-up cron), so snapshots stay current.
+
+The build always writes `dist/app.html` (the plain app shell, which `vercel.json` rewrites app routes to), `dist/404.html` (the app shell, noindex) and `dist/sitemap-pages.xml` (guides and type pages). `vercel.json` lists the app's routes explicitly, and any other path gets `404.html` with a real 404 status. **A new route in `src/App.jsx` must also be added to the `rewrites` in `vercel.json`.** Until it is, the page still works for visitors but returns a 404 status. Type-page and guide copy lives in `src/data/seoContent.js` and `src/data/guides.js`. A type's `name` there must match the product `sub` value exactly, so renaming a type in the admin needs the matching edit there.
 
 ---
 
@@ -87,7 +89,7 @@ Aurex-Truck-Parts/
 
 ## 🌐 Production Domain & Deployment
 
-* **Production Storefront**: `https://aurextruckparts.com.au`
-* **Staff Console**: `https://aurextruckparts.com.au/admin`
+* **Production Storefront**: `https://www.aurextruckparts.com.au`
+* **Staff Console**: `https://www.aurextruckparts.com.au/admin`
 * **Backend API**: `https://api.aurextruckparts.com.au`
 * **Depot / Warehouse**: 77 Capital Link Drive, Campbellfield VIC 3061, Australia

@@ -549,7 +549,7 @@ export default function BlogEditor() {
                   </p>
                 ) : (
                   <p className="mt-1.5 font-mono text-[11px] text-faint">
-                    Live route: https://aurextruckparts.com.au/news/{form.slug || "article-slug"}
+                    Live route: https://www.aurextruckparts.com.au/news/{form.slug || "article-slug"}
                   </p>
                 )}
               </div>

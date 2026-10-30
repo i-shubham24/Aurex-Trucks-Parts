@@ -113,12 +113,8 @@ export default function Contact() {
                 <span className="font-semibold text-steel">Mon – Fri</span>
                 <span className="font-extrabold tabular text-ink">9:00 AM – 5:00 PM</span>
               </div>
-              <div className="flex items-center justify-between gap-2 border-b border-line/60 pb-1">
-                <span className="font-semibold text-steel">Saturday</span>
-                <span className="font-extrabold tabular text-ink">9:00 AM – 12:00 PM</span>
-              </div>
               <div className="flex items-center justify-between gap-2 text-faint pt-0.5">
-                <span>Sunday</span>
+                <span>Sat – Sun</span>
                 <span className="font-bold">Closed</span>
               </div>
             </div>
@@ -169,9 +165,6 @@ export default function Contact() {
                 Send Another Message
               </button>
             </div>
-            <p className="mt-5 text-xs text-faint">
-              Need immediate parts matching? Call our trade desk directly on <a href={COMPANY.phoneHref} className="font-bold text-navy hover:underline">{COMPANY.phone}</a>.
-            </p>
           </div>
         ) : (
           <form className="rounded-md border border-line bg-mist p-5 md:p-7" onSubmit={send}>
@@ -239,8 +232,15 @@ export default function Contact() {
             <li>• VIN checks are free on critical jobs.</li>
           </ul>
           <div className="mt-5 border-t border-gray-700 pt-4">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Prefer to talk?</p>
-            <a href={COMPANY.phoneHref} className="tabular mt-1 block text-xl font-extrabold text-gold">{COMPANY.phone}</a>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-gray-400">What happens next</p>
+            <ol className="mt-3 space-y-3 text-sm text-gray-200">
+              {["We check stock and match the part to your vehicle.", "You get an exact price within 4 business hours.", "Order online, or collect from the Campbellfield counter."].map((step, k) => (
+                <li key={step} className="flex gap-3">
+                  <span className="grid h-5 w-5 shrink-0 place-items-center rounded-sm bg-gold text-[11px] font-extrabold text-ink">{k + 1}</span>
+                  {step}
+                </li>
+              ))}
+            </ol>
           </div>
         </aside>
       </section>

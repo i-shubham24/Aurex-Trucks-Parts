@@ -17,7 +17,6 @@ import {
 import { formatAUD } from "../data/products";
 import { imgFor } from "../data/images";
 import SafeImage from "../components/SafeImage";
-import { useCompany } from "../store/site";
 import { useCart } from "../store/cart";
 import { useAuth } from "../store/auth";
 import { useSite } from "../store/site";
@@ -46,7 +45,6 @@ const PHONE_MSG = "Enter an Australian phone number, e.g. 0412 345 678 or +61 41
 
 export default function Checkout() {
   const { lines, clear, setQty, remove } = useCart();
-  const COMPANY = useCompany();
   const { user, openAuthModal, updateProfile, placeOrder } = useAuth();
   const { settings } = useSite();
   const { notify } = useNotification();
@@ -729,7 +727,7 @@ export default function Checkout() {
           )}
 
           <p className="mt-2 text-center text-[11px] text-faint">
-            Fitment double-checked before dispatch. {COMPANY.phone}.
+            Fitment double-checked before dispatch.
           </p>
         </aside>
       </form>

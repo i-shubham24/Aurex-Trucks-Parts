@@ -3,12 +3,11 @@ import { Link, useSearchParams } from "react-router-dom";
 import {
   CheckCircle2,
   Clock,
-  Phone,
   Send,
   Lock,
   UserCheck,
 } from "lucide-react";
-import { useCompany, useSite } from "../store/site";
+import { useSite } from "../store/site";
 import { useAuth } from "../store/auth";
 import { useNotification } from "../store/notification";
 import { imgFor } from "../data/images";
@@ -23,7 +22,6 @@ export default function TailLiftEnquiry() {
   const { addEnquiry } = useSite();
   const { user, openAuthModal } = useAuth();
   const { notify } = useNotification();
-  const COMPANY = useCompany();
 
   const initialProduct = tailLiftProducts.find((p) => p.sku === requestedSku) || tailLiftProducts[0];
 
@@ -256,9 +254,6 @@ Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
                 <Clock size={14} className="text-primary" /> Response Time
               </span>
               <p className="text-lg font-extrabold text-navy">Within 4 Business Hours</p>
-              <a href={COMPANY.phoneHref} className="flex items-center gap-1.5 text-xs font-bold text-steel hover:text-navy">
-                <Phone size={13} className="text-primary" /> Or call {COMPANY.phone}
-              </a>
             </div>
           </div>
         </div>
@@ -318,25 +313,6 @@ Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
                     <p className="font-extrabold text-ink">{form.serviceType}</p>
                   </div>
                 </div>
-              </div>
-
-              {/* Immediate Call Notice */}
-              <div className="mt-6 flex flex-col items-center justify-between gap-4 rounded-lg border border-gold bg-gold/15 p-5 sm:flex-row">
-                <div className="flex items-center gap-3">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-gold text-ink">
-                    <Phone size={20} />
-                  </span>
-                  <div>
-                    <p className="text-sm font-extrabold text-ink">Need urgent sizing or immediate fleet consultation?</p>
-                    <p className="text-xs text-steel">Our Campbellfield engineering trade counter is standing by.</p>
-                  </div>
-                </div>
-                <a
-                  href={COMPANY.phoneHref}
-                  className="whitespace-nowrap rounded-md bg-ink px-5 py-2.5 text-xs font-extrabold text-white transition-colors hover:bg-navy"
-                >
-                  Call {COMPANY.phone}
-                </a>
               </div>
 
               {/* Action Buttons */}

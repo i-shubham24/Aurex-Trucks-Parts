@@ -280,13 +280,10 @@ export default function Header() {
                         );
                       })}
                     </div>
-                    <div className="flex items-center justify-between gap-4 border-t border-line bg-mist px-4 py-3">
+                    <div className="flex items-center justify-end gap-4 border-t border-line bg-mist px-4 py-3">
                       <Link to="/shop" className="flex items-center gap-1.5 text-sm font-extrabold transition-colors hover:text-navy">
                         Shop all {totalLines || ""} products <ArrowRight size={15} />
                       </Link>
-                      <a href={COMPANY.phoneHref} className="tabular text-[13px] font-bold text-steel transition-colors hover:text-navy">
-                        Can't find a part? {COMPANY.phone}
-                      </a>
                     </div>
                   </div>
                 </div>

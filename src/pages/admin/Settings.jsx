@@ -322,7 +322,7 @@ export default function Settings() {
                 type="text"
                 value={form.hours || ""}
                 onChange={handleChange("hours", "text")}
-                placeholder="Mon-Fri 7:00 AM - 5:00 PM AEST"
+                placeholder="Mon – Fri: 9:00 AM – 5:00 PM"
                 className="h-11 w-full rounded-lg border border-line bg-white px-3.5 text-sm font-medium text-ink outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/20"
               />
             </div>
@@ -397,7 +397,7 @@ export default function Settings() {
                 type="text"
                 value={form.announcement || ""}
                 onChange={handleChange("announcement", "text")}
-                placeholder="Campbellfield VIC Warehouse Open - Trade Counters Mon-Fri 7am-5pm | Same-day dispatch Australia-wide"
+                placeholder="Campbellfield VIC Warehouse Open - Trade Counters Mon-Fri 9am-5pm | Same-day dispatch Australia-wide"
                 className="h-11 w-full rounded-lg border border-line bg-white px-3.5 text-sm font-medium text-ink outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/20"
               />
             </div>

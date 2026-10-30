@@ -25,7 +25,7 @@ export default function CompareTray() {
 
   const priced = items.filter((p) => p.price != null);
   const bestSku = priced.length ? priced.reduce((a, b) => (a.price <= b.price ? a : b)).sku : null;
-  const topRated = [...items].sort((a, b) => (b.rating || 0) - (a.rating || 0))[0]?.sku;
+  const topRated = [...items].filter((p) => p.reviews || p.reviewCount).sort((a, b) => (b.rating || 0) - (a.rating || 0))[0]?.sku;
 
   const rows = [
     {
@@ -47,7 +47,9 @@ export default function CompareTray() {
     },
     {
       label: "Rating",
-      render: (p) => (
+      render: (p) => !(p.reviews || p.reviewCount) ? (
+        <span className="text-xs text-faint">No reviews yet</span>
+      ) : (
         <span className="inline-flex items-center gap-1.5">
           <span className="flex">
             {[1, 2, 3, 4, 5].map((s) => (

@@ -9,7 +9,7 @@ export const NEWS = [
       { h: "Picking the right capacity", p: "Match the lift to body type, pallet weight and lift height, not just the badge on the door. Most general-freight rigids suit a 2T lift. Heavy pallet, beverage or building-supply work calls for 3T steel. Vans and light rigids are best served by 1.5T aluminium, which saves tare weight for payload." },
       { h: "Voltage, platform and controls", p: "All Aurex lifts run 12V or 24V electro-hydraulics to suit the truck's system. Platform widths follow the W2450 standard with heights from 2200 to 2600mm. Foot controllers come standard, with hand controllers and wireless options on request." },
       { h: "VIN-matched before dispatch", p: "Send your VIN, body measurements and a photo of the rear frame. Our counter confirms voltage, platform size and bracket geometry before a lift leaves Campbellfield, and every consignment carries its fitting checklist." },
-      { list: ["Free VIN and fitment check on every tail lift order", "Same-day dispatch on stocked lines ordered by 2pm", "Fitting support on +61 414 730 467 during business hours", "Warranty support with parts ex VIC stock"] },
+      { list: ["Free VIN and fitment check on every tail lift order", "Same-day dispatch on stocked lines ordered by 2pm", "Fitting support from the counter during business hours", "Warranty support with parts ex VIC stock"] },
     ],
   },
   {

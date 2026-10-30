@@ -59,6 +59,8 @@ export function PartVisual({ p }) {
 }
 
 function Stars({ rating, reviews }) {
+  /* Unreviewed parts keep the row's height so prices stay aligned across the grid. */
+  if (!reviews) return <span className="mt-1 block h-4" aria-hidden="true" />;
   return (
     <span className="mt-1 flex items-center gap-1.5 text-[11px]">
       <span className="flex text-gold">
@@ -232,7 +234,7 @@ export default function ProductCard({ p, joined }) {
           </h3>
         </Link>
         <p className="mt-1 truncate text-[12.5px] text-steel">{p.fit}</p>
-        <Stars rating={p.rating || 4.6} reviews={p.reviews || 12} />
+        <Stars rating={p.rating} reviews={p.reviews} />
 
         {/* Clean bottom row: only compare on desktop and price / enquiry text. NO extra cart or msg icons here. */}
         <div className="mt-2 flex items-center justify-between gap-2">

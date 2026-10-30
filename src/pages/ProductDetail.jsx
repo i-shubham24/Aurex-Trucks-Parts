@@ -1,8 +1,8 @@
 import { Link, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Award, CheckCircle2, Minus, Phone, Plus, Ruler, ShieldCheck, Truck, ShoppingCart, ZoomIn, Star, Mail, Layers, Check } from "lucide-react";
+import { Award, CheckCircle2, Minus, Plus, Ruler, ShieldCheck, Truck, ShoppingCart, ZoomIn, Star, Mail, Layers, Check } from "lucide-react";
 import { formatAUD } from "../data/products";
-import { useCompany, useSite } from "../store/site";
+import { useSite } from "../store/site";
 import { imgFor, productImages } from "../data/images";
 import SafeImage from "../components/SafeImage";
 import { cld } from "../utils/img";
@@ -12,6 +12,7 @@ import { useProduct } from "../hooks/api/useProducts";
 import { useProductReviews } from "../hooks/api/useReviews";
 import ProductDetailSkeleton from "../components/ProductDetailSkeleton";
 import QuoteEnquiryModal from "../components/QuoteEnquiryModal";
+import { CATEGORY_NAMES, subContentFor, subSlug } from "../data/seoContent";
 
 function ProductImageZoom({ src, alt, isTailLift }) {
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
@@ -205,7 +206,6 @@ const SIZE_FAMILIES = [
 
 export default function ProductDetail() {
   const { sku } = useParams();
-  const COMPANY = useCompany();
   const { settings } = useSite();
   const freeOver = formatAUD(settings.freeFreightOver || 200);
 
@@ -215,6 +215,17 @@ export default function ProductDetail() {
 
   const { data: reviewsData } = useProductReviews(sku);
   const reviewsList = reviewsData?.reviews || [];
+  /* The score comes from approved reviews on file, never from the product's stored counters alone. */
+  const reviewCount = reviewsList.length;
+  const avgRating = reviewCount
+    ? Math.round((reviewsList.reduce((sum, r) => sum + (r.rating || 0), 0) / reviewCount) * 10) / 10
+    : 0;
+  const starRow = (
+    <>
+      {"★".repeat(Math.round(avgRating))}
+      <span className="text-line-dark">{"★".repeat(5 - Math.round(avgRating))}</span>
+    </>
+  );
 
   const { lines, add, setQty: setCartQty, setOpen, compare, toggleCompare } = useCart();
   const [qty, setQty] = useState(1);
@@ -256,9 +267,6 @@ export default function ProductDetail() {
           <button onClick={() => refetch()} disabled={isFetching} className="rounded bg-gold px-6 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white disabled:opacity-60">
             {isFetching ? "Trying again…" : "Try again"}
           </button>
-          <a href={COMPANY.phoneHref} className="rounded border border-ink px-6 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-ink hover:text-white">
-            Call {COMPANY.phone}
-          </a>
         </div>
       </main>
     );
@@ -273,9 +281,6 @@ export default function ProductDetail() {
           <Link to="/shop" className="rounded bg-gold px-6 py-2.5 text-sm font-bold text-ink hover:bg-navy hover:text-white transition-colors">
             Shop All Products
           </Link>
-          <a href={COMPANY.phoneHref} className="rounded border border-ink px-6 py-2.5 text-sm font-bold text-ink hover:bg-ink hover:text-white transition-colors">
-            Call {COMPANY.phone}
-          </a>
         </div>
       </main>
     );
@@ -377,7 +382,12 @@ export default function ProductDetail() {
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">
-      <p className="text-[12px] text-faint"><Link to="/" className="hover:text-navy hover:underline">Home</Link> / <Link to="/shop" className="hover:text-navy hover:underline">Shop</Link> / <span className="font-semibold text-ink">{p.sku}</span></p>
+      <p className="text-[12px] text-faint">
+        <Link to="/" className="hover:text-navy hover:underline">Home</Link> / <Link to="/shop" className="hover:text-navy hover:underline">Shop</Link> /{" "}
+        {p.categorySlug && <><Link to={`/shop/${p.categorySlug}`} className="hover:text-navy hover:underline">{CATEGORY_NAMES[p.categorySlug] || p.categorySlug}</Link> /{" "}</>}
+        {p.categorySlug && subContentFor(p.categorySlug, subSlug(p.sub)) && <><Link to={`/shop/${p.categorySlug}/${subSlug(p.sub)}`} className="hover:text-navy hover:underline">{p.sub}</Link> /{" "}</>}
+        <span className="font-semibold text-ink">{p.sku}</span>
+      </p>
       <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-10">
         <div className="space-y-3.5 md:sticky md:top-24 self-start">
           <div className="relative overflow-hidden rounded-md border border-line bg-white shadow-xs">
@@ -431,20 +441,22 @@ export default function ProductDetail() {
           <div>
             <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-faint">{p.sub} . {p.sku}</p>
             <h1 className="mt-1 text-2xl font-extrabold leading-tight tracking-tight sm:text-3xl md:text-4xl">{p.name}</h1>
-            <button 
-              type="button"
-              onClick={() => {
-                setTab("reviews");
-                const el = document.getElementById("product-detail-tabs");
-                if (el) el.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="mt-2 flex items-center gap-1.5 text-[13px] hover:opacity-80 transition-opacity text-left"
-              aria-label="View customer reviews"
-            >
-              <span className="text-gold">{"★★★★★"}</span>
-              <span className="font-bold">{p.rating}</span>
-              <span className="text-faint underline decoration-line/80 underline-offset-2">({reviewsList.length || p.reviews} reviews)</span>
-            </button>
+            {reviewCount > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setTab("reviews");
+                  const el = document.getElementById("product-detail-tabs");
+                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="mt-2 flex items-center gap-1.5 text-[13px] hover:opacity-80 transition-opacity text-left"
+                aria-label="View customer reviews"
+              >
+                <span className="text-gold">{starRow}</span>
+                <span className="font-bold">{avgRating}</span>
+                <span className="text-faint underline decoration-line/80 underline-offset-2">({reviewCount} {reviewCount === 1 ? "review" : "reviews"})</span>
+              </button>
+            )}
           </div>
 
           {(p.specs?.Certification || p.specs?.['Australian Standard']) && (
@@ -567,12 +579,6 @@ export default function ProductDetail() {
                       <Mail size={16} /> Email info@aurextruckparts.com.au →
                     </a>
                   )}
-                  <a
-                    href={COMPANY.phoneHref}
-                    className="flex w-full items-center justify-center gap-2 rounded bg-ink py-3 text-sm font-bold text-white transition-colors hover:bg-navy"
-                  >
-                    <Phone size={16} className="text-gold" /> Call {COMPANY.phone}
-                  </a>
                 </div>
                 <p className="mt-2.5 text-center font-mono text-[11px] text-faint">RESPONSE IN 4 BUSINESS HOURS</p>
               </>
@@ -652,7 +658,7 @@ export default function ProductDetail() {
             ...(p.dhollandiaSpecs ? [["characteristics", "Characteristics & Architecture"]] : []),
             ["fitment", "Fitment & Standards"],
             ["freight", "Freight & Delivery"],
-            ["reviews", `Customer Reviews (${reviewsList.length || p.reviews || 0})`],
+            ["reviews", `Customer Reviews (${reviewCount})`],
           ].map(([t, label]) => (
             <button key={t} onClick={() => setTab(t)} className={`shrink-0 px-4 sm:px-5 py-3 text-xs sm:text-sm font-bold transition-colors ${tab === t ? "bg-white text-navy shadow-[inset_0_2px_0_#002049]" : "text-steel hover:text-ink"}`}>{label}</button>
           ))}
@@ -823,36 +829,38 @@ export default function ProductDetail() {
                   <p>All Aurex cantilever tail lifts are engineered to meet Australian rear underrun safety and commercial vehicle hoist guidelines. Provide your chassis model, overhang, and bed height for engineering sign-off before dispatch.</p>
                 </div>
               )}
-              <p>Check measurements against your old part, or send our VIC desk your VIN on <a className="font-bold text-navy underline" href={COMPANY.phoneHref}>{COMPANY.phone}</a>.</p>
+              <p>Check measurements against your old part, or send our VIC desk your VIN through the <Link className="font-bold text-navy underline" to="/contact">contact form</Link>.</p>
             </div>
           )}
           {tab === "freight" && <p className="max-w-3xl text-sm leading-6 text-steel">Order by 2pm for same day dispatch ex Campbellfield. Free road freight over {freeOver}. Unused parts in original packaging can be returned within 30 days, see our <Link className="font-bold text-navy underline" to="/policies?tab=returns">returns policy</Link>.</p>}
           {tab === "reviews" && (
             <div className="space-y-6">
               {/* Ratings Summary Bar */}
-              <div className="flex flex-col gap-6 rounded-lg border border-line bg-mist/40 p-6 md:flex-row md:items-center md:justify-between">
-                <div className="flex items-center gap-5">
-                  <div className="text-center">
-                    <span className="text-4xl font-extrabold text-ink">{p.rating}</span>
-                    <span className="block text-xs font-semibold text-faint">out of 5</span>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-1 text-gold text-lg">
-                      {"★★★★★"}
+              {reviewCount > 0 && (
+                <div className="flex flex-col gap-6 rounded-lg border border-line bg-mist/40 p-6 md:flex-row md:items-center md:justify-between">
+                  <div className="flex items-center gap-5">
+                    <div className="text-center">
+                      <span className="text-4xl font-extrabold text-ink">{avgRating}</span>
+                      <span className="block text-xs font-semibold text-faint">out of 5</span>
                     </div>
-                    <p className="mt-1 text-xs text-steel">
-                      Based on <strong className="text-ink">{reviewsList.length || p.reviews || 0} genuine reviews</strong> from verified Australian fleets & workshops
-                    </p>
+                    <div>
+                      <div className="flex items-center gap-1 text-gold text-lg">
+                        {starRow}
+                      </div>
+                      <p className="mt-1 text-xs text-steel">
+                        Based on <strong className="text-ink">{reviewCount} {reviewCount === 1 ? "review" : "reviews"}</strong> from Aurex customers
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 rounded-md bg-white border border-line p-3 text-xs text-steel max-w-sm">
+                    <ShieldCheck size={18} className="shrink-0 text-emerald-600" />
+                    <span>
+                      <strong>Genuine Verified Purchase:</strong> Ratings are verified and submitted by account holders after orders are successfully delivered.
+                    </span>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-2 rounded-md bg-white border border-line p-3 text-xs text-steel max-w-sm">
-                  <ShieldCheck size={18} className="shrink-0 text-emerald-600" />
-                  <span>
-                    <strong>Genuine Verified Purchase:</strong> Ratings are verified and submitted by account holders after orders are successfully delivered.
-                  </span>
-                </div>
-              </div>
+              )}
 
               {/* Reviews List */}
               {reviewsList.length > 0 ? (

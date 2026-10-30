@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
-import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, ClipboardCheck, Headset, Phone, Truck } from "lucide-react";
+import { HOME_CONTENT } from "../data/seoContent";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, ClipboardCheck, Headset, Truck } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { FAQS } from "../data/company";
 import { useCompany, useSite } from "../store/site";
 import { NEWS, TESTIMONIALS } from "../data/content";
-import { PHOTO, blogImage } from "../data/images";
+import { PHOTO, blogImage, imgFor } from "../data/images";
 import { useCart } from "../store/cart";
 import ProductCard from "../components/ProductCard";
 import LazySection from "../components/LazySection";
@@ -70,6 +71,7 @@ function Hero() {
     <section className="mx-auto max-w-7xl px-4 pt-4">
       <div className="relative grid grid-cols-1 overflow-hidden rounded-lg bg-mist md:grid-cols-2 md:items-center">
         <div className="px-6 py-12 md:px-12 md:py-16" key={`t-${i}-${s.id || s.title}`}>
+          {/* The current slide's title is the page's only H1 (one slide renders at a time). */}
           <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight md:text-[56px]">{s.title}</h1>
           <p className="mt-3 max-w-sm text-[15px] leading-6 text-steel">{s.subtitle || s.sub}</p>
           <div className="mt-6 flex gap-2.5 sm:gap-3">
@@ -205,17 +207,37 @@ const TABS = [
   { id: "tail-lifts", label: "Tail Lifts" },
 ];
 
+/* Category grids draw from a larger pool so they can show the range, not the first ten SKUs (which in
+   trailer parts are all rear marking plates). */
+const HOME_POOL = 60;
+
+/* One of each part type, then a second of each, and so on, so a grid reads as a wide range rather than ten
+   of one thing. Signage goes last: a row of red/yellow marker plates swamps everything around it. */
+function mixTypes(list) {
+  const groups = new Map();
+  for (const p of list) {
+    const key = /signage|marker/i.test(p.sub || "") ? "~signage" : p.sub || p.category;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(p);
+  }
+  const queues = [...groups].sort(([a], [b]) => (a === "~signage") - (b === "~signage")).map(([, items]) => items);
+  const out = [];
+  for (let round = 0; out.length < list.length; round++) {
+    for (const q of queues) if (q[round]) out.push(q[round]);
+  }
+  return out;
+}
+
 function Arrivals() {
   const [tab, setTab] = useState("best");
 
-  const queryParams = {
-    category: tab === "best" ? undefined : tab,
-    sort: tab === "best" ? "popular" : "newest",
-    limit: 10,
-  };
+  // Best sellers are the parts ticked "Best Seller" in the admin (the API's popular sort puts them first).
+  const queryParams = tab === "best"
+    ? { sort: "popular", limit: 10 }
+    : { category: tab, limit: HOME_POOL };
 
   const { data, isLoading } = useProducts(queryParams);
-  const items = data?.products || [];
+  const items = useMemo(() => mixTypes(data?.products || []).slice(0, 10), [data]);
 
   return (
     <section id="bestsellers" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-10">
@@ -318,11 +340,14 @@ function LiftsBand() {
 }
 
 function TrailerBlock() {
-  const { data, isLoading } = useProducts({ category: "trailer-parts", limit: 10 });
+  // Same pool as the Trailer Parts tab above (one request), showing the next ten so the two don't repeat.
+  const { data, isLoading } = useProducts({ category: "trailer-parts", limit: HOME_POOL });
   const { data: categories = [] } = useCategories();
   const trailerCat = categories.find((c) => c.slug === "trailer-parts");
-  const COMPANY = useCompany();
-  const parts = data?.products || [];
+  const parts = useMemo(() => {
+    const mixed = mixTypes(data?.products || []);
+    return mixed.length >= 20 ? mixed.slice(10, 20) : mixed.slice(0, 10);
+  }, [data]);
   const totalCount = trailerCat?.count ?? trailerCat?.productCount ?? data?.pagination?.total ?? (parts.length > 0 ? parts.length : 114);
 
   return (
@@ -331,11 +356,7 @@ function TrailerBlock() {
         <div>
           <h2 className="text-2xl font-extrabold tracking-tight md:text-[28px]">Commercial Trailer Parts & Hardware</h2>
           <p className="mt-1 max-w-xl text-[13px] text-steel">
-            Heavy-duty hinges, locks, door seals, rollers, and fasteners in stock VIC. Call{" "}
-            <a className="font-bold text-primary hover:underline" href={COMPANY.phoneHref}>
-              {COMPANY.phone}
-            </a>{" "}
-            or order online for same-day dispatch ex Campbellfield.
+            Heavy-duty hinges, locks, door seals, rollers, and fasteners in stock VIC. Order online by 2pm for same-day dispatch ex Campbellfield.
           </p>
         </div>
         <Link
@@ -362,7 +383,6 @@ function TrailerBlock() {
 }
 
 function CounterBand() {
-  const COMPANY = useCompany();
   const { data: categories = [] } = useCategories();
   const totalLines = categories.reduce((sum, c) => sum + (c.count ?? c.productCount ?? 0), 0) || 136;
 
@@ -383,7 +403,7 @@ function CounterBand() {
               <div className="rounded-md border border-line bg-white p-3.5 shadow-xs">
                 <p className="font-mono text-xs font-bold uppercase text-primary">Trade Desk Hours</p>
                 <p className="mt-1 text-sm font-bold text-ink">Mon – Fri: 9:00am – 5:00pm</p>
-                <p className="text-xs text-steel">Saturday: 9:00am – 12:00pm</p>
+                <p className="text-xs text-steel">Closed weekends</p>
               </div>
               <div className="rounded-md border border-line bg-white p-3.5 shadow-xs">
                 <p className="font-mono text-xs font-bold uppercase text-primary">Daily Dispatch</p>
@@ -393,16 +413,9 @@ function CounterBand() {
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <a
-                href={COMPANY.phoneHref}
-                className="inline-flex items-center gap-2 rounded-md bg-ink px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-navy"
-              >
-                <Phone size={15} />
-                Call Trade Desk: {COMPANY.phone}
-              </a>
               <Link
                 to="/contact"
-                className="inline-flex items-center gap-1.5 rounded-md border border-ink bg-white px-5 py-3 text-sm font-bold text-ink transition-colors hover:bg-gold hover:border-gold"
+                className="inline-flex items-center gap-1.5 rounded-md bg-ink px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-navy"
               >
                 Directions & Hours <ArrowRight size={14} />
               </Link>
@@ -434,7 +447,6 @@ const TAG_LINKS = { "Tail Lifts": "/shop/tail-lifts", "Trailer Parts": "/shop/tr
 const articleHref = (n) => (n.slug ? `/news/${n.slug}` : TAG_LINKS[n.tag] || "/shop");
 
 function Blog() {
-  const COMPANY = useCompany();
   const { data: blogData, isLoading } = useBlogs({ limit: 4 });
   const posts = blogData?.blogs && blogData.blogs.length > 0 ? blogData.blogs : NEWS.slice(0, 4);
   const [lead, ...rest] = posts;
@@ -505,10 +517,10 @@ function Blog() {
               </span>
             </Link>
           ))}
-          <a href={COMPANY.phoneHref} className="flex items-center justify-between gap-3 rounded-md border border-gold bg-gold/15 px-5 py-4 transition-colors hover:bg-gold/25">
+          <Link to="/contact" className="flex items-center justify-between gap-3 rounded-md border border-gold bg-gold/15 px-5 py-4 transition-colors hover:bg-gold/25">
             <span className="text-[15px] font-extrabold text-ink">After something older? Ask the counter.</span>
-            <span className="tabular shrink-0 font-mono text-[11px] font-bold text-navy">{COMPANY.phone}</span>
-          </a>
+            <ArrowRight size={16} className="shrink-0 text-navy" />
+          </Link>
         </div>
       </div>
     </section>
@@ -516,13 +528,12 @@ function Blog() {
 }
 
 function Trust() {
-  const COMPANY = useCompany();
   const { settings } = useSite();
   const items = [
     [Truck, "Daily Freight Australia Wide", `Order by 2pm. Free road freight over ${formatAUD(settings.freeFreightOver || 200)}.`],
     [ClipboardCheck, "Quotes in 4 Business Hours", "Send VIN or photos for an exact price."],
     [BadgeCheck, "VIN Matched Catalogue", "Every line crossed to make, model and OEM."],
-    [Headset, "Talk to a Specialist", `${COMPANY.phone}. Real advice, no scripts.`],
+    [Headset, "Talk to a Specialist", "Real advice from the counter, no scripts."],
   ];
   return (
     <section className="mx-auto max-w-7xl px-4 pt-10">
@@ -539,25 +550,40 @@ function Trust() {
   );
 }
 
+/* The same testimonial saved more than once would make the carousel look stuck on one slide. */
+const uniqueTestimonials = (list) => {
+  const seen = new Set();
+  return list.filter((t) => {
+    const key = `${t.name}|${t.quote}`.toLowerCase().replace(/\s+/g, " ").trim();
+    if (!t.quote || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
 function Reviews() {
   const { data: dbTestimonials } = useTestimonials();
-  const items = (dbTestimonials && dbTestimonials.length > 0) ? dbTestimonials : TESTIMONIALS;
-  const [i, setI] = useState(0);
+  const fromDb = uniqueTestimonials(dbTestimonials || []);
+  const items = fromDb.length > 0 ? fromDb : TESTIMONIALS;
+  const [current, setI] = useState(0);
   const [paused, setPaused] = useState(false);
+  const i = current % items.length;
+  // Advances on its own; a click on an arrow or dot restarts the countdown from that slide.
   useEffect(() => {
-    if (paused) return;
-    const id = setInterval(() => setI((v) => (v + 1) % items.length), 7000);
-    return () => clearInterval(id);
-  }, [paused, items.length]);
-  const r = items[i] || items[0];
+    if (paused || items.length < 2) return;
+    const id = setTimeout(() => setI((i + 1) % items.length), 6000);
+    return () => clearTimeout(id);
+  }, [i, paused, items.length]);
+  const r = items[i];
   const initials = (r?.name || 'Aurex').split(" ").map((w) => w[0]).slice(0, 2).join("");
   return (
     <section id="reviews" className="mt-12 scroll-mt-24 overflow-hidden bg-ink py-14 text-white">
-      <div className="mx-auto max-w-4xl px-4 text-center" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+      {/* Holds still only while a keyboard user is on the controls; mouse hover and taps don't stop it. */}
+      <div className="mx-auto max-w-4xl px-4 text-center" onFocus={(e) => setPaused(e.target.matches(":focus-visible"))} onBlur={() => setPaused(false)}>
 
         <p className="flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-[0.24em] text-gold"><span className="inline-block h-4 w-1.5 bg-gold" />Reviews</p>
         <h2 className="mt-1.5 text-2xl font-extrabold tracking-tight text-white md:text-[28px]">Trusted at Counters Across the Country</h2>
-        <div key={i} className="mt-6">
+        <div key={i} className="fade-in mt-6">
           <p className="font-serif text-6xl leading-none text-gold">“</p>
           <blockquote className="-mt-4 text-xl font-medium leading-8 text-white md:text-2xl md:leading-10">{r.quote}</blockquote>
           <div className="mt-5 flex items-center justify-center gap-1 text-gold">
@@ -587,7 +613,6 @@ function Reviews() {
 
 function Faq() {
   const [open, setOpen] = useState(0);
-  const COMPANY = useCompany();
   const { settings } = useSite();
   const freeOver = formatAUD(settings.freeFreightOver || 200);
   return (
@@ -597,8 +622,7 @@ function Faq() {
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">FAQ</p>
           <h2 className="mt-1 text-2xl font-extrabold tracking-tight md:text-[28px]">Straight Answers</h2>
           <p className="mt-2 text-sm leading-6 text-steel">The questions we hear at the counter every week. Anything else, call and ask.</p>
-          <a href={COMPANY.phoneHref} className="mt-4 flex items-center justify-center gap-2 rounded-md bg-ink py-3 text-sm font-bold text-white transition-colors hover:bg-navy"><Phone size={15} /> {COMPANY.phone}</a>
-          <Link to="/contact" className="mt-2 block rounded-md border border-line-dark py-3 text-center text-sm font-bold transition-colors hover:border-navy hover:text-navy">Contact Page →</Link>
+          <Link to="/contact" className="mt-4 block rounded-md bg-ink py-3 text-center text-sm font-bold text-white transition-colors hover:bg-navy">Contact Page →</Link>
         </div>
         <div className="divide-y divide-line rounded-md border border-line bg-white">
           {FAQS.map((f, k) => {
@@ -622,9 +646,73 @@ function Faq() {
   );
 }
 
+/* Overview of the range: the copy on the left, a photo tile per part type on the right linking into the type
+   pages. Not lazy: crawlers should see the text and links. */
+function HomeIntro() {
+  const COMPANY = useCompany();
+  const tiles = HOME_CONTENT.links.filter(([, , sku]) => sku);
+  const extras = HOME_CONTENT.links.filter(([, , sku]) => !sku);
+  return (
+    <section className="mx-auto max-w-7xl px-4 pt-12">
+      <div className="grid grid-cols-1 gap-8 rounded-lg bg-mist p-5 md:p-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-10">
+        <div>
+          <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.24em] text-primary"><span className="inline-block h-4 w-1.5 bg-gold" />The Range</p>
+          <h2 className="mt-1.5 text-2xl font-extrabold leading-tight tracking-tight md:text-[28px]">{HOME_CONTENT.heading}</h2>
+          {HOME_CONTENT.paragraphs.map((p) => (
+            <p key={p.slice(0, 24)} className="mt-3 text-sm leading-6 text-steel">{p.replace("{address}", COMPANY.address)}</p>
+          ))}
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link to="/shop" className="inline-flex items-center gap-1.5 rounded-md bg-gold px-5 py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white">
+              Shop all parts <ArrowRight size={15} />
+            </Link>
+            {extras.map(([label, to]) => (
+              <Link key={to} to={to} className="inline-flex items-center rounded-md border border-ink bg-white px-5 py-3 text-sm font-bold text-ink transition-colors hover:border-navy hover:bg-navy hover:text-white">
+                Read our {label.toLowerCase()}
+              </Link>
+            ))}
+          </div>
+        </div>
+        <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 xl:grid-cols-4">
+          {tiles.map(([label, to, sku]) => (
+            <li key={to}>
+              <Link to={to} className="group flex h-full flex-col overflow-hidden rounded-md border border-line bg-white transition-colors hover:border-gold">
+                <span className="block aspect-square overflow-hidden bg-white">
+                  <img src={imgFor(sku)} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain p-3 transition-transform duration-300 group-hover:scale-105" />
+                </span>
+                <span className="flex flex-1 items-center justify-between gap-1.5 border-t border-line px-3 py-2.5 text-[13px] font-extrabold leading-tight text-ink">
+                  {label}
+                  <ArrowRight size={14} className="shrink-0 text-faint transition-colors group-hover:text-navy" />
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+/* FAQPage markup mirrors the visible FAQ word for word, and only on the page that shows it.
+   Rendered outside the lazy section so crawlers get it without scrolling. */
+function FaqSchema() {
+  const { settings } = useSite();
+  const freeOver = formatAUD(settings.freeFreightOver || 200);
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQS.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a.split("$500").join(freeOver) },
+    })),
+  };
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }} />;
+}
+
 export default function Home() {
   return (
     <main>
+      <FaqSchema />
       <Hero />
       <Tiles />
       <Arrivals />
@@ -634,6 +722,7 @@ export default function Home() {
       <LazySection minHeight={560}><Blog /></LazySection>
       <LazySection minHeight={220}><Trust /></LazySection>
       <LazySection id="reviews" minHeight={460}><Reviews /></LazySection>
+      <HomeIntro />
       <LazySection id="faq" minHeight={520}><Faq /></LazySection>
     </main>
   );

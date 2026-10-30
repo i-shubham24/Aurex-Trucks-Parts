@@ -25,6 +25,8 @@ const CategoryByParam = lazy(() => import("./pages/Shop").then((m) => ({ default
 const Policies = lazy(() => import("./pages/Policies"));
 const ProductDetail = lazy(() => import("./pages/ProductDetail"));
 const Article = lazy(() => import("./pages/Article"));
+const Guide = lazy(() => import("./pages/Guides"));
+const GuidesIndex = lazy(() => import("./pages/Guides").then((m) => ({ default: m.GuidesIndex })));
 const Checkout = lazy(() => import("./pages/Checkout"));
 const OrderSuccess = lazy(() => import("./pages/OrderSuccess"));
 const Orders = lazy(() => import("./pages/Account"));
@@ -96,6 +98,13 @@ function AuthRedirect({ mode = "login" }) {
   return <Navigate to={redirect} replace />;
 }
 
+/* Delivered-order emails sent before the fix link to /account?tab=orders&rate=<order>; the orders page is /orders. */
+function AccountRedirect() {
+  const [searchParams] = useSearchParams();
+  const rate = searchParams.get("rate");
+  return <Navigate to={rate ? `/orders?rate=${encodeURIComponent(rate)}` : "/orders"} replace />;
+}
+
 /**
  * Storefront chrome (header / cart / footer / popups) must NEVER render
  * inside the admin area. Admin login + dashboard are a totally separate
@@ -161,15 +170,20 @@ function Shell() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/tail-lift-enquiry" element={<TailLiftEnquiry />} />
-        <Route path="/enquiry/tail-lift" element={<TailLiftEnquiry />} />
+        {/* Old alias: vercel.json 301s it too, so only one URL gets indexed. */}
+        <Route path="/enquiry/tail-lift" element={<Navigate to="/tail-lift-enquiry" replace />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/shop/:slug" element={<CategoryByParam />} />
+        <Route path="/shop/:slug/:sub" element={<CategoryByParam />} />
+        <Route path="/guides" element={<GuidesIndex />} />
+        <Route path="/guides/:slug" element={<Guide />} />
         <Route path="/policies" element={<Policies />} />
         <Route path="/product/:sku" element={<ProductDetail />} />
         <Route path="/news/:slug" element={<Article />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/order-success/:id" element={<OrderSuccess />} />
         <Route path="/orders" element={<Orders />} />
+        <Route path="/account" element={<AccountRedirect />} />
         <Route path="/profile" element={<ProfileBody />} />
         <Route path="/track" element={<Track />} />
         <Route path="/login" element={<AuthRedirect mode="login" />} />

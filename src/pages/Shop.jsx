@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
-import { useCompany } from "../store/site";
+import { CATEGORY_CONTENT, SUB_CONTENT, subContentFor, subSlug } from "../data/seoContent";
+import { guideFor } from "../data/guides";
 import ProductCard from "../components/ProductCard";
 import ThemeSelect from "../components/ThemeSelect";
 import { useCategories, DEFAULT_CATEGORIES } from "../hooks/api/useCategories";
@@ -12,8 +13,72 @@ import { makeMatcher } from "../utils/search";
 // Part-number order: ATP-ACC-01, -02 … then ATP-TL-…, ATP-TP-… (numeric, so -99 sorts before -100).
 const bySku = (a, b) => String(a.sku).localeCompare(String(b.sku), "en", { numeric: true });
 
-export default function Shop({ preset }) {
-  const COMPANY = useCompany();
+/* Copy below the grid: buying notes, FAQs, links to each type's page and to guides (src/data/seoContent.js). */
+function ShelfContent({ slug, subEntry, categories }) {
+  const content = subEntry || (slug ? CATEGORY_CONTENT[slug] : null);
+  const typeLinks = Object.entries(SUB_CONTENT)
+    .filter(([key]) => !slug || key.startsWith(`${slug}/`))
+    .filter(([, entry]) => entry !== subEntry);
+  const guides = (content?.guides || []).map(guideFor).filter(Boolean);
+  const catName = (s) => categories.find((c) => c.slug === s)?.name || s;
+
+  return (
+    <section className="mt-12 grid gap-8 border-t border-line pt-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div>
+        {content && (
+          <>
+            <h2 className="text-xl font-extrabold tracking-tight">{subEntry ? `${subEntry.title}: what to know` : content.heading}</h2>
+            <div className="mt-3 space-y-3 text-sm leading-6 text-steel">
+              {content.notes.map((n) => <p key={n}>{n}</p>)}
+            </div>
+            {content.faqs?.length > 0 && (
+              <div className="mt-6">
+                <h2 className="text-lg font-extrabold tracking-tight">Common questions</h2>
+                <dl className="mt-3 divide-y divide-line rounded-md border border-line bg-white">
+                  {content.faqs.map((f) => (
+                    <div key={f.q} className="px-4 py-3">
+                      <dt className="text-sm font-bold text-ink">{f.q}</dt>
+                      <dd className="mt-1 text-sm leading-6 text-steel">{f.a}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+      <aside className="space-y-6">
+        {guides.length > 0 && (
+          <div>
+            <h2 className="text-sm font-extrabold uppercase tracking-wide text-ink">Guides</h2>
+            <ul className="mt-2 space-y-2 text-sm">
+              {guides.map((g) => (
+                <li key={g.slug}><Link to={`/guides/${g.slug}`} className="font-semibold text-navy hover:underline">{g.title}</Link></li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {typeLinks.length > 0 && (
+          <div>
+            <h2 className="text-sm font-extrabold uppercase tracking-wide text-ink">{subEntry ? "Other types" : "Shop by type"}</h2>
+            <ul className="mt-2 flex flex-wrap gap-1.5">
+              {typeLinks.map(([key, entry]) => (
+                <li key={key}>
+                  <Link to={`/shop/${key}`} className="inline-block rounded-md bg-mist px-2.5 py-1 text-xs font-bold text-steel transition-colors hover:text-ink">
+                    {slug ? entry.name : `${entry.name} (${catName(key.split("/")[0])})`}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </aside>
+    </section>
+  );
+}
+
+export default function Shop({ preset, subPreset }) {
+  const navigate = useNavigate();
   const { slug: paramSlug } = useParams();
   const [params, setParams] = useSearchParams();
   const slug = preset || paramSlug || null;
@@ -71,9 +136,19 @@ export default function Shop({ preset }) {
     [rawProducts]
   );
 
+  /* Each type on a category has its own crawlable page (/shop/:category/:type), so on a category the
+     Type filter navigates between them; on /shop it still just filters. */
+  const routeSub = subPreset ? subs.find((s) => s !== "All" && subSlug(s) === subPreset) || null : null;
+  const activeSub = subPreset ? routeSub || "All" : sub;
+  const subEntry = slug && subPreset ? subContentFor(slug, subPreset) : null;
+  const onSubChange = (value) => {
+    if (!slug) return setSub(value);
+    navigate(value === "All" ? `/shop/${slug}` : `/shop/${slug}/${subSlug(value)}`);
+  };
+
   const items = useMemo(() => {
     const query = q.toLowerCase().trim();
-    let list = rawProducts.filter((p) => sub === "All" || p.sub === sub);
+    let list = rawProducts.filter((p) => activeSub === "All" || p.sub === activeSub);
     if (avail === "stock") list = list.filter((p) => String(p.status).toLowerCase().includes("in stock") || p.inventory?.stock > 0);
     if (avail === "order") list = list.filter((p) => String(p.status).toLowerCase().includes("order"));
     if (avail === "enquiry") list = list.filter((p) => p.price === null || p.price === 0 || p.isPOA || p.pricing?.isPOA);
@@ -85,7 +160,7 @@ export default function Shop({ preset }) {
     if (sort === "low") list = [...list].sort((a, b) => (a.price ?? 1e12) - (b.price ?? 1e12));
     if (sort === "high") list = [...list].sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
     return list;
-  }, [rawProducts, sub, avail, sort, q]);
+  }, [rawProducts, activeSub, avail, sort, q]);
 
   const PAGE_CHUNK = 24;
   const [visibleCount, setVisibleCount] = useState(PAGE_CHUNK);
@@ -93,7 +168,7 @@ export default function Shop({ preset }) {
 
   useEffect(() => {
     setVisibleCount(PAGE_CHUNK);
-  }, [slug, q, sub, avail, sort]);
+  }, [slug, q, activeSub, avail, sort]);
 
   useEffect(() => {
     if (!sentinelRef.current) return;
@@ -130,6 +205,19 @@ export default function Shop({ preset }) {
     );
   }
 
+  // A type slug that matches none of this category's products.
+  if (subPreset && !isLoading && rawProducts.length > 0 && !routeSub) {
+    return (
+      <main className="mx-auto max-w-7xl px-4 py-16 text-center">
+        <h1 className="text-2xl font-extrabold text-ink">Shelf not found</h1>
+        <p className="mt-2 text-sm text-steel">We couldn't find that type of part{cat ? ` in ${cat.name}` : ""}.</p>
+        <Link to={cat ? `/shop/${cat.slug}` : "/shop"} className="mt-4 inline-block rounded bg-gold px-6 py-2.5 text-sm font-bold text-ink">
+          {cat ? `Shop ${cat.name}` : "Shop all"}
+        </Link>
+      </main>
+    );
+  }
+
   const AVAIL_OPTS = [
     { value: "All", label: "All availability" },
     { value: "stock", label: "In stock VIC" },
@@ -147,13 +235,14 @@ export default function Shop({ preset }) {
       <p className="text-[12px] text-faint">
         <Link to="/" className="hover:text-navy hover:underline">Home</Link> /{" "}
         <Link to="/shop" className="hover:text-navy hover:underline">Shop All</Link>
-        {cat && <> / <span className="font-semibold text-ink">{cat.name}</span></>}
+        {cat && routeSub && <> / <Link to={`/shop/${cat.slug}`} className="hover:text-navy hover:underline">{cat.name}</Link> / <span className="font-semibold text-ink">{routeSub}</span></>}
+        {cat && !routeSub && <> / <span className="font-semibold text-ink">{cat.name}</span></>}
       </p>
       <h1 className="mt-1 text-3xl font-extrabold tracking-tight md:text-4xl">
-        {cat ? cat.name : "Shop All Products"}
+        {subEntry ? subEntry.title : routeSub || (cat ? cat.name : "Shop All Products")}
       </h1>
       <p className="mt-1 max-w-2xl text-sm text-steel">
-        {cat ? cat.blurb : `All commercial lines across tail lifts, trailer parts and accessories.`}
+        {subEntry ? subEntry.intro : cat ? cat.blurb : `All commercial lines across tail lifts, trailer parts and accessories.`}
       </p>
 
       <div className="mt-5 flex flex-wrap items-center gap-2">
@@ -190,7 +279,7 @@ export default function Shop({ preset }) {
           />
         </span>
         <span className="grid grid-cols-2 gap-2 sm:contents">
-          <ThemeSelect value={sub} onChange={setSub} options={subs} label="Type" mega />
+          <ThemeSelect value={activeSub} onChange={onSubChange} options={subs} label="Type" mega />
           <ThemeSelect value={avail} onChange={setAvail} options={AVAIL_OPTS} label="Availability" />
         </span>
         <ThemeSelect value={sort} onChange={setSort} options={SORT_OPTS} label="Sort" align="right" />
@@ -222,17 +311,18 @@ export default function Shop({ preset }) {
           <button
             onClick={() => {
               setQ("");
-              setSub("All");
               setAvail("All");
+              if (subPreset) onSubChange("All");
+              else setSub("All");
             }}
             className="font-bold text-navy underline"
           >
             Clear filters
           </button>{" "}
-          or call{" "}
-          <a className="font-bold text-navy underline" href={COMPANY.phoneHref}>
-            {COMPANY.phone}
-          </a>
+          or{" "}
+          <Link className="font-bold text-navy underline" to="/contact">
+            ask the counter
+          </Link>
           .
         </p>
       ) : (
@@ -259,12 +349,14 @@ export default function Shop({ preset }) {
           )}
         </>
       )}
+
+      {!isLoading && <ShelfContent slug={slug} subEntry={subEntry} categories={categories} />}
     </main>
   );
 }
 
 export function CategoryByParam() {
-  const { slug } = useParams();
+  const { slug, sub } = useParams();
   const { data: categories = [], isLoading, isError, isPlaceholderData } = useCategories();
   const known = categories.some((c) => c.slug === slug);
 
@@ -279,7 +371,7 @@ export function CategoryByParam() {
 
   // If the list failed to load we can't tell the shelf is missing, so show it and let its products load.
   if (known || isError) {
-    return <Shop key={slug} preset={slug} />;
+    return <Shop key={slug} preset={slug} subPreset={sub} />;
   }
 
   return (

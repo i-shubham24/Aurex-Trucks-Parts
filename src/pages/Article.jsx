@@ -1,9 +1,8 @@
 import { useEffect } from "react";
 import { blogImage } from "../data/images";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Phone } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { NEWS } from "../data/content";
-import { useCompany } from "../store/site";
 import ProductCard from "../components/ProductCard";
 import SafeImage from "../components/SafeImage";
 import { useBlog, useBlogs } from "../hooks/api/useBlogs";
@@ -18,7 +17,6 @@ const TAG_CAT = {
 
 export default function Article() {
   const { slug } = useParams();
-  const COMPANY = useCompany();
 
   const { data: blogData, isLoading: blogLoading } = useBlog(slug);
   const { data: allBlogsData } = useBlogs({ limit: 6 });
@@ -121,12 +119,12 @@ export default function Article() {
         </div>
         <div className="mt-8 flex flex-wrap items-center justify-between gap-3 rounded-md bg-ink p-5 text-white">
           <p className="text-[15px] font-extrabold">Talk specs with the counter?</p>
-          <a
-            href={COMPANY.phoneHref}
+          <Link
+            to="/contact"
             className="flex items-center gap-2 rounded bg-gold px-5 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-white"
           >
-            <Phone size={15} /> {COMPANY.phone}
-          </a>
+            Contact the counter
+          </Link>
         </div>
       </article>
 

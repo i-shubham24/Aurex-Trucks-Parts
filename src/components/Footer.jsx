@@ -19,7 +19,7 @@ export default function Footer() {
     <footer className="mt-12 bg-white">
       <div className="mx-auto grid grid-cols-1 max-w-7xl gap-8 px-4 py-10 text-sm md:grid-cols-3">
         <div>
-          <img src="/logo.jpeg" alt="Aurex Truck Parts" className="h-20 w-auto" />
+          <img src="/logo.jpeg" alt="Aurex Truck Parts" className="h-24 w-auto" />
           <p className="mt-3 max-w-xs text-[13px] leading-5 text-steel">VIN matched catalogue for Aussie fleets. Tail lifts, trailer parts and accessories, stocked in Campbellfield and freighted Australia wide.</p>
           <a href={COMPANY.phoneHref} className="mt-3 flex items-center gap-2 text-[15px] font-extrabold transition-colors hover:text-navy"><Phone size={18} className="text-gold" />{COMPANY.phone}</a>
         </div>
@@ -96,6 +96,7 @@ export default function Footer() {
               <li><Link to="/about" className="transition-colors hover:text-navy hover:underline">About Us</Link></li>
               <li><Link to={{ pathname: "/", hash: "#reviews" }} className="transition-colors hover:text-navy hover:underline">Reviews</Link></li>
               <li><Link to={{ pathname: "/", hash: "#faq" }} className="transition-colors hover:text-navy hover:underline">FAQ</Link></li>
+              <li><Link to="/guides" className="transition-colors hover:text-navy hover:underline">Guides</Link></li>
               <li><Link to="/contact" className="transition-colors hover:text-navy hover:underline">Contact</Link></li>
               <li><Link to="/policies?tab=shipping" className="transition-colors hover:text-navy hover:underline">Shipping &amp; Returns</Link></li>
               <li><Link to="/policies?tab=terms" className="transition-colors hover:text-navy hover:underline">Terms &amp; Conditions</Link></li>

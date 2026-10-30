@@ -1,13 +1,291 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/enquiry/tail-lift",
+      "destination": "/tail-lift-enquiry",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-17",
+      "destination": "/product/ATP-TP-119",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-18",
+      "destination": "/product/ATP-TP-120",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-19",
+      "destination": "/product/ATP-TP-121",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-28",
+      "destination": "/product/ATP-TP-130",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-29",
+      "destination": "/product/ATP-TP-131",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-30",
+      "destination": "/product/ATP-TP-132",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-31",
+      "destination": "/product/ATP-TP-133",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-32",
+      "destination": "/product/ATP-TP-134",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-35",
+      "destination": "/product/ATP-TP-137",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-36",
+      "destination": "/product/ATP-TP-138",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-BP-01",
+      "destination": "/product/ATP-ACC-06",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-BP-02",
+      "destination": "/product/ATP-ACC-07",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-BP-03",
+      "destination": "/product/ATP-ACC-08",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-BP-04",
+      "destination": "/product/ATP-ACC-09",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-BP-05",
+      "destination": "/product/ATP-ACC-10",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-BP-06",
+      "destination": "/product/ATP-ACC-11",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-BP-07",
+      "destination": "/product/ATP-ACC-12",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-BP-08",
+      "destination": "/product/ATP-ACC-13",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-BP-09",
+      "destination": "/product/ATP-ACC-14",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-BP-10",
+      "destination": "/product/ATP-ACC-15",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-BP-11",
+      "destination": "/product/ATP-ACC-16",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-TP-38",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-TP-39",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-TP-40",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-TP-41",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-TP-44",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-TP-46",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-TP-51",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-TP-53",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-TP-55",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-TP-56",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-TP-57",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-TP-66",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-TP-93",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-TP-95",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-20",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-21",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-22",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-23",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-24",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-25",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-26",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-27",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-33",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-ACC-34",
+      "destination": "/shop/trailer-parts",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-BP-12",
+      "destination": "/shop/accessories",
+      "statusCode": 301
+    },
+    {
+      "source": "/product/ATP-BP-13",
+      "destination": "/shop/accessories",
+      "statusCode": 301
+    }
+  ],
   "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "https://truck-parts-api.vercel.app/api/v1/sitemap.xml"
+    },
     {
       "source": "/api/:path*",
       "destination": "https://truck-parts-api.vercel.app/api/:path*"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "source": "/(about|contact|policies|tail-lift-enquiry|track|shop|guides|checkout|orders|account|profile|login|signup|forgot-password|reset-password)",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/shop/:slug",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/shop/:slug/:sub",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/product/:sku",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/news/:slug",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/guides/:slug",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/order-success/:id",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/app.html"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "/app.html"
     }
   ],
   "headers": [

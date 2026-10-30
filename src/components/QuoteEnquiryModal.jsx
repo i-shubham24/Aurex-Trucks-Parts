@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { Mail, Phone, Copy, Check, X, ExternalLink, Send, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { Mail, Copy, Check, X, ExternalLink, Send, CheckCircle2 } from "lucide-react";
 import { useNotification } from "../store/notification";
-import { useCompany } from "../store/site";
 import api from "../lib/api";
 
 export default function QuoteEnquiryModal({ isOpen, onClose, product }) {
   const { notify } = useNotification();
-  const COMPANY = useCompany();
   const [copied, setCopied] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -266,20 +264,6 @@ Thank you!`;
                 </button>
               </form>
 
-              {/* Direct Phone Call Footer */}
-              <div className="border-t border-line pt-3 flex items-center justify-between text-xs text-steel">
-                <span className="flex items-center gap-1.5">
-                  <ShieldCheck size={14} className="text-emerald-700" />
-                  Melbourne Trade Counter Direct
-                </span>
-                <a
-                  href={COMPANY.phoneHref}
-                  className="font-bold text-navy hover:underline flex items-center gap-1"
-                >
-                  <Phone size={13} />
-                  Call {COMPANY.phone}
-                </a>
-              </div>
             </>
           )}
         </div>
