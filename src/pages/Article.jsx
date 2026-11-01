@@ -1,19 +1,13 @@
 import { useEffect } from "react";
 import { blogImage } from "../data/images";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { NEWS } from "../data/content";
-import ProductCard from "../components/ProductCard";
+import { GUIDES } from "../data/guides";
 import SafeImage from "../components/SafeImage";
 import { useBlog, useBlogs } from "../hooks/api/useBlogs";
-import { useProducts } from "../hooks/api/useProducts";
-
-const TAG_CAT = {
-  "Tail Lifts": "tail-lifts",
-  "Trailer Parts": "trailer-parts",
-  "Accessories": "accessories",
-  "Tool Boxes": "accessories",
-};
+import { SITE } from "../seo/meta.js";
+import { GuideCard } from "./Guides";
 
 export default function Article() {
   const { slug } = useParams();
@@ -23,10 +17,6 @@ export default function Article() {
 
   // Fallback to static NEWS if API didn't return or while transitioning
   const post = blogData?.blog || NEWS.find((n) => n.slug === slug);
-  const cat = post ? TAG_CAT[post.tag] || post.category || "trailer-parts" : "trailer-parts";
-
-  const { data: productsData } = useProducts({ category: cat, limit: 4 }, { enabled: Boolean(cat) });
-  const related = productsData?.products || [];
 
   const others = (allBlogsData?.blogs || NEWS)
     .filter((n) => n.slug !== slug)
@@ -43,7 +33,7 @@ export default function Article() {
       "@type": "BlogPosting",
       headline: post.title,
       description: post.excerpt,
-      image: blogImage(post),
+      image: new URL(blogImage(post), SITE).href, // schema needs an absolute URL; covers are site-relative
       datePublished: post.publishedAt || post.date,
       author: { "@type": "Organization", name: "Aurex Truck Parts Australia" },
     });
@@ -128,25 +118,6 @@ export default function Article() {
         </div>
       </article>
 
-      {related.length > 0 && (
-        <section className="mx-auto max-w-7xl px-4 pt-10">
-          <div className="mb-4 flex items-end justify-between gap-4">
-            <h2 className="text-2xl font-extrabold tracking-tight">Shop this story</h2>
-            <Link
-              to={`/shop/${cat}`}
-              className="flex shrink-0 items-center gap-1 text-[13px] font-bold text-steel hover:text-navy"
-            >
-              Shop all <ArrowRight size={14} />
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {related.map((p) => (
-              <ProductCard key={p.sku || p.id} p={p} />
-            ))}
-          </div>
-        </section>
-      )}
-
       <section className="mx-auto max-w-7xl px-4 pt-10">
         <h2 className="mb-4 text-2xl font-extrabold tracking-tight">More from the counter</h2>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -175,6 +146,13 @@ export default function Article() {
             );
           })}
         </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 pt-10 pb-4">
+        <h2 className="mb-4 text-2xl font-extrabold tracking-tight">Parts guides</h2>
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {GUIDES.map((g) => <li key={g.slug}><GuideCard g={g} /></li>)}
+        </ul>
         <Link
           to="/"
           className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-navy hover:underline"

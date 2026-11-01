@@ -53,7 +53,7 @@ function Hero() {
 
   useEffect(() => {
     if (!slides || slides.length === 0) return;
-    const id = setInterval(() => setI((v) => (v + 1) % slides.length), 6000);
+    const id = setInterval(() => setI((v) => (v + 1) % slides.length), 4000);
     return () => clearInterval(id);
   }, [slides]);
 
@@ -571,7 +571,7 @@ function Reviews() {
   // Advances on its own; a click on an arrow or dot restarts the countdown from that slide.
   useEffect(() => {
     if (paused || items.length < 2) return;
-    const id = setTimeout(() => setI((i + 1) % items.length), 6000);
+    const id = setTimeout(() => setI((i + 1) % items.length), 4000);
     return () => clearTimeout(id);
   }, [i, paused, items.length]);
   const r = items[i];

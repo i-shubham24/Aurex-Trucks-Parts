@@ -21,30 +21,56 @@ function ShelfContent({ slug, subEntry, categories }) {
     .filter(([, entry]) => entry !== subEntry);
   const guides = (content?.guides || []).map(guideFor).filter(Boolean);
   const catName = (s) => categories.find((c) => c.slug === s)?.name || s;
+  const chip = (key, label) => (
+    <Link to={`/shop/${key}`} className="inline-block rounded-md bg-mist px-2.5 py-1 text-xs font-bold text-steel transition-colors hover:text-ink">{label}</Link>
+  );
+
+  /* No notes to sit beside (the all-products page): the type links take the full width, one row per category. */
+  if (!content) {
+    if (typeLinks.length === 0) return null;
+    const order = (s) => { const i = categories.findIndex((c) => c.slug === s); return i < 0 ? categories.length : i; };
+    const groups = new Map();
+    for (const link of typeLinks) {
+      const cat = link[0].split("/")[0];
+      if (!groups.has(cat)) groups.set(cat, []);
+      groups.get(cat).push(link);
+    }
+    return (
+      <section className="mt-12 border-t border-line pt-8">
+        <h2 className="text-xl font-extrabold tracking-tight">Shop by type</h2>
+        <div className="mt-4 divide-y divide-line rounded-md border border-line bg-white">
+          {[...groups].sort(([a], [b]) => order(a) - order(b)).map(([cat, links]) => (
+            <div key={cat} className="grid gap-2 px-4 py-3.5 sm:grid-cols-[160px_minmax(0,1fr)] sm:items-baseline">
+              <Link to={`/shop/${cat}`} className="text-sm font-extrabold text-ink transition-colors hover:text-navy">{catName(cat)}</Link>
+              <ul className="flex flex-wrap gap-1.5">
+                {links.map(([key, entry]) => <li key={key}>{chip(key, entry.name)}</li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="mt-12 grid gap-8 border-t border-line pt-8 lg:grid-cols-[minmax(0,1fr)_320px]">
       <div>
-        {content && (
-          <>
-            <h2 className="text-xl font-extrabold tracking-tight">{subEntry ? `${subEntry.title}: what to know` : content.heading}</h2>
-            <div className="mt-3 space-y-3 text-sm leading-6 text-steel">
-              {content.notes.map((n) => <p key={n}>{n}</p>)}
-            </div>
-            {content.faqs?.length > 0 && (
-              <div className="mt-6">
-                <h2 className="text-lg font-extrabold tracking-tight">Common questions</h2>
-                <dl className="mt-3 divide-y divide-line rounded-md border border-line bg-white">
-                  {content.faqs.map((f) => (
-                    <div key={f.q} className="px-4 py-3">
-                      <dt className="text-sm font-bold text-ink">{f.q}</dt>
-                      <dd className="mt-1 text-sm leading-6 text-steel">{f.a}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-            )}
-          </>
+        <h2 className="text-xl font-extrabold tracking-tight">{subEntry ? `${subEntry.title}: what to know` : content.heading}</h2>
+        <div className="mt-3 space-y-3 text-sm leading-6 text-steel">
+          {content.notes.map((n) => <p key={n}>{n}</p>)}
+        </div>
+        {content.faqs?.length > 0 && (
+          <div className="mt-6">
+            <h2 className="text-lg font-extrabold tracking-tight">Common questions</h2>
+            <dl className="mt-3 divide-y divide-line rounded-md border border-line bg-white">
+              {content.faqs.map((f) => (
+                <div key={f.q} className="px-4 py-3">
+                  <dt className="text-sm font-bold text-ink">{f.q}</dt>
+                  <dd className="mt-1 text-sm leading-6 text-steel">{f.a}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
         )}
       </div>
       <aside className="space-y-6">
@@ -62,13 +88,7 @@ function ShelfContent({ slug, subEntry, categories }) {
           <div>
             <h2 className="text-sm font-extrabold uppercase tracking-wide text-ink">{subEntry ? "Other types" : "Shop by type"}</h2>
             <ul className="mt-2 flex flex-wrap gap-1.5">
-              {typeLinks.map(([key, entry]) => (
-                <li key={key}>
-                  <Link to={`/shop/${key}`} className="inline-block rounded-md bg-mist px-2.5 py-1 text-xs font-bold text-steel transition-colors hover:text-ink">
-                    {slug ? entry.name : `${entry.name} (${catName(key.split("/")[0])})`}
-                  </Link>
-                </li>
-              ))}
+              {typeLinks.map(([key, entry]) => <li key={key}>{chip(key, entry.name)}</li>)}
             </ul>
           </div>
         )}

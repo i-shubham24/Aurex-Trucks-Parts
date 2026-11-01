@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { GUIDES, guideFor } from "../data/guides";
+import { GUIDE_COVER } from "../data/images";
 
 const updatedOn = (iso) =>
   new Date(`${iso}T00:00:00`).toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
@@ -51,6 +52,20 @@ function Block({ b }) {
   return null;
 }
 
+export function GuideCard({ g, size = "md" }) {
+  const cover = GUIDE_COVER[g.slug];
+  return (
+    <Link to={`/guides/${g.slug}`} className="group block h-full overflow-hidden rounded-md border border-line bg-white transition-colors hover:border-navy">
+      {cover && <img src={cover.src} alt="" loading="lazy" decoding="async" className="aspect-[16/9] w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" />}
+      <span className={`block ${size === "lg" ? "p-5" : "p-4"}`}>
+        <span className={`block font-extrabold leading-snug text-ink ${size === "lg" ? "text-lg" : ""}`}>{g.title}</span>
+        <span className={`mt-1.5 block text-sm text-steel ${size === "lg" ? "leading-6" : ""}`}>{g.description}</span>
+        {size === "lg" && <span className="mt-3 block font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-faint">Updated {updatedOn(g.updated)}</span>}
+      </span>
+    </Link>
+  );
+}
+
 export default function Guide() {
   const { slug } = useParams();
   const guide = guideFor(slug);
@@ -65,6 +80,7 @@ export default function Guide() {
   }
 
   const others = GUIDES.filter((g) => g.slug !== guide.slug);
+  const cover = GUIDE_COVER[guide.slug];
 
   return (
     <main>
@@ -78,6 +94,7 @@ export default function Guide() {
         <p className="mt-2 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-faint">
           Updated {updatedOn(guide.updated)} · Aurex trade counter, Campbellfield VIC
         </p>
+        {cover && <img src={cover.src} alt={cover.alt} width="1600" height="900" decoding="async" className="mt-5 aspect-[16/9] w-full rounded-md object-cover" />}
         <div className="mt-6 space-y-4">
           {guide.body.map((b, k) => <Block key={k} b={b} />)}
         </div>
@@ -101,15 +118,8 @@ export default function Guide() {
       </article>
       <section className="mx-auto max-w-3xl px-4 pb-12 pt-10">
         <h2 className="text-xl font-extrabold tracking-tight">More guides</h2>
-        <ul className="mt-3 grid gap-3 sm:grid-cols-2">
-          {others.map((g) => (
-            <li key={g.slug}>
-              <Link to={`/guides/${g.slug}`} className="block h-full rounded-md border border-line bg-white p-4 transition-colors hover:border-navy">
-                <span className="block font-bold text-ink">{g.title}</span>
-                <span className="mt-1 block text-sm text-steel">{g.description}</span>
-              </Link>
-            </li>
-          ))}
+        <ul className="mt-3 grid gap-3 sm:grid-cols-3">
+          {others.map((g) => <li key={g.slug}><GuideCard g={g} /></li>)}
         </ul>
       </section>
     </main>
@@ -127,15 +137,7 @@ export function GuidesIndex() {
         Plain-English guides from our Campbellfield trade counter: compliance basics, how parts work and what to measure before you order.
       </p>
       <ul className="mt-6 grid gap-4 sm:grid-cols-2">
-        {GUIDES.map((g) => (
-          <li key={g.slug}>
-            <Link to={`/guides/${g.slug}`} className="block h-full rounded-md border border-line bg-white p-5 transition-colors hover:border-navy">
-              <span className="block text-lg font-extrabold leading-snug text-ink">{g.title}</span>
-              <span className="mt-2 block text-sm leading-6 text-steel">{g.description}</span>
-              <span className="mt-3 block font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-faint">Updated {updatedOn(g.updated)}</span>
-            </Link>
-          </li>
-        ))}
+        {GUIDES.map((g) => <li key={g.slug}><GuideCard g={g} size="lg" /></li>)}
       </ul>
     </main>
   );

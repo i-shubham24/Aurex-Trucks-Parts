@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" role="img" aria-label="Three tail lift platforms: 1.5 tonne and 2 tonne aluminium, 3 tonne steel">
+<defs>
+  <pattern id="g1" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#fff" stroke-opacity=".05" stroke-width="1"/></pattern>
+  <pattern id="g2" width="200" height="200" patternUnits="userSpaceOnUse"><path d="M200 0H0V200" fill="none" stroke="#fff" stroke-opacity=".1" stroke-width="1.5"/></pattern>
+  <pattern id="hatch" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="28" height="28" fill="#15335e"/><rect width="14" height="28" fill="#ffb800"/></pattern>
+  <pattern id="hex" width="56" height="100" patternUnits="userSpaceOnUse" patternTransform="scale(.42)"><path d="M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100" fill="none" stroke="#9fb3cf" stroke-width="4"/><path d="M28 0L28 34L0 50L0 84L28 100L56 84L56 50L28 34" fill="none" stroke="#9fb3cf" stroke-width="4"/></pattern>
+  <pattern id="foam" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="2.6" fill="#9fb3cf" fill-opacity=".75"/><circle cx="14" cy="13" r="2" fill="#9fb3cf" fill-opacity=".5"/></pattern>
+  <pattern id="tread" width="34" height="34" patternUnits="userSpaceOnUse"><path d="M7 5l8 8M24 21l8 8" stroke="#9fb3cf" stroke-opacity=".7" stroke-width="4" stroke-linecap="round"/><path d="M24 5l-8 8M10 21l-8 8" stroke="#9fb3cf" stroke-opacity=".35" stroke-width="4" stroke-linecap="round"/></pattern>
+  <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#ffb800"/></marker>
+</defs><style>
+  .ln{fill:none;stroke:#e3eaf5;stroke-width:4;stroke-linejoin:round;stroke-linecap:round}
+  .lbl{font:700 22px Consolas, 'Courier New', monospace;fill:#e3eaf5;letter-spacing:2px}
+  .sm{font:400 18px Consolas, 'Courier New', monospace;fill:#9fb3cf;letter-spacing:1.5px}
+  .tag{font:700 26px Consolas, 'Courier New', monospace;fill:#ffb800;letter-spacing:6px}
+  .big{font:800 64px Arial, Helvetica, sans-serif;fill:#e3eaf5}
+</style>
+<rect width="1600" height="900" fill="#0d2240"/><rect width="1600" height="900" fill="url(#g1)"/><rect width="1600" height="900" fill="url(#g2)"/>
+<text x="80" y="118" class="tag">AUREX STOCK NOTES</text>
+<text x="1520" y="118" class="sm" text-anchor="end">NEW RANGE · CAMPBELLFIELD VIC</text>
+<text x="330" y="300" class="big" text-anchor="middle">1.5T</text><rect x="170" y="336" width="320" height="210" rx="6" fill="#1c4377"/><rect x="170" y="336" width="320" height="210" rx="6" fill="url(#tread)" stroke="#ffb800" stroke-width="4"/><line x1="180" y1="336" x2="480" y2="336" stroke="#e3eaf5" stroke-width="10" stroke-linecap="round"/><text x="330" y="600" class="lbl" text-anchor="middle">ALUMINIUM</text><text x="330" y="634" class="sm" text-anchor="middle">LIGHT RIGIDS · VANS</text><text x="800" y="300" class="big" text-anchor="middle">2T</text><rect x="640" y="336" width="320" height="210" rx="6" fill="#1c4377"/><rect x="640" y="336" width="320" height="210" rx="6" fill="url(#tread)" stroke="#ffb800" stroke-width="4"/><line x1="650" y1="336" x2="950" y2="336" stroke="#e3eaf5" stroke-width="10" stroke-linecap="round"/><text x="800" y="600" class="lbl" text-anchor="middle">ALUMINIUM</text><text x="800" y="634" class="sm" text-anchor="middle">RIGIDS · TRAY BODIES</text><text x="1270" y="300" class="big" text-anchor="middle">3T</text><rect x="1110" y="336" width="320" height="210" rx="6" fill="#1c4377"/><rect x="1110" y="336" width="320" height="210" rx="6" fill="url(#tread)" stroke="#ffb800" stroke-width="4"/><line x1="1120" y1="336" x2="1420" y2="336" stroke="#e3eaf5" stroke-width="10" stroke-linecap="round"/><text x="1270" y="600" class="lbl" text-anchor="middle">STEEL</text><text x="1270" y="634" class="sm" text-anchor="middle">HEAVY RIGIDS · FLEETS</text>
+<text x="80" y="815" class="sm">AUREX TRUCK PARTS · CAMPBELLFIELD VIC</text>
+</svg>

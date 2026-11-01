@@ -54,15 +54,27 @@ export const PHOTO = {
   fleetAccessories: "/images/web/aurex-fleet-accessories.webp",
 };
 
+/* Drawn covers (public/images/covers) for the guides and the launch stock notes, so they don't
+   repeat the hero, category and product photos. */
+export const GUIDE_COVER = {
+  "rear-marking-plates-vsb12": { src: "/images/covers/guide-rear-marking-plates.svg", alt: "Diagram of a trailer rear showing rear marking plates and the DO NOT OVERTAKE TURNING VEHICLE sign" },
+  "truck-trailer-door-hardware": { src: "/images/covers/guide-door-hardware.svg", alt: "Diagram of truck rear doors showing cam door gear, keepers, handles, strap hinges and door seals" },
+  "frp-honeycomb-vs-plywood-vs-xps-panels": { src: "/images/covers/guide-body-panels.svg", alt: "Cross-sections of FRP honeycomb, FRP plywood and XPS insulated truck body panels" },
+  "choosing-a-tail-lift": { src: "/images/covers/guide-tail-lift.svg", alt: "Side view of a rigid truck with a tail lift lowered, showing lift height and load centre" },
+};
+
 /* Article covers: a scene that matches the story rather than a product cut-out.
    Known posts are matched by slug; a post with no cover of its own falls back
    to a photo for its topic. Anything else keeps the cover set in the CMS. */
 const BLOG_BY_SLUG = {
-  "tail-lifts-land-in-vic": PHOTO.tailLift,
-  "tracks-caps-fittings-explained": PHOTO.trailerCategory,
-  "stainless-hinges-paddle-latches": PHOTO.tradeCounter,
-  "toolbox-door-hardware-refresh": PHOTO.fleetAccessories,
+  "tail-lifts-land-in-vic": "/images/covers/news-tail-lift-range.svg",
+  "tracks-caps-fittings-explained": "/images/covers/news-tracks-fittings.svg",
+  "stainless-hinges-paddle-latches": "/images/covers/news-hinges-latches.svg",
+  "toolbox-door-hardware-refresh": "/images/covers/news-toolbox-hardware.svg",
 };
+/* The launch posts were seeded in the CMS with the hero and category photos; their drawn cover replaces
+   those, while a photo uploaded for the post in the admin still wins. */
+const SITE_PHOTO = /\/(aurex-tail-lift|aurex-trade-counter|aurex-fleet-accessories|aurex-trailer-parts|trailer-parts-category|hero-[\w-]+)(-square)?\.(webp|jpe?g|png)$/;
 const BLOG_BY_TAG = {
   "Tail Lifts": PHOTO.tailLift,
   "Trailer Parts": PHOTO.trailerCategory,
@@ -77,5 +89,7 @@ export const blogImage = (post) => {
     (typeof post?.img === "string" && post.img) ||
     post?.img?.url;
 
-  return backendImg || BLOG_BY_SLUG[post?.slug] || BLOG_BY_TAG[post?.tag] || PHOTO.tradeCounter;
+  const cover = BLOG_BY_SLUG[post?.slug];
+  if (cover && (!backendImg || SITE_PHOTO.test(backendImg))) return cover;
+  return backendImg || BLOG_BY_TAG[post?.tag] || PHOTO.tradeCounter;
 };

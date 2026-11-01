@@ -17,7 +17,7 @@ import path from "node:path";
 import { getPageMeta, SITE } from "../src/seo/meta.js";
 import { normalizeProduct } from "../src/api/normalizers/product.normalizer.js";
 import { normalizeCategory } from "../src/api/normalizers/category.normalizer.js";
-import { productImage } from "../src/data/images.js";
+import { GUIDE_COVER, productImage } from "../src/data/images.js";
 import { NEWS } from "../src/data/content.js";
 import { COMPANY, FAQS } from "../src/data/company.js";
 import { formatAUD } from "../src/data/products.js";
@@ -142,12 +142,13 @@ function guideBody(g) {
   };
   return crumbs([["Home", "/"], ["Guides", "/guides"], [g.title]])
     + `<article><h1>${esc(g.title)}</h1><p>Updated ${esc(g.updated)} · Aurex trade counter, Campbellfield VIC</p>`
+    + (GUIDE_COVER[g.slug] ? `<img src="${esc(GUIDE_COVER[g.slug].src)}" alt="${esc(GUIDE_COVER[g.slug].alt)}" width="1600" height="900" />` : "")
     + g.body.map(block).join("")
     + (g.sources.length ? `<h2>Source</h2>${linkList(g.sources.map((s) => [s.label, s.url]))}` : "")
     + "</article>";
 }
 
-function articleBody(post, category) {
+function articleBody(post) {
   const sections = (Array.isArray(post.body) ? post.body : []).map((b) =>
     (b.h ? `<h2>${esc(b.h)}</h2>` : "")
     + (b.p ? `<p>${esc(b.p)}</p>` : "")
@@ -156,7 +157,8 @@ function articleBody(post, category) {
     + ((post.summary || post.excerpt) ? `<p>${esc(post.summary || post.excerpt)}</p>` : "")
     + (sections.length ? sections.join("") : post.content ? `<p>${esc(post.content)}</p>` : "")
     + "</article>"
-    + (category ? `<p><a href="/shop/${encodeURIComponent(category.slug)}">Shop ${esc(category.name)}</a></p>` : "");
+    // Mirrors Article.jsx, which ends each story with the parts guides.
+    + `<h2>Parts guides</h2>${linkList(GUIDES.map((g) => [g.title, `/guides/${g.slug}`]))}`;
 }
 
 function sitemapXml(entries) {
@@ -259,8 +261,6 @@ export async function prerender(outDir) {
   // The app shows a CMS post when there is one and falls back to the built-in NEWS copy.
   const apiPosts = raw(blogsRes, "data.blogs", "blogs").filter((b) => b.slug && SAFE_SEGMENT.test(b.slug));
   const posts = [...apiPosts, ...NEWS.filter((n) => !apiPosts.some((b) => b.slug === n.slug))];
-  // Mirrors Article.jsx, which links each story to the shelf it's about.
-  const TAG_CAT = { "Tail Lifts": "tail-lifts", "Trailer Parts": "trailer-parts", "Accessories": "accessories", "Tool Boxes": "accessories" };
 
   let count = 0;
   for (const pathname of STATIC_PAGES) {
@@ -272,10 +272,9 @@ export async function prerender(outDir) {
   }
 
   for (const post of posts) {
-    const tag = Array.isArray(post.tags) && post.tags[0] ? post.tags[0] : post.tag;
     const pathname = `/news/${post.slug}`;
     await write(outDir, pathname, pageHtml(template, pathname, {
-      body: frame(categories, articleBody(post, catBySlug.get(TAG_CAT[tag] || post.category || "trailer-parts"))),
+      body: frame(categories, articleBody(post)),
     }));
     count++;
   }
