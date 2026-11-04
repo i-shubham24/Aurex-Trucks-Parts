@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, useLocation, Navigate, useSearchParams } from "react-router-dom";
 import { NotificationProvider } from "./store/notification";
 import NotificationCenter from "./components/NotificationCenter";
@@ -50,6 +50,21 @@ const PageFallback = () => <div className="min-h-[60vh]" aria-busy="true" />;
 
 function ScrollManager() {
   const { pathname, search, hash } = useLocation();
+  const isFirstRender = useRef(true);
+
+  // Send SPA page_view event on client-side route transitions
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (typeof window !== "undefined" && typeof window.gtag === "function") {
+      window.gtag("event", "page_view", {
+        page_path: pathname + search,
+        page_location: window.location.href,
+      });
+    }
+  }, [pathname, search]);
 
   useEffect(() => {
     if (hash) {
