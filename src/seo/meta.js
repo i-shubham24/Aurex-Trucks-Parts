@@ -78,6 +78,7 @@ const META = [
   [/^\/forgot-password$/, [branded("Forgot Password"), "Forgot your password? Enter your email for a secure reset link to your Aurex Truck Parts account and get back to your orders and freight tracking."]],
   [/^\/reset-password$/, [branded("Set New Password"), "Set a new password for your Aurex Truck Parts account, then log back in to check your orders, freight tracking and trade pricing in one place."]],
   [/^\/order-success(\/|$)/, [branded("Order Confirmed"), "Thank you for your order with Aurex Truck Parts Australia. Your commercial truck parts are being prepared for dispatch from Campbellfield VIC."]],
+  [/^\/thank-you$/, [branded("Thank You"), "Thank you for contacting Aurex Truck Parts Australia. Your quotation enquiry has been received and our Campbellfield team will be in touch shortly."]],
   [/^\/policies$/, [branded("Shipping, Returns & Policies"), "Plain-English policies for Aurex Truck Parts orders in Australia: shipping and freight, returns, warranty claims, terms of sale and privacy."]],
   [/^\/guides$/, [branded("Truck & Trailer Parts Guides"), "Plain-English guides to rear marking plates (VSB 12), truck and trailer door hardware, body panels and choosing a tail lift."]],
 ];
@@ -86,11 +87,11 @@ const META = [
 const KNOWN_ROUTES = [
   /^\/$/, /^\/about$/, /^\/contact$/, /^\/tail-lift-enquiry$/, /^\/enquiry\/tail-lift$/,
   /^\/shop(\/[^/]+){0,2}$/, /^\/guides(\/[^/]+)?$/, /^\/policies$/, /^\/product\/[^/]+$/, /^\/news\/[^/]+$/,
-  /^\/checkout$/, /^\/order-success\/[^/]+$/, /^\/orders$/, /^\/profile$/, /^\/track$/,
+  /^\/checkout$/, /^\/order-success\/[^/]+$/, /^\/thank-you$/, /^\/orders$/, /^\/profile$/, /^\/track$/,
   /^\/login$/, /^\/signup$/, /^\/forgot-password$/, /^\/reset-password$/,
 ];
 /* Private, transactional and sign-in pages stay out of search results. */
-const NOINDEX = /^\/(admin|account|orders|profile|checkout|order-success|login|signup|forgot-password|reset-password)(\/|$)/;
+const NOINDEX = /^\/(admin|account|orders|profile|checkout|order-success|thank-you|login|signup|forgot-password|reset-password)(\/|$)/;
 
 /* A malformed escape in the URL (e.g. /product/%E0) must not crash the app. */
 export const safeDecode = (value) => {

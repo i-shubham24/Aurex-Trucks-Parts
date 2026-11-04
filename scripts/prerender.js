@@ -25,7 +25,7 @@ import { CATEGORY_CONTENT, CATEGORY_NAMES, HOME_CONTENT, SUB_CONTENT, subSlug } 
 import { GUIDES, guideFor } from "../src/data/guides.js";
 
 const API = (process.env.PRERENDER_API_URL || "https://truck-parts-api.vercel.app/api/v1").replace(/\/$/, "");
-const STATIC_PAGES = ["/about", "/contact", "/policies", "/tail-lift-enquiry", "/track"];
+const STATIC_PAGES = ["/about", "/contact", "/policies", "/tail-lift-enquiry", "/track", "/thank-you"];
 const SAFE_SEGMENT = /^[A-Za-z0-9._-]+$/;
 
 const esc = (value) =>

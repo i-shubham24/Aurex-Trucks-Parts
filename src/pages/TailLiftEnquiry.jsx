@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import {
   CheckCircle2,
   Clock,
@@ -22,6 +22,7 @@ export default function TailLiftEnquiry() {
   const { addEnquiry } = useSite();
   const { user, openAuthModal } = useAuth();
   const { notify } = useNotification();
+  const navigate = useNavigate();
 
   const initialProduct = tailLiftProducts.find((p) => p.sku === requestedSku) || tailLiftProducts[0];
 
@@ -213,6 +214,16 @@ Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
     setSubmitting(false);
     setSubmitted(true);
     window.scrollTo({ top: 100, behavior: "smooth" });
+    navigate("/thank-you", {
+      state: {
+        type: "tail-lift",
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        sku: selectedProduct?.sku || selectedSku,
+        ref: reference || "",
+      },
+    });
 
     notify.success({
       kicker: "TAIL LIFT ENQUIRY RECEIVED",

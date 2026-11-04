@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import EmailLink from "../components/EmailLink";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { CheckCircle2, Clock, Mail, MapPin, Phone, Send, ArrowRight, Lock } from "lucide-react";
 import { useCompany } from "../store/site";
 import { useSite } from "../store/site";
@@ -14,6 +14,7 @@ export default function Contact() {
   const { addEnquiry } = useSite();
   const { user, openAuthModal } = useAuth();
   const { notify } = useNotification();
+  const navigate = useNavigate();
   const COMPANY = useCompany();
   const [sent, setSent] = useState(false);
   const [sentDetails, setSentDetails] = useState({ name: "", email: "", topic: "", ref: "" });
@@ -49,10 +50,11 @@ export default function Contact() {
     }
 
     const fe = {};
-    if (form.name.trim().length < 2) fe.name = "Enter your full name.";
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) fe.email = "Enter a valid email address.";
-    if (!/^0[45]\d{8}$|^0[2378]\d{8}$|^\+61\d{9}$/.test(form.phone.replace(/[\s()-]/g, ""))) fe.phone = "Enter a 10-digit AU number, e.g. 04XX XXX XXX.";
-    if (form.msg.trim().length < 10) fe.msg = "Tell us a little more (10+ characters).";
+    if (!form.name.trim() || form.name.trim().length < 2) fe.name = "Full name is required (at least 2 characters).";
+    if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) fe.email = "A valid email address is required.";
+    if (!form.phone.trim() || !/^0[45]\d{8}$|^0[2378]\d{8}$|^\+61\d{9}$/.test(form.phone.replace(/[\s()-]/g, ""))) fe.phone = "A valid 10-digit AU phone number is required (e.g. 04XX XXX XXX).";
+    if (!form.topic || !form.topic.trim()) fe.topic = "Please select a topic.";
+    if (!form.msg.trim() || form.msg.trim().length < 10) fe.msg = "Message is required (at least 10 characters).";
     setErrs(fe);
     if (Object.keys(fe).length) return;
     const cleanName = form.name.trim();
@@ -71,6 +73,16 @@ export default function Contact() {
     setSentDetails({ name: cleanName, email: form.email.trim(), topic: form.topic, ref: ref || "" });
     setForm({ name: "", phone: "", email: "", topic: "Tail Lifts", msg: "" });
     setSent(true);
+    navigate("/thank-you", {
+      state: {
+        type: "contact",
+        name: cleanName,
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        topic: form.topic,
+        ref: ref || "",
+      },
+    });
     notify.success({
       kicker: "ENQUIRY SUBMITTED",
       title: "Contact Form Submitted Successfully!",

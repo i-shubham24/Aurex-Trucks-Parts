@@ -33,6 +33,7 @@ const Orders = lazy(() => import("./pages/Account"));
 const ProfileBody = lazy(() => import("./pages/Account").then((m) => ({ default: m.ProfileBody })));
 const Track = lazy(() => import("./pages/Track"));
 const Reset = lazy(() => import("./pages/Reset"));
+const ThankYou = lazy(() => import("./pages/ThankYou"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AdminLayout = lazy(() => import("./pages/admin/AdminLayout"));
 const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
@@ -197,6 +198,7 @@ function Shell() {
         <Route path="/news/:slug" element={<Article />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/order-success/:id" element={<OrderSuccess />} />
+        <Route path="/thank-you" element={<ThankYou />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/account" element={<AccountRedirect />} />
         <Route path="/profile" element={<ProfileBody />} />
