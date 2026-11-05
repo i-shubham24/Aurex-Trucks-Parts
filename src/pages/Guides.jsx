@@ -56,7 +56,7 @@ export function GuideCard({ g, size = "md" }) {
   const cover = GUIDE_COVER[g.slug];
   return (
     <Link to={`/guides/${g.slug}`} className="group block h-full overflow-hidden rounded-md border border-line bg-white transition-colors hover:border-navy">
-      {cover && <img src={cover.src} alt="" loading="lazy" decoding="async" className="aspect-[16/9] w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" />}
+      {cover && <img src={cover.src} alt={cover.alt || g.title} loading="lazy" decoding="async" className="aspect-[16/9] w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" />}
       <span className={`block ${size === "lg" ? "p-5" : "p-4"}`}>
         <span className={`block font-extrabold leading-snug text-ink ${size === "lg" ? "text-lg" : ""}`}>{g.title}</span>
         <span className={`mt-1.5 block text-sm text-steel ${size === "lg" ? "leading-6" : ""}`}>{g.description}</span>

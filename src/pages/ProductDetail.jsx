@@ -421,7 +421,7 @@ export default function ProductDetail() {
                     idx === activeImgIdx ? "border-gold ring-2 ring-gold/50" : "border-line opacity-70 hover:opacity-100"
                   }`}
                 >
-                  <img src={cld(imgSrc, 120)} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain" />
+                  <img src={cld(imgSrc, 120)} alt={`${p.name} - thumbnail ${idx + 1}`} loading="lazy" decoding="async" className="h-full w-full object-contain" />
                 </button>
               ))}
             </div>

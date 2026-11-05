@@ -4,7 +4,7 @@ import { cld } from "../utils/img";
 
 export default function SafeImage({
   src,
-  alt = "",
+  alt,
   className = "",
   fallbackIconSize = 18,
   loading,
@@ -12,6 +12,7 @@ export default function SafeImage({
   cdnWidth,
   ...props
 }) {
+  const safeAlt = (alt && alt.trim()) || "Aurex commercial truck and trailer parts";
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export default function SafeImage({
   return (
     <img
       src={cld(src, cdnWidth)}
-      alt={alt}
+      alt={safeAlt}
       loading={loading}
       decoding="async"
       fetchPriority={fetchPriority}

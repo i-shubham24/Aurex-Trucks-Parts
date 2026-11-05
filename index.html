@@ -60,17 +60,35 @@
       "@context": "https://schema.org",
       "@graph": [
         {
-          "@type": "AutoPartsStore",
-          "@id": "https://www.aurextruckparts.com.au/#store",
+          "@type": "Organization",
+          "@id": "https://www.aurextruckparts.com.au/#organization",
           "name": "Aurex Truck Parts Australia",
           "legalName": "Aurex Panels Pty Limited",
           "taxID": "47670781254",
           "url": "https://www.aurextruckparts.com.au/",
           "logo": "https://www.aurextruckparts.com.au/logo.jpeg",
           "image": "https://www.aurextruckparts.com.au/images/web/aurex-trade-counter.jpg",
-          "description": "Heavy-duty hydraulic tail lifts, trailer parts and commercial fleet accessories for Australian transport operators. Campbellfield VIC trade counter stock, daily Australia-wide freight.",
           "telephone": "+61414730467",
           "email": "info@aurextruckparts.com.au",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "77 Capital Link Drive",
+            "addressLocality": "Campbellfield",
+            "addressRegion": "VIC",
+            "postalCode": "3061",
+            "addressCountry": "AU"
+          }
+        },
+        {
+          "@type": "AutoPartsStore",
+          "@id": "https://www.aurextruckparts.com.au/#store",
+          "name": "Aurex Truck Parts Australia - Campbellfield Trade Counter",
+          "url": "https://www.aurextruckparts.com.au/",
+          "description": "Truck and trailer parts supplier with a physical trade counter in Campbellfield, Melbourne, offering hydraulic tail lifts, trailer hardware, truck body parts and accessories.",
+          "telephone": "+61414730467",
+          "email": "info@aurextruckparts.com.au",
+          "logo": "https://www.aurextruckparts.com.au/logo.jpeg",
+          "image": "https://www.aurextruckparts.com.au/images/web/aurex-trade-counter.jpg",
           "address": {
             "@type": "PostalAddress",
             "streetAddress": "77 Capital Link Drive",
@@ -88,7 +106,13 @@
           "openingHoursSpecification": [
             {
               "@type": "OpeningHoursSpecification",
-              "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+              "dayOfWeek": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday"
+              ],
               "opens": "09:00",
               "closes": "17:00"
             }
@@ -97,22 +121,167 @@
           "currenciesAccepted": "AUD",
           "paymentAccepted": "Cash, Credit Card, Direct Debit, Bank Transfer, Trade Account",
           "areaServed": {
+            "@type": "Place",
+            "name": "Melbourne, Victoria, Australia"
+          },
+          "parentOrganization": {
+            "@id": "https://www.aurextruckparts.com.au/#organization"
+          }
+        },
+        {
+          "@type": "OnlineStore",
+          "@id": "https://www.aurextruckparts.com.au/#onlinestore",
+          "name": "Aurex Truck Parts Australia - Online Store",
+          "url": "https://www.aurextruckparts.com.au/",
+          "description": "Shop truck and trailer parts, hydraulic tail lifts, truck body hardware, door gear, locks, hinges, seals, cargo restraints and commercial vehicle accessories online with Australia-wide delivery.",
+          "telephone": "+61414730467",
+          "email": "info@aurextruckparts.com.au",
+          "currenciesAccepted": "AUD",
+          "paymentAccepted": "Cash, Credit Card, Direct Debit, Bank Transfer, Trade Account",
+          "areaServed": {
             "@type": "Country",
             "name": "Australia"
+          },
+          "parentOrganization": {
+            "@id": "https://www.aurextruckparts.com.au/#organization"
+          },
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Truck and Trailer Parts",
+            "itemListElement": [
+              {
+                "@type": "OfferCatalog",
+                "name": "Hydraulic Tail Lifts"
+              },
+              {
+                "@type": "OfferCatalog",
+                "name": "Trailer Parts"
+              },
+              {
+                "@type": "OfferCatalog",
+                "name": "Door Gear and Cam Locks"
+              },
+              {
+                "@type": "OfferCatalog",
+                "name": "Hinges"
+              },
+              {
+                "@type": "OfferCatalog",
+                "name": "Door Hardware and Seals"
+              },
+              {
+                "@type": "OfferCatalog",
+                "name": "Cargo Tracks and Restraint Fittings"
+              },
+              {
+                "@type": "OfferCatalog",
+                "name": "Tipper Hardware"
+              },
+              {
+                "@type": "OfferCatalog",
+                "name": "Side Guards"
+              },
+              {
+                "@type": "OfferCatalog",
+                "name": "FRP Honeycomb Panels"
+              },
+              {
+                "@type": "OfferCatalog",
+                "name": "Rear Marking Plates"
+              }
+            ]
           }
         },
         {
           "@type": "WebSite",
           "@id": "https://www.aurextruckparts.com.au/#website",
-          "url": "https://www.aurextruckparts.com.au/",
           "name": "Aurex Truck Parts Australia",
-          "description": "Commercial truck parts, hydraulic tail lifts and trailer hardware store.",
-          "publisher": { "@id": "https://www.aurextruckparts.com.au/#store" },
+          "url": "https://www.aurextruckparts.com.au/",
+          "description": "Australian online truck and trailer parts store with a physical trade counter in Campbellfield, Melbourne.",
+          "publisher": {
+            "@id": "https://www.aurextruckparts.com.au/#organization"
+          },
+          "inLanguage": "en-AU",
           "potentialAction": {
             "@type": "SearchAction",
             "target": "https://www.aurextruckparts.com.au/shop?q={search_term_string}",
             "query-input": "required name=search_term_string"
           }
+        },
+        {
+          "@type": "WebPage",
+          "@id": "https://www.aurextruckparts.com.au/#webpage",
+          "name": "Truck & Trailer Parts, Tail Lifts & Accessories | Aurex",
+          "url": "https://www.aurextruckparts.com.au/",
+          "isPartOf": {
+            "@id": "https://www.aurextruckparts.com.au/#website"
+          },
+          "about": [
+            {
+              "@id": "https://www.aurextruckparts.com.au/#store"
+            },
+            {
+              "@id": "https://www.aurextruckparts.com.au/#onlinestore"
+            }
+          ],
+          "inLanguage": "en-AU"
+        },
+        {
+          "@type": "FAQPage",
+          "@id": "https://www.aurextruckparts.com.au/#faq",
+          "isPartOf": {
+            "@id": "https://www.aurextruckparts.com.au/#webpage"
+          },
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How do I pick the right tail lift capacity?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Tell us your body type, pallet weight and lift height. Most rigids suit 2T. Heavy pallet work suits 3T steel. Vans suit 1.5T aluminium. We confirm voltage and platform size before you order."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Why are tail lifts enquiry only?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Tail lifts require custom fitment matching for your chassis, platform dimensions, voltage and mounting brackets. Submit an enquiry for an exact quote within 4 business hours."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Do you help with fitment?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. Every line is catalogued by make, model and OEM cross. For critical jobs we run a VIN check before dispatch so the part fits first time."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How fast is freight?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "VIC Metro 1 day. Sydney, Brisbane and Adelaide 1 to 2 days. Perth and regional 2 to 5 days. Free road freight over $200. Click and Collect from Campbellfield is free with 4 hour turnaround."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Do you offer trade pricing?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. ABN workshops save 5 percent with priority quotes. Fleets with 5 plus vehicles save 10 percent with 30 day terms and saved lists. Volume breaks apply over 5 units."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Are parts ADR compliant?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Our range is selected for Australian bodies and tested to suit ADR requirements. If a line needs a drawing or compliance note, we supply it with the quote."
+              }
+            }
+          ]
         }
       ]
     }

@@ -677,7 +677,7 @@ function HomeIntro() {
             <li key={to}>
               <Link to={to} className="group flex h-full flex-col overflow-hidden rounded-md border border-line bg-white transition-colors hover:border-gold">
                 <span className="block aspect-square overflow-hidden bg-white">
-                  <img src={imgFor(sku)} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain p-3 transition-transform duration-300 group-hover:scale-105" />
+                  <img src={imgFor(sku)} alt={label} loading="lazy" decoding="async" className="h-full w-full object-contain p-3 transition-transform duration-300 group-hover:scale-105" />
                 </span>
                 <span className="flex flex-1 items-center justify-between gap-1.5 border-t border-line px-3 py-2.5 text-[13px] font-extrabold leading-tight text-ink">
                   {label}

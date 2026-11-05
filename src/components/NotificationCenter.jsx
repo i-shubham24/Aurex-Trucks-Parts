@@ -102,7 +102,7 @@ function ToastItem({ toast, onDismiss, muted, onToggleMute }) {
           <div className={`relative h-11 w-11 shrink-0 overflow-hidden rounded-xl border-2 p-0.5 shadow-inner ${
             isErr ? "border-rose-500/50 bg-rose-50/50" : "border-emerald-500/50 bg-emerald-50/50"
           }`}>
-            <img src={imageSrc} alt="" className="h-full w-full rounded-lg object-cover" />
+            <img src={imageSrc} alt="Notification thumbnail" className="h-full w-full rounded-lg object-cover" />
             <span className={`absolute -bottom-1 -right-1 grid h-4 w-4 place-items-center rounded-full text-white shadow ${
               isErr ? "bg-rose-500" : "bg-emerald-500"
             }`}>

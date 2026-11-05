@@ -108,7 +108,7 @@ function SearchBox({ onDone, autoFocus = false }) {
                 className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-mist"
               >
                 <span className="h-9 w-9 shrink-0 overflow-hidden rounded bg-mist">
-                  <SafeImage src={imgSrc} cdnWidth={96} alt="" className="h-full w-full object-cover" fallbackIconSize={14} />
+                  <SafeImage src={imgSrc} cdnWidth={96} alt={p.name} className="h-full w-full object-cover" fallbackIconSize={14} />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[13px] font-bold">{p.name}</span>
@@ -268,7 +268,7 @@ export default function Header() {
                             className="card-zoom overflow-hidden rounded-md border border-line bg-mist transition-colors hover:border-gold"
                           >
                             <span className="block aspect-[16/10] overflow-hidden bg-pale">
-                              {src && <img src={cld(src, 480)} alt="" loading="lazy" decoding="async" className="h-full w-full object-cover" />}
+                              {src && <img src={cld(src, 480)} alt={c.name} loading="lazy" decoding="async" className="h-full w-full object-cover" />}
                             </span>
                             <span className="block px-3 py-2.5">
                               <span className="block text-[15px] font-extrabold leading-tight">{c.name}</span>

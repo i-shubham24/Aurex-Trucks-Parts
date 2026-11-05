@@ -146,7 +146,7 @@ export default function Track() {
                       className="group flex items-center gap-2.5 border-b border-line px-3 py-2 text-[13px] last:border-0 transition hover:bg-mist"
                       title={`View ${l.name || l.sku}`}
                     >
-                      <span className="h-9 w-9 shrink-0 overflow-hidden rounded bg-mist ring-1 ring-line group-hover:ring-navy transition"><SafeImage src={imgFor(l.sku)} alt="" className="h-full w-full object-cover group-hover:scale-105 transition-transform" fallbackIconSize={14} /></span>
+                      <span className="h-9 w-9 shrink-0 overflow-hidden rounded bg-mist ring-1 ring-line group-hover:ring-navy transition"><SafeImage src={imgFor(l.sku)} alt={l.name || l.sku || "Ordered product"} className="h-full w-full object-cover group-hover:scale-105 transition-transform" fallbackIconSize={14} /></span>
                       <span className="min-w-0 flex-1 truncate"><span className="font-bold">{l.qty} × </span><span className="group-hover:text-navy group-hover:underline transition-colors">{l.name}</span></span>
                       {l.price != null && <span className="tabular shrink-0 font-bold">{formatAUD(l.price * l.qty)}</span>}
                     </Link>
