@@ -250,12 +250,12 @@ function OrderCard({ order, onReorder }) {
           {shown.map((l) => (
             <li key={l.sku}>
               <Link
-                to={l.sku ? `/product/${encodeURIComponent(l.sku)}` : "#"}
+                to={l.slug ? `/product/${encodeURIComponent(l.slug)}` : l.sku ? `/product/${encodeURIComponent(l.sku)}` : "#"}
                 className="group flex items-center gap-3 px-3 py-2.5 transition hover:bg-mist/70"
                 title={`View ${l.name || l.sku}`}
               >
                 <span className="h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-mist ring-1 ring-line transition group-hover:ring-navy">
-                  <SafeImage src={imgFor(l.sku)} alt={l.name || ""} className="h-full w-full object-cover transition-transform group-hover:scale-105" fallbackIconSize={16} />
+                  <SafeImage src={imgFor(l.sku)} alt={l.name || l.sku || "Ordered product"} className="h-full w-full object-cover transition-transform group-hover:scale-105" fallbackIconSize={16} />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[13px] font-bold text-ink transition-colors group-hover:text-navy group-hover:underline">{l.qty} × {l.name}</span>

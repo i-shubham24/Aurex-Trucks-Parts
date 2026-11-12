@@ -123,7 +123,7 @@ export default function ProductCard({ p, joined }) {
   const navigate = useNavigate();
   const isTailLift = p.category === "tail-lifts" || p.categorySlug === "tail-lifts" || (p.sku && p.sku.startsWith("ATP-TL-"));
   const enquiry = p.price === null || p.pricing?.isPOA === true || p.isPOA === true || p.status === "Enquiry only" || isTailLift;
-  const targetUrl = `/product/${p.sku}`;
+  const targetUrl = `/product/${p.slug || p.sku}`;
 
   const handleEnquiryClick = (e) => {
     e.preventDefault();

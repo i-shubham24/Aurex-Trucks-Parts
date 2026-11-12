@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Award, CheckCircle2, Minus, Plus, Ruler, ShieldCheck, Truck, ShoppingCart, ZoomIn, Star, Mail, Layers, Check } from "lucide-react";
 import { formatAUD } from "../data/products";
@@ -205,15 +205,24 @@ const SIZE_FAMILIES = [
 ];
 
 export default function ProductDetail() {
-  const { sku } = useParams();
+  const { slug, sku } = useParams();
+  const identifier = slug || sku;
+  const navigate = useNavigate();
   const { settings } = useSite();
   const freeOver = formatAUD(settings.freeFreightOver || 200);
 
-  const { data, isLoading, isError, error, refetch, isFetching } = useProduct(sku);
+  const { data, isLoading, isError, error, refetch, isFetching } = useProduct(identifier);
   const p = data?.product;
   const related = data?.relatedProducts || [];
 
-  const { data: reviewsData } = useProductReviews(sku);
+  // When product loads, if accessed via SKU or legacy slug, seamlessly replace URL with canonical clean slug
+  useEffect(() => {
+    if (p?.slug && identifier !== p.slug) {
+      navigate(`/product/${p.slug}`, { replace: true });
+    }
+  }, [p?.slug, identifier, navigate]);
+
+  const { data: reviewsData } = useProductReviews(p?.sku || identifier);
   const reviewsList = reviewsData?.reviews || [];
   /* The score comes from approved reviews on file, never from the product's stored counters alone. */
   const reviewCount = reviewsList.length;
@@ -238,7 +247,7 @@ export default function ProductDetail() {
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     if (document.documentElement) document.documentElement.scrollTop = 0;
     if (document.body) document.body.scrollTop = 0;
-  }, [sku]);
+  }, [identifier]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -386,7 +395,7 @@ export default function ProductDetail() {
         <Link to="/" className="hover:text-navy hover:underline">Home</Link> / <Link to="/shop" className="hover:text-navy hover:underline">Shop</Link> /{" "}
         {p.categorySlug && <><Link to={`/shop/${p.categorySlug}`} className="hover:text-navy hover:underline">{CATEGORY_NAMES[p.categorySlug] || p.categorySlug}</Link> /{" "}</>}
         {p.categorySlug && subContentFor(p.categorySlug, subSlug(p.sub)) && <><Link to={`/shop/${p.categorySlug}/${subSlug(p.sub)}`} className="hover:text-navy hover:underline">{p.sub}</Link> /{" "}</>}
-        <span className="font-semibold text-ink">{p.sku}</span>
+        <span className="font-semibold text-ink">{p.name}</span>
       </p>
       <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-10">
         <div className="space-y-3.5 md:sticky md:top-24 self-start">

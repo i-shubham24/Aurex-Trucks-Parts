@@ -36,7 +36,7 @@ const esc = (value) =>
     .replace(/"/g, "&quot;");
 const jsonLd = (obj) => JSON.stringify(obj).replace(/</g, "\\u003c");
 const priceText = (p) => (p.price == null ? "Price on application: request a quote" : `$${p.price.toFixed(2)} AUD`);
-const productLink = (p) => `<a href="/product/${encodeURIComponent(p.sku)}">${esc(p.name)}</a> (${esc(p.sku)}) ${esc(priceText(p))}`;
+const productLink = (p) => `<a href="/product/${encodeURIComponent(p.slug || p.sku)}">${esc(p.name)}</a> (${esc(p.sku)}) ${esc(priceText(p))}`;
 const linkList = (links) => `<ul>${links.map(([label, to]) => `<li><a href="${esc(to)}">${esc(label)}</a></li>`).join("")}</ul>`;
 const crumbs = (trail) => `<nav aria-label="Breadcrumb">${trail.map(([label, to], i) => (i < trail.length - 1 ? `<a href="${esc(to)}">${esc(label)}</a>` : esc(label))).join(" › ")}</nav>`;
 
@@ -336,12 +336,25 @@ export async function prerender(outDir) {
           const p = normalizeProduct(j.data?.product || j.product);
           if (!p || p.sku !== sku) throw new Error("unexpected payload");
           const related = (j.data?.relatedProducts || j.relatedProducts || []).map(normalizeProduct).filter((r) => r && SAFE_SEGMENT.test(r.sku));
-          const pathname = `/product/${sku}`;
+          const slug = p.slug || (p.name ? String(p.name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : sku);
+          const pathname = `/product/${slug}`;
           await write(outDir, pathname, pageHtml(template, pathname, {
             product: p,
             body: frame(categories, productBody(p, catBySlug.get(p.categorySlug), related)),
           }));
           count++;
+
+          // Prerender backwards-compatible snapshot for the SKU route with meta-refresh + canonical pointing to slug
+          if (sku && sku !== slug) {
+            const skuPath = `/product/${sku}`;
+            const redirectBody = frame(categories, `<p>Redirecting to <a href="/product/${esc(slug)}">${esc(p.name)}</a>...</p>`);
+            const redirectHtml = pageHtml(template, skuPath, {
+              product: p,
+              body: redirectBody,
+            }).replace("</head>", `    <meta http-equiv="refresh" content="0; url=/product/${esc(slug)}" />\n  </head>`);
+            await write(outDir, skuPath, redirectHtml);
+            count++;
+          }
         } catch {
           failed++; // that page falls back to the plain app shell
         }

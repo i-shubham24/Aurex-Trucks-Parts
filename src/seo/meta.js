@@ -211,9 +211,12 @@ export function getPageMeta(pathname, { product = null, productMissing = false }
 
   /* Product pages get the part's own name in the title and its fitment, price and stock in the description. */
   const pm = pathname.match(/^\/product\/([^/]+)/);
+  let canonicalPath = path;
   if (pm) {
     const p = product;
     if (p) {
+      const slug = p.slug || (p.name ? String(p.name).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') : p.sku);
+      canonicalPath = `/product/${slug}`;
       title = productTitle(p.name || p.sku);
       desc = productDescription(p);
       const pImg = productImage(p);
@@ -239,7 +242,7 @@ export function getPageMeta(pathname, { product = null, productMissing = false }
       if (p.price != null) {
         productSchema.offers = {
           "@type": "Offer",
-          "url": `${SITE}${path}`,
+          "url": `${SITE}${canonicalPath}`,
           "priceCurrency": "AUD",
           "price": p.price,
           "priceValidUntil": "2027-12-31",
@@ -257,7 +260,7 @@ export function getPageMeta(pathname, { product = null, productMissing = false }
         const sub = subContentFor(p.categorySlug, subSlug(p.sub));
         if (sub) trail.push([sub.name, `/shop/${p.categorySlug}/${subSlug(p.sub)}`]);
       }
-      trail.push([p.name, path]);
+      trail.push([p.name, canonicalPath]);
     } else {
       title = branded("Part Detail");
       desc = "Specifications, fitment, freight and pricing for this Aurex Truck Parts line, stocked in Campbellfield VIC and shipped Australia-wide.";
@@ -331,5 +334,5 @@ export function getPageMeta(pathname, { product = null, productMissing = false }
     article && { id: "article-jsonld", data: article },
   ].filter(Boolean);
 
-  return { title, desc: fitDescription(desc), image, robots, canonical: SITE + path, schemas };
+  return { title, desc: fitDescription(desc), image, robots, canonical: SITE + canonicalPath, schemas };
 }

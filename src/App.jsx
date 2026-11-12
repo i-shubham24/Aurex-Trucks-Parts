@@ -194,7 +194,7 @@ function Shell() {
         <Route path="/guides" element={<GuidesIndex />} />
         <Route path="/guides/:slug" element={<Guide />} />
         <Route path="/policies" element={<Policies />} />
-        <Route path="/product/:sku" element={<ProductDetail />} />
+        <Route path="/product/:slug" element={<ProductDetail />} />
         <Route path="/news/:slug" element={<Article />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/order-success/:id" element={<OrderSuccess />} />

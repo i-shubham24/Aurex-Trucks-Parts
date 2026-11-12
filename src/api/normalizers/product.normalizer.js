@@ -1,3 +1,9 @@
+const toSlug = (text) =>
+  String(text || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
+
 /**
  * Normalizes backend product payload into a consistent frontend entity
  */
@@ -19,6 +25,7 @@ export function normalizeProduct(p) {
     _id: p._id || p.id || sku,
     sku,
     name: p.name || '',
+    slug: p.slug || toSlug(p.name) || sku.toLowerCase(),
     category: categorySlug,
     categorySlug,
     categoryName: typeof p.category === 'object' ? p.category?.name : '',

@@ -103,7 +103,7 @@ function SearchBox({ onDone, autoFocus = false }) {
                   setFocus(false);
                   setQ("");
                   if (onDone) onDone();
-                  go(`/product/${p.sku}`);
+                  go(`/product/${p.slug || p.sku}`);
                 }}
                 className="flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-mist"
               >

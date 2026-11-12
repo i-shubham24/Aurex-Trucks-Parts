@@ -142,7 +142,7 @@ export default function Track() {
                   {lines.map((l) => (
                     <Link
                       key={l.sku}
-                      to={l.sku ? `/product/${encodeURIComponent(l.sku)}` : "#"}
+                      to={l.slug ? `/product/${encodeURIComponent(l.slug)}` : l.sku ? `/product/${encodeURIComponent(l.sku)}` : "#"}
                       className="group flex items-center gap-2.5 border-b border-line px-3 py-2 text-[13px] last:border-0 transition hover:bg-mist"
                       title={`View ${l.name || l.sku}`}
                     >
