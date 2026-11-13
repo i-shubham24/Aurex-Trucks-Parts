@@ -3,8 +3,9 @@
    Node imports this file directly: keep it free of React/Vite code and keep the explicit .js extensions. */
 import { NEWS } from "../data/content.js";
 import { productImage } from "../data/images.js";
-import { CATEGORY_NAMES, subContentFor, subSlug } from "../data/seoContent.js";
+import { CATEGORY_NAMES, CATEGORY_CONTENT, subContentFor, subSlug } from "../data/seoContent.js";
 import { guideFor } from "../data/guides.js";
+import { FAQS } from "../data/company.js";
 
 export const BASE = "Aurex Truck Parts Australia";
 /* The www host is the one Vercel serves; the bare domain 308-redirects to it. */
@@ -190,20 +191,30 @@ const breadcrumbList = (trail) => ({
 });
 
 /* Ids of the JSON-LD scripts the app keeps in <head>; the prerender writes the same ids. */
-export const SCHEMA_IDS = ["product-jsonld", "breadcrumb-jsonld", "article-jsonld"];
+export const SCHEMA_IDS = [
+  "product-jsonld",
+  "breadcrumb-jsonld",
+  "article-jsonld",
+  "faq-jsonld",
+  "webpage-jsonld",
+  "itemlist-jsonld"
+];
 
 /**
  * Everything a page's <head> needs. `product` is the normalized product on a product route (null while it
- * loads); `productMissing` means the API said that SKU doesn't exist. `schemas` lists the JSON-LD blocks
- * as { id, data }.
+ * loads); `productMissing` means the API said that SKU doesn't exist. `items` is an array of products for
+ * category/shelf ItemList schema. `schemas` lists the JSON-LD blocks as { id, data }.
  */
-export function getPageMeta(pathname, { product = null, productMissing = false } = {}) {
+export function getPageMeta(pathname, { product = null, productMissing = false, items = null } = {}) {
   let title = branded("Shop Truck Parts");
   let desc = "Aurex Truck Parts Australia: tail lifts, trailer parts and truck accessories, stocked at our Campbellfield VIC trade counter and shipped Australia-wide.";
   let image = DEFAULT_IMAGE;
   let productSchema = null;
   let trail = null;
   let article = null;
+  let webPageSchema = null;
+  let faqSchema = null;
+  let itemListSchema = null;
   let thin = false; // a real page, but without enough of its own content to index
   const path = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
   const shopMatch = path.match(/^\/shop(?:\/([^/]+))?(?:\/([^/]+))?$/);
@@ -233,13 +244,34 @@ export function getPageMeta(pathname, { product = null, productMissing = false }
         "description": p.desc || desc,
         "sku": p.sku,
         "mpn": p.sku,
+        "category": p.categorySlug || p.category || "Commercial Vehicle Parts",
         "brand": {
           "@type": "Brand",
-          "name": "Aurex"
+          "name": p.brand || "Aurex"
         },
       };
+
+      // Review & Aggregate Rating Rich Snippets (enables Google golden stars in SERP)
+      if (p.rating && p.reviews > 0) {
+        productSchema.aggregateRating = {
+          "@type": "AggregateRating",
+          "ratingValue": p.rating,
+          "reviewCount": p.reviews,
+          "bestRating": "5",
+          "worstRating": "1"
+        };
+      }
+
       // Price-on-application parts have no public price; publishing "0" would be wrong.
       if (p.price != null) {
+        const isOutOfStock = /out of stock/i.test(p.stockStatus || "");
+        const isPreOrder = /built to order|order/i.test(p.stockStatus || "");
+        const availability = isOutOfStock
+          ? "https://schema.org/OutOfStock"
+          : isPreOrder
+          ? "https://schema.org/PreOrder"
+          : "https://schema.org/InStock";
+
         productSchema.offers = {
           "@type": "Offer",
           "url": `${SITE}${canonicalPath}`,
@@ -247,10 +279,46 @@ export function getPageMeta(pathname, { product = null, productMissing = false }
           "price": p.price,
           "priceValidUntil": "2027-12-31",
           "itemCondition": "https://schema.org/NewCondition",
-          "availability": "https://schema.org/InStock",
+          "availability": availability,
           "seller": {
             "@type": "AutoPartsStore",
+            "@id": `${SITE}/#store`,
             "name": "Aurex Truck Parts Australia"
+          },
+          "hasMerchantReturnPolicy": {
+            "@type": "MerchantReturnPolicy",
+            "applicableCountry": "AU",
+            "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+            "merchantReturnDays": 30,
+            "returnMethod": "https://schema.org/ReturnByMail",
+            "returnFees": "https://schema.org/FreeReturn"
+          },
+          "shippingDetails": {
+            "@type": "OfferShippingDetails",
+            "shippingRate": {
+              "@type": "MonetaryAmount",
+              "value": p.price >= 200 ? "0.00" : "15.00",
+              "currency": "AUD"
+            },
+            "shippingDestination": {
+              "@type": "DefinedRegion",
+              "addressCountry": "AU"
+            },
+            "deliveryTime": {
+              "@type": "ShippingDeliveryTime",
+              "handlingTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 0,
+                "maxValue": 1,
+                "unitCode": "DAY"
+              },
+              "transitTime": {
+                "@type": "QuantitativeValue",
+                "minValue": 1,
+                "maxValue": 3,
+                "unitCode": "DAY"
+              }
+            }
           }
         };
       }
@@ -287,6 +355,17 @@ export function getPageMeta(pathname, { product = null, productMissing = false }
         title = branded(entry.title);
         desc = entry.description;
         trail = [["Home", "/"], ["Shop", "/shop"], [categoryName(cat), `/shop/${cat}`], [entry.name, path]];
+        if (entry.faqs?.length) {
+          faqSchema = {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": entry.faqs.map((f) => ({
+              "@type": "Question",
+              "name": f.q,
+              "acceptedAnswer": { "@type": "Answer", "text": f.a }
+            }))
+          };
+        }
       } else {
         title = branded(categoryName(cat));
         thin = true;
@@ -318,11 +397,72 @@ export function getPageMeta(pathname, { product = null, productMissing = false }
       if (hit) [title, desc] = hit[1];
       if (shopMatch) {
         trail = [["Home", "/"], ["Shop", "/shop"]];
-        if (shopMatch[1]) trail.push([categoryName(shopMatch[1]), path]);
+        if (shopMatch[1]) {
+          const catKey = shopMatch[1];
+          trail.push([categoryName(catKey), path]);
+          const catContent = CATEGORY_CONTENT[catKey];
+          if (catContent?.faqs?.length) {
+            faqSchema = {
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": catContent.faqs.map((f) => ({
+                "@type": "Question",
+                "name": f.q,
+                "acceptedAnswer": { "@type": "Answer", "text": f.a }
+              }))
+            };
+          }
+        }
       } else if (guideMatch) {
         trail = [["Home", "/"], ["Guides", "/guides"]];
       }
     }
+  }
+
+  // Homepage WebPage and FAQPage schemas
+  if (path === "/") {
+    webPageSchema = {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "@id": `${SITE}/#webpage`,
+      "name": "Truck & Trailer Parts, Tail Lifts & Accessories | Aurex",
+      "url": `${SITE}/`,
+      "isPartOf": { "@id": `${SITE}/#website` },
+      "about": [{ "@id": `${SITE}/#store` }, { "@id": `${SITE}/#onlinestore` }],
+      "inLanguage": "en-AU"
+    };
+
+    faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "@id": `${SITE}/#faq`,
+      "isPartOf": { "@id": `${SITE}/#webpage` },
+      "mainEntity": FAQS.map((f) => ({
+        "@type": "Question",
+        "name": f.q,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": f.a
+        }
+      }))
+    };
+  }
+
+  // Category ItemList schema for rich catalogue indexation
+  if (shopMatch && items && items.length > 0) {
+    itemListSchema = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "name": title,
+      "description": fitDescription(desc),
+      "numberOfItems": items.length,
+      "itemListElement": items.slice(0, 30).map((it, idx) => ({
+        "@type": "ListItem",
+        "position": idx + 1,
+        "name": it.name,
+        "url": `${SITE}/product/${it.slug || it.sku}`
+      }))
+    };
   }
 
   const notFound = productMissing || !KNOWN_ROUTES.some((rx) => rx.test(path));
@@ -332,6 +472,9 @@ export function getPageMeta(pathname, { product = null, productMissing = false }
     productSchema && { id: "product-jsonld", data: productSchema },
     trail && !notFound && !thin && { id: "breadcrumb-jsonld", data: breadcrumbList(trail) },
     article && { id: "article-jsonld", data: article },
+    webPageSchema && { id: "webpage-jsonld", data: webPageSchema },
+    faqSchema && { id: "faq-jsonld", data: faqSchema },
+    itemListSchema && { id: "itemlist-jsonld", data: itemListSchema },
   ].filter(Boolean);
 
   return { title, desc: fitDescription(desc), image, robots, canonical: SITE + canonicalPath, schemas };

@@ -1,6 +1,6 @@
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { Award, CheckCircle2, Minus, Plus, Ruler, ShieldCheck, Truck, ShoppingCart, ZoomIn, Star, Mail, Layers, Check } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Award, CheckCircle2, Minus, Plus, Ruler, ShieldCheck, Truck, ShoppingCart, ZoomIn, Star, Mail, Layers, Check, BookOpen } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { useSite } from "../store/site";
 import { imgFor, productImages } from "../data/images";
@@ -389,6 +389,42 @@ export default function ProductDetail() {
     return null;
   })();
 
+  const relevantGuide = useMemo(() => {
+    if (isTailLift) {
+      return {
+        title: "Choosing the Right Tail Lift Capacity",
+        url: "/guides/choosing-a-tail-lift",
+        badge: "Fitment & Capacity Guide",
+        snippet: "Need help sizing capacity or platform dimensions for your chassis?"
+      };
+    }
+    if (p.categorySlug === 'trailer-parts' && (p.sub?.includes('Signage') || p.sub?.includes('Marker') || p.sku?.startsWith('ATP-TP-10') || p.sku?.startsWith('ATP-TP-11'))) {
+      return {
+        title: "Rear Marking Plates: What Your Truck Needs (VSB 12)",
+        url: "/guides/rear-marking-plates-vsb12",
+        badge: "VSB 12 Compliance Guide",
+        snippet: "Check NHVR regulations for Categories 33, 34, 41, 81 and 615 plates."
+      };
+    }
+    if (p.sub?.includes('Honeycomb') || p.sub?.includes('Plywood') || p.sub?.includes('XPS') || p.sub?.includes('Panel')) {
+      return {
+        title: "FRP Honeycomb vs Plywood vs XPS Panels",
+        url: "/guides/frp-honeycomb-vs-plywood-vs-xps-panels",
+        badge: "Material Comparison Guide",
+        snippet: "Compare structural strength, core weight, and thermal insulation."
+      };
+    }
+    if (p.sub?.includes('Door') || p.sub?.includes('Gear') || p.sub?.includes('Hinge') || p.sub?.includes('Lock') || p.sub?.includes('Seal')) {
+      return {
+        title: "Truck & Trailer Door Hardware Explained",
+        url: "/guides/truck-trailer-door-hardware",
+        badge: "Hardware & Sizing Guide",
+        snippet: "Learn how to measure bar diameters, handle handing and seals."
+      };
+    }
+    return null;
+  }, [isTailLift, p.categorySlug, p.sub, p.sku]);
+
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">
       <p className="text-[12px] text-faint">
@@ -507,6 +543,27 @@ export default function ProductDetail() {
                 <p className="text-xs font-extrabold text-amber-950">{remarkCallout.badge}</p>
                 <p className="mt-0.5 text-[11px] leading-tight text-amber-800">{remarkCallout.text}</p>
               </div>
+            </div>
+          )}
+
+          {relevantGuide && (
+            <div className="flex items-center justify-between gap-3 rounded-lg border border-line bg-mist/60 px-3 py-2.5 transition-colors hover:border-navy">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 text-navy">
+                  <BookOpen size={12} className="shrink-0" />
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider">
+                    {relevantGuide.badge}
+                  </span>
+                </div>
+                <p className="text-xs font-bold text-ink truncate mt-0.5">{relevantGuide.title}</p>
+                <p className="text-[11px] text-steel hidden sm:block">{relevantGuide.snippet}</p>
+              </div>
+              <Link
+                to={relevantGuide.url}
+                className="shrink-0 rounded bg-navy px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-ink whitespace-nowrap"
+              >
+                Read Guide →
+              </Link>
             </div>
           )}
 

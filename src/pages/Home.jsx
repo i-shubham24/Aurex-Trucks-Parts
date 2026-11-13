@@ -69,10 +69,11 @@ function Hero() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 pt-4">
+      {/* Permanent, semantic H1 matching prerender and search intent */}
+      <h1 className="sr-only">{HOME_CONTENT.h1}</h1>
       <div className="relative grid grid-cols-1 overflow-hidden rounded-lg bg-mist md:grid-cols-2 md:items-center">
         <div className="px-6 py-12 md:px-12 md:py-16" key={`t-${i}-${s.id || s.title}`}>
-          {/* The current slide's title is the page's only H1 (one slide renders at a time). */}
-          <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight md:text-[56px]">{s.title}</h1>
+          <h2 className="text-4xl font-extrabold leading-[1.05] tracking-tight md:text-[56px]">{s.title}</h2>
           <p className="mt-3 max-w-sm text-[15px] leading-6 text-steel">{s.subtitle || s.sub}</p>
           <div className="mt-6 flex gap-2.5 sm:gap-3">
             <Link

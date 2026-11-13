@@ -60,8 +60,8 @@ function setTagContent(html, attr, key, value) {
   return html.replace(rx, (_, open, close) => `${open}${esc(value)}${close}`);
 }
 
-function pageHtml(template, pathname, { product = null, body, canonical = true }) {
-  const meta = getPageMeta(pathname, { product });
+function pageHtml(template, pathname, { product = null, items = null, body, canonical = true }) {
+  const meta = getPageMeta(pathname, { product, items });
   let html = template.replace(/<title>[^<]*<\/title>/, `<title>${esc(meta.title)}</title>`);
   html = setTagContent(html, "name", "description", meta.desc);
   html = setTagContent(html, "name", "robots", meta.robots);
@@ -294,7 +294,7 @@ export async function prerender(outDir) {
   if (catalogueOk && products.length && categories.length) {
     const shopMain = crumbs([["Home", "/"], ["Shop"]]) + `<h1>Shop All Products</h1><p>All commercial lines across tail lifts, trailer parts and accessories.</p>`
       + categories.map((c) => `<h2><a href="/shop/${encodeURIComponent(c.slug)}">${esc(c.name)}</a></h2><ul>${products.filter((p) => p.categorySlug === c.slug).map((p) => `<li>${productLink(p)}</li>`).join("")}</ul>`).join("");
-    await write(outDir, "/shop", pageHtml(template, "/shop", { body: frame(categories, shopMain) }));
+    await write(outDir, "/shop", pageHtml(template, "/shop", { body: frame(categories, shopMain), items: products }));
     count++;
 
     // Type pages exist for types with their own copy and at least one product on the shelf.
@@ -309,7 +309,7 @@ export async function prerender(outDir) {
         + `<h1>${esc(entry.title)}</h1><p>${esc(entry.intro)}</p>`
         + `<ul>${items.map((p) => `<li>${productLink(p)}</li>`).join("")}</ul>`
         + shelfHtml(`${entry.title}: what to know`, entry, siblings);
-      await write(outDir, pathname, pageHtml(template, pathname, { body: frame(categories, main) }));
+      await write(outDir, pathname, pageHtml(template, pathname, { body: frame(categories, main), items }));
       typePages.push([pathname, null]); // the public product list carries no updatedAt to date it by
       count++;
     }
@@ -317,12 +317,13 @@ export async function prerender(outDir) {
 
     for (const c of categories) {
       const pathname = `/shop/${c.slug}`;
+      const catItems = products.filter((p) => p.categorySlug === c.slug);
       const typeLinks = Object.entries(SUB_CONTENT).filter(([k]) => k.startsWith(`${c.slug}/`) && liveTypes.has(`/shop/${k}`)).map(([k, e]) => [e.name, `/shop/${k}`]);
       const main = crumbs([["Home", "/"], ["Shop", "/shop"], [c.name]])
         + `<h1>${esc(c.name)}</h1>` + (c.blurb ? `<p>${esc(c.blurb)}</p>` : "")
-        + `<ul>${products.filter((p) => p.categorySlug === c.slug).map((p) => `<li>${productLink(p)}</li>`).join("")}</ul>`
+        + `<ul>${catItems.map((p) => `<li>${productLink(p)}</li>`).join("")}</ul>`
         + shelfHtml(CATEGORY_CONTENT[c.slug]?.heading || c.name, CATEGORY_CONTENT[c.slug], typeLinks);
-      await write(outDir, pathname, pageHtml(template, pathname, { body: frame(categories, main) }));
+      await write(outDir, pathname, pageHtml(template, pathname, { body: frame(categories, main), items: catItems }));
       count++;
     }
 
