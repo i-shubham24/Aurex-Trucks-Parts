@@ -8,7 +8,7 @@ export const PRODUCT_QUERY_KEYS = {
   lists: () => [...PRODUCT_QUERY_KEYS.all, 'list'],
   list: (params) => [...PRODUCT_QUERY_KEYS.lists(), params],
   details: () => [...PRODUCT_QUERY_KEYS.all, 'detail'],
-  detail: (sku) => [...PRODUCT_QUERY_KEYS.details(), (sku || '').toUpperCase()],
+  detail: (identifier) => [...PRODUCT_QUERY_KEYS.details(), (identifier || '').toLowerCase()],
 };
 
 function getCacheKey(params) {
@@ -69,17 +69,18 @@ export function useProducts(params = {}, options = {}) {
 }
 
 /**
- * Custom TanStack Query hook to fetch a single product by SKU with instant client-cache fallback
+ * Custom TanStack Query hook to fetch a single product by SKU or slug with instant client-cache fallback
  */
-export function useProduct(sku, options = {}) {
+export function useProduct(identifier, options = {}) {
   const queryClient = useQueryClient();
-  const normalizedSku = (sku || '').toUpperCase();
-  const cacheKey = normalizedSku ? `aurex_cache_prod_${normalizedSku.toLowerCase()}` : null;
+  const rawId = String(identifier || '').trim();
+  const normalizedKey = rawId.toLowerCase();
+  const cacheKey = normalizedKey ? `aurex_cache_prod_${normalizedKey}` : null;
   const persistedData = useMemo(() => (cacheKey ? persisted(cacheKey) : {}), [cacheKey]);
 
   const getCachedProduct = () => {
-    if (!normalizedSku) return undefined;
-    const existing = queryClient.getQueryData(PRODUCT_QUERY_KEYS.detail(normalizedSku));
+    if (!rawId) return undefined;
+    const existing = queryClient.getQueryData(PRODUCT_QUERY_KEYS.detail(normalizedKey));
     if (existing?.product) return existing;
     if (existing && !existing.product) return { product: existing, relatedProducts: [] };
 
@@ -88,7 +89,8 @@ export function useProduct(sku, options = {}) {
     for (const [, queryData] of queries) {
       const list = queryData?.products || (Array.isArray(queryData) ? queryData : []);
       const found = list.find(
-        (p) => (p.sku || '').toUpperCase() === normalizedSku || (p.slug || '').toLowerCase() === (sku || '').toLowerCase()
+        (p) => (p.sku || '').toUpperCase() === rawId.toUpperCase() ||
+               (p.slug || '').toLowerCase() === normalizedKey
       );
       if (found) {
         return { product: found, relatedProducts: [] };
@@ -103,12 +105,12 @@ export function useProduct(sku, options = {}) {
   };
 
   return useQuery({
-    queryKey: PRODUCT_QUERY_KEYS.detail(normalizedSku),
+    queryKey: PRODUCT_QUERY_KEYS.detail(normalizedKey),
     queryFn: () => {
-      const promise = getProductBySkuApi(normalizedSku);
+      const promise = getProductBySkuApi(rawId);
       return cacheKey ? promise.then(remember(cacheKey)) : promise;
     },
-    enabled: Boolean(normalizedSku),
+    enabled: Boolean(rawId),
     placeholderData: () => getCachedProduct(),
     staleTime: 1000 * 60 * 5, // 5 minutes fresh
     gcTime: 1000 * 60 * 30,

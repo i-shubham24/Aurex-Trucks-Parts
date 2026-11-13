@@ -271,7 +271,7 @@ export default function ProductDetail() {
     return (
       <main className="mx-auto max-w-7xl px-4 py-16 text-center">
         <h1 className="text-2xl font-extrabold text-ink">We couldn't load this part</h1>
-        <p className="mt-2 text-sm text-steel">The catalogue didn't answer for <span className="font-mono font-bold text-ink">{sku}</span>. It is usually back in a moment.</p>
+        <p className="mt-2 text-sm text-steel">The catalogue didn't answer for <span className="font-mono font-bold text-ink">{identifier}</span>. It is usually back in a moment.</p>
         <div className="mt-6 flex justify-center gap-3">
           <button onClick={() => refetch()} disabled={isFetching} className="rounded bg-gold px-6 py-2.5 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white disabled:opacity-60">
             {isFetching ? "Trying again…" : "Try again"}
@@ -285,7 +285,7 @@ export default function ProductDetail() {
     return (
       <main className="mx-auto max-w-7xl px-4 py-16 text-center">
         <h1 className="text-2xl font-extrabold text-ink">Part not on file</h1>
-        <p className="mt-2 text-sm text-steel">We couldn't find the product SKU: <span className="font-mono font-bold text-ink">{sku}</span></p>
+        <p className="mt-2 text-sm text-steel">We couldn't find the requested product: <span className="font-mono font-bold text-ink">{identifier}</span></p>
         <div className="mt-6 flex justify-center gap-3">
           <Link to="/shop" className="rounded bg-gold px-6 py-2.5 text-sm font-bold text-ink hover:bg-navy hover:text-white transition-colors">
             Shop All Products
