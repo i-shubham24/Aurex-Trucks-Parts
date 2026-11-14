@@ -1,5 +1,5 @@
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { Award, CheckCircle2, Minus, Plus, Ruler, ShieldCheck, Truck, ShoppingCart, ZoomIn, Star, Mail, Layers, Check, BookOpen } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { useSite } from "../store/site";
@@ -204,6 +204,43 @@ const SIZE_FAMILIES = [
   }
 ];
 
+function getRelevantGuide(p, isTailLift) {
+  if (!p) return null;
+  if (isTailLift) {
+    return {
+      title: "Choosing the Right Tail Lift Capacity",
+      url: "/guides/choosing-a-tail-lift",
+      badge: "Fitment & Capacity Guide",
+      snippet: "Need help sizing capacity or platform dimensions for your chassis?"
+    };
+  }
+  if (p.categorySlug === 'trailer-parts' && (p.sub?.includes('Signage') || p.sub?.includes('Marker') || p.sku?.startsWith('ATP-TP-10') || p.sku?.startsWith('ATP-TP-11'))) {
+    return {
+      title: "Rear Marking Plates: What Your Truck Needs (VSB 12)",
+      url: "/guides/rear-marking-plates-vsb12",
+      badge: "VSB 12 Compliance Guide",
+      snippet: "Check NHVR regulations for Categories 33, 34, 41, 81 and 615 plates."
+    };
+  }
+  if (p.sub?.includes('Honeycomb') || p.sub?.includes('Plywood') || p.sub?.includes('XPS') || p.sub?.includes('Panel')) {
+    return {
+      title: "FRP Honeycomb vs Plywood vs XPS Panels",
+      url: "/guides/frp-honeycomb-vs-plywood-vs-xps-panels",
+      badge: "Material Comparison Guide",
+      snippet: "Compare structural strength, core weight, and thermal insulation."
+    };
+  }
+  if (p.sub?.includes('Door') || p.sub?.includes('Gear') || p.sub?.includes('Hinge') || p.sub?.includes('Lock') || p.sub?.includes('Seal')) {
+    return {
+      title: "Truck & Trailer Door Hardware Explained",
+      url: "/guides/truck-trailer-door-hardware",
+      badge: "Hardware & Sizing Guide",
+      snippet: "Learn how to measure bar diameters, handle handing and seals."
+    };
+  }
+  return null;
+}
+
 export default function ProductDetail() {
   const { slug, sku } = useParams();
   const identifier = slug || sku;
@@ -389,41 +426,7 @@ export default function ProductDetail() {
     return null;
   })();
 
-  const relevantGuide = useMemo(() => {
-    if (isTailLift) {
-      return {
-        title: "Choosing the Right Tail Lift Capacity",
-        url: "/guides/choosing-a-tail-lift",
-        badge: "Fitment & Capacity Guide",
-        snippet: "Need help sizing capacity or platform dimensions for your chassis?"
-      };
-    }
-    if (p.categorySlug === 'trailer-parts' && (p.sub?.includes('Signage') || p.sub?.includes('Marker') || p.sku?.startsWith('ATP-TP-10') || p.sku?.startsWith('ATP-TP-11'))) {
-      return {
-        title: "Rear Marking Plates: What Your Truck Needs (VSB 12)",
-        url: "/guides/rear-marking-plates-vsb12",
-        badge: "VSB 12 Compliance Guide",
-        snippet: "Check NHVR regulations for Categories 33, 34, 41, 81 and 615 plates."
-      };
-    }
-    if (p.sub?.includes('Honeycomb') || p.sub?.includes('Plywood') || p.sub?.includes('XPS') || p.sub?.includes('Panel')) {
-      return {
-        title: "FRP Honeycomb vs Plywood vs XPS Panels",
-        url: "/guides/frp-honeycomb-vs-plywood-vs-xps-panels",
-        badge: "Material Comparison Guide",
-        snippet: "Compare structural strength, core weight, and thermal insulation."
-      };
-    }
-    if (p.sub?.includes('Door') || p.sub?.includes('Gear') || p.sub?.includes('Hinge') || p.sub?.includes('Lock') || p.sub?.includes('Seal')) {
-      return {
-        title: "Truck & Trailer Door Hardware Explained",
-        url: "/guides/truck-trailer-door-hardware",
-        badge: "Hardware & Sizing Guide",
-        snippet: "Learn how to measure bar diameters, handle handing and seals."
-      };
-    }
-    return null;
-  }, [isTailLift, p.categorySlug, p.sub, p.sku]);
+  const relevantGuide = getRelevantGuide(p, isTailLift);
 
   return (
     <main className="mx-auto max-w-7xl px-4 py-6">
