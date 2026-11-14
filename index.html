@@ -80,11 +80,12 @@
           }
         },
         {
-          "@type": "AutoPartsStore",
+          "@type": ["AutoPartsStore", "LocalBusiness"],
           "@id": "https://www.aurextruckparts.com.au/#store",
           "name": "Aurex Truck Parts Australia - Campbellfield Trade Counter",
+          "legalName": "Aurex Panels Pty Limited",
           "url": "https://www.aurextruckparts.com.au/",
-          "description": "Truck and trailer parts supplier with a physical trade counter in Campbellfield, Melbourne, offering hydraulic tail lifts, trailer hardware, truck body parts and accessories.",
+          "description": "Truck and trailer parts supplier with a physical trade counter and warehouse in Campbellfield, Melbourne, offering hydraulic tail lifts, trailer hardware, truck body parts, fleet accessories, and Click & Collect pickup.",
           "telephone": "+61414730467",
           "email": "info@aurextruckparts.com.au",
           "logo": "https://www.aurextruckparts.com.au/logo.jpeg",
@@ -103,6 +104,9 @@
             "longitude": 144.9572
           },
           "hasMap": "https://maps.google.com/?q=77+Capital+Link+Drive,+Campbellfield+VIC+3061",
+          "sameAs": [
+            "https://maps.google.com/?q=77+Capital+Link+Drive,+Campbellfield+VIC+3061"
+          ],
           "openingHoursSpecification": [
             {
               "@type": "OpeningHoursSpecification",
@@ -119,11 +123,13 @@
           ],
           "priceRange": "$$",
           "currenciesAccepted": "AUD",
-          "paymentAccepted": "Cash, Credit Card, Direct Debit, Bank Transfer, Trade Account",
-          "areaServed": {
-            "@type": "Place",
-            "name": "Melbourne, Victoria, Australia"
-          },
+          "paymentAccepted": "Cash, Credit Card, EFTPOS, Direct Bank Transfer, 30-Day Fleet Trade Account",
+          "areaServed": [
+            { "@type": "City", "name": "Campbellfield" },
+            { "@type": "City", "name": "Melbourne" },
+            { "@type": "AdministrativeArea", "name": "Victoria" },
+            { "@type": "Country", "name": "Australia" }
+          ],
           "parentOrganization": {
             "@id": "https://www.aurextruckparts.com.au/#organization"
           }
@@ -215,7 +221,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
     <link rel="preload" as="image" href="/images/web/aurex-tail-lift.webp" type="image/webp" fetchpriority="high" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" /></noscript>
     <!-- #seo-snapshot is build-time HTML for crawlers that don't run JavaScript (scripts/prerender.js).
          Browsers running the app never show it; React replaces #root on load. -->
     <script>document.documentElement.classList.add("js")</script>

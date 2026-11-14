@@ -27,10 +27,14 @@ export default function SafeImage({
     );
   }
 
+  const defaultDimension = cdnWidth || 360;
+
   return (
     <img
       src={cld(src, cdnWidth)}
       alt={safeAlt}
+      width={props.width || defaultDimension}
+      height={props.height || defaultDimension}
       loading={loading}
       decoding="async"
       fetchPriority={fetchPriority}

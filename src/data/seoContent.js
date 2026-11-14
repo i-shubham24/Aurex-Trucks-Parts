@@ -10,11 +10,29 @@ export const subSlug = (name) =>
 
 /* Homepage H1 and overview section; "{address}" is replaced with the trade counter address. */
 export const HOME_CONTENT = {
-  h1: "Truck & trailer parts, tail lifts and body hardware · Campbellfield, Melbourne",
-  heading: "Truck and trailer parts from Campbellfield, shipped Australia-wide",
+  h1: "Truck & Trailer Parts Australia · Tail Lift Parts & Accessories · Melbourne Trade Counter",
+  heading: "Australian Truck & Trailer Parts, Tail Lifts & Heavy Vehicle Spares",
   paragraphs: [
-    "Aurex supplies fleets, body builders and workshops with hydraulic tail lifts, trailer and truck body hardware and heavy vehicle signage. The range covers door gear and cam locks, hinges, paddle locks, door seals, cargo tracks and restraint fittings, curtainsider and tipper hardware, side guards, aluminium body profiles, composite body panels, and Class 1 reflective rear marking plates.",
-    "Stocked lines ship from our trade counter at {address}. Order by 2pm for same-day dispatch. VIC metro is overnight, Sydney, Brisbane and Adelaide take 1 to 2 business days, and Perth and regional areas take 2 to 5. ABN workshops and fleets can open a trade account, and tail lifts are quoted to suit your chassis.",
+    "Aurex Truck Parts is Australia's dedicated supplier of commercial heavy vehicle spares, hydraulic tail lifts, and heavy-duty trailer parts & accessories online Australia. Engineered for transport fleets, commercial body builders, and repair workshops, our catalogue provides ADR-compliant hardware, certified load restraint systems, and replacement components built to endure harsh Australian freight corridors.",
+    "Order online for fast Australia-wide dispatch or visit our Melbourne trade counter at {address}. Whether you need to buy online trailer parts in Australia or collect urgent truck and trailer parts online today, we stock over 140+ verified lines ready for immediate dispatch.",
+  ],
+  subsections: [
+    {
+      title: "Tail Lift Parts & Accessories in Australia",
+      content: "As commercial tail lift specialists, we engineer and stock high-performance cantilever tail lifts and replacement tail lift truck parts in Australia. Our inventory ranges from 1.5-tonne lightweight aluminium units for urban delivery vehicles to 2.0-tonne and 3.0-tonne high-tensile steel lifts for heavy regional haulage. In addition to full lift assemblies, we supply genuine hydraulic power packs (12V and 24V), cylinders, heavy-duty foot controls, wander leads, safety flags, and pivot pins. For Melbourne fleet operators seeking tail lift truck parts Melbourne, our Campbellfield workshop provides technical sizing, VIN-matched advice, and same-day collection.",
+    },
+    {
+      title: "Shop Heavy Vehicle Spares & Trailer Parts Melbourne",
+      content: "Commercial transport uptime depends on heavy hardware that survives constant road vibration and heavy payloads. Aurex is your premier source for trailer spare parts Australia, covering 27mm cam door locks, heavy-duty stainless steel and forged steel hinges, recessed paddle latches, weld-on spring bolts, and continuous EPDM automotive door rubber seals. Located in Campbellfield (VIC 3061) right along the Hume Highway transport corridor, we are the first stop for trailer parts Melbourne mechanics and fleet managers rely on when vehicle downtime is not an option.",
+    },
+    {
+      title: "Cargo Restraint, Body Panels & Australian Transport Signage",
+      content: "Keep your trailers secure and compliant with Australia's Heavy Vehicle National Law (HVNL). Our cargo restraint selection includes F-track and E-track logistics systems, shoring bars, spring-loaded cargo fittings, and commercial tie-down tracks. We also manufacture precision composite body panels, including lightweight FRP polypropylene honeycomb panels, heavy-duty plywood core panels, and XPS thermal insulated panels for refrigerated transport bodies. All safety signage—including 3M Class 1 reflective rear marking plates, Cat 34A, Cat 41A/B zebra plates, and 'Do Not Overtake Turning Vehicle' plates—complies strictly with NHVR VSB 12 regulations.",
+    },
+    {
+      title: "Fast Nationwide Delivery & Melbourne Trade Counter Click & Collect",
+      content: "We understand that every hour a truck is off the road costs your business money. All stocked lines ordered by 2:00 PM AEST dispatch same-day from our Melbourne warehouse. Metro Melbourne and Victoria regional orders receive overnight express courier delivery. Interstate freight reaches Sydney, Brisbane, and Adelaide within 1 to 2 business days, and Perth or regional hubs within 2 to 5 business days. Free freight is automatically applied on eligible orders over $200. Alternatively, choose our 4-hour Click & Collect service to pick up your trailer parts & accessories directly from our Campbellfield trade counter.",
+    },
   ],
   // [label, path, part number whose photo the homepage tile shows]; links without a photo render as buttons.
   links: [

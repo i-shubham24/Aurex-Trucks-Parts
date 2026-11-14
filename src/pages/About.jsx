@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, BadgeCheck, ClipboardCheck, Phone, Truck } from "lucide-react";
+import { ArrowRight, BadgeCheck, ClipboardCheck, MapPin, Phone, Truck } from "lucide-react";
 import { useCompany, useSite } from "../store/site";
 import { formatAUD } from "../data/products";
+import { HOME_CONTENT } from "../data/seoContent";
 
 import { PHOTO } from "../data/images";
 import { useCategories } from "../hooks/api/useCategories";
@@ -74,6 +75,56 @@ export default function About() {
               </li>
             ))}
           </ul>
+        </div>
+      </section>
+
+      {/* Technical Spares Capabilities & Melbourne Trade Counter */}
+      <section className="mx-auto max-w-7xl px-4 pt-12">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">Technical Spares & Distribution</p>
+          <h2 className="mt-1 text-2xl font-extrabold tracking-tight md:text-[28px]">Australian Truck &amp; Trailer Parts, Tail Lifts &amp; Heavy Vehicle Spares</h2>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-steel">
+            Engineered for transport fleets, commercial body builders, and repair workshops across Australia. Every line is sourced and verified to meet Australian Design Rules (ADR) and heavy freight standards.
+          </p>
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+          {HOME_CONTENT.subsections?.map((sub) => (
+            <div key={sub.title} className="rounded-md border border-line bg-white p-6 shadow-xs">
+              <h3 className="text-base font-extrabold text-ink">{sub.title}</h3>
+              <p className="mt-2 text-xs sm:text-[13px] leading-relaxed text-steel">{sub.content}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Campbellfield Trade Counter & Google Maps Directions Block */}
+        <div className="mt-6 rounded-md border border-gold/50 bg-white p-6 shadow-xs">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div>
+              <span className="inline-block rounded-full bg-gold/20 px-2.5 py-0.5 text-[11px] font-bold text-ink">Melbourne Trade Counter &amp; Click &amp; Collect</span>
+              <h3 className="mt-1 text-lg font-extrabold text-ink">Campbellfield Warehouse &amp; Trade Counter</h3>
+              <p className="mt-1 text-xs text-steel">77 Capital Link Drive, Campbellfield VIC 3061 (Melbourne Northern Transport Corridor)</p>
+              <p className="mt-1 text-xs font-semibold text-primary">Open Monday – Friday: 9:00 AM – 5:00 PM AEST | Free 4-Hour Urgent Click &amp; Collect</p>
+            </div>
+            <div className="flex flex-col lg:flex-row shrink-0 gap-2.5 w-full lg:w-auto">
+              <a
+                href="https://maps.google.com/?q=77+Capital+Link+Drive,+Campbellfield+VIC+3061"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-1.5 rounded bg-navy px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-gold hover:text-ink text-center w-full lg:w-auto shadow-xs"
+              >
+                <MapPin size={14} className="text-gold shrink-0" />
+                Get Directions
+              </a>
+              <a
+                href={COMPANY.phoneHref}
+                className="inline-flex items-center justify-center gap-1.5 rounded border border-ink px-4 py-2.5 text-xs font-bold text-ink transition-colors hover:bg-ink hover:text-white text-center w-full lg:w-auto"
+              >
+                <Phone size={14} className="shrink-0" />
+                Call {COMPANY.phone}
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 

@@ -265,8 +265,14 @@ export async function prerender(outDir) {
   let count = 0;
   for (const pathname of STATIC_PAGES) {
     const { title, desc } = getPageMeta(pathname);
+    let extra = "";
+    if (pathname === "/about") {
+      extra = `<h2>Australian Truck &amp; Trailer Parts, Tail Lifts &amp; Heavy Vehicle Spares</h2>`
+        + (HOME_CONTENT.subsections || []).map((sub) => `<h3>${esc(sub.title)}</h3><p>${esc(sub.content)}</p>`).join("")
+        + `<h2>Melbourne Trade Counter &amp; Local Pickup</h2><p>Visit our trade counter and warehouse at 77 Capital Link Drive, Campbellfield VIC 3061 (Melbourne Northern Transport Corridor). Open Monday – Friday: 9:00 AM – 5:00 PM AEST. Phone: +61 414 730 467. Free 4-Hour Urgent Click &amp; Collect available for transport fleets and mechanics.</p>`;
+    }
     await write(outDir, pathname, pageHtml(template, pathname, {
-      body: frame(categories, `<h1>${esc(title.split(" | ")[0])}</h1><p>${esc(desc)}</p>`),
+      body: frame(categories, `<h1>${esc(title.split(" | ")[0])}</h1><p>${esc(desc)}</p>${extra}`),
     }));
     count++;
   }

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { HOME_CONTENT } from "../data/seoContent";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, ClipboardCheck, Headset, Truck } from "lucide-react";
+import { ArrowRight, BadgeCheck, ChevronLeft, ChevronRight, ClipboardCheck, Headset, Phone, Truck } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { FAQS } from "../data/company";
 import { useCompany, useSite } from "../store/site";
