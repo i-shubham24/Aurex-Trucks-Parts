@@ -249,6 +249,14 @@
       "destination": "https://truck-parts-api.vercel.app/api/v1/sitemap.xml"
     },
     {
+      "source": "/google-merchant.xml",
+      "destination": "https://truck-parts-api.vercel.app/api/v1/feeds/google-merchant.xml"
+    },
+    {
+      "source": "/feeds/google-merchant.xml",
+      "destination": "https://truck-parts-api.vercel.app/api/v1/feeds/google-merchant.xml"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://truck-parts-api.vercel.app/api/:path*"
     },

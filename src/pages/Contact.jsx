@@ -38,14 +38,9 @@ export default function Contact() {
   
   const send = async (e) => {
     e.preventDefault();
-    if (!user) {
-      notify.info({
-        kicker: "LOGIN REQUIRED",
-        title: "Sign In Required",
-        message: "Please sign in or create an account to submit an enquiry.",
-        sound: false,
-      });
-      openAuthModal({ mode: "login" });
+    // Bot honeypot check
+    if (form.hp_website) {
+      setSent(true);
       return;
     }
 
@@ -183,21 +178,7 @@ export default function Contact() {
             <p className="text-lg font-extrabold">Request a Quote</p>
             <p className="mt-1 text-[13px] text-steel">For trailer parts, photos and measurements get you an exact price fastest.</p>
             
-            {!user ? (
-              <div className="mt-4 flex items-center justify-between gap-3 rounded-lg border border-amber-300 bg-amber-50 p-3.5 text-xs text-amber-900">
-                <div className="flex items-center gap-2 font-medium">
-                  <Lock size={15} className="shrink-0 text-amber-700" />
-                  <span>Account sign-in is required to submit an enquiry.</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => openAuthModal({ mode: "login" })}
-                  className="shrink-0 rounded bg-navy px-3 py-1.5 font-bold text-white transition-colors hover:bg-gold hover:text-ink cursor-pointer"
-                >
-                  Sign In →
-                </button>
-              </div>
-            ) : (
+            {user && (
               <div className="mt-4 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-2.5 text-xs font-semibold text-green-900">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-600 text-[10px] text-white">✓</span>
                 <span>Signed in as {[user.firstName, user.lastName].filter(Boolean).join(" ") || user.name || user.email}</span>
@@ -215,23 +196,25 @@ export default function Contact() {
             <label className="mt-3 block"><span className="mb-1 block text-xs font-bold">What do you need? *</span><textarea required value={form.msg} onChange={set("msg")} rows={5} maxLength={2000} placeholder="Body type, SKU, sizes, VIN if critical" className={`w-full rounded-md border bg-white px-3 py-2.5 text-sm outline-none placeholder:text-faint focus:border-gold ${errs.msg ? "border-red-500" : "border-line-dark"}`} />{err("msg")}</label>
             {errs.form && <p role="alert" className="mt-3 text-[13px] font-semibold text-red-600">{errs.form}</p>}
             
-            {!user ? (
-              <button
-                type="button"
-                onClick={() => openAuthModal({ mode: "login" })}
-                className="mt-4 flex items-center gap-2 rounded bg-navy px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-gold hover:text-ink cursor-pointer"
-              >
-                <Lock size={15} /> Sign In to Send Enquiry
-              </button>
-            ) : (
-              <button
-                type="submit"
-                disabled={sending}
-                className="mt-4 flex items-center gap-2 rounded bg-gold px-6 py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white disabled:cursor-wait disabled:opacity-60 cursor-pointer"
-              >
-                <Send size={15} /> {sending ? "Sending…" : "Send Enquiry"}
-              </button>
-            )}
+            {/* Honeypot field for bot mitigation */}
+            <input
+              type="text"
+              name="hp_website"
+              value={form.hp_website || ""}
+              onChange={set("hp_website")}
+              tabIndex={-1}
+              autoComplete="off"
+              className="hidden opacity-0 absolute -z-10 pointer-events-none"
+              aria-hidden="true"
+            />
+
+            <button
+              type="submit"
+              disabled={sending}
+              className="mt-4 flex items-center gap-2 rounded bg-gold px-6 py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white disabled:cursor-wait disabled:opacity-60 cursor-pointer shadow-xs"
+            >
+              <Send size={15} /> {sending ? "Sending…" : "Submit Enquiry"}
+            </button>
           </form>
         )}
 
