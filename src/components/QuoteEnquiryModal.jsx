@@ -56,6 +56,11 @@ Thank you!`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Bot honeypot check (Audit 6.3)
+    if (form.hp_website) {
+      setSubmitted(true);
+      return;
+    }
     if (!form.name || !form.emailOrPhone) {
       notify.error({
         title: "Required fields missing",
@@ -247,6 +252,18 @@ Thank you!`;
                     className="w-28 rounded border border-line px-3 py-1.5 text-xs focus:border-navy focus:outline-hidden"
                   />
                 </div>
+
+                {/* Honeypot field for bot mitigation (Audit 6.3) */}
+                <input
+                  type="text"
+                  name="hp_website"
+                  value={form.hp_website || ""}
+                  onChange={(e) => setForm({ ...form, hp_website: e.target.value })}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  className="hidden opacity-0 absolute -z-10 pointer-events-none"
+                  aria-hidden="true"
+                />
 
                 {submitError && (
                   <p role="alert" className="rounded border border-red-300 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
