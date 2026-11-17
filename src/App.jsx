@@ -10,10 +10,10 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import PageMeta from "./components/PageMeta";
 import ErrorBoundary from "./components/ErrorBoundary";
-import CartDrawer from "./components/CartDrawer";
-import CompareTray from "./components/CompareTray";
-import AuthModal from "./components/AuthModal";
-import RatingPromptModal from "./components/RatingPromptModal";
+const CartDrawer = lazy(() => import("./components/CartDrawer"));
+const CompareTray = lazy(() => import("./components/CompareTray"));
+const AuthModal = lazy(() => import("./components/AuthModal"));
+const RatingPromptModal = lazy(() => import("./components/RatingPromptModal"));
 import Home from "./pages/Home";
 
 /* Everything except the landing page loads on demand. */
@@ -178,8 +178,10 @@ function Shell() {
       <ScrollManager />
       <PageMeta />
       <Header />
-      <CartDrawer />
-      <CompareTray />
+      <Suspense fallback={null}>
+        <CartDrawer />
+        <CompareTray />
+      </Suspense>
       <Suspense fallback={<PageFallback />}>
       <Routes>
         <Route path="/" element={<Home />} />
@@ -215,13 +217,15 @@ function Shell() {
       </Routes>
       </Suspense>
       <Footer />
-      <AuthModal
+      <Suspense fallback={null}>
+        <AuthModal
         isOpen={authModal.isOpen}
         onClose={closeAuthModal}
         initialMode={authModal.mode}
         onComplete={authModal.onComplete}
       />
       <RatingPromptModal />
+      </Suspense>
     </>
   );
 }

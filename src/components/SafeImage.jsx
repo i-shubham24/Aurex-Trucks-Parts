@@ -13,13 +13,15 @@ export default function SafeImage({
   ...props
 }) {
   const safeAlt = (alt && alt.trim()) || "Aurex commercial truck and trailer parts";
+  const [imgSrc, setImgSrc] = useState(src);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
+    setImgSrc(src);
     setFailed(false);
   }, [src]);
 
-  if (!src || failed) {
+  if (!imgSrc || failed) {
     return (
       <span className="grid h-full w-full place-items-center bg-mist text-faint select-none">
         <Package size={fallbackIconSize} />
@@ -31,14 +33,20 @@ export default function SafeImage({
 
   return (
     <img
-      src={cld(src, cdnWidth)}
+      src={cld(imgSrc, cdnWidth)}
       alt={safeAlt}
       width={props.width || defaultDimension}
       height={props.height || defaultDimension}
       loading={loading}
       decoding="async"
       fetchPriority={fetchPriority}
-      onError={() => setFailed(true)}
+      onError={() => {
+        if (typeof imgSrc === "string" && imgSrc.endsWith(".webp")) {
+          setImgSrc(imgSrc.replace(/\.webp$/, ".jpg"));
+        } else {
+          setFailed(true);
+        }
+      }}
       className={className}
       {...props}
     />

@@ -2,22 +2,35 @@
 <html lang="en-AU">
   <head>
     <meta charset="UTF-8" />
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-NRTJ4TLN');</script>
-    <!-- End Google Tag Manager -->
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18551723648"></script>
+    <!-- Google Tag Manager & Google Tag (Core Web Vitals Deferred Load) -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'AW-18551723648');
+      function initAnalytics() {
+        if (window.__analyticsLoaded) return;
+        window.__analyticsLoaded = true;
+        (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-NRTJ4TLN');
+        var gTag = document.createElement('script');
+        gTag.async = true;
+        gTag.src = 'https://www.googletagmanager.com/gtag/js?id=AW-18551723648';
+        document.head.appendChild(gTag);
+        gtag('js', new Date());
+        gtag('config', 'AW-18551723648');
+      }
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(function() { setTimeout(initAnalytics, 1500); }, { timeout: 3500 });
+      } else {
+        window.addEventListener('load', function() { setTimeout(initAnalytics, 1500); });
+      }
+      ['touchstart', 'scroll', 'click', 'keydown'].forEach(function(evt) {
+        window.addEventListener(evt, initAnalytics, { once: true, passive: true });
+      });
     </script>
+    <!-- End Google Tag Manager -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -221,7 +234,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
     <link rel="preload" as="image" href="/images/web/aurex-tail-lift.webp" type="image/webp" fetchpriority="high" />
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'" />
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" /></noscript>
     <!-- #seo-snapshot is build-time HTML for crawlers that don't run JavaScript (scripts/prerender.js).

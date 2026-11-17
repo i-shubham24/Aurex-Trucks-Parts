@@ -1,16 +1,16 @@
-// Local product shots live at public/images/products/<ATP part number>.jpg or .webp
+// Local product shots live at public/images/products/<ATP part number>.webp or .jpg
 export const imgFor = (sku) => {
   if (!sku) return null;
-  if (sku === 'ATP-TP-14') return '/images/products/ATP-TP-14-handle.jpg';
-  return `/images/products/${sku}.jpg`;
+  if (sku === 'ATP-TP-14') return '/images/products/ATP-TP-14-handle.webp';
+  return `/images/products/${sku}.webp`;
 };
 
 export const MULTI_IMAGES = {
-  'ATP-TP-83': ['/images/products/ATP-TP-83.jpg', '/images/products/ATP-TP-83-bar.jpg'],
-  'ATP-TP-69': ['/images/products/ATP-TP-69.jpg', '/images/products/ATP-TP-69-back.jpg'],
-  'ATP-TP-84': ['/images/products/ATP-TP-84.jpg', '/images/products/ATP-TP-84-back.jpg'],
-  'ATP-TP-85': ['/images/products/ATP-TP-85.jpg', '/images/products/ATP-TP-85-back.jpg'],
-  'ATP-TP-86': ['/images/products/ATP-TP-86.jpg', '/images/products/ATP-TP-86-back.jpg'],
+  'ATP-TP-83': ['/images/products/ATP-TP-83.webp', '/images/products/ATP-TP-83-bar.webp'],
+  'ATP-TP-69': ['/images/products/ATP-TP-69.webp', '/images/products/ATP-TP-69-back.webp'],
+  'ATP-TP-84': ['/images/products/ATP-TP-84.webp', '/images/products/ATP-TP-84-back.webp'],
+  'ATP-TP-85': ['/images/products/ATP-TP-85.webp', '/images/products/ATP-TP-85-back.webp'],
+  'ATP-TP-86': ['/images/products/ATP-TP-86.webp', '/images/products/ATP-TP-86-back.webp'],
 };
 
 const firstApiImage = (p) => {
@@ -20,7 +20,10 @@ const firstApiImage = (p) => {
 
 // The API's default image for a part is the same stock packshot path we keep locally.
 // Anything else was uploaded through the admin console.
-const isStockImage = (url, sku) => url === `/images/products/${sku}.jpg` || url === imgFor(sku);
+const isStockImage = (url, sku) =>
+  url === `/images/products/${sku}.jpg` ||
+  url === `/images/products/${sku}.webp` ||
+  url === imgFor(sku);
 
 /* Main image for a product: an admin-uploaded image wins, the local packshot is the fallback. */
 export const productImage = (p) => {
