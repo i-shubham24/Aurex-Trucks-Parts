@@ -98,9 +98,9 @@ export default function Footer() {
               <li><Link to={{ pathname: "/", hash: "#faq" }} className="transition-colors hover:text-navy hover:underline">FAQ</Link></li>
               <li><Link to="/guides" className="transition-colors hover:text-navy hover:underline">Guides</Link></li>
               <li><Link to="/contact" className="transition-colors hover:text-navy hover:underline">Contact</Link></li>
-              <li><Link to="/policies?tab=shipping" className="transition-colors hover:text-navy hover:underline">Shipping &amp; Returns</Link></li>
-              <li><Link to="/policies?tab=terms" className="transition-colors hover:text-navy hover:underline">Terms &amp; Conditions</Link></li>
-              <li><Link to="/policies?tab=privacy" className="transition-colors hover:text-navy hover:underline">Privacy Policy</Link></li>
+              <li><Link to="/shipping" className="transition-colors hover:text-navy hover:underline">Shipping &amp; Returns</Link></li>
+              <li><Link to="/terms" className="transition-colors hover:text-navy hover:underline">Terms &amp; Conditions</Link></li>
+              <li><Link to="/privacy" className="transition-colors hover:text-navy hover:underline">Privacy Policy</Link></li>
             </ul>
           </div>
         </div>

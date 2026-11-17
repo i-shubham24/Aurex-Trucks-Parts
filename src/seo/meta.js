@@ -81,13 +81,18 @@ const META = [
   [/^\/order-success(\/|$)/, [branded("Order Confirmed"), "Thank you for your order with Aurex Truck Parts Australia. Your commercial truck parts are being prepared for dispatch from Campbellfield VIC."]],
   [/^\/thank-you$/, [branded("Thank You"), "Thank you for contacting Aurex Truck Parts Australia. Your quotation enquiry has been received and our Campbellfield team will be in touch shortly."]],
   [/^\/policies$/, [branded("Shipping, Returns & Policies"), "Plain-English policies for Aurex Truck Parts orders in Australia: shipping and freight, returns, warranty claims, terms of sale and privacy."]],
+  [/^\/shipping$/, [branded("Shipping & Delivery Policy"), "Fast same-day dispatch from Campbellfield VIC across Australia. Road freight free over $200. Express courier and click & collect available."]],
+  [/^\/returns$/, [branded("Returns & Refund Policy"), "30-day unused returns on commercial truck and trailer parts. Fast processing, replacements, and account credits from Aurex Campbellfield."]],
+  [/^\/warranty$/, [branded("Warranty Policy"), "12-month commercial replacement warranty on Aurex truck and trailer body hardware, locks, hinges, and accessories."]],
+  [/^\/terms$/, [branded("Terms & Conditions of Sale"), "Official terms and conditions for commercial vehicle parts sales, orders, quotations, and warranties with Aurex Truck Parts Australia."]],
+  [/^\/privacy$/, [branded("Privacy Policy"), "How Aurex Truck Parts collects, handles, and protects customer, account, and quotation data under Australian privacy law."]],
   [/^\/guides$/, [branded("Truck & Trailer Parts Guides"), "Plain-English guides to rear marking plates (VSB 12), truck and trailer door hardware, body panels and choosing a tail lift."]],
 ];
 
 /* Routes the app actually serves (see App.jsx); anything else renders the 404 page. */
 const KNOWN_ROUTES = [
   /^\/$/, /^\/about$/, /^\/contact$/, /^\/tail-lift-enquiry$/, /^\/enquiry\/tail-lift$/,
-  /^\/shop(\/[^/]+){0,2}$/, /^\/guides(\/[^/]+)?$/, /^\/policies$/, /^\/product\/[^/]+$/, /^\/news\/[^/]+$/,
+  /^\/shop(\/[^/]+){0,2}$/, /^\/guides(\/[^/]+)?$/, /^\/policies$/, /^\/(shipping|returns|warranty|terms|privacy)$/, /^\/product\/[^/]+$/, /^\/p\/[^/]+$/, /^\/news\/[^/]+$/,
   /^\/checkout$/, /^\/order-success\/[^/]+$/, /^\/thank-you$/, /^\/orders$/, /^\/profile$/, /^\/track$/,
   /^\/login$/, /^\/signup$/, /^\/forgot-password$/, /^\/reset-password$/,
 ];

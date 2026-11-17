@@ -716,7 +716,7 @@ export default function ProductDetail() {
                 : "Send an enquiry and we confirm fitment and price before you order.")
               : "Good match for this line. Add to cart and we double check before dispatch."}</p>
             <p className="mt-2 flex items-start gap-2"><Truck size={16} className="mt-0.5 shrink-0 text-green-600" /> {p.status}. {p.lead}.</p>
-            <p className="mt-2 border-t border-line pt-2 text-[13px] text-steel"><Link className="font-bold text-navy underline" to="/policies?tab=shipping">Shipping</Link> . <Link className="font-bold text-navy underline" to="/policies?tab=returns">Returns</Link> . <Link className="font-bold text-navy underline" to="/policies?tab=warranty">Warranty</Link></p>
+            <p className="mt-2 border-t border-line pt-2 text-[13px] text-steel"><Link className="font-bold text-navy underline" to="/shipping">Shipping</Link> . <Link className="font-bold text-navy underline" to="/returns">Returns</Link> . <Link className="font-bold text-navy underline" to="/warranty">Warranty</Link></p>
           </div>
         </div>
       </div>
@@ -901,7 +901,7 @@ export default function ProductDetail() {
               <p>Check measurements against your old part, or send our VIC desk your VIN through the <Link className="font-bold text-navy underline" to="/contact">contact form</Link>.</p>
             </div>
           )}
-          {tab === "freight" && <p className="max-w-3xl text-sm leading-6 text-steel">Order by 2pm for same day dispatch ex Campbellfield. Free road freight over {freeOver}. Unused parts in original packaging can be returned within 30 days, see our <Link className="font-bold text-navy underline" to="/policies?tab=returns">returns policy</Link>.</p>}
+          {tab === "freight" && <p className="max-w-3xl text-sm leading-6 text-steel">Order by 2pm for same day dispatch ex Campbellfield. Free road freight over {freeOver}. Unused parts in original packaging can be returned within 30 days, see our <Link className="font-bold text-navy underline" to="/returns">returns policy</Link>.</p>}
           {tab === "reviews" && (
             <div className="space-y-6">
               {/* Ratings Summary Bar */}

@@ -194,6 +194,12 @@ function Shell() {
         <Route path="/guides" element={<GuidesIndex />} />
         <Route path="/guides/:slug" element={<Guide />} />
         <Route path="/policies" element={<Policies />} />
+        <Route path="/shipping" element={<Policies initial="shipping" />} />
+        <Route path="/returns" element={<Policies initial="returns" />} />
+        <Route path="/warranty" element={<Policies initial="warranty" />} />
+        <Route path="/terms" element={<Policies initial="terms" />} />
+        <Route path="/privacy" element={<Policies initial="privacy" />} />
+        <Route path="/p/:sku" element={<ProductDetail />} />
         <Route path="/product/:slug" element={<ProductDetail />} />
         <Route path="/news/:slug" element={<Article />} />
         <Route path="/checkout" element={<Checkout />} />

@@ -1,4 +1,4 @@
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import { formatAUD } from "../data/products";
 import { useCompany, useSite } from "../store/site";
 import EmailLink from "../components/EmailLink";
@@ -190,10 +190,22 @@ export default function Policies({ initial = "shipping" }) {
   const company = useCompany();
   const { settings } = useSite();
   const [params, setParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
   const tabs = buildPolicies({ company, settings });
 
-  const wanted = params.get("tab") || initial;
+  const currentPath = location.pathname.replace(/^\//, "");
+  const isDirect = tabs.some((t) => t.id === currentPath);
+  const wanted = isDirect ? currentPath : (params.get("tab") || initial);
   const active = tabs.find((t) => t.id === wanted) || tabs[0];
+
+  const handleTabChange = (tabId) => {
+    if (isDirect) {
+      navigate(`/${tabId}`);
+    } else {
+      setParams({ tab: tabId }, { replace: true });
+    }
+  };
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
@@ -205,7 +217,7 @@ export default function Policies({ initial = "shipping" }) {
             key={t.id}
             role="tab"
             aria-selected={active.id === t.id}
-            onClick={() => setParams({ tab: t.id }, { replace: true })}
+            onClick={() => handleTabChange(t.id)}
             className={`rounded-md px-3.5 py-2.5 text-xs font-bold uppercase tracking-wide transition-colors ${active.id === t.id ? "bg-ink text-white" : "bg-mist text-steel hover:text-ink"}`}
           >
             {t.label}

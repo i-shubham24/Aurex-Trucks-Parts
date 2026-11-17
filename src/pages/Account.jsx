@@ -425,7 +425,7 @@ export default function Orders() {
             <OrdersToolbar q={q} setQ={setQ} status={status} setStatus={setStatus} count={validOrders.length} />
             <div className="flex flex-wrap gap-2 text-[13px] font-bold">
               <Link to="/track" className="flex-1 whitespace-nowrap rounded-lg border border-ink bg-white px-4 py-2.5 text-center transition hover:bg-ink hover:text-white">Track by ID</Link>
-              <Link to="/policies?tab=returns" className="flex-1 whitespace-nowrap rounded-lg border border-line-dark bg-white px-4 py-2.5 text-center transition hover:border-navy hover:text-navy">Returns</Link>
+              <Link to="/returns" className="flex-1 whitespace-nowrap rounded-lg border border-line-dark bg-white px-4 py-2.5 text-center transition hover:border-navy hover:text-navy">Returns</Link>
             </div>
           </aside>
           <div>
@@ -843,7 +843,7 @@ export function ProfileBody() {
             <div className="grid gap-2">
               <Link to="/orders" className="rounded-lg border border-ink bg-white py-2 text-center text-[13px] font-bold transition hover:bg-ink hover:text-white">All Orders</Link>
               <Link to="/track" className="rounded-lg border border-ink bg-white py-2 text-center text-[13px] font-bold transition hover:bg-ink hover:text-white">Track Order</Link>
-              <Link to="/policies?tab=returns" className="rounded-lg border border-ink bg-white py-2 text-center text-[13px] font-bold transition hover:bg-ink hover:text-white">Returns Policy</Link>
+              <Link to="/returns" className="rounded-lg border border-ink bg-white py-2 text-center text-[13px] font-bold transition hover:bg-ink hover:text-white">Returns Policy</Link>
             </div>
           </aside>
 
