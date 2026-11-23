@@ -63,6 +63,16 @@ export default function OrderSuccess() {
                   localStorage.setItem("aurex_orders", JSON.stringify(list));
                 }
               }
+              const guestRaw = localStorage.getItem("aurex_guest_orders");
+              if (guestRaw) {
+                const guestList = JSON.parse(guestRaw);
+                const targetId = id || verifyRes.orderNumber;
+                const idx = guestList.findIndex((o) => (o.id || o.ref || o.orderNumber) === targetId);
+                if (idx !== -1) {
+                  guestList[idx] = { ...guestList[idx], paymentStatus: "PAID", status: "Confirmed" };
+                  localStorage.setItem("aurex_guest_orders", JSON.stringify(guestList));
+                }
+              }
             } catch {}
           }
         } catch {}
@@ -71,7 +81,10 @@ export default function OrderSuccess() {
       if (id && API_ON) {
         setLoading(true);
         try {
-          const res = await api.get(`/orders/${encodeURIComponent(id)}`);
+          const guestEmail = localStorage.getItem("aurex_last_guest_email") || searchParams.get("email");
+          const emailParam = guestEmail ? `?email=${encodeURIComponent(guestEmail)}` : "";
+          const sessionParam = sessionId ? `${emailParam ? '&' : '?'}sessionId=${encodeURIComponent(sessionId)}` : "";
+          const res = await api.get(`/orders/${encodeURIComponent(id)}${emailParam}${sessionParam}`);
           const live = res?.order || res?.data?.order;
           if (live && active) {
             const normalised = normaliseOrder(live);

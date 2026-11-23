@@ -218,6 +218,8 @@ function ApiAuthProvider({ children }) {
   // Checkout awaits this. Returns the created (normalised) order, or null on failure.
   const placeOrder = useCallback(async (order) => {
     try {
+      const isGuestOrder = order.isGuest ?? !user;
+      const guestEmail = order.guestEmail || order.address?.email || null;
       const payload = {
         items: (order.items || []).map((l) => ({ sku: l.sku, qty: l.qty, name: l.name, price: l.price })),
         promoCode: order.promoCode || null,
@@ -228,6 +230,8 @@ function ApiAuthProvider({ children }) {
         discount: order.discount,
         payment: order.payment,
         address: order.address,
+        isGuest: isGuestOrder,
+        guestEmail,
       };
       const res = await api.post("/orders", payload);
       const created = res.order || res.data?.order || res.data;
@@ -236,6 +240,13 @@ function ApiAuthProvider({ children }) {
       try {
         const stored = JSON.parse(localStorage.getItem(ORDERS_KEY) || "[]");
         localStorage.setItem(ORDERS_KEY, JSON.stringify([norm, ...stored.filter((x) => x.id !== norm.id)]));
+        if (isGuestOrder) {
+          const guest = JSON.parse(localStorage.getItem("aurex_guest_orders") || "[]");
+          localStorage.setItem("aurex_guest_orders", JSON.stringify([norm, ...guest.filter((x) => x.id !== norm.id)]));
+          if (guestEmail) {
+            localStorage.setItem("aurex_last_guest_email", guestEmail);
+          }
+        }
       } catch {}
       return norm;
     } catch (e) {
@@ -247,7 +258,7 @@ function ApiAuthProvider({ children }) {
       });
       return null;
     }
-  }, [notify]);
+  }, [user, notify]);
 
   const updateProfile = useCallback(async (profileData) => {
     try {

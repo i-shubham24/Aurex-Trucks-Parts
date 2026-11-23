@@ -2,12 +2,16 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
+  AlertCircle,
+  Building2,
   CheckCircle2,
+  Clock,
   CreditCard,
   Edit2,
   Landmark,
   Loader2,
   Lock,
+  MapPin,
   Minus,
   Plus,
   ShieldCheck,
@@ -30,12 +34,28 @@ import { calculateOrderTotals, tradeDiscountFor } from "../utils/pricing";
 
 const STATES = ["VIC", "NSW", "QLD", "SA", "WA", "TAS", "NT", "ACT"];
 const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const phoneRx = /^0[45]\d{8}$|^0[2378]\d{8}$/;
 const pcRx = /^\d{4}$/;
 
 const PICKUP = "Click and Collect VIC";
 
 const digits = (v) => v.replace(/\D/g, "");
+
+// Validates Australian mobile, landline, 1300/1800, or international phone numbers
+const validatePhone = (raw) => {
+  if (!raw || !String(raw).trim()) return false;
+  const clean = String(raw).trim().replace(/[\s\-().]/g, "");
+  // Australian mobile or landline with or without +61 or 0
+  if (/^(\+?61|0)?[2-578]\d{8}$/.test(clean)) return true;
+  // Australian 1300 / 1800 (10 digits)
+  if (/^(1300|1800)\d{6}$/.test(clean)) return true;
+  // Australian 13 (6 digits)
+  if (/^13\d{4}$/.test(clean)) return true;
+  // International phone (+ followed by 8 to 15 digits)
+  if (/^\+\d{8,15}$/.test(clean)) return true;
+  // General digits check
+  const digitsOnly = clean.replace(/\D/g, "");
+  return digitsOnly.length >= 8 && digitsOnly.length <= 15;
+};
 
 // Accepts spaces, dashes, brackets and a +61 / 61 prefix; returns the 0-leading AU form.
 const normalisePhone = (v) => {
@@ -43,7 +63,6 @@ const normalisePhone = (v) => {
   const intl = d.match(/^\+?610?([2-578]\d{8})$/);
   return intl ? `0${intl[1]}` : d;
 };
-const PHONE_MSG = "Enter an Australian phone number, e.g. 0412 345 678 or +61 412 345 678.";
 
 export default function Checkout() {
   const { lines, clear, setQty, remove } = useCart();
@@ -57,22 +76,26 @@ export default function Checkout() {
     {
       id: "Standard road",
       name: "Standard Road Freight",
-      desc: `${formatAUD(settings.standardFee || 18)} flat rate. Estimated delivery 2 to 5 business days.`,
+      estimate: "2–5 Business Days",
+      desc: `${formatAUD(settings.standardFee || 18)} flat rate. Reliable road transport across VIC and Australia-wide.`,
     },
     {
       id: "Express priority",
-      name: "Express",
-      desc: `${formatAUD(settings.expressFee)} flat. VIC metro next day.`,
+      name: "Express Priority Freight",
+      estimate: "1–2 Business Days",
+      desc: `${formatAUD(settings.expressFee || 38)} priority dispatch. Melbourne metro overnight; interstate capitals 1–2 days.`,
     },
     {
       id: PICKUP,
-      name: "Click and Collect",
-      desc: "Free. Ready in 4 hours, Campbellfield.",
+      name: "Click & Collect (Campbellfield VIC)",
+      estimate: "Ready in 4 Hours",
+      desc: "Free warehouse collection from 77 Capital Link Drive, Campbellfield VIC 3061.",
     },
   ];
 
   const [form, setForm] = useState({
     name: "",
+    company: "",
     phone: "",
     email: "",
     address: "",
@@ -299,37 +322,41 @@ export default function Checkout() {
   const PAYMENTS = [
     cardEnabled && {
       id: "Card",
-      name: "Card",
-      desc: "Visa and Mastercard, on our secure payment page.",
+      name: "Credit / Debit Card",
+      badge: "INSTANT CONFIRMATION",
+      desc: "Visa, Mastercard, AMEX & Apple Pay on 256-bit secure Stripe checkout.",
       icon: CreditCard,
     },
     {
       id: "Bank transfer",
-      name: "Bank Transfer",
-      desc: "EFT details shown with your order confirmation.",
+      name: "Direct Bank Transfer (EFT)",
+      badge: "BUSINESS EFT",
+      desc: "NAB account details provided upon confirmation. Items dispatched once funds settle.",
       icon: Landmark,
     },
     ship === PICKUP && {
       id: "Pay on pickup",
-      name: "Pay on Pickup",
-      desc: "Pay at the Campbellfield counter when you collect.",
+      name: "Pay on Pickup (Campbellfield)",
+      badge: "COUNTER COLLECTION",
+      desc: "Pay by Card or Cash when collecting from 77 Capital Link Drive, Campbellfield.",
       icon: Wallet,
     },
     {
       id: "30 day fleet terms",
-      name: "30 Day Fleet Terms",
+      name: "30-Day Commercial Account",
+      badge: user?.isTradeApproved ? "TRADE ACCOUNT" : "TRADE ONLY",
       desc: user?.isTradeApproved
-        ? "Charged to your trade account."
-        : "Approved trade accounts only. Call us to apply.",
+        ? "Charged to your registered 30-day commercial fleet account."
+        : "Approved fleet & workshop trade accounts only.",
       icon: Truck,
       disabled: !user?.isTradeApproved,
     },
   ].filter(Boolean);
 
-  const payId = PAYMENTS.some((m) => m.id === pay && !m.disabled) ? pay : "Bank transfer";
+  const payId = PAYMENTS.some((m) => m.id === pay && !m.disabled) ? pay : (cardEnabled ? "Card" : "Bank transfer");
   const input = (bad) =>
     `w-full rounded-md border bg-white px-3.5 py-2.5 text-sm outline-none placeholder:text-faint transition ${
-      bad ? "border-red-500" : "border-line-dark focus:border-gold"
+      bad ? "border-red-500 bg-red-50/20 focus:border-red-600" : "border-line-dark focus:border-gold"
     }`;
 
   const place = async (e) => {
@@ -337,29 +364,40 @@ export default function Checkout() {
 
     const phone = normalisePhone(form.phone);
     const errs = {};
-    if (!form.name.trim()) errs.name = 1;
-    if (!emailRx.test(form.email.trim())) errs.email = 1;
-    if (!phoneRx.test(phone)) errs.phone = 1;
+    if (!form.name.trim()) errs.name = "Full name is required";
+    if (!form.email.trim()) {
+      errs.email = "Email is required for receipt & tracking";
+    } else if (!emailRx.test(form.email.trim())) {
+      errs.email = "Please enter a valid email address";
+    }
+    if (!form.phone.trim()) {
+      errs.phone = "Phone number is required for dispatch & freight updates";
+    } else if (!validatePhone(form.phone)) {
+      errs.phone = "Enter a valid phone number, e.g. 0412 345 678 or +61 412 345 678";
+    }
     if (ship !== PICKUP) {
-      if (!form.address.trim()) errs.address = 1;
-      if (!form.suburb.trim()) errs.suburb = 1;
-      if (!pcRx.test(form.postcode)) errs.postcode = 1;
+      if (!form.address.trim()) errs.address = "Street address is required";
+      if (!form.suburb.trim()) errs.suburb = "Suburb is required";
+      if (!pcRx.test(form.postcode)) errs.postcode = "4-digit Australian postcode required";
     }
     setFieldErrs(errs);
-    setErr(
-      Object.keys(errs).length
-        ? errs.phone && Object.keys(errs).length === 1
-          ? PHONE_MSG
-          : `Check the highlighted fields and try again.${errs.phone ? ` ${PHONE_MSG}` : ""}`
-        : ""
-    );
     if (Object.keys(errs).length) {
-      // The saved-address card hides the inputs, so open them to show what needs fixing.
+      setErr("Please check the highlighted fields below and try again.");
       setIsEditingAddress(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-    const details = { ...form, phone };
+    setErr("");
+
+    const details = {
+      ...form,
+      phone,
+      companyName: form.company || undefined,
+      addressLine1: ship === PICKUP ? "Click and Collect" : form.address,
+      suburbOrCity: ship === PICKUP ? "Campbellfield" : form.suburb,
+      state: ship === PICKUP ? "VIC" : form.state,
+      postalCode: ship === PICKUP ? "3061" : form.postcode,
+    };
 
     if (placing) return;
     setPlacing(true);
@@ -397,11 +435,15 @@ export default function Checkout() {
 
     // Persist in guest orders so user can always track it when returning
     try {
-      const guestOrders = JSON.parse(localStorage.getItem("aurex_guest_orders") || "[]");
       const orderId = order.orderNumber || order.ref || order.id;
-      const updated = [order, ...guestOrders.filter((o) => (o.orderNumber || o.ref || o.id) !== orderId)];
-      localStorage.setItem("aurex_guest_orders", JSON.stringify(updated));
+      const guestOrders = JSON.parse(localStorage.getItem("aurex_guest_orders") || "[]");
+      const updatedGuest = [order, ...guestOrders.filter((o) => (o.orderNumber || o.ref || o.id) !== orderId)];
+      localStorage.setItem("aurex_guest_orders", JSON.stringify(updatedGuest));
       localStorage.setItem("aurex_last_guest_email", details.email);
+
+      const generalOrders = JSON.parse(localStorage.getItem("aurex_orders") || "[]");
+      const updatedGeneral = [order, ...generalOrders.filter((o) => (o.orderNumber || o.ref || o.id) !== orderId)];
+      localStorage.setItem("aurex_orders", JSON.stringify(updatedGeneral));
     } catch {}
 
     if (API_ON && payId === "Card") {
@@ -526,7 +568,7 @@ export default function Checkout() {
               <div>
                 <div className="flex items-center gap-2">
                   <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-faint">
-                    Contact + Delivery Address
+                    Step 1 • Contact &amp; Delivery Details
                   </p>
                   {!user && (
                     <span className="rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-extrabold px-2.5 py-0.5 uppercase tracking-wide">
@@ -540,126 +582,188 @@ export default function Checkout() {
                     : "One-time guest order. Tracking receipt and tax invoice will be sent to your email."}
                 </p>
               </div>
-                  {!user ? (
-                    <button
-                      type="button"
-                      onClick={() => openAuthModal?.("login")}
-                      className="inline-flex items-center gap-1 text-xs font-bold text-navy hover:underline cursor-pointer self-start sm:self-auto"
-                    >
-                      <Lock size={12} /> Already have an account? Log in
-                    </button>
-                  ) : savedAddress && (
-                    <button
-                      type="button"
-                      onClick={() => setIsEditingAddress((prev) => !prev)}
-                      className="flex items-center gap-1.5 text-xs font-bold text-navy hover:underline"
-                    >
-                      <Edit2 size={13} />
-                      <span>{isEditingAddress ? "Use Saved Address" : "Change / Edit Address"}</span>
-                    </button>
+              {!user ? (
+                <button
+                  type="button"
+                  onClick={() => openAuthModal?.("login")}
+                  className="inline-flex items-center gap-1 text-xs font-bold text-navy hover:underline cursor-pointer self-start sm:self-auto"
+                >
+                  <Lock size={12} /> Already have an account? Log in
+                </button>
+              ) : savedAddress && (
+                <button
+                  type="button"
+                  onClick={() => setIsEditingAddress((prev) => !prev)}
+                  className="flex items-center gap-1.5 text-xs font-bold text-navy hover:underline cursor-pointer"
+                >
+                  <Edit2 size={13} />
+                  <span>{isEditingAddress ? "Use Saved Address" : "Change / Edit Address"}</span>
+                </button>
+              )}
+            </div>
+
+            {/* If Click and Collect is chosen, show Campbellfield Depot info */}
+            {ship === PICKUP && (
+              <div className="mt-4 rounded-lg border-2 border-amber-500/30 bg-amber-50/60 p-4">
+                <div className="flex items-start gap-2.5">
+                  <MapPin className="text-amber-700 shrink-0 mt-0.5" size={18} />
+                  <div className="text-xs">
+                    <p className="font-extrabold text-amber-950 text-sm">Campbellfield Trade Warehouse Depot</p>
+                    <p className="text-amber-900 mt-1 font-semibold">
+                      77 Capital Link Drive, Campbellfield VIC 3061
+                    </p>
+                    <p className="text-amber-800 mt-0.5">
+                      Trade Counter Hours: Monday–Friday 9:00 AM – 5:00 PM • Saturday 9:00 AM – 12:00 PM
+                    </p>
+                    <p className="text-emerald-800 font-bold mt-1.5 flex items-center gap-1">
+                      ✓ Ready for collection within 4 business hours • Street delivery address not required
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Directly show saved address if available and not actively editing */}
+            {savedAddress && !isEditingAddress && ship !== PICKUP ? (
+              <div className="mt-4 rounded-lg border-2 border-emerald-600/40 bg-emerald-50/50 p-4">
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-800">
+                    <CheckCircle2 size={16} className="text-emerald-600" />
+                    <span>Saved Profile Delivery Address</span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingAddress(true)}
+                    className="text-xs font-bold text-navy underline hover:text-ink cursor-pointer"
+                  >
+                    Edit Address
+                  </button>
+                </div>
+                <div className="mt-2.5 space-y-0.5 text-sm">
+                  <p className="font-bold text-ink">{form.name || savedAddress.name}</p>
+                  <p className="text-steel">
+                    {form.address || savedAddress.address}, {form.suburb || savedAddress.suburb}{" "}
+                    {form.state || savedAddress.state} {form.postcode || savedAddress.postcode}
+                  </p>
+                  <p className="text-xs text-faint">
+                    Phone: {form.phone || savedAddress.phone} • Email: {form.email || savedAddress.email}
+                  </p>
+                  {form.notes && (
+                    <p className="mt-1.5 rounded bg-white/70 px-2.5 py-1 text-xs text-steel">
+                      <strong>Delivery note:</strong> {form.notes}
+                    </p>
                   )}
                 </div>
-
-                {/* Directly show saved address if available and not actively editing */}
-                {savedAddress && !isEditingAddress ? (
-                  <div className="mt-4 rounded-lg border-2 border-emerald-600/40 bg-emerald-50/50 p-4">
-                    <div className="flex items-center justify-between">
-                      <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-800">
-                        <CheckCircle2 size={16} className="text-emerald-600" />
-                        <span>Saved Profile Delivery Address</span>
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => setIsEditingAddress(true)}
-                        className="text-xs font-bold text-navy underline hover:text-ink"
-                      >
-                        Edit Address
-                      </button>
-                    </div>
-                    <div className="mt-2.5 space-y-0.5 text-sm">
-                      <p className="font-bold text-ink">{form.name || savedAddress.name}</p>
-                      <p className="text-steel">
-                        {form.address || savedAddress.address}, {form.suburb || savedAddress.suburb}{" "}
-                        {form.state || savedAddress.state} {form.postcode || savedAddress.postcode}
-                      </p>
-                      <p className="text-xs text-faint">
-                        Phone: {form.phone || savedAddress.phone} • Email: {form.email || savedAddress.email}
-                      </p>
-                      {form.notes && (
-                        <p className="mt-1.5 rounded bg-white/70 px-2.5 py-1 text-xs text-steel">
-                          <strong>Delivery note:</strong> {form.notes}
-                        </p>
-                      )}
-                    </div>
+              </div>
+            ) : (
+              /* Editable form inputs */
+              <div className="mt-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <p className="text-xs font-semibold text-steel">
+                    {ship === PICKUP ? "Enter your contact details for collection notice:" : (savedAddress ? "Update your delivery address below:" : "Enter your delivery address:")}
+                  </p>
+                  {user ? (
+                    <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-700">
+                      <CheckCircle2 size={12} /> Automatically saves to your profile
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1 text-[11px] font-medium text-slate-500">
+                      Direct dispatch delivery
+                    </span>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <input
+                      value={form.name}
+                      onChange={set("name")}
+                      maxLength={80}
+                      placeholder="Full name *"
+                      aria-label="Full name"
+                      autoComplete="name"
+                      className={input(fieldErrs.name)}
+                    />
+                    {fieldErrs.name && (
+                      <p className="mt-1 text-xs font-semibold text-red-600" role="alert">{fieldErrs.name}</p>
+                    )}
                   </div>
-                ) : (
-                  /* Editable form inputs */
-                  <div className="mt-4">
-                    <div className="mb-3 flex items-center justify-between">
-                      <p className="text-xs font-semibold text-steel">
-                        {savedAddress ? "Update your delivery address below:" : "Enter your delivery address:"}
-                      </p>
-                      {user ? (
-                        <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-700">
-                          <CheckCircle2 size={12} /> Automatically saves to your profile
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1 text-[11px] font-medium text-slate-500">
-                          Direct dispatch delivery
-                        </span>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                      <input
-                        value={form.name}
-                        onChange={set("name")}
-                        maxLength={80}
-                        placeholder="Full name *"
-                        aria-label="Full name"
-                        autoComplete="name"
-                        className={input(fieldErrs.name)}
-                      />
-                      <input
-                        value={form.phone}
-                        onChange={set("phone")}
-                        maxLength={20}
-                        placeholder="Phone (04XX XXX XXX) *"
-                        aria-label="Phone"
-                        aria-invalid={Boolean(fieldErrs.phone)}
-                        type="tel"
-                        autoComplete="tel"
-                        className={input(fieldErrs.phone)}
-                      />
-                      {fieldErrs.phone && (
-                        <p className="-mt-1 text-xs font-semibold text-red-600 sm:col-span-2" role="alert">{PHONE_MSG}</p>
-                      )}
-                      <input
-                        value={form.email}
-                        onChange={set("email")}
-                        type="email"
-                        maxLength={120}
-                        placeholder="Email for receipt + tracking *"
-                        aria-label="Email for receipt and tracking"
-                        autoComplete="email"
-                        className={`sm:col-span-2 ${input(fieldErrs.email)}`}
-                      />
-                      <input
-                        value={form.address}
-                        onChange={set("address")}
-                        maxLength={120}
-                        placeholder="Street address *"
-                        aria-label="Street address"
-                        autoComplete="street-address"
-                        className={`sm:col-span-2 ${input(fieldErrs.address)}`}
-                      />
-                      <input
-                        value={form.suburb}
-                        onChange={set("suburb")}
-                        maxLength={60}
-                        placeholder="Suburb *"
-                        aria-label="Suburb"
-                        className={input(fieldErrs.suburb)}
-                      />
+
+                  <div>
+                    <input
+                      value={form.phone}
+                      onChange={set("phone")}
+                      maxLength={20}
+                      placeholder="Phone (04XX XXX XXX or +61...) *"
+                      aria-label="Phone"
+                      aria-invalid={Boolean(fieldErrs.phone)}
+                      type="tel"
+                      autoComplete="tel"
+                      className={input(fieldErrs.phone)}
+                    />
+                    {fieldErrs.phone && (
+                      <p className="mt-1 text-xs font-semibold text-red-600" role="alert">{fieldErrs.phone}</p>
+                    )}
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <input
+                      value={form.email}
+                      onChange={set("email")}
+                      type="email"
+                      maxLength={120}
+                      placeholder="Email for receipt + live tracking *"
+                      aria-label="Email for receipt and tracking"
+                      autoComplete="email"
+                      className={input(fieldErrs.email)}
+                    />
+                    {fieldErrs.email && (
+                      <p className="mt-1 text-xs font-semibold text-red-600" role="alert">{fieldErrs.email}</p>
+                    )}
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <input
+                      value={form.company}
+                      onChange={set("company")}
+                      maxLength={100}
+                      placeholder="Company or Workshop name (optional)"
+                      aria-label="Company or Workshop name (optional)"
+                      autoComplete="organization"
+                      className={input(false)}
+                    />
+                  </div>
+
+                  {ship !== PICKUP && (
+                    <>
+                      <div className="sm:col-span-2">
+                        <input
+                          value={form.address}
+                          onChange={set("address")}
+                          maxLength={120}
+                          placeholder="Street address *"
+                          aria-label="Street address"
+                          autoComplete="street-address"
+                          className={input(fieldErrs.address)}
+                        />
+                        {fieldErrs.address && (
+                          <p className="mt-1 text-xs font-semibold text-red-600" role="alert">{fieldErrs.address}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <input
+                          value={form.suburb}
+                          onChange={set("suburb")}
+                          maxLength={60}
+                          placeholder="Suburb *"
+                          aria-label="Suburb"
+                          className={input(fieldErrs.suburb)}
+                        />
+                        {fieldErrs.suburb && (
+                          <p className="mt-1 text-xs font-semibold text-red-600" role="alert">{fieldErrs.suburb}</p>
+                        )}
+                      </div>
+
                       <div className="grid grid-cols-2 gap-2.5">
                         <ThemeSelect
                           value={form.state}
@@ -667,41 +771,190 @@ export default function Checkout() {
                           options={STATES}
                           label="State"
                         />
-                        <input
-                          value={form.postcode}
-                          onChange={(e) =>
-                            setForm({ ...form, postcode: digits(e.target.value).slice(0, 4) })
-                          }
-                          placeholder="Postcode *"
-                          aria-label="Postcode"
-                          inputMode="numeric"
-                          autoComplete="postal-code"
-                          className={`h-11 ${input(fieldErrs.postcode)}`}
-                        />
+                        <div>
+                          <input
+                            value={form.postcode}
+                            onChange={(e) =>
+                              setForm({ ...form, postcode: digits(e.target.value).slice(0, 4) })
+                            }
+                            placeholder="Postcode *"
+                            aria-label="Postcode"
+                            inputMode="numeric"
+                            autoComplete="postal-code"
+                            className={`h-11 ${input(fieldErrs.postcode)}`}
+                          />
+                          {fieldErrs.postcode && (
+                            <p className="mt-1 text-xs font-semibold text-red-600" role="alert">{fieldErrs.postcode}</p>
+                          )}
+                        </div>
                       </div>
-                      <input
-                        value={form.notes}
-                        onChange={set("notes")}
-                        maxLength={300}
-                        placeholder="Delivery notes, forklift on site or VIN (optional)"
-                        aria-label="Delivery notes (optional)"
-                        className={`sm:col-span-2 ${input(false)}`}
-                      />
-                    </div>
-                    {savedAddress && (
-                      <div className="mt-3 text-right">
-                        <button
-                          type="button"
-                          onClick={() => setIsEditingAddress(false)}
-                          className="text-xs font-bold text-steel hover:underline"
-                        >
-                          Cancel and use saved address
-                        </button>
-                      </div>
-                    )}
+                    </>
+                  )}
+
+                  <div className="sm:col-span-2">
+                    <input
+                      value={form.notes}
+                      onChange={set("notes")}
+                      maxLength={300}
+                      placeholder={ship === PICKUP ? "Pickup notes or vehicle rego (optional)" : "Delivery notes, forklift on site or VIN (optional)"}
+                      aria-label="Delivery notes (optional)"
+                      className={input(false)}
+                    />
+                  </div>
+                </div>
+
+                {savedAddress && (
+                  <div className="mt-3 text-right">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingAddress(false)}
+                      className="text-xs font-bold text-steel hover:underline cursor-pointer"
+                    >
+                      Cancel and use saved address
+                    </button>
                   </div>
                 )}
-              </section>
+              </div>
+            )}
+          </section>
+
+          {/* 2. DELIVERY METHOD SELECTION */}
+          <section className="rounded-md border border-line bg-white p-5">
+            <div className="flex items-center justify-between border-b border-line pb-3">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-faint">
+                  Step 2 • Delivery Method
+                </p>
+                <h2 className="text-base font-extrabold text-ink">Choose Shipping Option</h2>
+              </div>
+              <span className="flex items-center gap-1 rounded bg-mist px-2.5 py-1 text-xs font-bold text-navy">
+                <Truck size={14} /> {shipOpt.name}
+              </span>
+            </div>
+
+            <div className="mt-4 grid gap-3">
+              {SHIP.map((s) => {
+                const isSelected = ship === s.id;
+                const isFree = s.id === "Standard road" && totals.subtotal >= 500;
+                return (
+                  <label
+                    key={s.id}
+                    onClick={() => {
+                      setShip(s.id);
+                      if (s.id !== PICKUP && pay === "Pay on pickup") {
+                        setPay("Card");
+                      }
+                    }}
+                    className={`relative flex cursor-pointer items-start gap-3.5 rounded-lg border p-4 transition ${
+                      isSelected
+                        ? "border-navy bg-navy/[0.02] ring-2 ring-navy/20"
+                        : "border-line hover:border-line-dark hover:bg-mist/30"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="shippingMethod"
+                      value={s.id}
+                      checked={isSelected}
+                      onChange={() => {
+                        setShip(s.id);
+                        if (s.id !== PICKUP && pay === "Pay on pickup") {
+                          setPay("Card");
+                        }
+                      }}
+                      className="mt-1 h-4 w-4 accent-navy cursor-pointer"
+                    />
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center justify-between gap-1">
+                        <span className="text-sm font-extrabold text-ink">{s.name}</span>
+                        <span className="tabular text-sm font-extrabold text-navy">
+                          {s.id === PICKUP || isFree ? (
+                            <span className="text-emerald-700 font-extrabold">FREE</span>
+                          ) : s.id === "Express priority" ? (
+                            formatAUD(settings.expressFee || 38)
+                          ) : (
+                            formatAUD(settings.standardFee || 18)
+                          )}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-steel leading-relaxed">{s.desc}</p>
+                      {s.estimate && (
+                        <span className="mt-2 inline-flex items-center gap-1 rounded bg-mist px-2 py-0.5 text-[11px] font-bold text-faint">
+                          <Clock size={11} /> {s.estimate}
+                        </span>
+                      )}
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* 3. PAYMENT METHOD SELECTION */}
+          <section className="rounded-md border border-line bg-white p-5">
+            <div className="flex items-center justify-between border-b border-line pb-3">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-faint">
+                  Step 3 • Payment Method
+                </p>
+                <h2 className="text-base font-extrabold text-ink">Choose How to Pay</h2>
+              </div>
+              <span className="flex items-center gap-1 text-xs font-semibold text-emerald-700">
+                <ShieldCheck size={14} /> 256-bit Encrypted
+              </span>
+            </div>
+
+            <div className="mt-4 grid gap-3">
+              {PAYMENTS.map((p) => {
+                const isSelected = payId === p.id;
+                const Icon = p.icon;
+                return (
+                  <label
+                    key={p.id}
+                    onClick={() => {
+                      if (!p.disabled) setPay(p.id);
+                    }}
+                    className={`relative flex cursor-pointer items-start gap-3.5 rounded-lg border p-4 transition ${
+                      p.disabled
+                        ? "opacity-50 cursor-not-allowed border-line bg-mist/20"
+                        : isSelected
+                        ? "border-navy bg-navy/[0.02] ring-2 ring-navy/20"
+                        : "border-line hover:border-line-dark hover:bg-mist/30"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value={p.id}
+                      checked={isSelected}
+                      disabled={p.disabled}
+                      onChange={() => {
+                        if (!p.disabled) setPay(p.id);
+                      }}
+                      className="mt-1 h-4 w-4 accent-navy cursor-pointer"
+                    />
+                    <div className="flex-1">
+                      <div className="flex flex-wrap items-center justify-between gap-1">
+                        <span className="flex items-center gap-2 text-sm font-extrabold text-ink">
+                          <Icon size={16} className="text-navy" /> {p.name}
+                        </span>
+                        {p.badge && (
+                          <span className={`rounded px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider ${
+                            p.badge.includes('INSTANT') ? 'bg-amber-100 text-amber-900 border border-amber-300' :
+                            p.badge.includes('FREE') || p.badge.includes('TRADE') ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
+                            'bg-slate-100 text-slate-700'
+                          }`}>
+                            {p.badge}
+                          </span>
+                        )}
+                      </div>
+                      <p className="mt-1 text-xs text-steel leading-relaxed">{p.desc}</p>
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
+          </section>
         </div>
 
         {/* ORDER SUMMARY ASIDE */}
@@ -851,18 +1104,18 @@ export default function Checkout() {
                     <span>
                       {user ? (
                         payId === "Card"
-                          ? "Place Order & Pay with Card"
+                          ? `Place Order & Pay with Card • ${formatAUD(grand)}`
                           : payId === "Pay on pickup"
-                          ? "Confirm Click & Collect Order"
+                          ? `Confirm Click & Collect Order • ${formatAUD(grand)}`
                           : payId === "30 day fleet terms"
-                          ? "Place on Trade Account"
-                          : "Place Order (Bank Transfer)"
+                          ? `Place on Trade Account • ${formatAUD(grand)}`
+                          : `Place Order (Bank Transfer) • ${formatAUD(grand)}`
                       ) : (
                         payId === "Card"
-                          ? "Guest Checkout: Pay with Card"
+                          ? `Guest Checkout: Pay with Card • ${formatAUD(grand)}`
                           : payId === "Pay on pickup"
-                          ? "Confirm Click & Collect Order (Guest)"
-                          : "Place Order as Guest (Bank Transfer)"
+                          ? `Confirm Click & Collect Order (Guest) • ${formatAUD(grand)}`
+                          : `Place Order as Guest (Bank Transfer) • ${formatAUD(grand)}`
                       )}
                     </span>
                   </>
