@@ -13,7 +13,6 @@ export default function About() {
   const { data: categories = [] } = useCategories();
   const totalLines = categories.reduce((sum, c) => sum + (c.count ?? c.productCount ?? 0), 0) || 136;
   const numCats = categories.length || 3;
-  const freeOver = formatAUD(settings.freeFreightOver || 200);
 
   return (
     <main>
@@ -51,7 +50,7 @@ export default function About() {
         <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">How we work</p>
         <h2 className="mt-1 text-2xl font-extrabold tracking-tight md:text-[28px]">Three Steps, Zero Guesswork</h2>
         <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
-          {[["01", "Send specs", "VIN, photos and measurements through the counter, phone or email."], ["02", "We match it", "Profile, hand, finish and OEM cross checked before a price leaves."], ["03", "Freighted fast", `Daily tracked runs ex Campbellfield. Free road freight over ${freeOver}.`]].map(([n, t, d]) => (
+          {[["01", "Send specs", "VIN, photos and measurements through the counter, phone or email."], ["02", "We match it", "Profile, hand, finish and OEM cross checked before a price leaves."], ["03", "Freighted fast", "Daily tracked runs ex Campbellfield. Flat $18 road freight nationwide."]].map(([n, t, d]) => (
             <div key={n} className="group rounded-md border border-line bg-white p-6 transition-colors hover:border-gold">
               <p className="font-mono text-sm font-bold text-gold">{n}</p>
               <p className="mt-2 text-lg font-extrabold">{t}</p>

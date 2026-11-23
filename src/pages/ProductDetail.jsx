@@ -246,7 +246,6 @@ export default function ProductDetail() {
   const identifier = slug || sku;
   const navigate = useNavigate();
   const { settings } = useSite();
-  const freeOver = formatAUD(settings.freeFreightOver || 200);
 
   const { data, isLoading, isError, error, refetch, isFetching } = useProduct(identifier);
   const p = data?.product;
@@ -901,7 +900,7 @@ export default function ProductDetail() {
               <p>Check measurements against your old part, or send our VIC desk your VIN through the <Link className="font-bold text-navy underline" to="/contact">contact form</Link>.</p>
             </div>
           )}
-          {tab === "freight" && <p className="max-w-3xl text-sm leading-6 text-steel">Order by 2pm for same day dispatch ex Campbellfield. Free road freight over {freeOver}. Unused parts in original packaging can be returned within 30 days, see our <Link className="font-bold text-navy underline" to="/returns">returns policy</Link>.</p>}
+          {tab === "freight" && <p className="max-w-3xl text-sm leading-6 text-steel">Order by 2pm for same day dispatch ex Campbellfield. Standard road freight flat rate $18 across Australia (estimated 2 to 5 business days). Unused parts in original packaging can be returned within 30 days, see our <Link className="font-bold text-navy underline" to="/returns">returns policy</Link>.</p>}
           {tab === "reviews" && (
             <div className="space-y-6">
               {/* Ratings Summary Bar */}

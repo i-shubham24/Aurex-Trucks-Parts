@@ -8,9 +8,8 @@ const UPDATED = "9 October 2026";
 /* Policy copy is built from live store settings (freight fees, contact details, ABN)
    so it can never drift from what checkout actually charges or where we really are. */
 function buildPolicies({ company, settings }) {
-  const freeOver = formatAUD(settings.freeFreightOver || 200);
-  const standard = formatAUD(settings.standardFee || 0);
-  const express = formatAUD(settings.expressFee || 0);
+  const standard = formatAUD(settings.standardFee || 18);
+  const express = formatAUD(settings.expressFee || 39);
   const { name, phone, email, address, hours, legalName, abn, acn } = company;
   const canonicalEntity = legalName || "Aurex Panels Pty Limited";
   const canonicalAbn = abn || settings.abn || "ABN 47 670 781 254";
@@ -25,7 +24,7 @@ function buildPolicies({ company, settings }) {
           "Bank transfer orders are released for packing once the transfer shows in our account, so the dispatch day runs from when your payment lands, not from when the order was placed.",
         ]],
         ["Freight options and cost", [
-          `Standard road freight is ${standard} per order, and free when the goods total ${freeOver} or more after any promo discount.`,
+          `Standard road freight is ${standard} flat rate per order across Australia.`,
           `Express freight is a flat ${express} per order.`,
           "Click and Collect from Campbellfield is free.",
           "All freight prices include GST and are shown in the order summary before you place the order. The amount on your tax invoice is the amount calculated by our system at that point.",

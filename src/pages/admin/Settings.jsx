@@ -149,11 +149,11 @@ export default function Settings() {
 
     // Same fallbacks the inputs display; an explicit 0 is valid (e.g. free freight on everything).
     const freightFields = [
-      ["Free freight threshold", form.freeFreightOver ?? 200],
-      ["Standard freight fee", form.standardFee ?? 45],
-      ["Express courier fee", form.expressFee ?? 95],
-    ].map(([label, raw]) => [label, String(raw).trim() === "" ? NaN : Number(raw)]);
-    const badFreight = freightFields.find(([, n]) => !Number.isFinite(n) || n < 0);
+      ["Free freight threshold", form.freeFreightOver ?? null],
+      ["Standard freight fee", form.standardFee ?? 18],
+      ["Express courier fee", form.expressFee ?? 39],
+    ].map(([label, raw]) => [label, raw === null || raw === undefined || String(raw).trim() === "" ? null : Number(raw)]);
+    const badFreight = freightFields.find(([, n]) => n !== null && (!Number.isFinite(n) || n < 0));
     if (badFreight) {
       setErr(`${badFreight[0]} must be a number, 0 or greater.`);
       return;
@@ -462,12 +462,13 @@ export default function Settings() {
                   type="number"
                   min="0"
                   step="1"
-                  value={form.freeFreightOver ?? 200}
+                  value={form.freeFreightOver ?? ""}
+                  placeholder="Disabled"
                   onChange={handleChange("freeFreightOver", "number")}
                   className="h-11 w-full rounded-lg border border-line bg-white pl-8 pr-3.5 text-sm font-bold text-ink outline-none transition focus:border-gold focus:ring-2 focus:ring-gold/20"
                 />
               </div>
-              <p className="mt-1 text-[11px] text-faint">Orders with goods total above this amount receive free road delivery.</p>
+              <p className="mt-1 text-[11px] text-faint">Free freight threshold (leave empty to disable free freight).</p>
             </div>
 
             <div>

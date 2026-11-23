@@ -531,7 +531,7 @@ function Blog() {
 function Trust() {
   const { settings } = useSite();
   const items = [
-    [Truck, "Daily Freight Australia Wide", `Order by 2pm. Free road freight over ${formatAUD(settings.freeFreightOver || 200)}.`],
+    [Truck, "Daily Freight Australia Wide", "Order by 2pm for same-day dispatch. Flat road freight across Australia."],
     [ClipboardCheck, "Quotes in 4 Business Hours", "Send VIN or photos for an exact price."],
     [BadgeCheck, "VIN Matched Catalogue", "Every line crossed to make, model and OEM."],
     [Headset, "Talk to a Specialist", "Real advice from the counter, no scripts."],
@@ -614,8 +614,6 @@ function Reviews() {
 
 function Faq() {
   const [open, setOpen] = useState(0);
-  const { settings } = useSite();
-  const freeOver = formatAUD(settings.freeFreightOver || 200);
   return (
     <section id="faq" className="mx-auto max-w-7xl scroll-mt-24 px-4 pt-12">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[280px_minmax(0,1fr)]">
@@ -636,7 +634,7 @@ function Faq() {
                   <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-md text-lg font-bold leading-none transition-all duration-200 ${isOpen ? "rotate-45 bg-primary text-white" : "bg-mist text-ink"}`}>+</span>
                 </button>
                 <div className={`grid transition-all duration-300 ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
-                  <div className="overflow-hidden"><p className="px-5 pb-5 pl-[52px] text-sm leading-6 text-steel">{f.a.split("$500").join(freeOver)}</p></div>
+                  <div className="overflow-hidden"><p className="px-5 pb-5 pl-[52px] text-sm leading-6 text-steel">{f.a}</p></div>
                 </div>
               </div>
             );
@@ -696,15 +694,13 @@ function HomeIntro() {
 /* FAQPage markup mirrors the visible FAQ word for word, and only on the page that shows it.
    Rendered outside the lazy section so crawlers get it without scrolling. */
 function FaqSchema() {
-  const { settings } = useSite();
-  const freeOver = formatAUD(settings.freeFreightOver || 200);
   const schema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     mainEntity: FAQS.map((f) => ({
       "@type": "Question",
       name: f.q,
-      acceptedAnswer: { "@type": "Answer", text: f.a.split("$500").join(freeOver) },
+      acceptedAnswer: { "@type": "Answer", text: f.a },
     })),
   };
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replace(/</g, "\\u003c") }} />;

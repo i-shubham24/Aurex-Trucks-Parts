@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Minus, Plus, ShoppingCart, X } from "lucide-react";
+import { Minus, Plus, ShoppingCart, Truck, X } from "lucide-react";
 import { formatAUD } from "../data/products";
 import { imgFor } from "../data/images";
 import SafeImage from "./SafeImage";
@@ -15,7 +15,6 @@ export default function CartDrawer() {
   const { settings } = useSite();
   const { user } = useAuth();
   useLockBody(open);
-  const FREE_FREIGHT = settings.freeFreightOver || 200;
 
   /* Swipe-right to close (mobile back-gesture direction). */
   const [drag, setDrag] = useState(0);
@@ -43,11 +42,6 @@ export default function CartDrawer() {
   }, [open, setOpen]);
 
   if (!open) return null;
-  // Like the server, free freight is judged on the subtotal after any trade discount.
-  const tradePct = tradeDiscountFor(user);
-  const towardsFree = calculateOrderTotals({ lines, tradeDiscountPercent: tradePct, settings }).discountedSubtotal;
-  const progress = Math.min(1, towardsFree / FREE_FREIGHT);
-  const shortBy = tradePct < 100 ? (FREE_FREIGHT - towardsFree) / (1 - tradePct / 100) : 0;
 
   const onTouchStart = (e) => {
     live.current = true;
@@ -78,11 +72,9 @@ export default function CartDrawer() {
           <p className="flex items-center gap-2 text-[15px] font-bold"><ShoppingCart size={18} /> Shopping Cart ({lines.reduce((s, l) => s + l.qty, 0)})</p>
           <button onClick={close} aria-label="Close cart" className="transition-colors hover:text-gold"><X size={20} /></button>
         </div>
-        <div className="border-b border-line bg-gold/15 px-4 py-3">
-          {towardsFree >= FREE_FREIGHT
-            ? <p className="text-[13px] font-bold text-green-700">You unlocked FREE road freight.</p>
-            : <p className="text-[13px] text-steel">Add <strong className="tabular">{formatAUD(shortBy)}</strong> more for free road freight.</p>}
-          <div className="mt-2 h-1.5 rounded-full bg-pale"><div className="h-full rounded-full bg-gold transition-all" style={{ width: `${progress * 100}%` }} /></div>
+        <div className="border-b border-line bg-mist/60 px-4 py-2.5 text-xs text-steel flex items-center justify-between">
+          <span className="flex items-center gap-1.5"><Truck size={14} className="text-navy" /> Standard Road Freight</span>
+          <span className="font-bold text-ink">{formatAUD(settings.standardFee || 18)}</span>
         </div>
         <div className="flex-1 overflow-auto overscroll-contain px-4 py-3">
           {lines.length === 0 && <p className="py-6 text-center text-sm text-steel">Your cart is empty.<br />Explore our hardware catalog to add parts.</p>}

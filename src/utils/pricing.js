@@ -29,15 +29,13 @@ export function calculateOrderTotals({ lines = [], shippingMethod = "", tradeDis
   const totalDiscount = round2(tradeDiscountAmount);
   const discountedSubtotal = Math.max(0, subtotal - totalDiscount);
 
-  // Free freight is tested on the discounted subtotal, as the server does.
-  const freeFreightOver = Number(settings.freeFreightOver) || 200;
-  const standardFee = Number(settings.standardFee) || 24;
+  const standardFee = Number(settings.standardFee) || 18;
   const expressFee = Number(settings.expressFee) || 39;
   const method = String(shippingMethod || "").toLowerCase();
   let shippingFee;
   if (method.includes("click") || method.includes("collect") || method.includes("pickup")) shippingFee = 0;
   else if (method.includes("express")) shippingFee = expressFee;
-  else shippingFee = discountedSubtotal >= freeFreightOver ? 0 : standardFee;
+  else shippingFee = standardFee;
   shippingFee = round2(shippingFee);
 
   return {

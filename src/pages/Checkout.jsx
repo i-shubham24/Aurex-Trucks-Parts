@@ -54,8 +54,8 @@ export default function Checkout() {
   const SHIP = [
     {
       id: "Standard road",
-      name: "Standard Road",
-      desc: `Free over ${formatAUD(settings.freeFreightOver)}, else ${formatAUD(settings.standardFee)}. 1 to 5 days.`,
+      name: "Standard Road Freight",
+      desc: `${formatAUD(settings.standardFee || 18)} flat rate. Estimated delivery 2 to 5 business days.`,
     },
     {
       id: "Express priority",
