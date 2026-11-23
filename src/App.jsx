@@ -14,6 +14,7 @@ const CartDrawer = lazy(() => import("./components/CartDrawer"));
 const CompareTray = lazy(() => import("./components/CompareTray"));
 const AuthModal = lazy(() => import("./components/AuthModal"));
 const RatingPromptModal = lazy(() => import("./components/RatingPromptModal"));
+const PromoPopup = lazy(() => import("./components/PromoPopup"));
 import Home from "./pages/Home";
 
 /* Everything except the landing page loads on demand. */
@@ -225,6 +226,7 @@ function Shell() {
         onComplete={authModal.onComplete}
       />
       <RatingPromptModal />
+      <PromoPopup />
       </Suspense>
     </>
   );

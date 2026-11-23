@@ -11,6 +11,8 @@ import {
   Minus,
   Plus,
   ShieldCheck,
+  Sparkles,
+  Tag,
   Truck,
   Wallet,
 } from "lucide-react";
@@ -85,6 +87,10 @@ export default function Checkout() {
   const [err, setErr] = useState("");
   const [fieldErrs, setFieldErrs] = useState({});
   const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponErr, setCouponErr] = useState("");
 
   const set = (k) => (e) => setForm((prev) => ({ ...prev, [k]: e.target.value }));
 
@@ -212,9 +218,83 @@ export default function Checkout() {
   // Same rules as the server (trade discount, free freight on the discounted subtotal,
   // core deposits), so the total shown is the total charged.
   const tradeDiscountPercent = tradeDiscountFor(user);
-  const totals = calculateOrderTotals({ lines, shippingMethod: shipOpt.id, tradeDiscountPercent, settings });
+  const totals = calculateOrderTotals({ lines, shippingMethod: shipOpt.id, tradeDiscountPercent, settings, coupon: appliedCoupon });
   const shipFee = totals.shippingFee;
   const grand = totals.grandTotal;
+
+  const applyCouponCode = async (rawCode, silent = false) => {
+    const code = (rawCode || "").trim().toUpperCase();
+    if (!code) return;
+    setCouponLoading(true);
+    setCouponErr("");
+    try {
+      if (API_ON) {
+        try {
+          const res = await api.post("/coupons/validate", { code, cartSubtotal: totals.subtotal });
+          if (res?.data?.coupon || res?.coupon) {
+            const coup = res?.data?.coupon || res?.coupon;
+            setAppliedCoupon(coup);
+            setCouponInput(coup.code);
+            localStorage.setItem("aurex_applied_coupon", coup.code);
+            if (!silent) {
+              notify.info({
+                kicker: "COUPON APPLIED",
+                title: "10% Discount Applied",
+                message: `Coupon ${coup.code} applied! 10% off your parts.`,
+                duration: 4000
+              });
+            }
+            return;
+          }
+        } catch (apiErr) {
+          if (code === "AUREX10" || code === "SAVE10" || code === "WELCOME10") {
+            const fallback = { code, discountType: "PERCENTAGE", discountValue: 10, description: "10% Off Limited Period" };
+            setAppliedCoupon(fallback);
+            setCouponInput(code);
+            localStorage.setItem("aurex_applied_coupon", code);
+            if (!silent) {
+              notify.info({
+                kicker: "COUPON APPLIED",
+                title: "10% Discount Applied",
+                message: `Coupon ${code} applied! 10% off your parts.`,
+                duration: 4000
+              });
+            }
+            return;
+          }
+          throw apiErr;
+        }
+      } else {
+        if (code === "AUREX10" || code === "SAVE10" || code === "WELCOME10") {
+          const fallback = { code, discountType: "PERCENTAGE", discountValue: 10, description: "10% Off Limited Period" };
+          setAppliedCoupon(fallback);
+          setCouponInput(code);
+          localStorage.setItem("aurex_applied_coupon", code);
+          return;
+        }
+        throw new Error("Invalid or expired coupon code");
+      }
+    } catch (err) {
+      setCouponErr(err.message || "Invalid or expired coupon code");
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput("");
+    setCouponErr("");
+    localStorage.removeItem("aurex_applied_coupon");
+  };
+
+  useEffect(() => {
+    const qCoupon = searchParams.get("coupon") || searchParams.get("promo");
+    const saved = qCoupon || localStorage.getItem("aurex_applied_coupon");
+    if (saved && !appliedCoupon) {
+      applyCouponCode(saved, true);
+    }
+  }, [searchParams]);
 
   const PAYMENTS = [
     cardEnabled && {
@@ -305,7 +385,7 @@ export default function Checkout() {
       items: lines.map((l) => ({ sku: l.sku, name: l.name, price: l.price, qty: l.qty })),
       subtotal: totals.subtotal,
       discount: totals.totalDiscount,
-      promoCode: null,
+      promoCode: appliedCoupon?.code || null,
       shipping: shipOpt.id,
       shippingFee: shipFee,
       payment: payId,
@@ -634,6 +714,12 @@ export default function Checkout() {
                 <span className="tabular font-bold">−{formatAUD(totals.tradeDiscountAmount)}</span>
               </p>
             )}
+            {totals.couponDiscountAmount > 0 && (
+              <p className="flex justify-between text-emerald-700 font-semibold">
+                <span className="flex items-center gap-1"><Tag size={12} /> Promo ({appliedCoupon?.code || "10%"})</span>
+                <span className="tabular font-bold">−{formatAUD(totals.couponDiscountAmount)}</span>
+              </p>
+            )}
             <p className="flex justify-between text-steel">
               <span>Freight ({shipOpt.name})</span>
               <span className="tabular font-bold text-ink">{shipFee === 0 ? "FREE" : formatAUD(shipFee)}</span>
@@ -650,6 +736,64 @@ export default function Checkout() {
               </span>
               <span>{formatAUD(grand)}</span>
             </p>
+          </div>
+
+          {/* Coupon / Promo Code Input Card */}
+          <div className="mt-3 border-t border-line pt-3">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-xs font-bold text-slate-800 flex items-center gap-1">
+                <Tag size={12} className="text-amber-500" /> Have a Coupon or Promo Code?
+              </span>
+            </div>
+
+            {appliedCoupon ? (
+              <div className="flex items-center justify-between rounded-md bg-emerald-50 border border-emerald-200 px-3 py-2 text-xs">
+                <div className="flex items-center gap-1.5 text-emerald-800 font-bold">
+                  <span className="font-mono bg-emerald-100 text-emerald-900 px-1.5 py-0.5 rounded tracking-wide">{appliedCoupon.code}</span>
+                  <span className="font-medium text-emerald-700">10% Off Applied</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={removeCoupon}
+                  className="text-xs font-bold text-red-600 hover:text-red-800 hover:underline cursor-pointer"
+                >
+                  Remove
+                </button>
+              </div>
+            ) : (
+              <div>
+                <div className="flex gap-1.5">
+                  <input
+                    type="text"
+                    value={couponInput}
+                    onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                    placeholder="Enter code (e.g. AUREX10)"
+                    className="w-full uppercase rounded border border-line-dark bg-white px-2.5 py-1.5 text-xs font-mono font-bold tracking-wider outline-none focus:border-gold"
+                  />
+                  <button
+                    type="button"
+                    disabled={couponLoading || !couponInput.trim()}
+                    onClick={() => applyCouponCode(couponInput)}
+                    className="rounded bg-navy px-3.5 py-1.5 text-xs font-bold text-white hover:bg-gold hover:text-ink disabled:opacity-50 transition cursor-pointer shrink-0"
+                  >
+                    {couponLoading ? "..." : "Apply"}
+                  </button>
+                </div>
+                {couponErr && <p className="mt-1 text-[11px] text-red-600 font-semibold">{couponErr}</p>}
+                <div className="mt-2 flex items-center justify-between text-[11px] bg-amber-50/70 border border-amber-200/60 rounded px-2.5 py-1.5">
+                  <span className="text-amber-900 font-medium flex items-center gap-1">
+                    <Sparkles size={11} className="text-amber-600" /> Limited 10% off: <strong className="font-mono text-slate-900">AUREX10</strong>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => applyCouponCode("AUREX10")}
+                    className="font-bold text-amber-700 hover:text-amber-900 underline cursor-pointer"
+                  >
+                    Apply Now
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* ACTION BUTTON: If LOGGED IN -> Place Order. If NOT LOGGED IN -> Login to Checkout */}

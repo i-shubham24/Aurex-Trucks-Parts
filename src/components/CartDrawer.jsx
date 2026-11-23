@@ -99,6 +99,10 @@ export default function CartDrawer() {
         </div>
         <div className="border-t border-line px-4 py-3">
           <div className="tabular flex justify-between text-[15px] font-extrabold"><span>Subtotal</span><span>{formatAUD(total)}</span></div>
+          <div className="my-1.5 flex items-center justify-between text-[11px] text-amber-900 bg-amber-50 border border-amber-200/80 rounded px-2.5 py-1">
+            <span>⚡ Limited: 10% off with <strong className="font-mono font-bold">AUREX10</strong></span>
+            <span className="font-bold text-amber-700">At checkout</span>
+          </div>
           <p className="mt-0.5 text-[11px] text-faint">Freight calculated at checkout.</p>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <button onClick={close} className="rounded border border-ink py-2.5 text-sm font-bold transition-colors hover:bg-mist">Continue shopping</button>

@@ -16,7 +16,7 @@ export const tradeDiscountFor = (user) =>
     ? Number(user.tradeDiscountPercent) || 0
     : 0;
 
-export function calculateOrderTotals({ lines = [], shippingMethod = "", tradeDiscountPercent = 0, settings = {} }) {
+export function calculateOrderTotals({ lines = [], shippingMethod = "", tradeDiscountPercent = 0, settings = {}, coupon = null }) {
   let subtotal = 0;
   let totalCoreDeposit = 0;
   for (const l of lines) {
@@ -26,7 +26,28 @@ export function calculateOrderTotals({ lines = [], shippingMethod = "", tradeDis
   }
 
   const tradeDiscountAmount = tradeDiscountPercent > 0 ? round2(subtotal * (tradeDiscountPercent / 100)) : 0;
-  const totalDiscount = round2(tradeDiscountAmount);
+
+  let couponDiscountAmount = 0;
+  if (coupon) {
+    const eligibleAmount = Math.max(0, subtotal - tradeDiscountAmount);
+    const minOrder = Number(coupon.minimumOrderValue || coupon.minOrder) || 0;
+    if (eligibleAmount >= minOrder) {
+      const type = String(coupon.discountType || coupon.type || "PERCENTAGE").toUpperCase();
+      if (type === "PERCENTAGE") {
+        const val = Number(coupon.discountValue ?? coupon.pct ?? coupon.value) || 10;
+        couponDiscountAmount = round2(eligibleAmount * (val / 100));
+        if (coupon.maximumDiscount && couponDiscountAmount > coupon.maximumDiscount) {
+          couponDiscountAmount = Number(coupon.maximumDiscount);
+        }
+      } else {
+        const val = Number(coupon.discountValue ?? coupon.value) || 0;
+        couponDiscountAmount = Math.min(eligibleAmount, val);
+      }
+      couponDiscountAmount = round2(couponDiscountAmount);
+    }
+  }
+
+  const totalDiscount = round2(tradeDiscountAmount + couponDiscountAmount);
   const discountedSubtotal = Math.max(0, subtotal - totalDiscount);
 
   const standardFee = Number(settings.standardFee) || 18;
@@ -41,6 +62,7 @@ export function calculateOrderTotals({ lines = [], shippingMethod = "", tradeDis
   return {
     subtotal: round2(subtotal),
     tradeDiscountAmount,
+    couponDiscountAmount,
     totalDiscount,
     discountedSubtotal: round2(discountedSubtotal),
     totalCoreDeposit: round2(totalCoreDeposit),
