@@ -335,11 +335,6 @@ export default function Checkout() {
   const place = async (e) => {
     e.preventDefault();
 
-    if (!user) {
-      openAuthModal?.("login");
-      return;
-    }
-
     const phone = normalisePhone(form.phone);
     const errs = {};
     if (!form.name.trim()) errs.name = 1;
@@ -369,16 +364,16 @@ export default function Checkout() {
     if (placing) return;
     setPlacing(true);
 
-    // Save whatever address user writes here to their profile!
-    try {
-      if (updateProfile) {
+    // Save address to profile if logged in
+    if (user && updateProfile) {
+      try {
         await updateProfile({
           address: { ...details },
           shippingAddress: { ...details },
         });
+      } catch (saveErr) {
+        console.warn("Could not save address to profile:", saveErr);
       }
-    } catch (saveErr) {
-      console.warn("Could not save address to profile:", saveErr);
     }
 
     const order = await placeOrder({
@@ -391,12 +386,23 @@ export default function Checkout() {
       payment: payId,
       total: grand,
       address: details,
+      isGuest: !user,
+      guestEmail: !user ? details.email : undefined
     });
 
     if (!order) {
       setPlacing(false);
       return;
     }
+
+    // Persist in guest orders so user can always track it when returning
+    try {
+      const guestOrders = JSON.parse(localStorage.getItem("aurex_guest_orders") || "[]");
+      const orderId = order.orderNumber || order.ref || order.id;
+      const updated = [order, ...guestOrders.filter((o) => (o.orderNumber || o.ref || o.id) !== orderId)];
+      localStorage.setItem("aurex_guest_orders", JSON.stringify(updated));
+      localStorage.setItem("aurex_last_guest_email", details.email);
+    } catch {}
 
     if (API_ON && payId === "Card") {
       try {
@@ -517,16 +523,33 @@ export default function Checkout() {
           {/* CONTACT + DELIVERY ADDRESS (WHEN LOGGED IN) */}
           {user && (
             <section className="rounded-md border border-line bg-white p-5">
-                <div className="flex items-center justify-between border-b border-line pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-line pb-3 gap-2">
                   <div>
-                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-faint">
-                      Contact + Delivery Address
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-faint">
+                        Contact + Delivery Address
+                      </p>
+                      {!user && (
+                        <span className="rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-extrabold px-2 py-0.5 uppercase tracking-wide">
+                          Guest Checkout — No Login Required
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-steel">
-                      Delivery details will be saved to your profile for future orders
+                      {user
+                        ? "Delivery details will be saved to your profile for future orders"
+                        : "One-time guest order. Tracking receipt and tax invoice will be sent to your email."}
                     </p>
                   </div>
-                  {savedAddress && (
+                  {!user ? (
+                    <button
+                      type="button"
+                      onClick={() => openAuthModal?.("login")}
+                      className="inline-flex items-center gap-1 text-xs font-bold text-navy hover:underline cursor-pointer self-start sm:self-auto"
+                    >
+                      <Lock size={12} /> Already have an account? Log in
+                    </button>
+                  ) : savedAddress && (
                     <button
                       type="button"
                       onClick={() => setIsEditingAddress((prev) => !prev)}
@@ -796,9 +819,8 @@ export default function Checkout() {
             )}
           </div>
 
-          {/* ACTION BUTTON: If LOGGED IN -> Place Order. If NOT LOGGED IN -> Login to Checkout */}
-          {user ? (
-            <div className="space-y-2">
+          {/* ACTION BUTTON */}
+          <div className="space-y-2">
               <button
                 type="submit"
                 disabled={placing}
@@ -823,13 +845,21 @@ export default function Checkout() {
                       <CheckCircle2 size={16} />
                     )}
                     <span>
-                      {payId === "Card"
-                        ? "Place Order & Pay with Card"
-                        : payId === "Pay on pickup"
-                        ? "Confirm Click & Collect Order"
-                        : payId === "30 day fleet terms"
-                        ? "Place on Trade Account"
-                        : "Place Order (Bank Transfer)"}
+                      {user ? (
+                        payId === "Card"
+                          ? "Place Order & Pay with Card"
+                          : payId === "Pay on pickup"
+                          ? "Confirm Click & Collect Order"
+                          : payId === "30 day fleet terms"
+                          ? "Place on Trade Account"
+                          : "Place Order (Bank Transfer)"
+                      ) : (
+                        payId === "Card"
+                          ? "Guest Checkout — Pay with Card"
+                          : payId === "Pay on pickup"
+                          ? "Confirm Click & Collect Order (Guest)"
+                          : "Place Order as Guest (Bank Transfer)"
+                      )}
                     </span>
                   </>
                 )}
@@ -847,28 +877,20 @@ export default function Checkout() {
                   <span>Direct EFT tax invoice details provided upon confirmation</span>
                 )}
               </div>
+
+              {!user && (
+                <div className="pt-2 text-center text-xs text-steel border-t border-line/60 mt-2">
+                  <span>Want to save this address? </span>
+                  <button
+                    type="button"
+                    onClick={() => openAuthModal?.("login")}
+                    className="font-bold text-navy underline hover:text-ink cursor-pointer bg-transparent border-none p-0"
+                  >
+                    Log in or Create Account
+                  </button>
+                </div>
+              )}
             </div>
-          ) : (
-            <div>
-              <button
-                type="button"
-                onClick={() => openAuthModal?.("login")}
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded bg-gold py-3 text-sm font-bold text-ink transition-colors hover:bg-navy hover:text-white cursor-pointer"
-              >
-                <Lock size={16} /> Login to Checkout
-              </button>
-              <p className="mt-2 text-center text-xs text-steel">
-                New trade customer?{" "}
-                <button
-                  type="button"
-                  onClick={() => openAuthModal?.("signup")}
-                  className="font-bold text-navy underline hover:text-ink cursor-pointer bg-transparent border-none p-0"
-                >
-                  Create Account
-                </button>
-              </p>
-            </div>
-          )}
 
           <p className="mt-2 text-center text-[11px] text-faint">
             Fitment double-checked before dispatch.

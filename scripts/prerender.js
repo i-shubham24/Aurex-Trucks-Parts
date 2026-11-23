@@ -85,6 +85,12 @@ function pageHtml(template, pathname, { product = null, items = null, body, cano
 }
 
 function withSnapshot(html, body) {
+  if (html.includes('<div id="root"><div id="seo-snapshot">')) {
+    return html.replace(/<div id="root"><div id="seo-snapshot">[\s\S]*?<\/div><\/div>/, `<div id="root"><div id="seo-snapshot">${body}</div></div>`);
+  }
+  if (/<div id="root">[\s\S]*?<\/div>/.test(html)) {
+    return html.replace(/<div id="root">[\s\S]*?<\/div>/, `<div id="root"><div id="seo-snapshot">${body}</div></div>`);
+  }
   if (!html.includes('<div id="root"></div>')) throw new Error('index.html has no empty <div id="root">');
   return html.replace('<div id="root"></div>', `<div id="root"><div id="seo-snapshot">${body}</div></div>`);
 }
@@ -180,7 +186,10 @@ async function write(outDir, pathname, html) {
  * this fails, so a deployment without them is never published. Run before prerender(), on the untouched shell.
  */
 export async function writeShellPages(outDir) {
-  const template = await readFile(path.join(outDir, "index.html"), "utf8");
+  let template = await readFile(path.join(outDir, "index.html"), "utf8");
+  if (/<div id="root">[\s\S]*?<\/div>/.test(template)) {
+    template = template.replace(/<div id="root">[\s\S]*?<\/div>/, '<div id="root"></div>');
+  }
   await writeFile(path.join(outDir, "app.html"), template);
   const body = frame([], `<h1>Page not found</h1><p>This page doesn't exist or has moved.</p><p><a href="/shop">Shop all parts</a> · <a href="/contact">Contact the counter</a></p>`);
   // An unknown path gets the same title and noindex the app gives it, and no canonical.

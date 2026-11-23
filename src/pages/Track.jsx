@@ -48,7 +48,7 @@ function Timeline({ order }) {
 
 export default function Track() {
   const [params] = useSearchParams();
-  const paramId = params.get("id") || "";
+  const paramId = params.get("id") || params.get("order") || params.get("orderNumber") || "";
   const [id, setId] = useState(paramId);
   const [order, setOrder] = useState(() => (paramId ? findOrder(paramId) : null));
   const [miss, setMiss] = useState(false);

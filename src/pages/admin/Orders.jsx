@@ -273,8 +273,15 @@ export default function Orders() {
                         </span>
                       </td>
                       <td className="px-5 py-3.5">
-                        <span className="block font-semibold text-ink">{o.address?.name || "Customer"}</span>
-                        <span className="block font-mono text-[11px] text-steel truncate max-w-[200px]">{o.email || "—"}</span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-semibold text-ink">{o.address?.name || o.shippingAddress?.fullName || "Customer"}</span>
+                          {(o.isGuest || !o.user) && (
+                            <span className="rounded bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-extrabold px-1.5 py-0.5 uppercase tracking-wider">
+                              Guest
+                            </span>
+                          )}
+                        </div>
+                        <span className="block font-mono text-[11px] text-steel truncate max-w-[200px]">{o.email || o.guestEmail || o.shippingAddress?.email || "—"}</span>
                       </td>
                       <td className="px-5 py-3.5 font-mono text-xs text-steel">
                         {new Date(o.placedAt || o.createdAt || Date.now()).toLocaleString("en-AU", { dateStyle: "short", timeStyle: "short" })}
@@ -387,8 +394,15 @@ export default function Orders() {
           {/* Customer & Address Details */}
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 rounded-xl bg-mist p-4 text-xs">
             <div>
-              <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-faint">Delivery Address</p>
-              <p className="mt-1 font-bold text-ink">{selectedOrder.address?.name || "Customer"}</p>
+              <div className="flex items-center gap-1.5 mb-1">
+                <p className="font-mono text-[10px] font-bold uppercase tracking-wider text-faint">Delivery Address</p>
+                {(selectedOrder.isGuest || !selectedOrder.user) && (
+                  <span className="rounded bg-amber-100 text-amber-900 border border-amber-300 text-[9px] font-extrabold px-1.5 py-0.2 uppercase tracking-wider">
+                    Guest Order
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 font-bold text-ink">{selectedOrder.address?.name || selectedOrder.shippingAddress?.fullName || "Customer"}</p>
               <p className="text-steel">{selectedOrder.address?.address || ""}</p>
               <p className="text-steel">
                 {selectedOrder.address?.suburb} {selectedOrder.address?.state} {selectedOrder.address?.postcode}

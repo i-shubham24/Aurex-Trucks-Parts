@@ -135,6 +135,11 @@ export default function OrderSuccess() {
             : "Order confirmed. Allocated for warehouse packing."}
         </p>
         <p className="mt-3 font-mono text-xl font-extrabold text-navy">{id}</p>
+        {(order?.isGuest || !order?.user) && (
+          <p className="mt-2 text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-3 inline-block">
+            ✓ <strong>Guest Order Saved:</strong> Saved to this browser for live tracking anytime without logging in.
+          </p>
+        )}
         <div className="mt-5 flex flex-wrap justify-center gap-2.5">
           <Link to={`/track?id=${id}`} className="rounded-lg bg-gold px-6 py-2.5 text-sm font-extrabold text-ink transition-colors hover:bg-navy hover:text-white">Track this order →</Link>
           <button onClick={() => order ? downloadInvoice(order) : window.print()} className="flex items-center gap-2 rounded-lg border border-line-dark px-6 py-2.5 text-sm font-bold text-steel transition-colors hover:border-navy hover:text-navy"><Printer size={15} /> Print Tax Invoice</button>

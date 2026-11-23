@@ -20,21 +20,42 @@ function readKey(key) {
 
 export function listOrders() {
   const fresh = readKey(NEW_KEY);
-  const legacy = readKey(LEGACY_KEY).filter((o) => !fresh.some((n) => n.id === o.id));
-  return [...fresh, ...legacy];
+  const guest = readKey("aurex_guest_orders");
+  const legacy = readKey(LEGACY_KEY);
+  const map = new Map();
+  [...fresh, ...guest, ...legacy].forEach((o) => {
+    if (!o) return;
+    const key = o.id || o.ref || o.orderNumber;
+    if (key && !map.has(key)) {
+      map.set(key, o);
+    }
+  });
+  return Array.from(map.values());
 }
 
 export function saveOrder(order) {
   const all = readKey(NEW_KEY);
-  all.unshift(order);
-  try { localStorage.setItem(NEW_KEY, JSON.stringify(all)); } catch { /* private mode */ }
+  const key = order.id || order.ref || order.orderNumber;
+  const filtered = all.filter((x) => (x.id || x.ref || x.orderNumber) !== key);
+  filtered.unshift(order);
+  try {
+    localStorage.setItem(NEW_KEY, JSON.stringify(filtered));
+    if (order.isGuest || !order.user) {
+      const guest = readKey("aurex_guest_orders").filter((x) => (x.id || x.ref || x.orderNumber) !== key);
+      guest.unshift(order);
+      localStorage.setItem("aurex_guest_orders", JSON.stringify(guest));
+    }
+  } catch { /* private mode */ }
   return order;
 }
 
 export function findOrder(id) {
   const needle = String(id || "").trim().toUpperCase();
   if (!needle) return null;
-  return listOrders().find((o) => String(o.id || "").toUpperCase() === needle) || null;
+  return listOrders().find((o) => {
+    const key = String(o.id || o.ref || o.orderNumber || "").toUpperCase();
+    return key === needle;
+  }) || null;
 }
 
 export function makeId() {
