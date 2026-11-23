@@ -317,7 +317,7 @@ Notes / VIN: ${form.vinOrNotes.trim() || "None provided"}
                   </div>
                   <div>
                     <span className="text-xs font-bold text-faint uppercase">Lifting Capacity & Material:</span>
-                    <p className="font-extrabold text-ink">{form.liftCapacity} — {form.platformMaterial}</p>
+                    <p className="font-extrabold text-ink">{form.liftCapacity} · {form.platformMaterial}</p>
                   </div>
                   <div>
                     <span className="text-xs font-bold text-faint uppercase">Service Mode:</span>

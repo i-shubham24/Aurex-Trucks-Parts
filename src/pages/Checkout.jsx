@@ -520,27 +520,26 @@ export default function Checkout() {
             </div>
           </section>
 
-          {/* CONTACT + DELIVERY ADDRESS (WHEN LOGGED IN) */}
-          {user && (
-            <section className="rounded-md border border-line bg-white p-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-line pb-3 gap-2">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-faint">
-                        Contact + Delivery Address
-                      </p>
-                      {!user && (
-                        <span className="rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-extrabold px-2 py-0.5 uppercase tracking-wide">
-                          Guest Checkout — No Login Required
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs text-steel">
-                      {user
-                        ? "Delivery details will be saved to your profile for future orders"
-                        : "One-time guest order. Tracking receipt and tax invoice will be sent to your email."}
-                    </p>
-                  </div>
+          {/* CONTACT + DELIVERY ADDRESS */}
+          <section className="rounded-md border border-line bg-white p-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-line pb-3 gap-2">
+              <div>
+                <div className="flex items-center gap-2">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-faint">
+                    Contact + Delivery Address
+                  </p>
+                  {!user && (
+                    <span className="rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-extrabold px-2.5 py-0.5 uppercase tracking-wide">
+                      Guest Checkout: No Login Required
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-steel">
+                  {user
+                    ? "Delivery details will be saved to your profile for future orders"
+                    : "One-time guest order. Tracking receipt and tax invoice will be sent to your email."}
+                </p>
+              </div>
                   {!user ? (
                     <button
                       type="button"
@@ -600,9 +599,15 @@ export default function Checkout() {
                       <p className="text-xs font-semibold text-steel">
                         {savedAddress ? "Update your delivery address below:" : "Enter your delivery address:"}
                       </p>
-                      <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-700">
-                        <CheckCircle2 size={12} /> Automatically saves to your profile
-                      </span>
+                      {user ? (
+                        <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-700">
+                          <CheckCircle2 size={12} /> Automatically saves to your profile
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-[11px] font-medium text-slate-500">
+                          Direct dispatch delivery
+                        </span>
+                      )}
                     </div>
                     <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
                       <input
@@ -697,7 +702,6 @@ export default function Checkout() {
                   </div>
                 )}
               </section>
-          )}
         </div>
 
         {/* ORDER SUMMARY ASIDE */}
@@ -855,7 +859,7 @@ export default function Checkout() {
                           : "Place Order (Bank Transfer)"
                       ) : (
                         payId === "Card"
-                          ? "Guest Checkout — Pay with Card"
+                          ? "Guest Checkout: Pay with Card"
                           : payId === "Pay on pickup"
                           ? "Confirm Click & Collect Order (Guest)"
                           : "Place Order as Guest (Bank Transfer)"

@@ -119,7 +119,7 @@ Thank you!`;
               Commercial Fleet Quotation
             </span>
             <h3 className="truncate text-base font-extrabold text-ink">
-              {product.sku} — {product.name}
+              {product.sku} · {product.name}
             </h3>
           </div>
           <button

@@ -634,7 +634,7 @@ export default function Products() {
                           {p.category?.replace("-", " ") || "Accessories"}
                         </span>
                         <p className="text-[11px] text-faint mt-1 truncate max-w-[150px]">
-                          {p.sub || "—"}
+                          {p.sub || "-"}
                         </p>
                       </td>
 
@@ -671,8 +671,8 @@ export default function Products() {
                               }`}
                             title={
                               p.isVisible !== false && p.publicationStatus !== "DRAFT"
-                                ? "Live on Client Store — Click to hide from client side"
-                                : "Hidden from Store — Click to show on client side"
+                                ? "Live on Client Store: Click to hide from client side"
+                                : "Hidden from Store: Click to show on client side"
                             }
                           >
                             <span
@@ -750,7 +750,7 @@ export default function Products() {
                 {modal === "add" ? "Catalogue Management" : `SKU #${modal}`}
               </p>
               <h2 className="text-xl font-extrabold text-ink">
-                {modal === "add" ? "Add New Truck Part" : `Edit Part Details — ${form.name || modal}`}
+                {modal === "add" ? "Add New Truck Part" : `Edit Part Details: ${form.name || modal}`}
               </h2>
             </div>
             {modal !== "add" && (

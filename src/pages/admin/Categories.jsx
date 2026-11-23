@@ -277,7 +277,7 @@ export default function Categories() {
                           <span>{c.tag}</span>
                         </span>
                       ) : (
-                        <span className="text-faint text-xs">—</span>
+                        <span className="text-faint text-xs">-</span>
                       )}
                     </td>
 

@@ -109,9 +109,9 @@ export default function Customers() {
                     )}
                   </td>
                   <td className={td}>{u.email}</td>
-                  <td className={td}>{u.company || "—"}</td>
+                  <td className={td}>{u.company || "-"}</td>
                   <td className={td}>
-                    {u.createdAt ? new Date(u.createdAt).toLocaleDateString("en-AU") : "—"}
+                    {u.createdAt ? new Date(u.createdAt).toLocaleDateString("en-AU") : "-"}
                   </td>
                   <td className={td}>
                     {u.role !== "admin" && (

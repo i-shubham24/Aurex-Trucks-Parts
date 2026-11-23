@@ -160,11 +160,11 @@ export default function RatingPromptModal() {
   };
 
   const ratingDescriptions = {
-    1: '1 Star — Poor fit or quality',
-    2: '2 Stars — Fair, had minor issues',
-    3: '3 Stars — Average commercial grade',
-    4: '4 Stars — Good quality & fitment',
-    5: '5 Stars — Excellent commercial performance',
+    1: '1 Star: Poor fit or quality',
+    2: '2 Stars: Fair, had minor issues',
+    3: '3 Stars: Average commercial grade',
+    4: '4 Stars: Good quality & fitment',
+    5: '5 Stars: Excellent commercial performance',
   };
 
   const activeStarCount = hoverRating || rating;

@@ -526,16 +526,16 @@ export default function Enquiries() {
                     <div>
                       <span className="text-[10px] font-bold text-faint uppercase block">Account Holder:</span>
                       <span className="font-semibold text-ink">
-                        {[selectedEnquiry.user.firstName, selectedEnquiry.user.lastName].filter(Boolean).join(" ") || "—"}
+                        {[selectedEnquiry.user.firstName, selectedEnquiry.user.lastName].filter(Boolean).join(" ") || "-"}
                       </span>
                     </div>
                     <div>
                       <span className="text-[10px] font-bold text-faint uppercase block">Account Email:</span>
-                      <span className="font-mono text-ink">{selectedEnquiry.user.email || "—"}</span>
+                      <span className="font-mono text-ink">{selectedEnquiry.user.email || "-"}</span>
                     </div>
                     <div>
                       <span className="text-[10px] font-bold text-faint uppercase block">Account Phone:</span>
-                      <span className="font-mono text-ink">{selectedEnquiry.user.phone || selectedEnquiry.phone || "—"}</span>
+                      <span className="font-mono text-ink">{selectedEnquiry.user.phone || selectedEnquiry.phone || "-"}</span>
                     </div>
                   </div>
                 )}

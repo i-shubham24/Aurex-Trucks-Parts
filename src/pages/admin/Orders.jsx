@@ -281,7 +281,7 @@ export default function Orders() {
                             </span>
                           )}
                         </div>
-                        <span className="block font-mono text-[11px] text-steel truncate max-w-[200px]">{o.email || o.guestEmail || o.shippingAddress?.email || "—"}</span>
+                        <span className="block font-mono text-[11px] text-steel truncate max-w-[200px]">{o.email || o.guestEmail || o.shippingAddress?.email || "-"}</span>
                       </td>
                       <td className="px-5 py-3.5 font-mono text-xs text-steel">
                         {new Date(o.placedAt || o.createdAt || Date.now()).toLocaleString("en-AU", { dateStyle: "short", timeStyle: "short" })}

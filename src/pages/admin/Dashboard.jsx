@@ -234,7 +234,7 @@ export default function Dashboard() {
                           </td>
                           <td className="px-5 py-3.5">
                             <span className="block font-semibold text-ink">{order.address?.name || "Customer"}</span>
-                            <span className="block font-mono text-[11px] text-steel truncate max-w-[200px]">{order.email || "—"}</span>
+                            <span className="block font-mono text-[11px] text-steel truncate max-w-[200px]">{order.email || "-"}</span>
                           </td>
                           <td className="px-5 py-3.5 font-mono text-xs text-steel">
                             {new Date(order.placedAt).toLocaleString("en-AU", { dateStyle: "short", timeStyle: "short" })}

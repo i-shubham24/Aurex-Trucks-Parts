@@ -27,11 +27,11 @@ export const HOME_CONTENT = {
     },
     {
       title: "Cargo Restraint, Body Panels & Australian Transport Signage",
-      content: "Keep your trailers secure and compliant with Australia's Heavy Vehicle National Law (HVNL). Our cargo restraint selection includes F-track and E-track logistics systems, shoring bars, spring-loaded cargo fittings, and commercial tie-down tracks. We also manufacture precision composite body panels, including lightweight FRP polypropylene honeycomb panels, heavy-duty plywood core panels, and XPS thermal insulated panels for refrigerated transport bodies. All safety signage—including 3M Class 1 reflective rear marking plates, Cat 34A, Cat 41A/B zebra plates, and 'Do Not Overtake Turning Vehicle' plates—complies strictly with NHVR VSB 12 regulations.",
+      content: "Keep your trailers secure and compliant with Australia's Heavy Vehicle National Law (HVNL). Our cargo restraint selection includes F-track and E-track logistics systems, shoring bars, spring-loaded cargo fittings, and commercial tie-down tracks. We also manufacture precision composite body panels, including lightweight FRP polypropylene honeycomb panels, heavy-duty plywood core panels, and XPS thermal insulated panels for refrigerated transport bodies. All safety signage (including 3M Class 1 reflective rear marking plates, Cat 34A, Cat 41A/B zebra plates, and 'Do Not Overtake Turning Vehicle' plates) complies strictly with NHVR VSB 12 regulations.",
     },
     {
       title: "Fast Nationwide Delivery & Melbourne Trade Counter Click & Collect",
-      content: "We understand that every hour a truck is off the road costs your business money. All stocked lines ordered by 2:00 PM AEST dispatch same-day from our Melbourne warehouse. Metro Melbourne and Victoria regional orders receive overnight express courier delivery. Interstate freight reaches Sydney, Brisbane, and Adelaide within 1 to 2 business days, and Perth or regional hubs within 2 to 5 business days. Free freight is automatically applied on eligible orders over $200. Alternatively, choose our 4-hour Click & Collect service to pick up your trailer parts & accessories directly from our Campbellfield trade counter.",
+      content: "We understand that every hour a truck is off the road costs your business money. All stocked lines ordered by 2:00 PM AEST dispatch same-day from our Melbourne warehouse. Metro Melbourne and Victoria regional orders receive overnight express courier delivery. Interstate freight reaches Sydney, Brisbane, and Adelaide within 1 to 2 business days, and Perth or regional hubs within 2 to 5 business days. Flat $18 standard road freight is available nationwide. Alternatively, choose our 4-hour Click & Collect service to pick up your trailer parts & accessories directly from our Campbellfield trade counter.",
     },
   ],
   // [label, path, part number whose photo the homepage tile shows]; links without a photo render as buttons.
@@ -80,7 +80,7 @@ export const CATEGORY_CONTENT = {
       "Most lines are stocked at our Campbellfield trade counter. Matching a replacement is easiest with measurements of the old part and a photo, so send both if you're unsure.",
     ],
     faqs: [
-      { q: "Do you offer trade pricing?", a: "Yes. ABN workshops save 5 percent with priority quotes, and fleets with 5 or more vehicles save 10 percent with 30-day terms. Volume breaks apply over 5 units." },
+      { q: "Do you offer trade pricing?", a: "Yes. ABN workshops and fleet accounts save up to 5 to 10% with priority quotes and 30 day terms. Volume breaks apply over 5 units." },
       { q: "Can I collect from Campbellfield?", a: "Yes. Click and Collect from our Campbellfield trade counter is free, with a 4-hour turnaround." },
     ],
     guides: ["truck-trailer-door-hardware", "rear-marking-plates-vsb12"],

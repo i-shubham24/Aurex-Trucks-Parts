@@ -187,7 +187,7 @@ export default function Reviews() {
         <Stat label="Total Reviews" value={stats.total} sub="Customer & fleet ratings" />
         <Stat
           label="Average Rating"
-          value={stats.avgRating > 0 ? `${stats.avgRating} ★` : "—"}
+          value={stats.avgRating > 0 ? `${stats.avgRating} ★` : "-"}
           sub="Across catalogue"
         />
         <Stat label="Verified Orders" value={stats.verified} sub="Delivered purchase ratings" />
@@ -514,7 +514,7 @@ export default function Reviews() {
                 </p>
                 {deleteTarget.product && (
                   <p className="mt-1 text-xs text-faint">
-                    Part: <span className="font-mono">{deleteTarget.product.sku}</span> — {deleteTarget.product.name}
+                    Part: <span className="font-mono">{deleteTarget.product.sku}</span> · {deleteTarget.product.name}
                   </p>
                 )}
                 <p className="mt-2 rounded bg-rose-50 p-2.5 text-[11px] text-rose-800">
