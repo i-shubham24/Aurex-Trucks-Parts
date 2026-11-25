@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, Copy, Flame, ShieldCheck, Sparkles, Tag, Truck, X } from "lucide-react";
+import { ArrowRight, Check, Copy, ShieldCheck, Sparkles, Truck, X, Zap } from "lucide-react";
 import useLockBody from "../utils/useLockBody";
 
 const SESSION_KEY = "aurex_promo_popup_session_seen";
@@ -11,6 +11,15 @@ export default function PromoPopup() {
   const [copied, setCopied] = useState(false);
   useLockBody(show);
 
+  const close = useCallback(() => {
+    setShow(false);
+    try {
+      sessionStorage.setItem(SESSION_KEY, "1");
+    } catch {
+      /* private mode */
+    }
+  }, []);
+
   useEffect(() => {
     // Only show if not dismissed in the current browser session
     try {
@@ -19,7 +28,7 @@ export default function PromoPopup() {
       /* private mode */
     }
 
-    // Trigger randomly between 4 and 7 seconds after page loads
+    // Trigger between 4 and 7 seconds after page loads
     const randomDelay = Math.floor(Math.random() * 3000) + 4000;
     const timer = setTimeout(() => {
       setShow(true);
@@ -28,156 +37,156 @@ export default function PromoPopup() {
     return () => clearTimeout(timer);
   }, []);
 
-  const close = () => {
-    setShow(false);
+  useEffect(() => {
+    if (!show) return;
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") close();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [show, close]);
+
+  const applyCoupon = () => {
     try {
+      navigator.clipboard?.writeText(COUPON_CODE);
+      localStorage.setItem("aurex_applied_coupon", COUPON_CODE);
       sessionStorage.setItem(SESSION_KEY, "1");
     } catch {
-      /* private mode */
+      /* fallback */
     }
   };
 
   const handleCopyAndApply = () => {
-    try {
-      navigator.clipboard.writeText(COUPON_CODE);
-      localStorage.setItem("aurex_applied_coupon", COUPON_CODE);
-    } catch {
-      /* fallback */
-    }
+    applyCoupon();
     setCopied(true);
-    try {
-      sessionStorage.setItem(SESSION_KEY, "1");
-    } catch {
-      /* private mode */
-    }
     setTimeout(() => {
       setShow(false);
-    }, 1800);
+    }, 1500);
   };
 
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="promo-popup-title"
+    >
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-navy-dark/70 backdrop-blur-[3px] transition-opacity"
         onClick={close}
       />
 
-      {/* Modal Dialog Card */}
-      <div className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
-        {/* Top Industrial Hazard / Accent Bar */}
-        <div className="h-2 w-full bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600" />
+      {/* Modal Card */}
+      <div className="popup-in relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-[0_24px_60px_rgba(0,22,51,0.35)] ring-1 ring-black/5">
+        {/* Deep Navy Header */}
+        <div className="relative overflow-hidden bg-navy px-6 pt-7 pb-6 text-white sm:px-7">
+          {/* Subtle decorative radial highlight */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-gold/15 blur-2xl"
+          />
 
-        {/* Close Button */}
-        <button
-          onClick={close}
-          aria-label="Close promotion dialog"
-          className="absolute right-3.5 top-5 z-20 grid h-8 w-8 place-items-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-900 transition cursor-pointer"
-        >
-          <X size={18} />
-        </button>
+          <button
+            type="button"
+            onClick={close}
+            aria-label="Close promotion dialog"
+            className="absolute right-3.5 top-3.5 z-20 grid h-8 w-8 place-items-center rounded-full bg-white/10 text-white/75 transition hover:bg-white/20 hover:text-white cursor-pointer"
+          >
+            <X size={16} />
+          </button>
 
-        <div className="p-6 sm:p-8">
-          {/* Header Pill */}
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 px-3 py-1 text-[11px] font-black uppercase tracking-widest text-amber-900 border border-amber-500/30">
-              <Sparkles size={13} className="text-amber-600" /> Limited Time Fleet Offer
-            </span>
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-red-600">
-              <Flame size={13} /> Active Now
-            </span>
-          </div>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-gold ring-1 ring-gold/30">
+            Limited Fleet Offer
+          </span>
 
-          {/* Main Headline */}
-          <div className="mt-3.5">
-            <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-950 leading-tight">
-              Take <span className="text-amber-600">10% Off</span> Storewide
-            </h3>
-            <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-slate-600">
-              Claim an instant discount on commercial trailer parts, door cam gear, container locks, tailgate hinges, and EPDM body rubber.
-            </p>
-          </div>
+          <h3
+            id="promo-popup-title"
+            className="mt-3.5 text-2xl font-extrabold tracking-tight text-white sm:text-[28px] sm:leading-tight"
+          >
+            Take <span className="text-gold">10% Off</span> Storewide
+          </h3>
+          <p className="mt-1.5 text-xs leading-relaxed text-slate-300 sm:text-[13px]">
+            Save instantly on commercial trailer parts, cam locks, tailgate hinges, and fleet hardware.
+          </p>
+        </div>
 
-          {/* Premium Ticket Voucher Box */}
-          <div className="relative mt-5 overflow-hidden rounded-xl border-2 border-dashed border-amber-400 bg-amber-50/70 p-4 sm:p-5">
-            <div className="flex items-center justify-between text-[11px] font-extrabold uppercase tracking-wider text-amber-950">
-              <span className="flex items-center gap-1.5">
-                <Tag size={13} className="text-amber-600" /> Promo Coupon Code
-              </span>
-              <span className="text-emerald-700 font-bold">10% Instant Saving</span>
-            </div>
+        {/* Gold Accent Divider */}
+        <div className="h-1 w-full bg-gradient-to-r from-gold via-amber-300 to-gold-dark" />
 
-            <div className="mt-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="font-mono text-2xl sm:text-3xl font-black tracking-widest text-slate-900 select-all">
-                {COUPON_CODE}
+        {/* Body */}
+        <div className="p-6 sm:p-7">
+          {/* Clean Coupon Strip */}
+          <div className="rounded-xl border border-dashed border-slate-300 bg-mist p-3.5 sm:p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-faint">
+                  Promo Code
+                </p>
+                <p className="mt-0.5 font-mono text-2xl font-black tracking-[0.14em] text-navy select-all">
+                  {COUPON_CODE}
+                </p>
               </div>
 
               <button
                 type="button"
                 onClick={handleCopyAndApply}
-                className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-xs font-black uppercase tracking-wider transition shadow-sm cursor-pointer ${
-                  copied
-                    ? "bg-emerald-600 text-white"
-                    : "bg-slate-950 text-white hover:bg-amber-500 hover:text-slate-950"
-                }`}
+                className={`inline-flex shrink-0 items-center gap-1.5 rounded-lg px-4 py-2.5 text-xs font-extrabold tracking-wide transition shadow-sm cursor-pointer ${copied
+                  ? "bg-emerald-600 text-white"
+                  : "bg-navy text-white hover:bg-navy-dark"
+                  }`}
               >
                 {copied ? (
                   <>
-                    <Check size={15} /> Applied!
+                    <Check size={14} strokeWidth={2.5} /> Applied
                   </>
                 ) : (
                   <>
-                    <Copy size={15} /> Copy & Apply
+                    <Copy size={14} /> Copy &amp; Apply
                   </>
                 )}
               </button>
             </div>
-
-            <p className="mt-2 text-[11px] font-semibold text-slate-500">
-              * Automatically applies to your cart and checkout total.
+            <p className="mt-2 text-[11px] text-faint">
+              Automatically applies 10% off at checkout.
             </p>
           </div>
 
-          {/* Trust Highlights Grid */}
-          <div className="mt-5 grid grid-cols-3 gap-2 border-t border-slate-100 pt-4 text-center">
-            <div className="rounded-lg bg-slate-50 p-2">
-              <Truck size={16} className="mx-auto text-amber-600" />
-              <div className="mt-1 text-[11px] font-extrabold text-slate-800">$18 Flat Freight</div>
-              <div className="text-[10px] text-slate-500">Australia-wide</div>
-            </div>
-            <div className="rounded-lg bg-slate-50 p-2">
-              <Sparkles size={16} className="mx-auto text-amber-600" />
-              <div className="mt-1 text-[11px] font-extrabold text-slate-800">Same-Day Dispatch</div>
-              <div className="text-[10px] text-slate-500">Order by 2pm AEST</div>
-            </div>
-            <div className="rounded-lg bg-slate-50 p-2">
-              <ShieldCheck size={16} className="mx-auto text-emerald-600" />
-              <div className="mt-1 text-[11px] font-extrabold text-slate-800">Commercial Grade</div>
-              <div className="text-[10px] text-slate-500">Heavy transport parts</div>
-            </div>
+          {/* Minimal Trust Strip */}
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-y border-line py-2.5 text-[11px] font-semibold text-steel">
+            <span className="inline-flex items-center gap-1.5">
+              <Truck size={13} className="text-navy" /> $18 Flat Freight
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Zap size={13} className="text-gold-dark" /> Same-Day Dispatch
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <ShieldCheck size={13} className="text-emerald-600" /> Commercial Grade
+            </span>
           </div>
 
-          {/* Action CTAs */}
-          <div className="mt-5 space-y-2.5">
+          {/* Actions */}
+          <div className="mt-5 space-y-2">
             <Link
               to="/shop"
               onClick={() => {
-                handleCopyAndApply();
+                applyCoupon();
                 close();
               }}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 py-3.5 text-sm font-extrabold text-slate-950 transition hover:bg-amber-400 shadow-md text-center cursor-pointer"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gold py-3.5 text-sm font-extrabold text-ink shadow-sm transition hover:bg-gold-dark cursor-pointer"
             >
-              Shop All Products with 10% Off →
+              <span>Shop Now with 10% Off</span>
+              <ArrowRight size={16} />
             </Link>
 
             <button
               type="button"
               onClick={close}
-              className="w-full text-center text-xs font-semibold text-slate-400 hover:text-slate-700 py-1 transition cursor-pointer"
+              className="w-full py-1.5 text-center text-xs font-medium text-faint transition hover:text-ink cursor-pointer"
             >
-              No thanks, continue browsing at standard price
+              No thanks, maybe later
             </button>
           </div>
         </div>
